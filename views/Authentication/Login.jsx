@@ -2,23 +2,37 @@ import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useEffect, useState } from "react"
 import { Image, ScrollView } from "react-native"
 import { Button, Card, Text, TextInput, Checkbox, ActivityIndicator, useTheme } from "react-native-paper"
-import * as SecureStore from 'expo-secure-store';
-import jwtDecode from "jwt-decode";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import * as SecureStore from 'expo-secure-store'
+import jwtDecode from "jwt-decode"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
+import Constants from "expo-constants"
+import LoadingDialog from "../Shared/Dialog";
+import ErrorDialog from "../Shared/Dialog";
 
 export default Login = ({navigation}) => {
     const insets = useSafeAreaInsets()
     const theme = useTheme()
+    const localhost = Constants.expoConfig.extra.API_LOCAL
 
     const [credential, setCredential] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
     const [rememberUser, setRememberUser] = useState(false)
-    const [activeSession, setActiveSession] = useState(undefined);
+    const [activeSession, setActiveSession] = useState(undefined)
+    const [loadingDialogState, setLoadingDialogState] = useState(false)
+    const [errorDialogState, setErrorDialogState] = useState(false)
+    const [errorMessage, setErrorMessage] = useState(['', ''])
+
+    const changeStateLoadingDialog = _ => setLoadingDialogState(!loadingDialogState)
+    const changeStateErrorDialog = _ => setErrorDialogState(!errorDialogState)
 
     async function getSession() {
+        changeStateLoadingDialog()
+
+        let payload = ""
+
         const session = await fetch(
-            `https://966b-2806-261-498-9a0d-8d55-c415-f13c-a61a.ngrok.io/auth/login`,
+            `${localhost}/auth/login`,
             {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
@@ -29,21 +43,65 @@ export default Login = ({navigation}) => {
                 })
             }
         ).then(
-            respuesta => respuesta.ok ? respuesta.json() : null
+            respuesta => respuesta.ok ? respuesta.json() : respuesta.status
+        ).catch(
+            _ => null
+        )
+
+        if(session && isNaN(session)) {
+            payload = jwtDecode(session.token)
+        } else {
+            setLoadingDialogState(false)
+            changeStateErrorDialog()
+            switch (session) {
+                case 400:
+                    setErrorMessage(['Ocurrió un problema', 'No pudimos iniciar sesión, revisa tu usuario y contraseña y vuelve a intentar'])
+                    break;
+            
+                default:
+                    setErrorMessage(['Ocurrió un problema', 'No pudimos iniciar sesión, revisa tu conexión a internet y vuelve a intentar'])
+                    break;
+            }
+            return
+        }
+
+        const profile = await fetch(
+            `${localhost}/profile/${payload.register}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${session.token}`
+                }
+            }
+        ).then(
+            response => response.ok ? response.json() : response.status
         ).catch(
             error => null
         )
 
-        if(session) {
-            if(rememberUser) {
-                await SecureStore.setItemAsync("token", session.token)
+        if(session && profile && isNaN(profile)) {
+            console.log(session.token, profile.user);
+            
+            await SecureStore.setItemAsync("token", session.token)
+            await SecureStore.setItemAsync("user", JSON.stringify(profile.user))
+
+            setLoadingDialogState(false)
+
+            navigation.replace("Dashboard")
+        } else {
+            setLoadingDialogState(false)
+            changeStateErrorDialog()
+            switch (session) {
+                case 400:
+                    setErrorMessage(['Ocurrió un problema', 'No pudimos iniciar sesión, revisa tu usuario y contraseña y vuelve a intentar'])
+                    break;
+            
+                default:
+                    setErrorMessage(['Ocurrió un problema', 'No pudimos iniciar sesión, revisa tu conexión a internet y vuelve a intentar'])
+                    break;
             }
-
-            await SecureStore.setItemAsync("user", JSON.stringify(session.user))
-
-            navigation.replace("Dashboard", {
-                user: session.user
-            })
+            return
         }
     }
 
@@ -118,6 +176,11 @@ export default Login = ({navigation}) => {
                     </ScrollView>
                 )
             }
+
+            <LoadingDialog permanente={false} cargando={true} handler={[loadingDialogState, changeStateLoadingDialog]}/>
+
+            <ErrorDialog titulo={errorMessage[0]} descripcion={errorMessage[1]} /*icono="alert"*/ handler={[errorDialogState, changeStateErrorDialog]} botonUno={['Aceptar']}/>
+            
         </Flex>
     )
 }

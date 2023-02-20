@@ -33,7 +33,7 @@ const VentanaDeDialogo = (props) => {
 
     return (
         <Portal>
-            <Dialog style={{maxHeight: "70%", zIndex: 10}} visible={(handler[0] ? handler[0] : false)} onDismiss={(handler[1] ? handler[1] : null)} dismissable={(permanente ? false : true)} >
+            <Dialog style={{zIndex: 10}} visible={(handler[0] ? handler[0] : false)} onDismiss={(handler[1] ? handler[1] : null)} dismissable={(permanente ? false : true)} >
                 {
                     icono ? (
                         <Dialog.Icon icon={icono} />

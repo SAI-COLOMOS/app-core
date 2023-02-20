@@ -8,6 +8,7 @@ import ResetPassword from "./Authentication/ResetPassword";
 
 // Dashboard
 import Dashboard from "./Dashboard/Dashboard";
+import Profile from "./Profile/Profile";
 import AddUser from "./Users/AddUser";
 
 // Users
@@ -17,7 +18,7 @@ export default Navigation = () => {
     const Stack = createNativeStackNavigator()   
 
     return (
-        <Stack.Navigator>
+        <Stack.Navigator initialRouteName="Login">
             <Stack.Group navigationKey="authentication" screenOptions={{headerShown: false, animationTypeForReplace: "pop"}}>
                 <Stack.Screen name="Login" component={Login} options={{animation: "fade_from_bottom"}}/>
                 <Stack.Screen name="ResetPassword" component={ResetPassword} options={{animation: "fade_from_bottom"}}/>
@@ -30,6 +31,10 @@ export default Navigation = () => {
             <Stack.Group navigationKey="UsersAdmon" screenOptions={{headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom"}}>
                 <Stack.Screen name="Users" component={Users}/>
                 <Stack.Screen name="AddUser" component={AddUser} options={{headerShown: false, presentation: "transparentModal"}}/>
+            </Stack.Group>
+
+            <Stack.Group navigationKey="Profile" screenOptions={{headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom"}}>
+                <Stack.Screen name="Profile" component={Profile}/>
             </Stack.Group>
         </Stack.Navigator>
     )

@@ -1,14 +1,16 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useEffect, useState } from "react"
-import { Card, IconButton, Text, TextInput, useTheme, Avatar, FAB } from "react-native-paper"
+import { Card, IconButton, Text, TextInput, useTheme, Avatar, FAB, Button } from "react-native-paper"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useHeaderHeight } from "@react-navigation/elements";
 import Header from "../Shared/Header";
+import Constants from "expo-constants"
 import { RefreshControl, ScrollView } from "react-native";
 
 export default Users = ({navigation, route}) => {
     const headerMargin = useHeaderHeight()
     const {user, token} = route.params
+    const localhost = Constants.expoConfig.extra.API_LOCAL
 
     const [loading, setLoading] = useState(false)
     const [users, setUsers] = useState(undefined)
@@ -17,7 +19,7 @@ export default Users = ({navigation, route}) => {
         setLoading(true)
 
         const request = await fetch(
-            'https://966b-2806-261-498-9a0d-8d55-c415-f13c-a61a.ngrok.io/users',
+            `${localhost}/users`,
             {
                 method: "POST",
                 headers: {
@@ -73,11 +75,32 @@ export default Users = ({navigation, route}) => {
                 <VStack p={10} spacing={10}>
                     {
                         users !== undefined ? (
-                            users.map(user => (
-                                <Item key={user.register} user={user}/>
-                            ))
+                            users?.length > 0 ? (
+                                users.map(user => (
+                                    <Item key={user.register} user={user}/>
+                                ))
+                            ) : (
+                                <Text>
+                                    Hola
+                                </Text>
+                            )
                         ) : (
-                            null
+                            <VStack center spacing={20}>
+                                <IconButton icon="wifi-alert" size={50}/>
+                                <VStack center>
+                                    <Text variant="headlineSmall">
+                                        Ocurrió un problema
+                                    </Text>
+                                    <Text variant="bodyMedium" style={{textAlign: "center"}}>
+                                        No podemos recuperar los usuarios, revisa tu conexión a internet e intentalo de nuevo
+                                    </Text>
+                                </VStack>
+                                <Flex>
+                                    <Button mode="outlined" onPress={_ => {getUsers()}}>
+                                        Reintentar
+                                    </Button>
+                                </Flex>
+                            </VStack>
                         )
                     }
                 </VStack>

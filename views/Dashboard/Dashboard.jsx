@@ -4,6 +4,7 @@ import * as SecureStore from 'expo-secure-store';
 import { Button, Card, Text, useTheme, Avatar, TouchableRipple } from "react-native-paper"
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Image, ScrollView } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default Dashboard = ({navigation, route}) => {
     const insets = useSafeAreaInsets()
@@ -40,9 +41,29 @@ export default Dashboard = ({navigation, route}) => {
         }
     }, [actualToken])
 
+    const Item = ({screen, payload, icon, title}) => {
+        return (
+            <Flex w={"50%"} p={10}>
+                <Card mode="outlined">
+                    <TouchableRipple onPress={() => {
+                        navigation.navigate(screen, {...payload})
+                    }}>
+                        <VStack center p={20} spacing={10}>
+                            <Avatar.Icon icon={icon} size={50} />
+
+                            <Text>
+                                {title}
+                            </Text>
+                        </VStack>
+                    </TouchableRipple>
+                </Card>
+            </Flex>
+        )
+    }
+
     return (
         <Flex fill pt={insets.top}>
-            <Flex w={"100%"} h={"45%"} style={{backgroundColor: "#ff0099", position: "absolute"}}>
+            <Flex w={"100%"} h={"35%"} style={{backgroundColor: "#ff0099", position: "absolute"}}>
                 {
                     {
                         0: <Image source={require('../../assets/imagees/cover/1.jpg')} style={{width: "100%", height: "100%"}}/>,
@@ -52,9 +73,11 @@ export default Dashboard = ({navigation, route}) => {
                         4: <Image source={require('../../assets/imagees/cover/5.jpg')} style={{width: "100%", height: "100%"}}/>,
                     }[Math.floor(Math.random() * 4)]
                 }
+
+                <LinearGradient colors={[theme.colors.cover, theme.colors.background]} locations={[0.5, 1]} style={{width: "100%", height: "100%", position: "absolute"}} />
                 
-                <Flex w={"100%"} h={"100%"} style={{backgroundColor: theme.colors.cover, position: "absolute"}}>
-                </Flex>
+                {/* <Flex w={"100%"} h={"100%"} style={{backgroundColor: theme.colors.cover, position: "absolute"}}>
+                </Flex> */}
             </Flex>
 
             <ScrollView>
@@ -75,93 +98,13 @@ export default Dashboard = ({navigation, route}) => {
                             </Text>
                         </Flex>
 
-                        <VStack spacing={20} pr={25} pl={25} pb={50}>
-                            <Flex>
-                                <TouchableRipple onPress={() => {
-                                    navigation.navigate("Users", {
-                                        user: actualUser,
-                                        token: actualToken
-                                    })
-                                }}>
-                                    <Card mode="contained">
-                                        <Card.Title title="Administración de usuarios" left={props => <Avatar.Icon {...props} icon="account"/>}/>
-                                    </Card>
-                                </TouchableRipple>
-                            </Flex>
+                        <Flex direction="row" wrap="wrap" pr={25} pl={25} pb={50}>
+                            
+                            <Item screen="Profile" payload={{user: actualUser, token: actualToken}} icon="account-outline" title="Tu perfil"/>
+                            <Item screen="Users" payload={{user: actualUser, token: actualToken}} icon="account-supervisor-outline" title="Usuarios"/>
 
-                            <Flex>
-                                <TouchableRipple onPress={() => {
-                                    navigation.navigate("Users", {
-                                        user: actualUser,
-                                        token: actualToken
-                                    })
-                                }}>
-                                    <Card mode="contained">
-                                        <Card.Title title="Administración de usuarios" left={props => <Avatar.Icon {...props} icon="account"/>}/>
-                                    </Card>
-                                </TouchableRipple>
-                            </Flex>
-
-                            <Flex>
-                                <TouchableRipple onPress={() => {
-                                    navigation.navigate("Users", {
-                                        user: actualUser,
-                                        token: actualToken
-                                    })
-                                }}>
-                                    <Card mode="contained">
-                                        <Card.Title title="Administración de usuarios" left={props => <Avatar.Icon {...props} icon="account"/>}/>
-                                    </Card>
-                                </TouchableRipple>
-                            </Flex>
-
-                            <Flex>
-                                <TouchableRipple onPress={() => {
-                                    navigation.navigate("Users", {
-                                        user: actualUser,
-                                        token: actualToken
-                                    })
-                                }}>
-                                    <Card mode="contained">
-                                        <Card.Title title="Administración de usuarios" left={props => <Avatar.Icon {...props} icon="account"/>}/>
-                                    </Card>
-                                </TouchableRipple>
-                            </Flex>
-
-                            <Flex>
-                                <TouchableRipple onPress={() => {
-                                    navigation.navigate("Users", {
-                                        user: actualUser,
-                                        token: actualToken
-                                    })
-                                }}>
-                                    <Card mode="contained">
-                                        <Card.Title title="Administración de usuarios" left={props => <Avatar.Icon {...props} icon="account"/>}/>
-                                    </Card>
-                                </TouchableRipple>
-                            </Flex>
-
-                            <Flex>
-                                <TouchableRipple onPress={() => {
-                                    navigation.navigate("Users", {
-                                        user: actualUser,
-                                        token: actualToken
-                                    })
-                                }}>
-                                    <Card mode="contained">
-                                        <Card.Title title="Administración de usuarios" left={props => <Avatar.Icon {...props} icon="account"/>}/>
-                                    </Card>
-                                </TouchableRipple>
-                            </Flex>
-                        </VStack>
+                        </Flex>
                     </Flex>
-
-                    <Button onPress={_ => {
-                        SecureStore.deleteItemAsync("token")
-                        navigation.replace("Login")
-                    }}>
-                        Cerrar sesión
-                    </Button>
                 </VStack>
             </ScrollView>
 
