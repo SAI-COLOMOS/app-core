@@ -1,10 +1,13 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useEffect, useState } from "react"
 import { ScrollView } from "react-native"
-import { Button, Text, TextInput, TouchableRipple, useTheme } from "react-native-paper"
+import { Button, Card, Text, TextInput, TouchableRipple, useTheme } from "react-native-paper"
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {Picker} from '@react-native-picker/picker';
 import BloodTypesDialog from "../Shared/Dialog";
 
 export default AddUser = ({navigation, route}) => {
+    const insets = useSafeAreaInsets()
     const theme = useTheme()
 
     const [first_name, setFirst_name] = useState('')
@@ -62,16 +65,23 @@ export default AddUser = ({navigation, route}) => {
 
     return (
         <Flex fill style={{backgroundColor: theme.colors.backdrop, zIndex: 0}} justify="end">
+            <TouchableRipple android_ripple={false} style={{height: "100%", width: "100%", position: "absolute"}} onPress={() => {
+                navigation.pop()
+                console.log("Wenas")
+            }}>
+                <Flex fill/>
+            </TouchableRipple>
+            
             <Flex maxH={"90%"} style={{backgroundColor: theme.colors.background, borderTopLeftRadius: 50, borderTopRightRadius: 50, overflow: "hidden"}}>
                 <ScrollView>
                     <Flex p={25} items="center">
-                        <Text variant="headlineMedium">
+                        <Text variant="headlineMedium" style={{textAlign: "center"}}>
                             Añadir nuevo usuario
                         </Text>
                     </Flex>
 
                     <VStack pr={25} pl={25} pb={50} spacing={30}>
-                        <Flex>
+                        <VStack spacing={5}>
                             <Text variant="labelLarge">
                                 Datos personales
                             </Text>
@@ -86,9 +96,9 @@ export default AddUser = ({navigation, route}) => {
                                     <TextInput mode="outlined" editable={false} value={blood_type.opcion} label="Grupo sangíneo" right={<TextInput.Icon disabled={true} icon="menu-down"/>}/>
                                 </TouchableRipple>
                             </VStack>
-                        </Flex>
+                        </VStack>
 
-                        <Flex>
+                        <VStack spacing={5}>
                             <Text variant="labelLarge">
                                 Datos de contacto
                             </Text>
@@ -98,14 +108,24 @@ export default AddUser = ({navigation, route}) => {
                                 <TextInput mode="outlined" onChangeText={setEmergency_contact} label="Contacto de emergencia" maxLength={50} autoComplete="off" autoCorrect={false}/>
                                 <TextInput mode="outlined" onChangeText={setEmergency_phone} label="Teléfono de emergencia" keyboardType="numeric" maxLength={15} autoComplete="off" autoCorrect={false}/>
                             </VStack>
-                        </Flex>
+                        </VStack>
 
+                        <VStack spacing={5}>
+                            <Text variant="labelLarge">
+                                Datos del usuario
+                            </Text>
+                            <VStack spacing={10}>
+                                <TextInput mode="outlined" onChangeText={setRole} label="Rol" maxLength={50} autoComplete="off" autoCorrect={false}/>
+                                <TextInput mode="outlined" onChangeText={setAssignment_area} label="Área asignada" keyboardType="numeric" maxLength={15} autoComplete="off" autoCorrect={false}/>
+                                <TextInput mode="outlined" onChangeText={setProvider_type} label="Tipo de servicio" maxLength={50} autoComplete="off" autoCorrect={false}/>
+                            </VStack>
+                        </VStack>
                         
                     </VStack>
 
                 </ScrollView>
 
-                <HStack spacing={20} justify="end" p={10}>
+                <HStack spacing={20} justify="end" p={10} pb={insets.bottom + 10}>
                     <Button mode="outlined" onPress={_ => {
                         navigation.pop()
                     }}>

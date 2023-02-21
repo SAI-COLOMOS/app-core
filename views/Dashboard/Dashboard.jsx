@@ -1,21 +1,18 @@
 import { Flex, VStack } from "@react-native-material/core"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import * as SecureStore from 'expo-secure-store';
 import { Button, Card, Text, useTheme, Avatar, TouchableRipple } from "react-native-paper"
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Image, ScrollView } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default Dashboard = ({navigation, route}) => {
     const insets = useSafeAreaInsets()
     const theme = useTheme()
-    const greetings = [
-        'Hola de nuevo',
-        'Un gusto atenderte✨',
-        'Hola',
-        '¿Qué hay de nuevo?'
-    ]
 
+    const [greeting, setGreeting] = useState("Hola")
+    const [timeToSleep, setTimeToSleep] = useState(false)
     const [actualUser, setActualUser] = useState(undefined)
     const [actualToken, setActualToken] = useState(undefined)
 
@@ -40,6 +37,30 @@ export default Dashboard = ({navigation, route}) => {
             getToken()
         }
     }, [actualToken])
+
+    useFocusEffect(useCallback(() => {
+        const time = new Date().getHours()
+
+        if (time >= 7 && time < 12) {
+            setGreeting("Buen día")
+        }
+
+        if (time >= 12 && time < 19) {
+            setGreeting("Buena tarde")
+        }
+
+        if (time >= 19 && time < 7) {
+            setGreeting("Buena noche")
+        }
+
+        if (time >= 22 && time < 5) {
+            setTimeToSleep(true)
+        } else {
+            setTimeToSleep(false)
+        }
+
+        return () => {}
+    }, []))
 
     const Item = ({screen, payload, icon, title}) => {
         return (
@@ -76,19 +97,26 @@ export default Dashboard = ({navigation, route}) => {
 
                 <LinearGradient colors={[theme.colors.cover, theme.colors.background]} locations={[0.5, 1]} style={{width: "100%", height: "100%", position: "absolute"}} />
                 
-                {/* <Flex w={"100%"} h={"100%"} style={{backgroundColor: theme.colors.cover, position: "absolute"}}>
-                </Flex> */}
             </Flex>
 
             <ScrollView>
                 <VStack pb={50} spacing={50}>
                     <VStack items="center" pt={50}>
                         <Text variant="headlineLarge" style={{color: theme.colors.primary}}>
-                            {greetings[Math.floor(Math.random() * greetings.length)]}
+                            {greeting}
                         </Text>
                         <Text variant="headlineSmall" numberOfLines={1}>
-                            {`${actualUser?.first_name} ${actualUser?.first_last_name} ${actualUser?.second_last_name}`}
+                            {actualUser?.first_name}
                         </Text>
+                        {
+                            timeToSleep ? (
+                                <Text variant="bodyMedium" numberOfLines={1}>
+                                    No dilates, dormir es importante ✨
+                                </Text>
+                            ) : (
+                                null
+                            )
+                        }
                     </VStack>
 
                     <Flex fill style={{borderTopLeftRadius: 50, borderTopRightRadius: 50, backgroundColor: theme.colors.background}}>

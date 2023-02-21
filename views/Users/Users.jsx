@@ -62,7 +62,7 @@ export default Users = ({navigation, route}) => {
             <Card>
                 <Card.Title
                     title={`${user.first_name} ${user.first_last_name} ${user.second_last_name}`}
-                    subtitle={`${user.register} - ${user.status}`}
+                    subtitle={`${user.role} - ${user.status}`}
                     left={props => <Avatar.Icon {...props} icon="account"/>}
                 />
             </Card>

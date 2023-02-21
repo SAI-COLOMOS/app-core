@@ -46,7 +46,7 @@ export default PlaceDetails = ({navigation, route}) => {
                             {
                                 place?.place_areas.length > 0 ? (
                                     place.place_areas.map(area => (
-                                        <Flex>
+                                        <Flex key={area.area_identifier}>
                                             <Item area={area}/>
                                         </Flex>
                                     ))

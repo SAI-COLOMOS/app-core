@@ -1,11 +1,12 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { Card, IconButton, Text, TextInput, useTheme, Avatar, FAB, Button, TouchableRipple } from "react-native-paper"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useHeaderHeight } from "@react-navigation/elements";
 import Header from "../Shared/Header";
 import Constants from "expo-constants"
 import { RefreshControl, ScrollView } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default Places = ({navigation, route}) => {
     const headerMargin = useHeaderHeight()
@@ -53,11 +54,11 @@ export default Places = ({navigation, route}) => {
         })
     }, [])
 
-    useEffect(() => {
-        if(places === undefined) {
-            getPlaces()
-        }
-    }, [places])
+    useFocusEffect(useCallback(() => {
+        getPlaces()
+
+        return () => {}
+    }, []))
 
     const Item = ({place}) => {
         return (
@@ -151,7 +152,7 @@ export default Places = ({navigation, route}) => {
             </ScrollView>
 
             <FAB icon="plus" style={{position: "absolute", margin: 16, right: 0, bottom: 0}} onPress={() => {
-                navigation.navigate("AddUser", {
+                navigation.navigate("AddPlace", {
                     user,
                     token
                 })

@@ -17,6 +17,7 @@ import PlacesAndAreas from "./Administration/PlacesAndAreas";
 // Users
 import Users from "./Users/Users";
 import PlaceDetails from "./Administration/PlaceDetails";
+import AddPlace from "./Administration/AddPlace";
 
 export default Navigation = () => {
     const Stack = createNativeStackNavigator()   
@@ -35,6 +36,7 @@ export default Navigation = () => {
             <Stack.Group navigationKey="Administration"screenOptions={{headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom"}}>
                 <Stack.Screen name="PlacesAndAreas" component={PlacesAndAreas}/>
                 <Stack.Screen name="PlaceDetails" component={PlaceDetails}/>
+                <Stack.Screen name="AddPlace" component={AddPlace} options={{headerShown: false, presentation: "transparentModal"}}/>
             </Stack.Group>
 
             <Stack.Group navigationKey="UsersAdmon" screenOptions={{headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom"}}>
