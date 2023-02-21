@@ -21,17 +21,17 @@ export default Users = ({navigation, route}) => {
         const request = await fetch(
             `${localhost}/users`,
             {
-                method: "POST",
+                method: "GET",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    items: 5
-                })
+                    "Authorization": `Bearer ${token}`,
+                    'Cache-Control': 'no-cache',
+                }
             }
         ).then(
             response => response.ok ? response.json() : response.status
+        ).catch(
+            _ => null
         )
 
         if(request?.users) {
@@ -77,7 +77,9 @@ export default Users = ({navigation, route}) => {
                         users !== undefined ? (
                             users?.length > 0 ? (
                                 users.map(user => (
-                                    <Item key={user.register} user={user}/>
+                                    <Flex key={user.register}>
+                                        <Item user={user}/>
+                                    </Flex>
                                 ))
                             ) : (
                                 <Text>

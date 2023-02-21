@@ -32,7 +32,7 @@
       "favicon": "./assets/favicon.png"
     },
     "extra": {
-      "API_LOCAL": "https://3469-2806-261-498-9a0d-89fd-8d1f-7247-8a7f.ngrok.io"
+      "API_LOCAL": "https://5edd-2806-261-498-9a0d-c5bc-c379-8c75-867c.ngrok.io"
     }
   }
 }

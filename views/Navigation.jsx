@@ -11,8 +11,12 @@ import Dashboard from "./Dashboard/Dashboard";
 import Profile from "./Profile/Profile";
 import AddUser from "./Users/AddUser";
 
+// Administration
+import PlacesAndAreas from "./Administration/PlacesAndAreas";
+
 // Users
 import Users from "./Users/Users";
+import PlaceDetails from "./Administration/PlaceDetails";
 
 export default Navigation = () => {
     const Stack = createNativeStackNavigator()   
@@ -26,6 +30,11 @@ export default Navigation = () => {
             
             <Stack.Group navigationKey="dashboard" screenOptions={{headerShown: false, animationTypeForReplace: "push", animation: "fade_from_bottom"}}>
                 <Stack.Screen name="Dashboard" component={Dashboard}/>
+            </Stack.Group>
+
+            <Stack.Group navigationKey="Administration"screenOptions={{headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom"}}>
+                <Stack.Screen name="PlacesAndAreas" component={PlacesAndAreas}/>
+                <Stack.Screen name="PlaceDetails" component={PlaceDetails}/>
             </Stack.Group>
 
             <Stack.Group navigationKey="UsersAdmon" screenOptions={{headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom"}}>

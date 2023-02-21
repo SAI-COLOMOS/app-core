@@ -11,7 +11,7 @@ export default Dashboard = ({navigation, route}) => {
     const theme = useTheme()
     const greetings = [
         'Hola de nuevo',
-        'Un gusto atenderte',
+        'Un gusto atenderte✨',
         'Hola',
         '¿Qué hay de nuevo?'
     ]
@@ -102,6 +102,7 @@ export default Dashboard = ({navigation, route}) => {
                             
                             <Item screen="Profile" payload={{user: actualUser, token: actualToken}} icon="account-outline" title="Tu perfil"/>
                             <Item screen="Users" payload={{user: actualUser, token: actualToken}} icon="account-supervisor-outline" title="Usuarios"/>
+                            <Item screen="PlacesAndAreas" payload={{user: actualUser, token: actualToken}} icon="map-marker-radius-outline" title="Lugares y áreas"/>
 
                         </Flex>
                     </Flex>

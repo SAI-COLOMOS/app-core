@@ -68,7 +68,7 @@ export default Login = ({navigation}) => {
         const profile = await fetch(
             `${localhost}/profile/${payload.register}`,
             {
-                method: "POST",
+                method: "GET",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${session.token}`
