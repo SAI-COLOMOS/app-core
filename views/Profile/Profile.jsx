@@ -42,39 +42,50 @@ export default Profile = ({navigation, route}) => {
                                 {`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name}`}
                         </Text>
                         <Text variant="bodySmall" numberOfLines={1}>
-                                {`${user.role}${user.provider_type != "no aplica" ? ` - ${user.provider_type}` : null}`}
+                                {`${user.role}${user.provider_type != "no aplica" ? ` - ${user.provider_type}` : ""}`}
                         </Text>
                     </VStack>
-
-                    <Flex>
-                        <Text variant='bodyLarge'>
-                            Tu información personal
-                        </Text>
-                        <VStack spacing={10}>
-                            <TextInput mode="outlined" editable={false} value={user.first_name} label="Nombre"/>
-                            <TextInput mode="outlined" editable={false} value={user.first_last_name} label="Apellido paterno"/>
-                            <TextInput mode="outlined" editable={false} value={user.second_last_name} label="Apellido materno"/>
-                            <TextInput mode="outlined" editable={false} value={user.age} label="Edad"/>
-                            <TextInput mode="outlined" editable={false} value={user.blood_type} label="Grupo sangíneo"/>
-                        </VStack>
-                    </Flex>
-
-                    <Flex>
-                        <Text variant='bodyLarge'>
-                            Tu información de contacto
-                        </Text>
-                        <VStack spacing={10}>
-                            <TextInput mode="outlined" editable={false} value={user.first_name} label="Nombre"/>
-                            <TextInput mode="outlined" editable={false} value={user.first_last_name} label="Apellido paterno"/>
-                            <TextInput mode="outlined" editable={false} value={user.second_last_name} label="Apellido materno"/>
-                            <TextInput mode="outlined" editable={false} value={user.age} label="Edad"/>
-                            <TextInput mode="outlined" editable={false} value={user.blood_type} label="Grupo sangíneo"/>
-                        </VStack>
-                    </Flex>
                 </VStack>
-                <Text>
-                    {JSON.stringify(user)}
-                </Text>
+
+                <VStack pr={25} pl={25} pb={50} spacing={30}>
+                    <VStack spacing={5}>
+                        <Text variant="labelLarge">
+                            Datos personales
+                        </Text>
+                        <VStack spacing={10}>
+                            <TextInput mode="outlined" editable={false} value={user.first_name} label="Nombre" maxLength={50} autoComplete="off" autoCorrect={false}/>
+                            <TextInput mode="outlined" editable={false} value={user.first_last_name} label="Apellido paterno" maxLength={50} autoComplete="off" autoCorrect={false}/>
+                            <TextInput mode="outlined" editable={false} value={user.second_last_name} label="Apellido materno" maxLength={50} autoComplete="off" autoCorrect={false}/>
+                            <TextInput mode="outlined" editable={false} value={user.age} label="Edad" keyboardType="numeric" maxLength={2} autoComplete="off" autoCorrect={false}/>
+                            <TextInput mode="outlined" editable={false} value={user.blood_type} label="Grupo sangíneo" right={<TextInput.Icon disabled={true} icon="menu-down"/>}/>
+                        </VStack>
+                    </VStack>
+
+                    <VStack spacing={5}>
+                        <Text variant="labelLarge">
+                            Datos de contacto
+                        </Text>
+                        <VStack spacing={10}>
+                            <TextInput mode="outlined" editable={false} value={user.email} label="Correo electrónico" maxLength={50} autoComplete="off" autoCorrect={false}/>
+                            <TextInput mode="outlined" editable={false} value={user.phone} label="Teléfono" keyboardType="numeric" maxLength={15} autoComplete="off" autoCorrect={false}/>
+                            <TextInput mode="outlined" editable={false} value={user.emergency_contact} label="Contacto de emergencia" maxLength={50} autoComplete="off" autoCorrect={false}/>
+                            <TextInput mode="outlined" editable={false} value={user.emergency_phone} label="Teléfono de emergencia" keyboardType="numeric" maxLength={15} autoComplete="off" autoCorrect={false}/>
+                        </VStack>
+                    </VStack>
+
+                    <VStack spacing={5}>
+                        <Text variant="labelLarge">
+                            Datos del usuario
+                        </Text>
+                        <VStack spacing={10}>
+                            <TextInput mode="outlined" editable={false} value={user.role} label="Rol" maxLength={50} autoComplete="off" autoCorrect={false}/>
+                            <TextInput mode="outlined" editable={false} value={user.assigned_area} label="Área asignada" keyboardType="numeric" maxLength={50} autoComplete="off" autoCorrect={false}/>
+                            <TextInput mode="outlined" editable={false} value={user.provider_type} label="Tipo de servicio" maxLength={50} autoComplete="off" autoCorrect={false}/>
+                        </VStack>
+                    </VStack>
+                </VStack>
+
+
             </ScrollView>
         </Flex>
     )

@@ -1,7 +1,7 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useEffect, useState } from "react"
 import { Image, ScrollView } from "react-native"
-import { Button, Card, Text, TextInput, Checkbox, ActivityIndicator, useTheme } from "react-native-paper"
+import { Button, Card, Text, TextInput, Checkbox, ActivityIndicator, useTheme, Switch } from "react-native-paper"
 import * as SecureStore from 'expo-secure-store'
 import jwtDecode from "jwt-decode"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
@@ -112,7 +112,7 @@ export default Login = ({navigation}) => {
             if(token) {
                 const payload = jwtDecode(token)
                 
-                if(payload.exp < Date.now()) {
+                if(payload.exp > Math.floor(Date.now() / 1000)) {
                     setTimeout(_ => {
                         setActiveSession(true)
                         navigation.replace("Dashboard")
@@ -142,17 +142,17 @@ export default Login = ({navigation}) => {
                     </Flex>
                 ) : (
                     <ScrollView>
-                        <VStack p={10} pb={50} spacing={50}>
+                        <VStack p={20} pb={50} spacing={50}>
                             
                             <Flex center>
                                 <Image source={require('../../assets/logo.png')} style={{width: 150, height: 150}}/>
                             </Flex>
 
                             <VStack spacing={10}>
-                                <TextInput mode="outlined" label="Registro, email o teléfono" onChangeText={setCredential}/>
-                                <TextInput mode="outlined" label="Contraseña" onChangeText={setPassword} secureTextEntry={!showPassword} right={<TextInput.Icon icon="eye" onPress={_ => {setShowPassword(!showPassword)}}/>}/>
-                                <HStack items="center">
-                                    <Checkbox status={rememberUser ? "checked" : "unchecked"} onPress={_ => {setRememberUser(!rememberUser)}}/>
+                                <TextInput mode="outlined" label="Registro, email o teléfono" autoComplete="username" onChangeText={setCredential}/>
+                                <TextInput mode="outlined" label="Contraseña" autoComplete="password" onChangeText={setPassword} secureTextEntry={!showPassword} right={<TextInput.Icon icon="eye" onPress={_ => {setShowPassword(!showPassword)}}/>}/>
+                                <HStack items="center" spacing={10}>
+                                    <Switch value={rememberUser} onValueChange={_ => {setRememberUser(!rememberUser)}}/>
                                     <Text variant="bodyMedium">
                                         Mantaner la sesión abierta
                                     </Text>
