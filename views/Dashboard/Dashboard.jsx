@@ -131,7 +131,7 @@ export default Dashboard = ({navigation, route}) => {
                             <Item screen="Profile" payload={{user: actualUser, token: actualToken}} icon="account-outline" title="Tu perfil"/>
 
                             {
-                                actualUser?.role == "administrador" || actualUser?.role == "encargado" ? (
+                                actualUser?.role == "Administrador" || actualUser?.role == "Encargado" ? (
                                     <Item screen="Users" payload={{user: actualUser, token: actualToken}} icon="account-supervisor-outline" title="Usuarios"/>
                                 ) : (
                                     null
@@ -139,7 +139,7 @@ export default Dashboard = ({navigation, route}) => {
                             }
 
                             {
-                                actualUser?.role == "administrador" ? (
+                                actualUser?.role == "Administrador" ? (
                                     <Item screen="PlacesAndAreas" payload={{user: actualUser, token: actualToken}} icon="map-marker-radius-outline" title="Lugares y áreas"/>
                                 ) : (
                                     null
