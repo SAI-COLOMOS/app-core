@@ -21,7 +21,7 @@ export default AddPlace = ({navigation, route}) => {
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`,
-                    'Cache-Control': 'no-cache',
+                    "Cache-Control": "no-cache"
                 },
                 body: JSON.stringify({
                     place_name
@@ -33,15 +33,12 @@ export default AddPlace = ({navigation, route}) => {
             _ => null
         )
 
-        console.log(request)
-
         if(request == 201) {
             console.log("ok")
             navigation.pop()
             return
         }
 
-        console.log("Error")
         return
     }
 
@@ -67,11 +64,7 @@ export default AddPlace = ({navigation, route}) => {
             </Button>
         )
     }
-
-    useEffect(() => {
-        console.log(place_name)
-    }, [place_name])
-
+    
     const Cancel = _ => {
         return (
             <Button mode="outlined" onPress={_ => {
@@ -82,39 +75,11 @@ export default AddPlace = ({navigation, route}) => {
         )
     }
 
+    useEffect(() => {
+        console.log(place_name)
+    }, [place_name])
+
     return (
         <CreateForm navigation={navigation} title="Añadir nuevo bosque urbano" children={[Data()]} actions={[Save(), Cancel()]} />
-
-        // <Flex fill>
-        //     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{width: "100%", height: "100%"}}>
-        //         <Flex fill style={{backgroundColor: theme.colors.backdrop}} justify="end">
-        //             <TouchableRipple android_ripple={false} style={{width: "100%", height: "100%", position: "absolute"}} onPress={() => {
-        //                 navigation.pop()
-        //             }}>
-        //                 <Flex fill/>
-        //             </TouchableRipple>
-
-        //             <Flex maxH={"90%"} pb={insets.bottom} style={{backgroundColor: theme.colors.background, borderTopLeftRadius: 20, borderTopRightRadius: 20, overflow: "hidden"}}>
-        //                 <ScrollView>
-
-        //                         <Flex p={25} items="center">
-        //                             <Text variant="headlineMedium" style={{textAlign: "center"}}>
-        //                                 Añadir nuevo bosque urbano
-        //                             </Text>
-        //                         </Flex>
-
-        //                         <VStack pr={25} pl={25} pb={50} spacing={30}>
-                                    
-        //                         </VStack>
-
-        //                 </ScrollView>
-
-        //                 <HStack spacing={20} justify="end" p={10}>
-
-        //                 </HStack>
-        //             </Flex>
-        //         </Flex>
-        //     </KeyboardAvoidingView>
-        // </Flex>
     )
 }

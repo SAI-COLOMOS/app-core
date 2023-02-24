@@ -129,8 +129,22 @@ export default Dashboard = ({navigation, route}) => {
                         <Flex direction="row" wrap="wrap" pr={25} pl={25} pb={50}>
                             
                             <Item screen="Profile" payload={{user: actualUser, token: actualToken}} icon="account-outline" title="Tu perfil"/>
-                            <Item screen="Users" payload={{user: actualUser, token: actualToken}} icon="account-supervisor-outline" title="Usuarios"/>
-                            <Item screen="PlacesAndAreas" payload={{user: actualUser, token: actualToken}} icon="map-marker-radius-outline" title="Lugares y áreas"/>
+
+                            {
+                                actualUser?.role == "administrador" || actualUser?.role == "encargado" ? (
+                                    <Item screen="Users" payload={{user: actualUser, token: actualToken}} icon="account-supervisor-outline" title="Usuarios"/>
+                                ) : (
+                                    null
+                                )
+                            }
+
+                            {
+                                actualUser?.role == "administrador" ? (
+                                    <Item screen="PlacesAndAreas" payload={{user: actualUser, token: actualToken}} icon="map-marker-radius-outline" title="Lugares y áreas"/>
+                                ) : (
+                                    null
+                                )
+                            }
 
                         </Flex>
                     </Flex>
