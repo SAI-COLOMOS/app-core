@@ -38,7 +38,7 @@ export default CreateForm = ({navigation, route, title, children, actions}) => {
 
                         </ScrollView>
 
-                        <HStack spacing={20} justify="end" p={10}>
+                        <HStack key={actions.map} spacing={20} justify="end" p={10}>
                             {
                                 actions.map(action => (
                                     action
