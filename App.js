@@ -131,15 +131,16 @@ export default function App() {
         }
     }, [fontsLoaded]);
 
-    useEffect(() => {
-        if(url) {
-            const {hostname, path, queryParams} = Linking.parse(url)
-            if(path === "recovery" && queryParams?.tkn) {
-                recovery.current.navigate("SetNewPassword", {token: queryParams.tkn})
-                console.log(queryParams)
-            }
-        }
-    }, [url])
+    // useEffect(() => {
+    //     console.log(url)
+    //     if(url) {
+    //         const {hostname, path, queryParams} = Linking.parse(url)
+    //         if(path === "recovery" && queryParams?.tkn) {
+    //             recovery.current.navigate("SetNewPassword", {token: queryParams.tkn})
+    //             console.log(queryParams)
+    //         }
+    //     }
+    // }, [url])
 
     onLayoutRootView()
 

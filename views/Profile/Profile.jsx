@@ -1,14 +1,16 @@
 import { Flex, VStack } from '@react-native-material/core'
 import { useState, useEffect } from 'react'
-import { IconButton, Text, TextInput } from 'react-native-paper'
-import { useHeaderHeight } from "@react-navigation/elements";
+import { IconButton, Text, TextInput, useTheme } from 'react-native-paper'
+import { useHeaderHeight } from "@react-navigation/elements"
 import Header from '../Shared/Header'
-import * as SecureStore from 'expo-secure-store';
-import { Image, ScrollView } from 'react-native';
+import * as SecureStore from 'expo-secure-store'
+import { Image, ScrollView } from 'react-native'
+import { LinearGradient } from 'expo-linear-gradient'
 
 export default Profile = ({navigation, route}) => {
     const headerMargin = useHeaderHeight()
     const {user, token} = route.params
+    const theme = useTheme()
 
     useEffect(() => {
         navigation.setOptions({
@@ -24,14 +26,23 @@ export default Profile = ({navigation, route}) => {
         return (
             <IconButton key="logut" icon="logout" onPress={async _ => {
                 await SecureStore.deleteItemAsync("token")
+                await SecureStore.deleteItemAsync("user")
+                await SecureStore.deleteItemAsync("keepAlive")
                 navigation.replace("Login")
             }}/>
         )
     }
     
     return (
-        <Flex fill pt={headerMargin}>
-            <ScrollView>
+        <Flex fill pt={headerMargin - 20}>
+            <ScrollView bounces={false} bouncesZoom={10}>
+                <Flex w={"100%"} h={"25%"} style={{backgroundColor: theme.colors.back, position: "absolute"}}>
+                    <Image blurRadius={10} source={require('../../assets/imagees/cover/3.jpg')} style={{width: "100%", height: "100%"}}/>
+                    
+                    <LinearGradient colors={[theme.colors.cover, theme.colors.background]} locations={[0.5, 1]} style={{width: "100%", height: "100%", position: "absolute"}} />
+                    
+                </Flex>
+
                 <VStack p={20} spacing={30}>
                     <VStack items='center'>
                         <Flex w={150} h={150} justify="end" items='end'>

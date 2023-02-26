@@ -5,10 +5,13 @@ import { useCallback, useEffect, useState } from "react"
 import { ScrollView } from "react-native"
 import { Text, IconButton, Button, useTheme, TextInput } from "react-native-paper"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import Constants from "expo-constants";
 import CreateForm from "../Shared/CreateForm"
+import ModalMessage from "../Shared/ModalMessage";
 
 export default SetNewPassword = ({navigation, route}) => {
     const theme = useTheme()
+    const localhost = Constants.expoConfig.extra.API_LOCAL
     const {token} = route.params
 
     const [validToken, setValidToken] = useState(undefined)
@@ -22,6 +25,45 @@ export default SetNewPassword = ({navigation, route}) => {
     const [hasNumber, setHasNumber] = useState(false)
     const [hasSpecial, setHasSpecial] = useState(false)
     const [areSamePassword, setAreSamePassword] = useState(false)
+
+    const [modalLoading, setModalLoading] = useState(false)
+    const [modalSuccess, setModalSuccess] = useState(false)
+    const [modalError, setModalError] = useState(false)
+    const [modalFatal, setModalFatal] = useState(false)
+    const [reponseCode, setReponseCode] = useState("")
+
+    async function changePassword() {
+        setModalLoading(true)
+
+        const request = await fetch(
+            `${localhost}/auth/recovery?token=${token}`,
+            {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Cache-Control": "no-cache"
+                },
+                body: JSON.stringify({
+                    password: newPassword.trim()
+                })
+            }
+        ).then(
+            response => response.status
+        ).catch(
+            error => null
+        )
+
+        setModalLoading(false)
+
+        if(request == 200) {
+            setModalSuccess(true)
+        } else if (request != null) {
+            setReponseCode(response)
+            setModalError(true)
+        } else {
+            setModalFatal(true)
+        }
+    }
 
     useFocusEffect(useCallback(() => {
         try {
@@ -146,8 +188,8 @@ export default SetNewPassword = ({navigation, route}) => {
 
     const Save = _ => {
         return (
-            <Button mode="contained" disabled={(!passLength || !hasNumber || !hasUppercase || !hasLowercase || !hasSpecial || !areSamePassword)} onPress={() => {
-                savePlace()
+            <Button loading={modalLoading} mode="contained" disabled={(!passLength || !hasNumber || !hasUppercase || !hasLowercase || !hasSpecial || !areSamePassword || modalLoading)} onPress={() => {
+                changePassword()
             }}>
                 Cambiar contraseña
             </Button>
@@ -156,7 +198,7 @@ export default SetNewPassword = ({navigation, route}) => {
     
     const Cancel = _ => {
         return (
-            <Button mode="outlined" onPress={_ => {
+            <Button disabled={modalLoading} mode="outlined" onPress={_ => {
                 navigation.pop()
             }}>
                 Cancelar
@@ -167,6 +209,7 @@ export default SetNewPassword = ({navigation, route}) => {
     const Accept = _ => {
         return (
             <Button mode="contained" onPress={_ => {
+                token = null
                 navigation.pop()
             }}>
                 Aceptar
@@ -179,7 +222,7 @@ export default SetNewPassword = ({navigation, route}) => {
             {
                 validToken !== null ? (
                     validToken === true ? (
-                        <CreateForm title="Cambiar tu contraseña" navigation={navigation} children={[Information(), Form()]} actions={[Cancel(), Save()]}/>
+                        <CreateForm title="Cambiar tu contraseña" loading={modalLoading} navigation={navigation} children={[Information(), Form()]} actions={[Cancel(), Save()]}/>
                     ) : (
                         <CreateForm title="Token vencido" navigation={navigation} children={[OutOfTime()]} actions={[Accept()]}/>
                     )
@@ -187,6 +230,12 @@ export default SetNewPassword = ({navigation, route}) => {
                     <CreateForm title="Token inválido" navigation={navigation} children={[NotValid()]} actions={[Accept()]}/>
                 )
             }
+
+            <ModalMessage title="¡Listo!" description="La contraseña ha sido actualizada, inicia sesión para acceder a la aplicación" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline"/>
+
+            <ModalMessage title="Ocurrió un problema" description={`No pudimos actualizar tu contraseña, intentalo más tarde. (${reponseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline"/>
+
+            <ModalMessage title="Sin conexión a internet" description={`Parece que no tienes conexión a internet, conectate e intenta de nuevo`} handler={[modalFatal, () => setModalFatal(!modalFatal)]} actions={[['Aceptar']]} dismissable={true} icon="wifi-alert"/>
         </Flex>
     )
 }

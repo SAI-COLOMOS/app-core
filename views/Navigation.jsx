@@ -19,9 +19,10 @@ import Users from "./Users/Users";
 import PlaceDetails from "./Administration/PlaceDetails";
 import AddPlace from "./Administration/AddPlace";
 import SetNewPassword from "./Authentication/SetNewPassword";
+import FirstAccess from "./Authentication/FirstAccess";
 
 export default Navigation = () => {
-    const Stack = createNativeStackNavigator()   
+    const Stack = createNativeStackNavigator()
 
     return (
         <Stack.Navigator initialRouteName="Login">
@@ -29,6 +30,7 @@ export default Navigation = () => {
                 <Stack.Screen name="Login" component={Login} options={{animation: "fade_from_bottom"}}/>
                 <Stack.Screen name="ResetPassword" component={ResetPassword} options={{headerShown: false, presentation: "containedTransparentModal"}}/>
                 <Stack.Screen name="SetNewPassword" component={SetNewPassword} options={{headerShown: false, presentation: "containedTransparentModal"}}/>
+                <Stack.Screen name="FirstAccess" component={FirstAccess} options={{headerShown: false}}/>
             </Stack.Group>
             
             <Stack.Group navigationKey="dashboard" screenOptions={{headerShown: false, animationTypeForReplace: "push", animation: "fade_from_bottom"}}>

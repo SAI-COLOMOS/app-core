@@ -49,11 +49,11 @@ export default Dashboard = ({navigation, route}) => {
             setGreeting("Buena tarde")
         }
 
-        if (time >= 19 && time < 7) {
+        if (time >= 19 || time < 7) {
             setGreeting("Buena noche")
         }
 
-        if (time >= 22 && time < 5) {
+        if (time >= 22 || time < 5) {
             setTimeToSleep(true)
         } else {
             setTimeToSleep(false)
