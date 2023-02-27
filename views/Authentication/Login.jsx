@@ -124,8 +124,8 @@ export default Login = ({navigation}) => {
         const getActualSession = async _ => {
             const token = await SecureStore.getItemAsync("token")
             const keepAlive = await SecureStore.getItemAsync("keepAlive")
-
-            if(keepAlive == true) {
+            
+            if(keepAlive === "true") {
                 const payload = jwtDecode(token)
                 
                 if(payload.exp > Math.floor(Date.now() / 1000)) {

@@ -94,7 +94,7 @@ export default AddSchool = ({navigation, route}) => {
                     Datos de la escuela
                 </Text>
                 <VStack spacing={10}>
-                    <TextInput mode="outlined" value={school_name} onChangeText={setSchool_name} label="Nombre de la escuela" maxLength={150} autoComplete="off" autoCorrect={false} autoCapitalize="words"/>
+                    <TextInput mode="outlined" multiline={true} value={school_name} onChangeText={setSchool_name} label="Nombre de la escuela" maxLength={150} autoComplete="off" autoCapitalize="words"/>
                 </VStack>
             </VStack>
         )
@@ -107,13 +107,13 @@ export default AddSchool = ({navigation, route}) => {
                     Dirección de la escuela
                 </Text>
                 <VStack spacing={10}>
-                    <TextInput mode="outlined" value={street} onChangeText={setStreet} label="Calle de la escuela" maxLength={150} autoComplete="off" autoCorrect={false} autoCapitalize="words"/>
+                    <TextInput mode="outlined" value={street} onChangeText={setStreet} label="Calle de la escuela" maxLength={150} autoComplete="off" autoCapitalize="words"/>
 
                     <TextInput mode="outlined" value={exterior_number} onChangeText={setExterior_number} label="Número de la escuela" keyboardType="number-pad" maxLength={10} autoComplete="off"/>
 
-                    <TextInput mode="outlined" value={colony} onChangeText={setColony} label="Colonia de la escuela" maxLength={150} autoComplete="off" autoCorrect={false} autoCapitalize="words"/>
+                    <TextInput mode="outlined" value={colony} onChangeText={setColony} label="Colonia de la escuela" maxLength={150} autoComplete="off" autoCapitalize="words"/>
 
-                    <TextInput mode="outlined" value={municipality} onChangeText={setMunicipality} label="Municipio de la escuela" maxLength={150} autoComplete="off" autoCorrect={false} autoCapitalize="words"/>
+                    <TextInput mode="outlined" value={municipality} onChangeText={setMunicipality} label="Municipio de la escuela" maxLength={150} autoComplete="off" autoCapitalize="words"/>
 
                     <TextInput mode="outlined" value={postal_code} onChangeText={setPostal_code} label="Código postal de la escuela" maxLength={5} autoComplete="off" keyboardType="number-pad"/>
 
@@ -128,7 +128,7 @@ export default AddSchool = ({navigation, route}) => {
 
     const Save = _ => {
         return (
-            <Button disabled={modalLoading || !verified} loading={modalLoading} mode="contained" onPress={() => {
+            <Button icon="content-save-outline" disabled={modalLoading || !verified} loading={modalLoading} mode="contained" onPress={() => {
                 saveSchool()
             }}>
                 Guardar
@@ -138,7 +138,7 @@ export default AddSchool = ({navigation, route}) => {
     
     const Cancel = _ => {
         return (
-            <Button disabled={modalLoading} mode="outlined" onPress={_ => {
+            <Button icon="close" disabled={modalLoading} mode="outlined" onPress={_ => {
                 navigation.pop()
             }}>
                 Cancelar

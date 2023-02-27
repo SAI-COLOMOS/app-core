@@ -35,35 +35,35 @@ export default AddUser = ({navigation, route}) => {
     const changeStateBloodTypeDialog = _ => setBloodTypesDialogState(!bloodTypesDialogState)
     const bloodTypes = [
         {
-            opcion: "RH O+",
+            opcion: "O+",
             id: "o+"
         },
         {
-            opcion: "RH O-",
+            opcion: "O-",
             id: "o-"
         },
         {
-            opcion: "RH A+",
+            opcion: "A+",
             id: "a+"
         },
         {
-            opcion: "RH A-",
+            opcion: "A-",
             id: "a-"
         },
         {
-            opcion: "RH B+",
+            opcion: "B+",
             id: "b+"
         },
         {
-            opcion: "RH B-",
+            opcion: "B-",
             id: "b-"
         },
         {
-            opcion: "RH AB+",
+            opcion: "AB+",
             id: "ab+"
         },
         {
-            opcion: "RH AB-",
+            opcion: "AB-",
             id: "ab-"
         }
     ]
