@@ -48,10 +48,12 @@ export default Login = ({navigation}) => {
                 })
             }
         ).then(
-            respuesta => respuesta.ok ? respuesta.json() : respuesta.status
+            response => response.ok ? response.json() : response.status
         ).catch(
             _ => null
         )
+
+        console.log(session)
 
         if(session && isNaN(session)) {
             payload = jwtDecode(session.token)

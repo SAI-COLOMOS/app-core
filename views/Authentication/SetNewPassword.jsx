@@ -58,7 +58,7 @@ export default SetNewPassword = ({navigation, route}) => {
         if(request == 200) {
             setModalSuccess(true)
         } else if (request != null) {
-            setReponseCode(response)
+            setReponseCode(request)
             setModalError(true)
         } else {
             setModalFatal(true)

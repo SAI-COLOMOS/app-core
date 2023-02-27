@@ -130,6 +130,8 @@ export default Dashboard = ({navigation, route}) => {
                             
                             <Item screen="Profile" payload={{user: actualUser, token: actualToken}} icon="account-outline" title="Tu perfil"/>
 
+                            <Item screen="Schools" payload={{user: actualUser, token: actualToken}} icon="town-hall" title="Escuelas"/>
+
                             {
                                 actualUser?.role == "Administrador" || actualUser?.role == "Encargado" ? (
                                     <Item screen="Users" payload={{user: actualUser, token: actualToken}} icon="account-supervisor-outline" title="Usuarios"/>
@@ -145,6 +147,8 @@ export default Dashboard = ({navigation, route}) => {
                                     null
                                 )
                             }
+
+
 
                         </Flex>
                     </Flex>

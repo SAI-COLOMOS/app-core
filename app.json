@@ -45,7 +45,7 @@
       "favicon": "./assets/favicon.png"
     },
     "extra": {
-      "API_LOCAL": "http://192.168.100.36:3000"
+      "API_LOCAL": "https://0d69-2806-102e-1e-32a0-216-3eff-feee-9184.ngrok.io"
     }
   }
 }
