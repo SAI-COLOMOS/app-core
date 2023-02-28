@@ -13,9 +13,9 @@ import Profile from "./Profile/Profile";
 import AddUser from "./Users/AddUser";
 
 // Places and areas
-import PlacesAndAreas from "./Administration/PlacesAndAreas";
-import PlaceDetails from "./Administration/PlaceDetails";
-import AddPlace from "./Administration/AddPlace";
+import PlacesAndAreas from "./PlacesAndAreas/PlacesAndAreas";
+import PlaceDetails from "./PlacesAndAreas/PlaceDetails";
+import AddPlace from "./PlacesAndAreas/AddPlace";
 
 // Schools
 import Schools from "./Schools/Schools";
