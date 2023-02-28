@@ -25,7 +25,7 @@
       "userInterfaceStyle": "automatic",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#390761"
+        "backgroundColor": "#000000"
       },
       "intentFilters": [
         {

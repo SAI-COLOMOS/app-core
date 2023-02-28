@@ -1,14 +1,51 @@
 import { Flex, VStack } from '@react-native-material/core'
-import { useState, useEffect } from 'react'
-import { IconButton, Text, TextInput } from 'react-native-paper'
-import { useHeaderHeight } from "@react-navigation/elements";
+import { useState, useEffect, useCallback } from 'react'
+import { Button, IconButton, Text, TextInput, useTheme } from 'react-native-paper'
+import { useHeaderHeight } from "@react-navigation/elements"
 import Header from '../Shared/Header'
-import * as SecureStore from 'expo-secure-store';
-import { Image, ScrollView } from 'react-native';
+import * as SecureStore from 'expo-secure-store'
+import { FlatList, Image, RefreshControl, ScrollView } from 'react-native'
+import { LinearGradient } from 'expo-linear-gradient'
+import Constants from "expo-constants";
+import DisplayDetails from '../Shared/DisplayDetails'
+import { useFocusEffect } from '@react-navigation/native'
 
 export default Profile = ({navigation, route}) => {
+    const localhost = Constants.expoConfig.extra.API_LOCAL
     const headerMargin = useHeaderHeight()
     const {user, token} = route.params
+    const theme = useTheme()
+
+    const [loading, setLoading] = useState(false)
+    const [profile, setProfile] = useState(undefined)
+
+    async function getProfile() {
+        setLoading(true)
+
+        const request = await fetch(
+            `${localhost}/profile/${user.register}`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                    "Cache-Control": "no-cache"
+                }
+            }
+        ).then(
+            response => response.ok ? response.json() : response.status
+        ).catch(
+            _ => null
+        )
+
+        setLoading(false)
+
+        if(request?.user) {
+            setProfile(request.user)
+        } else {
+            setProfile(request)
+        }
+    }
 
     useEffect(() => {
         navigation.setOptions({
@@ -20,72 +57,194 @@ export default Profile = ({navigation, route}) => {
         })
     }, [])
 
+    useFocusEffect(useCallback(() => {
+        getProfile()
+
+        return () => {}
+    }, []))
+
     const Logout = () => {
         return (
             <IconButton key="logut" icon="logout" onPress={async _ => {
                 await SecureStore.deleteItemAsync("token")
+                await SecureStore.deleteItemAsync("user")
+                await SecureStore.deleteItemAsync("keepAlive")
                 navigation.replace("Login")
             }}/>
+        )
+    }
+
+    const PersonalData = () => {
+        return (
+            <VStack p={20} spacing={5}>
+                <Text variant="bodyLarge">
+                    Datos personales
+                </Text>
+                <VStack spacing={10}>
+                    <Flex>
+                        <Text variant='labelSmall'>
+                            Edad
+                        </Text>
+                        <Text variant="bodyMedium">
+                            {profile?.age} años
+                        </Text>
+                    </Flex>
+                    
+                    <Flex>
+                        <Text variant='labelSmall'>
+                            Grupo sanguíneo
+                        </Text>
+                        <Text variant="bodyMedium">
+                            RH {profile?.blood_type}
+                        </Text>
+                    </Flex>
+
+                    <Flex>
+                        <Text variant='labelSmall'>
+                            Escuela de procedencia
+                        </Text>
+                        <Text variant="bodyMedium">
+                            {profile?.school}
+                        </Text>
+                    </Flex>
+                </VStack>
+            </VStack>
+        )
+    }
+
+    const ContactData = () => {
+        return (
+            <VStack p={20} spacing={5}>
+                <Text variant="labelLarge">
+                    Datos de contacto
+                </Text>
+                <VStack spacing={10}>
+                    <Flex>
+                        <Text variant='labelSmall'>
+                            Teléfono
+                        </Text>
+                        <Text variant="bodyMedium">
+                            {profile?.phone}
+                        </Text>
+                    </Flex>
+
+                    <Flex>
+                        <Text variant='labelSmall'>
+                            Correo electrónico
+                        </Text>
+                        <Text variant="bodyMedium">
+                            {profile?.email}
+                        </Text>
+                    </Flex>
+                </VStack>
+            </VStack>
+        )
+    }
+
+    const EmergencyData = () => {
+        return (
+            <VStack p={20} spacing={5}>
+                <Text variant="labelLarge">
+                    Datos de emergencia
+                </Text>
+                <VStack spacing={10}>
+                    <Flex>
+                        <Text variant='labelSmall'>
+                            Contacto de emergencia
+                        </Text>
+                        <Text variant="bodyMedium">
+                            {profile?.emergency_contact}
+                        </Text>
+                    </Flex>
+
+                    <Flex>
+                        <Text variant='labelSmall'>
+                            Teléfono de emergencia
+                        </Text>
+                        <Text variant="bodyMedium">
+                            {profile?.emergency_phone}
+                        </Text>
+                    </Flex>
+                </VStack>
+            </VStack>
+        )
+    }
+
+    const AccountData = () => {
+        return (
+            <VStack p={20} spacing={5}>
+                <Text variant="labelLarge">
+                    Datos de la cuenta
+                </Text>
+                <VStack spacing={10}>
+                    <Flex>
+                        <Text variant='labelSmall'>
+                            Rol
+                        </Text>
+                        <Text variant="bodyMedium">
+                            {profile?.role}
+                        </Text>
+                    </Flex>
+
+                    <Flex>
+                        <Text variant='labelSmall'>
+                            Tipo de prestador
+                        </Text>
+                        <Text variant="bodyMedium">
+                            {profile?.provider_type}
+                        </Text>
+                    </Flex>
+
+                    <Flex>
+                        <Text variant='labelSmall'>
+                            Bosque urbano de procedencia
+                        </Text>
+                        <Text variant="bodyMedium">
+                            {profile?.place}
+                        </Text>
+                    </Flex>
+
+                    <Flex>
+                        <Text variant='labelSmall'>
+                            Área de asignada
+                        </Text>
+                        <Text variant="bodyMedium">
+                            {profile?.assigned_area}
+                        </Text>
+                    </Flex>
+                </VStack>
+            </VStack>
+        )
+    }
+
+    const UpdatePassword = () => {
+        return (
+            <Button icon="form-textbox-password" onPress={() => {
+                navigation.navigate("UpdatePassword", {token, register: profile?.register})
+            }}>
+                Actualizar contraseña
+            </Button>
         )
     }
     
     return (
         <Flex fill pt={headerMargin}>
-            <ScrollView>
-                <VStack p={20} spacing={30}>
-                    <VStack items='center'>
-                        <Flex w={150} h={150} justify="end" items='end'>
-                            <Image source={require('../../assets/logo.png')} style={{height: "100%", width: "100%", position: 'absolute'}} />
-                            <IconButton mode='contained' icon="pencil-outline"/>
-                        </Flex>
-                        <Text variant="headlineSmall" numberOfLines={1}>
-                                {`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name}`}
-                        </Text>
-                        <Text variant="bodySmall" numberOfLines={1}>
-                                {`${user.role}${user.provider_type != "no aplica" ? ` - ${user.provider_type}` : ""}`}
-                        </Text>
-                    </VStack>
-                </VStack>
-
-                <VStack pr={25} pl={25} pb={50} spacing={30}>
-                    <VStack spacing={5}>
-                        <Text variant="labelLarge">
-                            Datos personales
-                        </Text>
-                        <VStack spacing={10}>
-                            <TextInput mode="outlined" editable={false} value={user.first_name} label="Nombre" maxLength={50} autoComplete="off" autoCorrect={false}/>
-                            <TextInput mode="outlined" editable={false} value={user.first_last_name} label="Apellido paterno" maxLength={50} autoComplete="off" autoCorrect={false}/>
-                            <TextInput mode="outlined" editable={false} value={user.second_last_name} label="Apellido materno" maxLength={50} autoComplete="off" autoCorrect={false}/>
-                            <TextInput mode="outlined" editable={false} value={user.age} label="Edad" keyboardType="numeric" maxLength={2} autoComplete="off" autoCorrect={false}/>
-                            <TextInput mode="outlined" editable={false} value={user.blood_type} label="Grupo sangíneo" right={<TextInput.Icon disabled={true} icon="menu-down"/>}/>
-                        </VStack>
-                    </VStack>
-
-                    <VStack spacing={5}>
-                        <Text variant="labelLarge">
-                            Datos de contacto
-                        </Text>
-                        <VStack spacing={10}>
-                            <TextInput mode="outlined" editable={false} value={user.email} label="Correo electrónico" maxLength={50} autoComplete="off" autoCorrect={false}/>
-                            <TextInput mode="outlined" editable={false} value={user.phone} label="Teléfono" keyboardType="numeric" maxLength={15} autoComplete="off" autoCorrect={false}/>
-                            <TextInput mode="outlined" editable={false} value={user.emergency_contact} label="Contacto de emergencia" maxLength={50} autoComplete="off" autoCorrect={false}/>
-                            <TextInput mode="outlined" editable={false} value={user.emergency_phone} label="Teléfono de emergencia" keyboardType="numeric" maxLength={15} autoComplete="off" autoCorrect={false}/>
-                        </VStack>
-                    </VStack>
-
-                    <VStack spacing={5}>
-                        <Text variant="labelLarge">
-                            Datos del usuario
-                        </Text>
-                        <VStack spacing={10}>
-                            <TextInput mode="outlined" editable={false} value={user.role} label="Rol" maxLength={50} autoComplete="off" autoCorrect={false}/>
-                            <TextInput mode="outlined" editable={false} value={user.assigned_area} label="Área asignada" keyboardType="numeric" maxLength={50} autoComplete="off" autoCorrect={false}/>
-                            <TextInput mode="outlined" editable={false} value={user.provider_type} label="Tipo de servicio" maxLength={50} autoComplete="off" autoCorrect={false}/>
-                        </VStack>
-                    </VStack>
-                </VStack>
-
-
+            <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={_ => getProfile()} />}>
+                {
+                    profile !== undefined ? (
+                        profile !== null ? (
+                            isNaN(profile) ? (
+                                <DisplayDetails icon="account-circle-outline" title={`${profile?.first_name} ${profile?.first_last_name} ${profile.second_last_name}`} children={[PersonalData(), ContactData(), EmergencyData(), AccountData()]} actions={[UpdatePassword()]}/>
+                            ) : (
+                                null
+                            )
+                        ) : (
+                            null
+                        )
+                    ) : (
+                        null
+                    )
+                }
             </ScrollView>
         </Flex>
     )

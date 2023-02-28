@@ -6,28 +6,30 @@ import * as SecureStore from 'expo-secure-store'
 import jwtDecode from "jwt-decode"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import Constants from "expo-constants"
-import LoadingDialog from "../Shared/Dialog";
-import ErrorDialog from "../Shared/Dialog";
+import * as Linking from 'expo-linking';
+import ModalMessage from "../Shared/ModalMessage"
+import ModalLoaading from "../Shared/ModalLoading"
 
 export default Login = ({navigation}) => {
     const insets = useSafeAreaInsets()
     const theme = useTheme()
     const localhost = Constants.expoConfig.extra.API_LOCAL
+    const url = Linking.useURL()
 
     const [credential, setCredential] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
     const [rememberUser, setRememberUser] = useState(false)
     const [activeSession, setActiveSession] = useState(undefined)
-    const [loadingDialogState, setLoadingDialogState] = useState(false)
-    const [errorDialogState, setErrorDialogState] = useState(false)
-    const [errorMessage, setErrorMessage] = useState(['', ''])
 
-    const changeStateLoadingDialog = _ => setLoadingDialogState(!loadingDialogState)
-    const changeStateErrorDialog = _ => setErrorDialogState(!errorDialogState)
+    const [modalLoading, setModalLoading] = useState(false)
+    const [modalSuccess, setModalSuccess] = useState(false)
+    const [modalError, setModalError] = useState(false)
+    const [modalFatal, setModalFatal] = useState(false)
+    const [reponseCode, setReponseCode] = useState("")
 
     async function getSession() {
-        changeStateLoadingDialog()
+        setModalLoading(true)
 
         let payload = ""
 
@@ -35,33 +37,34 @@ export default Login = ({navigation}) => {
             `${localhost}/auth/login`,
             {
                 method: "POST",
-                headers: {"Content-Type": "application/json"},
+                headers: {
+                    "Content-Type": "application/json",
+                    "Cache-Control": `no-cahce`
+                },
                 body: JSON.stringify({
-                    credential,
-                    password,
+                    credential: credential.trim(),
+                    password: password.trim(),
                     keepAlive: rememberUser
                 })
             }
         ).then(
-            respuesta => respuesta.ok ? respuesta.json() : respuesta.status
+            response => response.ok ? response.json() : response.status
         ).catch(
             _ => null
         )
 
+        console.log(session)
+
         if(session && isNaN(session)) {
             payload = jwtDecode(session.token)
+        } else if(session != null) {
+            setReponseCode(session)
+            setModalLoading(false)
+            setModalError(true)
+            return
         } else {
-            setLoadingDialogState(false)
-            changeStateErrorDialog()
-            switch (session) {
-                case 400:
-                    setErrorMessage(['Ocurrió un problema', 'No pudimos iniciar sesión, revisa tu usuario y contraseña y vuelve a intentar'])
-                    break;
-            
-                default:
-                    setErrorMessage(['Ocurrió un problema', 'No pudimos iniciar sesión, revisa tu conexión a internet y vuelve a intentar'])
-                    break;
-            }
+            setModalLoading(false)
+            setModalFatal(true)
             return
         }
 
@@ -71,7 +74,8 @@ export default Login = ({navigation}) => {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${session.token}`
+                    "Authorization": `Bearer ${session.token}`,
+                    "Cache-Control": `no-cahce`
                 }
             }
         ).then(
@@ -85,31 +89,43 @@ export default Login = ({navigation}) => {
             
             await SecureStore.setItemAsync("token", session.token)
             await SecureStore.setItemAsync("user", JSON.stringify(profile.user))
-
-            setLoadingDialogState(false)
-
-            navigation.replace("Dashboard")
-        } else {
-            setLoadingDialogState(false)
-            changeStateErrorDialog()
-            switch (session) {
-                case 400:
-                    setErrorMessage(['Ocurrió un problema', 'No pudimos iniciar sesión, revisa tu usuario y contraseña y vuelve a intentar'])
-                    break;
-            
-                default:
-                    setErrorMessage(['Ocurrió un problema', 'No pudimos iniciar sesión, revisa tu conexión a internet y vuelve a intentar'])
-                    break;
+            if (rememberUser) {
+                await SecureStore.setItemAsync("keepAlive", `${rememberUser}`)
             }
+            
+            if(credential === password) {
+                navigation.replace("FirstAccess")
+            } else {
+                navigation.replace("Dashboard")
+            }
+        } else if(profile != null) {
+            setReponseCode(session)
+            setModalLoading(false)
+            setModalError(true)
+            return
+        } else {
+            setModalLoading(false)
+            setModalFatal(true)
             return
         }
     }
 
     useEffect(() => {
+        if(url) {
+            const {hostname, path, queryParams} = Linking.parse(url)
+            if(path === "recovery" && queryParams?.token) {
+                navigation.navigate("SetNewPassword", {token: queryParams.token})
+                console.log(queryParams)
+            }
+        }
+    }, [url])
+
+    useEffect(() => {
         const getActualSession = async _ => {
             const token = await SecureStore.getItemAsync("token")
-
-            if(token) {
+            const keepAlive = await SecureStore.getItemAsync("keepAlive")
+            
+            if(keepAlive === "true") {
                 const payload = jwtDecode(token)
                 
                 if(payload.exp > Math.floor(Date.now() / 1000)) {
@@ -129,8 +145,6 @@ export default Login = ({navigation}) => {
             getActualSession()
         }
 
-        console.log(activeSession)
-
     }, [activeSession])
     
     return (
@@ -149,8 +163,8 @@ export default Login = ({navigation}) => {
                             </Flex>
 
                             <VStack spacing={10}>
-                                <TextInput mode="outlined" label="Registro, email o teléfono" autoComplete="username" onChangeText={setCredential}/>
-                                <TextInput mode="outlined" label="Contraseña" autoComplete="password" onChangeText={setPassword} secureTextEntry={!showPassword} right={<TextInput.Icon icon="eye" onPress={_ => {setShowPassword(!showPassword)}}/>}/>
+                                <TextInput mode="outlined" label="Registro, email o teléfono" autoComplete="username" autoCapitalize="none" onChangeText={setCredential}/>
+                                <TextInput mode="outlined" label="Contraseña" autoComplete="password" autoCapitalize="none" onChangeText={setPassword} secureTextEntry={!showPassword} right={<TextInput.Icon icon="eye" onPress={_ => {setShowPassword(!showPassword)}}/>}/>
                                 <HStack items="center" spacing={10}>
                                     <Switch value={rememberUser} onValueChange={_ => {setRememberUser(!rememberUser)}}/>
                                     <Text variant="bodyMedium">
@@ -160,13 +174,13 @@ export default Login = ({navigation}) => {
                             </VStack>
 
                             <VStack spacing={10}>
-                                <Button mode="contained" onPress={_ => {
+                                <Button disabled={modalLoading} loading={modalLoading} mode="contained" onPress={_ => {
                                     getSession()
                                 }}>
                                     Iniciar sesión
                                 </Button>
 
-                                <Button mode="text" onPress={_ => {
+                                <Button disabled={modalLoading} mode="text" onPress={_ => {
                                     navigation.navigate("ResetPassword")
                                 }}>
                                     Recuperar contraseña
@@ -184,11 +198,15 @@ export default Login = ({navigation}) => {
                     </ScrollView>
                 )
             }
-
-            <LoadingDialog permanente={false} cargando={true} handler={[loadingDialogState, changeStateLoadingDialog]}/>
-
-            <ErrorDialog titulo={errorMessage[0]} descripcion={errorMessage[1]} /*icono="alert"*/ handler={[errorDialogState, changeStateErrorDialog]} botonUno={['Aceptar']}/>
             
+            {/* <ModalLoaading handler={[modalLoading, () => setModalLoading(!modalLoading)]} dismissable={false}/> */}
+
+            <ModalMessage title="¡Listo!" description="La contraseña ha sido actualizada, ahora puedes acceder a la aplicación" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.replace("Dashboard")]]} dismissable={false} icon="check-circle-outline"/>
+
+            <ModalMessage title="Ocurrió un problema" description={`No pudimos iniciar sesión, verifica tu usuario y contraseña e intentalo nuevamente. (${reponseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline"/>
+
+            <ModalMessage title="Sin conexión a internet" description={`Parece que no tienes conexión a internet, conectate e intenta de nuevo`} handler={[modalFatal, () => setModalFatal(!modalFatal)]} actions={[['Aceptar']]} dismissable={true} icon="wifi-alert"/>
+
         </Flex>
     )
 }

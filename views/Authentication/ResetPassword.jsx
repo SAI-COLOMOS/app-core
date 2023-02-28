@@ -3,17 +3,21 @@ import { useState, useEffect } from "react"
 import { Text, Button, TextInput, Portal, Dialog } from "react-native-paper"
 import Constants from "expo-constants";
 import CreateForm from "../Shared/CreateForm"
-import Modal from "../Shared/Modal";
+import ModalLoaading from "../Shared/ModalLoading";
+import ModalMessage from "../Shared/ModalMessage";
 
 export default ResetPassword = ({navigation}) => {
     const localhost = Constants.expoConfig.extra.API_LOCAL
     const [credential, setCredential] = useState("")
-    const [loading, setLoading] = useState(false)
-    const [modalComplete, setModalComplete] = useState(false)
+
+    const [modalLoading, setModalLoading] = useState(false)
+    const [modalSuccess, setModalSuccess] = useState(false)
     const [modalError, setModalError] = useState(false)
+    const [modalFatal, setModalFatal] = useState(false)
+    const [reponseCode, setReponseCode] = useState("")
 
     const getRecovery = async () => {
-        setLoading(true)
+        setModalLoading(true)
 
         const request = await fetch(
             `${localhost}/auth/recovery`,
@@ -24,7 +28,7 @@ export default ResetPassword = ({navigation}) => {
                     "Cache-Control": "no-cache"
                 },
                 body: JSON.stringify({
-                    credential
+                    credential: credential.trim()
                 })
             }
         ).then(
@@ -32,25 +36,16 @@ export default ResetPassword = ({navigation}) => {
         ).catch(
             _ => null
         )
-
-        // setTimeout(() => {
-        //     setLoading(false)
-
-        //     setModalComplete(true)
-        // }, 1000);
             
-        setLoading(false)
-
-        console.log(request)
+        setModalLoading(false)
 
         if(request == 200) {
-            setModalComplete(true)
-            return
-        }
-
-        if(request == null) {
+            setModalSuccess(true)
+        } else if(request != null) {
+            setReponseCode(request)
             setModalError(true)
-            return
+        } else {
+            setModalFatal(true)
         }
 
         return
@@ -59,7 +54,7 @@ export default ResetPassword = ({navigation}) => {
     const Form = _ => {
         return (
             <VStack spacing={5}>
-                <TextInput mode="outlined" label="Registro, email o teléfono" autoComplete="username" onChangeText={setCredential}/>
+                <TextInput mode="outlined" label="Registro, email o teléfono" autoComplete="username" autoCapitalize="none" autoCorrect={false} onChangeText={setCredential}/>
             </VStack>
         )
     }
@@ -76,7 +71,7 @@ export default ResetPassword = ({navigation}) => {
 
     const Submit = _ => {
         return (
-            <Button mode="contained" loading={loading} disabled={loading} onPress={() => {
+            <Button icon="lock-reset" mode="contained" loading={modalLoading} disabled={modalLoading} onPress={() => {
                 getRecovery()
             }}>
                 Solicitar cambio
@@ -86,7 +81,7 @@ export default ResetPassword = ({navigation}) => {
 
     const Cancel = _ => {
         return (
-            <Button mode="outlined" disabled={loading} onPress={_ => {
+            <Button icon="close" mode="outlined" disabled={modalLoading} onPress={_ => {
                 navigation.pop()
             }}>
                 Cancelar
@@ -96,11 +91,16 @@ export default ResetPassword = ({navigation}) => {
 
     return (
         <Flex fill>
-            <CreateForm navigation={navigation} title="Reestablecer tu contraseña" loading={loading} children={[Info(), Form()]} actions={[Cancel(), Submit()]}/>
+            <CreateForm navigation={navigation} title="Reestablecer tu contraseña" loading={modalLoading} children={[Info(), Form()]} actions={[Submit(), Cancel()]}/>
 
-            <Modal title="¡Listo!" description="Se ha mandado un enlace a tu correo electrónico registrado, accede a él para que puedas cambiar tu contraseña" handler={[modalComplete, () => setModalComplete(!modalComplete)]} actions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline"/>
+            {/* <ModalLoaading handler={[modalLoading, () => setModalLoading(!modalLoading)]} dismissable={false}/> */}
 
-            {/* <Modal title="Ocurrió un problema" description="No podemos conectarnos a internet, revisa tu conexión e intentalo de nuevo" handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline"/> */}
+            <ModalMessage title="¡Listo!" description="Si la información que nos diste corresponde con tu usuario, te mandaremos un correo con los pasos para que puedas cambiar tu contraseña" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline"/>
+
+            <ModalMessage title="Ocurrió un problema" description={`No pudimos solicitar tu cambio de contraseña, intentalo más tarde. (${reponseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline"/>
+
+            <ModalMessage title="Sin conexión a internet" description={`Parece que no tienes conexión a internet, conectate e intenta de nuevo`} handler={[modalFatal, () => setModalFatal(!modalFatal)]} actions={[['Aceptar']]} dismissable={true} icon="wifi-alert"/>
+
 
         </Flex>
     )

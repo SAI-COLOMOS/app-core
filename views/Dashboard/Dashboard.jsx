@@ -49,11 +49,11 @@ export default Dashboard = ({navigation, route}) => {
             setGreeting("Buena tarde")
         }
 
-        if (time >= 19 && time < 7) {
+        if (time >= 19 || time < 7) {
             setGreeting("Buena noche")
         }
 
-        if (time >= 22 && time < 5) {
+        if (time >= 22 || time < 5) {
             setTimeToSleep(true)
         } else {
             setTimeToSleep(false)
@@ -130,8 +130,10 @@ export default Dashboard = ({navigation, route}) => {
                             
                             <Item screen="Profile" payload={{user: actualUser, token: actualToken}} icon="account-outline" title="Tu perfil"/>
 
+                            <Item screen="Schools" payload={{user: actualUser, token: actualToken}} icon="town-hall" title="Escuelas"/>
+
                             {
-                                actualUser?.role == "administrador" || actualUser?.role == "encargado" ? (
+                                actualUser?.role == "Administrador" || actualUser?.role == "Encargado" ? (
                                     <Item screen="Users" payload={{user: actualUser, token: actualToken}} icon="account-supervisor-outline" title="Usuarios"/>
                                 ) : (
                                     null
@@ -139,12 +141,14 @@ export default Dashboard = ({navigation, route}) => {
                             }
 
                             {
-                                actualUser?.role == "administrador" ? (
+                                actualUser?.role == "Administrador" ? (
                                     <Item screen="PlacesAndAreas" payload={{user: actualUser, token: actualToken}} icon="map-marker-radius-outline" title="Lugares y áreas"/>
                                 ) : (
                                     null
                                 )
                             }
+
+
 
                         </Flex>
                     </Flex>

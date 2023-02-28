@@ -9,12 +9,11 @@ import Constants from "expo-constants";
 import CreateForm from "../Shared/CreateForm"
 import ModalMessage from "../Shared/ModalMessage";
 
-export default SetNewPassword = ({navigation, route}) => {
+export default UpdatePassword = ({navigation, route}) => {
     const theme = useTheme()
     const localhost = Constants.expoConfig.extra.API_LOCAL
-    const {token} = route.params
+    const {token, register} = route.params
 
-    const [validToken, setValidToken] = useState(undefined)
     const [newPassword, setNewPassword] = useState("")
     const [showNewPassword, setShowNewPassword] = useState(false)
     const [confirmationNewPassword, setConfirmationNewPassword] = useState("")
@@ -32,15 +31,16 @@ export default SetNewPassword = ({navigation, route}) => {
     const [modalFatal, setModalFatal] = useState(false)
     const [reponseCode, setReponseCode] = useState("")
 
-    async function changePassword() {
+    async function updatePassword() {
         setModalLoading(true)
 
         const request = await fetch(
-            `${localhost}/auth/recovery?token=${token}`,
+            `${localhost}/users/password/${register}`,
             {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
                     "Cache-Control": "no-cache"
                 },
                 body: JSON.stringify({
@@ -65,24 +65,6 @@ export default SetNewPassword = ({navigation, route}) => {
         }
     }
 
-    useFocusEffect(useCallback(() => {
-        try {
-            console.log(token)
-            const payload = jwtDecode(token)
-    
-            if (payload.exp > Math.floor(Date.now() / 1000)) {
-                setValidToken(true)
-            } else {
-                setValidToken(false)
-            }
-        } catch (erro) {
-            setValidToken(null)
-            console.log(erro)
-        }
-
-        return () => {}
-    }, [token]))
-
     useEffect(() => {
         (/^.*(?=.{8,}).*$/).test(newPassword) ? setPassLength(true) : setPassLength(false);
         (/^.*(?=.*[A-Z]).*$/).test(newPassword) ? setHasUppercase(true) : setHasUppercase(false);
@@ -99,7 +81,7 @@ export default SetNewPassword = ({navigation, route}) => {
         return (
             <VStack spacing={5}>
                 <Text variant="bodyMedium">
-                    Para poder cambiar tu contraseña es necesario que cumplas con los siguientes requisitos:
+                    Para poder actualizar tu contraseña es necesario que cumplas con los siguientes requisitos:
                 </Text>
                 <VStack spacing={0}>
                     <HStack items="center" spacing={5}>
@@ -148,32 +130,6 @@ export default SetNewPassword = ({navigation, route}) => {
         )
     }
 
-    const OutOfTime = () => {
-        return (
-            <VStack center spacing={20} p={30}>
-                <IconButton icon="clock-alert-outline" size={50}/>
-                <VStack center>
-                    <Text variant="bodyMedium" style={{textAlign: "center"}}>
-                        El token para realizar el cambio de contraseña ya venció, vuelve a realizar el proceso de restablecimiento para obtener uno nuevo
-                    </Text>
-                </VStack>
-            </VStack>
-        )
-    }
-
-    const NotValid = () => {
-        return (
-            <VStack center spacing={20} p={30}>
-                <IconButton icon="key-alert-outline" size={50}/>
-                <VStack center>
-                    <Text variant="bodyMedium" style={{textAlign: "center"}}>
-                        El token para realizar el cambio de contraseña no es válido
-                    </Text>
-                </VStack>
-            </VStack>
-        )
-    }
-
     const Form = () => {
         return (
             <VStack spacing={5}>
@@ -188,8 +144,8 @@ export default SetNewPassword = ({navigation, route}) => {
 
     const Save = _ => {
         return (
-            <Button loading={modalLoading} mode="contained" disabled={(!passLength || !hasNumber || !hasUppercase || !hasLowercase || !hasSpecial || !areSamePassword || modalLoading)} onPress={() => {
-                changePassword()
+            <Button icon="content-save-outline" loading={modalLoading} mode="contained" disabled={(!passLength || !hasNumber || !hasUppercase || !hasLowercase || !hasSpecial || !areSamePassword || modalLoading)} onPress={() => {
+                updatePassword()
             }}>
                 Cambiar contraseña
             </Button>
@@ -198,7 +154,7 @@ export default SetNewPassword = ({navigation, route}) => {
     
     const Cancel = _ => {
         return (
-            <Button disabled={modalLoading} mode="outlined" onPress={_ => {
+            <Button icon="close" disabled={modalLoading} mode="outlined" onPress={_ => {
                 navigation.pop()
             }}>
                 Cancelar
@@ -206,32 +162,11 @@ export default SetNewPassword = ({navigation, route}) => {
         )
     }
 
-    const Accept = _ => {
-        return (
-            <Button mode="contained" onPress={_ => {
-                token = null
-                navigation.pop()
-            }}>
-                Aceptar
-            </Button>
-        )
-    }
-
     return (
         <Flex fill>
-            {
-                validToken !== null ? (
-                    validToken === true ? (
-                        <CreateForm title="Cambiar tu contraseña" loading={modalLoading} navigation={navigation} children={[Information(), Form()]} actions={[Cancel(), Save()]}/>
-                    ) : (
-                        <CreateForm title="Token vencido" navigation={navigation} children={[OutOfTime()]} actions={[Accept()]}/>
-                    )
-                ) : (
-                    <CreateForm title="Token inválido" navigation={navigation} children={[NotValid()]} actions={[Accept()]}/>
-                )
-            }
+            <CreateForm title="Actualizar tu contraseña" loading={modalLoading} navigation={navigation} children={[Information(), Form()]} actions={[Save(), Cancel()]}/>
 
-            <ModalMessage title="¡Listo!" description="La contraseña ha sido actualizada, inicia sesión para acceder a la aplicación" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline"/>
+            <ModalMessage title="¡Listo!" description="La contraseña ha sido actualizada" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline"/>
 
             <ModalMessage title="Ocurrió un problema" description={`No pudimos actualizar tu contraseña, intentalo más tarde. (${reponseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline"/>
 
