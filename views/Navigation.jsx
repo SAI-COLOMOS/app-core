@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 // Authentication
 import Login from "./Authentication/Login";
 import ResetPassword from "./Authentication/ResetPassword";
+import AddArea from "./Administration/AddArea";
 
 // Dashboard
 import Dashboard from "./Dashboard/Dashboard";
@@ -29,6 +30,7 @@ export default Navigation = () => {
                 <Stack.Screen name="Login" component={Login} options={{animation: "fade_from_bottom"}}/>
                 <Stack.Screen name="ResetPassword" component={ResetPassword} options={{headerShown: false, presentation: "containedTransparentModal"}}/>
                 <Stack.Screen name="SetNewPassword" component={SetNewPassword} options={{headerShown: false, presentation: "containedTransparentModal"}}/>
+                <Stack.Screen name="AddArea" component={AddArea}/>
             </Stack.Group>
             
             <Stack.Group navigationKey="dashboard" screenOptions={{headerShown: false, animationTypeForReplace: "push", animation: "fade_from_bottom"}}>
