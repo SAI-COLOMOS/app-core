@@ -19,7 +19,7 @@ export default Header = ({options, navigation, children}) => {
                         <IconButton icon="arrow-left" onPress={_ => {
                             navigation.pop()
                         }}/>
-                        <Text variant="headlineSmall">
+                        <Text variant="headlineSmall" numberOfLines={1}>
                             {options.headerTitle}
                         </Text>
                     </HStack>

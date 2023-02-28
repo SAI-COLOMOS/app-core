@@ -19,11 +19,13 @@ import AddPlace from "./Administration/AddPlace";
 
 // Schools
 import Schools from "./Schools/Schools";
+import SchoolDetails from "./Schools/SchoolDetails";
+import AddSchool from "./Schools/AddSchool";
+import EditSchool from "./Schools/EditSchool";
 
 // Users
 import Users from "./Users/Users";
 import SetNewPassword from "./Authentication/SetNewPassword";
-import AddSchool from "./Schools/AddSchool";
 
 export default Navigation = () => {
     const Stack = createNativeStackNavigator()
@@ -43,7 +45,9 @@ export default Navigation = () => {
 
             <Stack.Group navigationKey="schools" screenOptions={{headerShown: true, animation: "fade_from_bottom", animationTypeForReplace: "pop"}}>
                 <Stack.Screen name="Schools" component={Schools}/>
+                <Stack.Screen name="SchoolDetails" component={SchoolDetails}/>
                 <Stack.Screen name="AddSchool" component={AddSchool} options={{headerShown: false, presentation: "containedTransparentModal"}}/>
+                <Stack.Screen name="EditSchool" component={EditSchool} options={{headerShown: false, presentation: "containedTransparentModal"}}/>
             </Stack.Group>
 
             <Stack.Group navigationKey="placesAndAreas"screenOptions={{headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom"}}>

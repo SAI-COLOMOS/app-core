@@ -1,37 +1,42 @@
 import { Flex, VStack } from "@react-native-material/core"
 import { useEffect, useState } from "react"
-import { Button, Text, TextInput } from "react-native-paper"
+import { Button, Text, TextInput, useTheme } from "react-native-paper"
 import Constants from "expo-constants";
 import CreateForm from "../Shared/CreateForm"
 import ModalMessage from "../Shared/ModalMessage";
 
-export default AddSchool = ({navigation, route}) => {
+export default EditSchool = ({navigation, route}) => {
     const localhost = Constants.expoConfig.extra.API_LOCAL
-    const {token} = route.params
+    const theme = useTheme()
+    const {token, school} = route.params
 
-    const [school_name, setSchool_name] = useState("")
-    const [municipality, setMunicipality] = useState("")
-    const [street, setStreet] = useState("")
-    const [postal_code, setPostal_code] = useState("")
-    const [exterior_number, setExterior_number] = useState("")
-    const [colony, setColony] = useState("")
-    const [phone, setPhone] = useState("")
-    const [reference, setReference] = useState("")
+    const [school_name, setSchool_name] = useState(`${school.school_name}`)
+    const [municipality, setMunicipality] = useState(`${school.municipality}`)
+    const [street, setStreet] = useState(`${school.street}`)
+    const [postal_code, setPostal_code] = useState(`${school.postal_code}`)
+    const [exterior_number, setExterior_number] = useState(`${school.exterior_number}`)
+    const [colony, setColony] = useState(`${school.colony}`)
+    const [phone, setPhone] = useState(`${school.phone}`)
+    const [reference, setReference] = useState(`${school.reference}`)
     const [verified, setVerified] = useState(false)
 
+    const [modalConfim, setModalConfim] = useState(false)
     const [modalLoading, setModalLoading] = useState(false)
     const [modalSuccess, setModalSuccess] = useState(false)
+    const [modalSuccessDelete, setModalSuccessDelete] = useState(false)
     const [modalError, setModalError] = useState(false)
+    const [modalErrorDelete, setModalErrorDelete] = useState(false)
     const [modalFatal, setModalFatal] = useState(false)
     const [reponseCode, setReponseCode] = useState("")
+
 
     async function saveSchool() {
         setModalLoading(true)
 
         const request = await fetch(
-            `${localhost}/schools`,
+            `${localhost}/schools/${school.school_identifier}`,
             {
-                method: "POST",
+                method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`,
@@ -58,11 +63,44 @@ export default AddSchool = ({navigation, route}) => {
 
         setModalLoading(false)
 
-        if(request == 201 ) {
+        if(request == 200) {
             setModalSuccess(true)
         } else if(request != null) {
             setReponseCode(request)
             setModalError(true)
+        } else {
+            setModalFatal(true)
+        }
+    }
+
+    async function deleteSchool() {
+        setModalLoading(true)
+
+        const request = await fetch(
+            `${localhost}/schools/${school.school_identifier}`,
+            {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                    "Cache-Control": "no-cache"
+                }
+            }
+        ).then(
+            response => response.status
+        ).catch(
+            _ => null
+        )
+
+        console.log(request)
+
+        setModalLoading(false)
+
+        if(request == 200) {
+            setModalSuccessDelete(true)
+        } else if(request != null) {
+            setReponseCode(request)
+            setModalErrorDelete(true)
         } else {
             setModalFatal(true)
         }
@@ -126,6 +164,23 @@ export default AddSchool = ({navigation, route}) => {
         )
     }
 
+    const Delete = () => {
+        return (
+            <VStack spacing={5}>
+                <Text variant="labelLarge">
+                    Eliminar la escuela
+                </Text>
+                <VStack spacing={10}>
+                    <Button textColor={theme.colors.error}  icon="trash-can-outline" mode="outlined" onPress={() => {
+                        setModalConfim(!modalConfim)
+                    }}>
+                        Eliminar
+                    </Button>
+                </VStack>
+            </VStack>
+        )
+    }
+
     const Save = _ => {
         return (
             <Button icon="content-save-outline" disabled={modalLoading || !verified} loading={modalLoading} mode="contained" onPress={() => {
@@ -148,11 +203,17 @@ export default AddSchool = ({navigation, route}) => {
     
     return (
         <Flex fill>
-            <CreateForm title="Añadir escuela" children={[Data(), Address()]} actions={[Save(), Cancel()]} navigation={navigation} loading={modalLoading}/>
+            <CreateForm title="Editar escuela" children={[Data(), Address(), Delete()]} actions={[Save(), Cancel()]} navigation={navigation} loading={modalLoading}/>
 
-            <ModalMessage title="¡Listo!" description="La escuela ha sido añadida" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline"/>
+            <ModalMessage title="Eliminar escuela" description="¿Seguro que deseas elimina esta escuela? La acción no se puede deshacer" handler={[modalConfim, () => setModalConfim(!modalConfim)]} actions={[["Cancelar", () => setModalConfim(!modalConfim)], ['Aceptar', () => {setModalConfim(!modalConfim), deleteSchool()}]]} dismissable={true} icon="help-circle-outline"/>
+            
+            <ModalMessage title="¡Listo!" description="La escuela ha sido actualizada" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline"/>
+            
+            <ModalMessage title="¡Listo!" description="La escuela ha sido eliminada" handler={[modalSuccessDelete, () => setModalSuccessDelete(!modalSuccessDelete)]} actions={[['Aceptar', () => navigation.pop(2)]]} dismissable={false} icon="check-circle-outline"/>
 
-            <ModalMessage title="Ocurrió un problema" description={`No pudimos añadir la escuela, intentalo más tarde. (${reponseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline"/>
+            <ModalMessage title="Ocurrió un problema" description={`No pudimos actualizar la escuela, intentalo más tarde. (${reponseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline"/>
+            
+            <ModalMessage title="Ocurrió un problema" description={`No pudimos eliminar la escuela, intentalo más tarde. (${reponseCode})`} handler={[modalErrorDelete, () => setModalErrorDelete(!modalErrorDelete)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline"/>
         
             <ModalMessage title="Sin conexión a internet" description={`Parece que no tienes conexión a internet, conectate e intenta de nuevo`} handler={[modalFatal, () => setModalFatal(!modalFatal)]} actions={[['Aceptar']]} dismissable={true} icon="wifi-alert"/>
         </Flex>

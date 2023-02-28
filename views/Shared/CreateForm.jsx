@@ -22,7 +22,7 @@ export default CreateForm = ({navigation, route, loading, title, children, actio
 
     return (
         <Flex fill>
-            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{width: "100%", height: "100%"}}>
+            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'height' : 'height'} style={{width: "100%", height: "100%"}}>
                 <Flex fill style={{backgroundColor: theme.colors.backdrop}} justify="end">
                     <TouchableRipple android_ripple={false} style={{width: "100%", height: "100%", position: "absolute"}} onPress={() => {
                         if(!loading) {
@@ -55,7 +55,7 @@ export default CreateForm = ({navigation, route, loading, title, children, actio
 
                         </ScrollView>
 
-                        <HStack spacing={20} justify="between" pv={20} ph={20}>
+                        <HStack justify="between" reverse={true} pv={20} ph={20}>
                             {
                                 actions.map((action, index) => (
                                     <Flex key={`action ${index.toString()}`}>

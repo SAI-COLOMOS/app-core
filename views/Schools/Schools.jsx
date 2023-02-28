@@ -1,6 +1,6 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useState, useEffect, useCallback } from "react"
-import { Avatar, Button, Card, Divider, FAB, IconButton, Text, TouchableRipple, useTheme } from "react-native-paper"
+import { ActivityIndicator, Avatar, Button, Card, Divider, FAB, IconButton, List, ProgressBar, Text, TouchableRipple, useTheme } from "react-native-paper"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useHeaderHeight } from "@react-navigation/elements";
 import Header from "../Shared/Header"
@@ -64,18 +64,19 @@ export default Schools = ({navigation, route}) => {
     const Item = ({school_name, address}) => {
         return (
             <Flex ph={20} pv={5} onPress={() => {}}>
-                <Card mode="elevated">
-                        <HStack p={10} spacing={10} items="center" overflow="hidden">
-                            <Avatar.Icon size={50} icon="alert"/>
-                            <VStack>
-                                <Text variant="bodyLarge" numberOfLines={1}>
-                                    {school_name}
-                                </Text>
-                                <Text variant="bodyMedium">
-                                    {address}
-                                </Text>
-                            </VStack>
-                        </HStack>
+
+                <Card>
+                <HStack p={20} spacing={10} items="center" overflow="hidden">
+                    <Avatar.Icon size={50} icon="alert"/>
+                    <Flex fill>
+                        <Text variant="bodyLarge" numberOfLines={1}>
+                            {school_name}
+                        </Text>
+                        <Text variant="bodyMedium">
+                            {address}
+                        </Text>
+                    </Flex>
+                </HStack>
                 </Card>
             </Flex>
         )
@@ -121,6 +122,7 @@ export default Schools = ({navigation, route}) => {
                 </VStack>
                 <Flex>
                     <Button icon="reload" mode="outlined" onPress={_ => {
+                        setSchools(undefined)
                         getSchools()
                     }}>
                         Reintentar
@@ -132,20 +134,30 @@ export default Schools = ({navigation, route}) => {
 
     return (
         <Flex fill pt={headerMargin}>
+
+            <FlatList 
+                data={schools} 
+                ListEmptyComponent={() => schools === undefined ? null : schools === null ? <NoConection/> : <EmptyList/>}
+                refreshing={loading}
+                onRefresh={_ => getSchools()}
+                renderItem={({item}) => <List.Item onPress={() => {navigation.navigate("SchoolDetails", {token, school_identifier: item.school_identifier})}} title={item.school_name} description={`${item.street} #${item.exterior_number}, ${item.colony}, ${item.municipality}`} left={(props) => <List.Icon {...props}icon="town-hall"/>}/>}
+                ItemSeparatorComponent={(props) => <Divider {...props}/>}
+                
+            />
+
             {
-                schools !== null ? (
-                    <FlatList data={schools} ListEmptyComponent={() => <EmptyList/>} refreshing={loading} onRefresh={_ => getSchools()} renderItem={({item}) => <Item school_name={item.school_name} address={`${item.street} #${item.exterior_number}, ${item.colony}, ${item.municipality}`} />}/>
+                !(schools === undefined || schools === null) ? (
+                    <FAB icon="plus" style={{position: "absolute", margin: 16, right: 0, bottom: 0}} onPress={() => {
+                        navigation.navigate("AddSchool", {
+                            user,
+                            token
+                        })
+                    }}/>
                 ) : (
-                    <NoConection/>
+                    null
                 )
             }
 
-            <FAB icon="plus" style={{position: "absolute", margin: 16, right: 0, bottom: 0}} onPress={() => {
-                navigation.navigate("AddSchool", {
-                    user,
-                    token
-                })
-            }}/>
         </Flex>
     )
 }
