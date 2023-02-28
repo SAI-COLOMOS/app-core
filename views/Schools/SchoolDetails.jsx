@@ -86,13 +86,18 @@ export default SchoolDetails = ({navigation, route}) => {
     const Contact = () => {
         return (
             <VStack p={20} spacing={5}>
-                <Text variant="labelLarge">
+                <Text variant="bodyLarge">
                     Contacto de la escuela
                 </Text>
                 <VStack spacing={10}>
-                    <Text variant="bodyLarge">
-                        {school?.phone}
-                    </Text>
+                    <Flex>
+                        <Text variant="labelSmall">
+                            Teléfono de la escuela
+                        </Text>
+                        <Text variant="bodyMedium">
+                            {school?.phone}
+                        </Text>
+                    </Flex>
                 </VStack>
             </VStack>
         )
@@ -101,13 +106,27 @@ export default SchoolDetails = ({navigation, route}) => {
     const Address = () => {
         return (
             <VStack p={20} spacing={5}>
-                <Text variant="labelLarge">
+                <Text variant="bodyLarge">
                     Dirección de la escuela
                 </Text>
                 <VStack spacing={10}>
-                    <Text variant="bodyLarge">
-                        {`${school?.street} #${school?.exterior_number}\n${school?.colony}, ${school?.municipality}. ${school?.postal_code}${school?.reference ? `\n${school?.reference}` : ""}`}
-                    </Text>
+                    <Flex>
+                        <Text variant="labelSmall">
+                            Domicilio
+                        </Text>
+                        <Text variant="bodyLarge">
+                            {`${school?.street} #${school?.exterior_number}\n${school?.colony}, ${school?.municipality}. ${school?.postal_code}`}
+                        </Text>
+                    </Flex>
+
+                    <Flex>
+                        <Text variant="labelSmall">
+                            Referencia
+                        </Text>
+                        <Text variant="bodyMedium">
+                            {school?.reference ? school?.reference : "Sin referencia"}
+                        </Text>
+                    </Flex>
                 </VStack>
             </VStack>
         )
@@ -115,7 +134,7 @@ export default SchoolDetails = ({navigation, route}) => {
 
     return (
         <Flex fill pt={headerMargin}> 
-            <ScrollView style={{height: "100%"}} refreshControl={<RefreshControl refreshing={loading} onRefresh={_ => getSchool()}/>}>
+            <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={_ => getSchool()}/>}>
                 {
                     school !== undefined ? (
                         school !== null ? (

@@ -6,11 +6,15 @@ import { useEffect, useState } from "react";
 import Login from "./Authentication/Login";
 import ResetPassword from "./Authentication/ResetPassword";
 import FirstAccess from "./Authentication/FirstAccess";
+import SetNewPassword from "./Authentication/SetNewPassword";
 
 // Dashboard
 import Dashboard from "./Dashboard/Dashboard";
-import Profile from "./Profile/Profile";
 import AddUser from "./Users/AddUser";
+
+// Profile
+import Profile from "./Profile/Profile";
+import UpdatePassword from "./Profile/UpdatePassword";
 
 // Places and areas
 import PlacesAndAreas from "./PlacesAndAreas/PlacesAndAreas";
@@ -25,7 +29,6 @@ import EditSchool from "./Schools/EditSchool";
 
 // Users
 import Users from "./Users/Users";
-import SetNewPassword from "./Authentication/SetNewPassword";
 
 export default Navigation = () => {
     const Stack = createNativeStackNavigator()
@@ -63,6 +66,7 @@ export default Navigation = () => {
 
             <Stack.Group navigationKey="Profile" screenOptions={{headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom"}}>
                 <Stack.Screen name="Profile" component={Profile}/>
+                <Stack.Screen name="UpdatePassword" component={UpdatePassword} options={{headerShown: false, presentation: "containedTransparentModal"}}/>
             </Stack.Group>
         </Stack.Navigator>
     )

@@ -4,7 +4,7 @@ import { ScrollView } from "react-native"
 import { Avatar, Card, Text } from "react-native-paper"
 import { useHeaderHeight } from "@react-navigation/elements";
 
-export default SchoolDetails = ({icon, title, children}) => {
+export default SchoolDetails = ({icon, title, children, actions}) => {
     const headerMargin = useHeaderHeight()
 
     return (
@@ -21,7 +21,17 @@ export default SchoolDetails = ({icon, title, children}) => {
                     {
                         children?.length > 0 ? (
                             children.map(child => (
-                                <Card mode="contained" children={child}/>
+                                <Card mode="outlined" children={child}/>
+                            ))
+                        ) : (
+                            null
+                        )
+                    }
+
+                    {
+                        actions?.length > 0 ? (
+                            actions.map(action => (
+                                <Flex children={action}/>
                             ))
                         ) : (
                             null

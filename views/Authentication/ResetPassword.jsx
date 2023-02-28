@@ -71,7 +71,7 @@ export default ResetPassword = ({navigation}) => {
 
     const Submit = _ => {
         return (
-            <Button mode="contained" loading={modalLoading} disabled={modalLoading} onPress={() => {
+            <Button icon="lock-reset" mode="contained" loading={modalLoading} disabled={modalLoading} onPress={() => {
                 getRecovery()
             }}>
                 Solicitar cambio
@@ -81,7 +81,7 @@ export default ResetPassword = ({navigation}) => {
 
     const Cancel = _ => {
         return (
-            <Button mode="outlined" disabled={modalLoading} onPress={_ => {
+            <Button icon="close" mode="outlined" disabled={modalLoading} onPress={_ => {
                 navigation.pop()
             }}>
                 Cancelar
@@ -91,7 +91,7 @@ export default ResetPassword = ({navigation}) => {
 
     return (
         <Flex fill>
-            <CreateForm navigation={navigation} title="Reestablecer tu contraseña" loading={modalLoading} children={[Info(), Form()]} actions={[Cancel(), Submit()]}/>
+            <CreateForm navigation={navigation} title="Reestablecer tu contraseña" loading={modalLoading} children={[Info(), Form()]} actions={[Submit(), Cancel()]}/>
 
             {/* <ModalLoaading handler={[modalLoading, () => setModalLoading(!modalLoading)]} dismissable={false}/> */}
 

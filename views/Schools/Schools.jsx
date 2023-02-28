@@ -61,22 +61,17 @@ export default Schools = ({navigation, route}) => {
         return () => {}
     }, []))
 
-    const Item = ({school_name, address}) => {
+    const Item = ({school_name, address, school_identifier}) => {
         return (
             <Flex ph={20} pv={5} onPress={() => {}}>
-
-                <Card>
-                <HStack p={20} spacing={10} items="center" overflow="hidden">
-                    <Avatar.Icon size={50} icon="alert"/>
-                    <Flex fill>
-                        <Text variant="bodyLarge" numberOfLines={1}>
-                            {school_name}
-                        </Text>
-                        <Text variant="bodyMedium">
-                            {address}
-                        </Text>
-                    </Flex>
-                </HStack>
+                <Card mode="outlined" style={{overflow: "hidden"}}>
+                    <TouchableRipple onPress={() => {
+                        navigation.navigate("SchoolDetails", {token, school_identifier})
+                    }}>
+                        <Flex p={10}>
+                            <Card.Title title={school_name} titleNumberOfLines={2} subtitle={address} subtitleNumberOfLines={1} left={(props) => <Avatar.Icon {...props} icon="town-hall"/>}/>
+                        </Flex>
+                    </TouchableRipple>
                 </Card>
             </Flex>
         )
@@ -140,9 +135,7 @@ export default Schools = ({navigation, route}) => {
                 ListEmptyComponent={() => schools === undefined ? null : schools === null ? <NoConection/> : <EmptyList/>}
                 refreshing={loading}
                 onRefresh={_ => getSchools()}
-                renderItem={({item}) => <List.Item onPress={() => {navigation.navigate("SchoolDetails", {token, school_identifier: item.school_identifier})}} title={item.school_name} description={`${item.street} #${item.exterior_number}, ${item.colony}, ${item.municipality}`} left={(props) => <List.Icon {...props}icon="town-hall"/>}/>}
-                ItemSeparatorComponent={(props) => <Divider {...props}/>}
-                
+                renderItem={({item}) => <Item onPress={() => {}} school_name={item.school_name} address={`${item.street} #${item.exterior_number}, ${item.colony}, ${item.municipality}`} school_identifier={item.school_identifier}/>}
             />
 
             {
