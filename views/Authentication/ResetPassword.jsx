@@ -3,7 +3,7 @@ import { useState, useEffect } from "react"
 import { Text, Button, TextInput, Portal, Dialog } from "react-native-paper"
 import Constants from "expo-constants";
 import CreateForm from "../Shared/CreateForm"
-import ModalLoaading from "../Shared/ModalLoaading";
+import ModalLoaading from "../Shared/ModalLoading";
 import ModalMessage from "../Shared/ModalMessage";
 
 export default ResetPassword = ({navigation}) => {

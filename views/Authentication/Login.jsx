@@ -8,7 +8,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 import Constants from "expo-constants"
 import * as Linking from 'expo-linking';
 import ModalMessage from "../Shared/ModalMessage"
-import ModalLoaading from "../Shared/ModalLoaading"
+import ModalLoaading from "../Shared/ModalLoading"
 
 export default Login = ({navigation}) => {
     const insets = useSafeAreaInsets()

@@ -7,7 +7,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import Constants from "expo-constants";
 import { KeyboardAvoidingView, ScrollView } from "react-native"
 import ModalMessage from "../Shared/ModalMessage";
-import ModalLoading from "../Shared/ModalLoaading";
+import ModalLoading from "../Shared/ModalLoading";
 
 export default FirstAccess = ({navigation}) => {
     const insets = useSafeAreaInsets()
