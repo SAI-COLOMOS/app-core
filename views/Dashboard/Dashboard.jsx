@@ -95,7 +95,7 @@ export default Dashboard = ({navigation, route}) => {
                     }[Math.floor(Math.random() * 4)]
                 }
 
-                <LinearGradient colors={[theme.colors.cover, theme.colors.background]} locations={[0.5, 1]} style={{width: "100%", height: "100%", position: "absolute"}} />
+                <LinearGradient colors={[theme.colors.cover, theme.colors.background]} locations={[0.75, 1]} style={{width: "100%", height: "100%", position: "absolute"}} />
                 
             </Flex>
 
@@ -130,7 +130,6 @@ export default Dashboard = ({navigation, route}) => {
                             
                             <Item screen="Profile" payload={{user: actualUser, token: actualToken}} icon="account-outline" title="Tu perfil"/>
 
-                            <Item screen="Schools" payload={{user: actualUser, token: actualToken}} icon="town-hall" title="Escuelas"/>
 
                             {
                                 actualUser?.role == "Administrador" || actualUser?.role == "Encargado" ? (
@@ -143,6 +142,14 @@ export default Dashboard = ({navigation, route}) => {
                             {
                                 actualUser?.role == "Administrador" ? (
                                     <Item screen="PlacesAndAreas" payload={{user: actualUser, token: actualToken}} icon="map-marker-radius-outline" title="Lugares y áreas"/>
+                                ) : (
+                                    null
+                                )
+                            }
+
+                            {
+                                actualUser?.role == "Administrador" ? (
+                                    <Item screen="Schools" payload={{user: actualUser, token: actualToken}} icon="town-hall" title="Escuelas"/>
                                 ) : (
                                     null
                                 )
