@@ -20,7 +20,7 @@ import UpdatePassword from "./Profile/UpdatePassword";
 import PlacesAndAreas from "./PlacesAndAreas/PlacesAndAreas";
 import PlaceDetails from "./PlacesAndAreas/PlaceDetails";
 import AddPlace from "./PlacesAndAreas/AddPlace";
-import AddArea from "./Administration/AddArea";
+import AddArea from "./PlacesAndAreas/AddArea";
 
 // Schools
 import Schools from "./Schools/Schools";

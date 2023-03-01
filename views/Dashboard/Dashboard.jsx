@@ -132,6 +132,7 @@ export default Dashboard = ({navigation, route}) => {
 
                             <Item screen="Schools" payload={{user: actualUser, token: actualToken}} icon="town-hall" title="Escuelas"/>
 
+                            <Item screen="Lugares" payload={{user: actualUser, token: actualToken}} icon="town-hall" title="Escuelas"/>
                             {
                                 actualUser?.role == "Administrador" || actualUser?.role == "Encargado" ? (
                                     <Item screen="Users" payload={{user: actualUser, token: actualToken}} icon="account-supervisor-outline" title="Usuarios"/>
