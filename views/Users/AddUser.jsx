@@ -8,6 +8,7 @@ import BloodTypesDialog from "../Shared/Dialog";
 import CreateForm from "../Shared/CreateForm";
 import Constants from "expo-constants";
 import ModalMessage from "../Shared/ModalMessage";
+import Dropdown from "../Shared/Dropdown";
 
 export default AddUser = ({navigation, route}) => {
     const insets = useSafeAreaInsets()
@@ -70,35 +71,35 @@ export default AddUser = ({navigation, route}) => {
     const changeStateBloodTypeDialog = _ => setBloodTypesDialogState(!bloodTypesDialogState)
     const bloodTypes = [
         {
-            opcion: "O+",
+            option: "O+",
             id: "o+"
         },
         {
-            opcion: "O-",
+            option: "O-",
             id: "o-"
         },
         {
-            opcion: "A+",
+            option: "A+",
             id: "a+"
         },
         {
-            opcion: "A-",
+            option: "A-",
             id: "a-"
         },
         {
-            opcion: "B+",
+            option: "B+",
             id: "b+"
         },
         {
-            opcion: "B-",
+            option: "B-",
             id: "b-"
         },
         {
-            opcion: "AB+",
+            option: "AB+",
             id: "ab+"
         },
         {
-            opcion: "AB-",
+            option: "AB-",
             id: "ab-"
         }
     ]
@@ -121,25 +122,25 @@ export default AddUser = ({navigation, route}) => {
                     'Cache-Control': 'no-cache',
                 },
                 body: JSON.stringify({
-                    first_name,
-                    first_last_name,
-                    age,
-                    email,
-                    phone,
-                    emergency_contact,
-                    emergency_phone,
-                    blood_type: String(blood_type.opcion),
-                    provider_type: String(provider_type.opcion),
-                    place,
-                    assigned_area,
-                    school,
-                    role: String(role.opcion),
-                    status,
+                    first_name: first_name.trim(),
+                    first_last_name: first_last_name.trim(),
+                    age: age.trim(),
+                    email: email.trim(),
+                    phone: phone.trim(),
+                    emergency_contact: emergency_contact.trim(),
+                    emergency_phone: emergency_phone.trim(),
+                    blood_type: blood_type.opcion,
+                    provider_type: provider_type.opcion,
+                    place: place.trim(),
+                    assigned_area: assigned_area.trim(),
+                    school: school.trim(),
+                    role: role.opcion,
+                    status: status.trim(),
                     total_hours: Number(total_hours)
                 })
             }
         ).then(
-            response => response.json()
+            response => response.status
         ).catch(
             error => console.error("Error: ", error)
         )
@@ -147,7 +148,7 @@ export default AddUser = ({navigation, route}) => {
         console.log(request)
         setModalLoading(false)
         
-        if(request==201 || request == 200) {
+        if(request==201) {
             setModalSuccess(true)
             navigation.pop()
         }else if(request != null){
@@ -171,11 +172,7 @@ export default AddUser = ({navigation, route}) => {
                     <TextInput mode="outlined" value={first_last_name} onChangeText={setFirst_last_name} label="Apellido paterno" maxLength={50} autoComplete="off" autoCorrect={false}/>
                     <TextInput mode="outlined" value={second_last_name} onChangeText={setSecond_last_name} label="Apellido materno" maxLength={50} autoComplete="off" autoCorrect={false}/>
                     <TextInput mode="outlined" value={age} onChangeText={setAge} label="Edad" keyboardType="numeric" maxLength={2} autoComplete="off" autoCorrect={false}/>
-                    <TouchableRipple onPress={_ => {
-                        changeStateBloodTypeDialog()
-                    }}>
-                        <TextInput mode="outlined" editable={false} value={blood_type.opcion} /*onChange={setBlood_type}*/ label="Grupo sanguíneo" right={<TextInput.Icon disabled={true} icon="menu-down"/>}/>
-                    </TouchableRipple>
+                    <Dropdown title="Grupo sanguíneo" options={bloodTypes} value={blood_type} selected={setBlood_type}/>
                 </VStack>
                 <BloodTypesDialog titulo="Grupo sanguíneo" icono="alert" opciones={[bloodTypes, setBlood_type]} handler={[bloodTypesDialogState, changeStateBloodTypeDialog]} botonUno={['Aceptar']}/>
             </VStack>
@@ -212,9 +209,9 @@ export default AddUser = ({navigation, route}) => {
                     }}>
                         <TextInput mode="outlined" editable={false} value={provider_type.opcion} label="Tipo de prestador" right={<TextInput.Icon disabled={true} icon="menu-down"/>} />
                     </TouchableRipple>
-                    <TextInput mode="outlined" value={place.trim()} onChangeText={setPlace} label="Parque" maxLength={50} autoComplete="off" autoCorrect={false}/>
-                    <TextInput mode="outlined" value={assigned_area.trim()} onChangeText={setAssigned_area} label="Área asignada" maxLength={15} autoComplete="off" autoCorrect={false}/>
-                    <TextInput mode="outlined" value={school.trim()} onChangeText={setSchool} label="Escuela" maxLength={50} autoComplete="off" autoCorrect={false}/>
+                    <TextInput mode="outlined" value={place} onChangeText={setPlace} label="Parque" maxLength={100} autoComplete="off" autoCorrect={false}/>
+                    <TextInput mode="outlined" value={assigned_area} onChangeText={setAssigned_area} label="Área asignada" maxLength={100} autoComplete="off" autoCorrect={false}/>
+                    <TextInput mode="outlined" value={school} onChangeText={setSchool} label="Escuela" maxLength={100} autoComplete="off" autoCorrect={false}/>
                     <TouchableRipple onPress={_ => {
                         changeStateRoleTypeDialog()
                     }}>

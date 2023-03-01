@@ -143,7 +143,7 @@ export default FirstAccess = ({navigation}) => {
                             </VStack>
                         </VStack>
 
-                        <VStack ph={25} spacing={5}>
+                        <VStack ph={25} pb={50} spacing={5}>
                             <VStack spacing={10}>
                                 <TextInput mode="outlined" label="Nueva contraseña" value={newPassword} autoComplete="password-new" onChangeText={setNewPassword} secureTextEntry={!showNewPassword} right={<TextInput.Icon icon="eye" onPress={_ => {setShowNewPassword(!showNewPassword)}}/>}/>
 
@@ -154,7 +154,7 @@ export default FirstAccess = ({navigation}) => {
                     </ScrollView>
 
                     <HStack spacing={20} justify="between" pv={20} ph={20}>
-                        <Button disabled={modalLoading} mode="outlined" onPress={async _ => {
+                        <Button icon="logout" disabled={modalLoading} mode="outlined" onPress={async _ => {
                             await SecureStore.deleteItemAsync("token")
                             await SecureStore.deleteItemAsync("user")
                             await SecureStore.deleteItemAsync("keepAlive")
@@ -163,7 +163,7 @@ export default FirstAccess = ({navigation}) => {
                             Salir
                         </Button>
 
-                        <Button mode="contained" loading={modalLoading} disabled={(!passLength || !hasNumber || !hasUppercase || !hasLowercase || !hasSpecial || !areSamePassword || modalLoading)} onPress={() => {
+                        <Button icon="lock-reset" mode="contained" loading={modalLoading} disabled={(!passLength || !hasNumber || !hasUppercase || !hasLowercase || !hasSpecial || !areSamePassword || modalLoading)} onPress={() => {
                             changePassword()
                         }}>
                             Actualizar contraseña
