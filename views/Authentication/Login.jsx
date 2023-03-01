@@ -1,5 +1,5 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
-import { useEffect, useState } from "react"
+import { createContext, useEffect, useState } from "react"
 import { Image, ScrollView } from "react-native"
 import { Button, Card, Text, TextInput, Checkbox, ActivityIndicator, useTheme, Switch } from "react-native-paper"
 import * as SecureStore from 'expo-secure-store'
@@ -27,6 +27,7 @@ export default Login = ({navigation}) => {
     const [modalError, setModalError] = useState(false)
     const [modalFatal, setModalFatal] = useState(false)
     const [reponseCode, setReponseCode] = useState("")
+
 
     async function getSession() {
         setModalLoading(true)
@@ -85,10 +86,15 @@ export default Login = ({navigation}) => {
         )
 
         if(session && profile && isNaN(profile)) {
-            console.log(session.token, profile.user);
-            
             await SecureStore.setItemAsync("token", session.token)
-            await SecureStore.setItemAsync("user", JSON.stringify(profile.user))
+            await SecureStore.setItemAsync("user", JSON.stringify({
+                "first_name": profile.user.first_name,
+                "first_last_name": profile.user.first_last_name,
+                "second_last_name": profile.user.second_last_name ?? null,
+                "register": profile.user.register,
+                "role": profile.user.role
+            }))
+            
             if (rememberUser) {
                 await SecureStore.setItemAsync("keepAlive", `${rememberUser}`)
             }
@@ -129,10 +135,35 @@ export default Login = ({navigation}) => {
                 const payload = jwtDecode(token)
                 
                 if(payload.exp > Math.floor(Date.now() / 1000)) {
-                    setTimeout(_ => {
+                    
+                    const profile = await fetch(
+                        `${localhost}/profile/${payload.register}`,
+                        {
+                            method: "GET",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${token}`,
+                                "Cache-Control": `no-cahce`
+                            }
+                        }
+                    ).then(
+                        response => response.ok ? response.json() : response.status
+                    ).catch(
+                        error => null
+                    )
+                    if(profile?.user) {
+                        await SecureStore.setItemAsync("user", JSON.stringify({
+                            "first_name": profile.user.first_name,
+                            "first_last_name": profile.user.first_last_name,
+                            "second_last_name": profile.user.second_last_name ?? null,
+                            "register": profile.user.register,
+                            "role": profile.user.role
+                        }))
+            
                         setActiveSession(true)
                         navigation.replace("Dashboard")
-                    }, 3000)
+                    }
+
                 } else {
                     setActiveSession(false)
                 }
