@@ -1,44 +1,64 @@
 import { Flex, VStack } from "@react-native-material/core"
 import { useEffect, useState } from "react"
-import { ScrollView } from "react-native"
-import { Avatar, Card, Text } from "react-native-paper"
+import { Image, ScrollView, useWindowDimensions } from "react-native"
+import { Avatar, Card, Text, useTheme } from "react-native-paper"
 import { useHeaderHeight } from "@react-navigation/elements";
+import { LinearGradient } from "expo-linear-gradient";
 
-export default SchoolDetails = ({icon, title, children, actions}) => {
+export default SchoolDetails = ({icon, title, children, actions, photo}) => {
     const headerMargin = useHeaderHeight()
+    const {width} = useWindowDimensions()
+    const theme = useTheme()
 
     return (
         <Flex fill>
-                <VStack spacing={20} pt={30} pb={50} ph={20}>
-                    <Flex fill center>
-                        <Avatar.Icon icon={icon} size={100}/>
+            {
+                photo ? (
+                    <Flex w={"100%"} h={width} style={{position: "absolute"}}>
+                        <Image source={{uri: `data:image/png;base64,${photo}`}} style={{width: "100%", height: "100%"}} blurRadius={5} />
+                        <LinearGradient colors={[theme.colors.cover, theme.colors.background]} style={{width: "100%", height: "100%", position: "absolute"}}/>
                     </Flex>
-
-                    <Text variant="headlineSmall" style={{textAlign: "center"}}>
-                        {title}
-                    </Text>
-
+                ) : (
+                    null
+                )
+            }
+            
+            <VStack spacing={20} pt={50} pb={50} ph={20}>
+                <Flex fill center>
                     {
-                        children?.length > 0 ? (
-                            children.map(child => (
-                                <Card mode="outlined" children={child}/>
-                            ))
+                        photo ? (
+                            <Avatar.Image source={{uri: `data:image/png;base64,${photo}`}} size={150} />
                         ) : (
-                            null
+                            <Avatar.Icon icon={icon} size={150}/>
                         )
                     }
+                </Flex>
 
-                    {
-                        actions?.length > 0 ? (
-                            actions.map(action => (
-                                <Flex children={action}/>
-                            ))
-                        ) : (
-                            null
-                        )
-                    }
+                <Text variant="headlineSmall" style={{textAlign: "center"}}>
+                    {title}
+                </Text>
 
-                </VStack>
+                {
+                    children?.length > 0 ? (
+                        children.map((child, index) => (
+                            <Card key={index.toString()} mode="outlined" children={child}/>
+                        ))
+                    ) : (
+                        null
+                    )
+                }
+
+                {
+                    actions?.length > 0 ? (
+                        actions.map((action, index) => (
+                            <Flex key={index.toString()} children={action}/>
+                        ))
+                    ) : (
+                        null
+                    )
+                }
+
+            </VStack>
         </Flex>
     )
 }

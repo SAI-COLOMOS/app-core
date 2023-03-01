@@ -44,8 +44,20 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Necesitamos acceder a tu fotografías para poder seleccionar una."
+        }
+      ]
+    ],
     "extra": {
+<<<<<<< HEAD
       "API_LOCAL": "http://192.168.1.118:3000"
+=======
+      "API_LOCAL": "http://192.168.100.36:3000"
+>>>>>>> a3afe629c002c558a2379b253c4c9d97bc84febc
     }
   }
 }

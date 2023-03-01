@@ -5,10 +5,10 @@ import { Button, Text, TextInput, TouchableRipple, useTheme } from "react-native
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Constants from "expo-constants";
 import CreateForm from "../Shared/CreateForm";
+import ModalMessage from "../Shared/ModalMessage";
 
 export default AddPlace = ({navigation, route}) => {
-    const insets = useSafeAreaInsets()
-    const {user, token} = route.params
+    const {token} = route.params
     const localhost = Constants.expoConfig.extra.API_LOCAL
 
     const [place_name, setPlace_name] = useState('')
@@ -19,10 +19,19 @@ export default AddPlace = ({navigation, route}) => {
     const [postal_code, setPostal_code] = useState('')
     const [phone, setPhone] = useState('')
     const [reference, setReference] = useState('')
+    const [verified, setVerified] = useState(false)
+
+    const [modalLoading, setModalLoading] = useState(false)
+    const [modalSuccess, setModalSuccess] = useState(false)
+    const [modalError, setModalError] = useState(false)
+    const [modalFatal, setModalFatal] = useState(false)
+    const [reponseCode, setReponseCode] = useState("")
 
     async function savePlace() {
+        setModalLoading(true)
+
         const request = await fetch(
-            `${localhost}/places/`,
+            `${localhost}/places`,
             {
                 method: "POST",
                 headers: {
@@ -42,20 +51,45 @@ export default AddPlace = ({navigation, route}) => {
                 })
             }
         ).then(
-            response => response.JSON 
+            response => response.JSON
         ).catch(
             _ => null
         )
 
-        if(request == 201) {
-            console.log("ok")
-            navigation.pop()
-            return
-        }
+        console.log(request)
 
-        return
+        setModalLoading(false)
+
+        if(request == 201 ) {
+            setModalSuccess(true)
+        } else if(request != null) {
+            setReponseCode(request)
+            setModalError(true)
+        } else {
+            setModalFatal(true)
+        }
     }
 
+    useEffect(() => {
+        let check = true
+
+        place_name.length > 0 ? null : check = false
+        street.length > 0 ? null : check = false
+        number.length > 0 ? null : check = false
+        colony.length > 0 ? null : check = false
+        municipality.length > 0 ? null : check = false
+        postal_code.length == 5 ? null : check = false
+        phone.length == 10 ? null : check = false
+
+        if(check) {
+            setVerified(true)
+        } else {
+            setVerified(false)
+        }
+
+    }, [place_name, street, number, colony, municipality, postal_code, phone])
+
+    
     const Data = () => {
         return (
             <VStack spacing={5}>
@@ -63,13 +97,13 @@ export default AddPlace = ({navigation, route}) => {
                     Datos del bosque urbano
                 </Text>
                 <VStack spacing={10}>
-                <TextInput mode="outlined" value={place_name} onChangeText={setPlace_name} label="Nombre del bosque urbano" maxLength={50} autoComplete="off" autoCorrect={false}/>
-                <TextInput mode="outlined" value={street} onChangeText={setStreet} label="Nombre de la calle" maxLength={50} autoComplete="off" autoCorrect={false}/>
-                <TextInput mode="outlined" value={number} onChangeText={setNumber} label="Número del domicilio" maxLength={50} autoComplete="off" autoCorrect={false}/>
-                <TextInput mode="outlined" value={colony} onChangeText={setColony} label="Nombre de la colonia" maxLength={50} autoComplete="off" autoCorrect={false}/>
-                <TextInput mode="outlined" value={municipality} onChangeText={setMunicipality} label="Nombre del municipio" maxLength={50} autoComplete="off" autoCorrect={false}/>
-                <TextInput mode="outlined" value={postal_code} onChangeText={setPostal_code} label="Codigo postal" maxLength={50} autoComplete="off" autoCorrect={false}/>
-                <TextInput mode="outlined" value={phone} onChangeText={setPhone} label="Número telefónico" maxLength={50} autoComplete="off" autoCorrect={false}/>
+                <TextInput mode="outlined" value={place_name} onChangeText={setPlace_name} label="Nombre del bosque urbano" maxLength={50} />
+                <TextInput mode="outlined" value={street} onChangeText={setStreet} label="Nombre de la calle" maxLength={50} />
+                <TextInput mode="outlined" value={number} onChangeText={setNumber} label="Número del domicilio" maxLength={50} keyboardType="number-pad"/>
+                <TextInput mode="outlined" value={colony} onChangeText={setColony} label="Nombre de la colonia" maxLength={50} />
+                <TextInput mode="outlined" value={municipality} onChangeText={setMunicipality} label="Nombre del municipio" maxLength={50} />
+                <TextInput mode="outlined" value={postal_code} onChangeText={setPostal_code} label="Codigo postal" maxLength={5} keyboardType="number-pad" />
+                <TextInput mode="outlined" value={phone} onChangeText={setPhone} label="Número telefónico" maxLength={10} keyboardType="phone-pad" />
                 <TextInput mode="outlined" value={reference} onChangeText={setReference} label="Referencia del lugar" maxLength={250} />
                 </VStack>
             </VStack>
@@ -78,7 +112,7 @@ export default AddPlace = ({navigation, route}) => {
 
     const Save = _ => {
         return (
-            <Button mode="contained" onPress={() => {
+            <Button icon="content-save-outline" disabled={modalLoading || !verified} loading={modalLoading} mode="contained" onPress={() => {
                 savePlace()
             }}>
                 Guardar
@@ -88,7 +122,7 @@ export default AddPlace = ({navigation, route}) => {
     
     const Cancel = _ => {
         return (
-            <Button mode="outlined" onPress={_ => {
+            <Button icon="close" disabled={modalLoading} mode="outlined" onPress={_ => {
                 navigation.pop()
             }}>
                 Cancelar
@@ -96,20 +130,15 @@ export default AddPlace = ({navigation, route}) => {
         )
     }
 
-    useEffect(() => {
-        console.log()
-    }, [])
-
-    
-    console.log(place_name,
-        street,
-        number, 
-        colony,
-        municipality,
-        postal_code,
-        phone)
-
     return (
-        <CreateForm navigation={navigation} title="Añadir nuevo bosque urbano" children={[Data()]} actions={[Cancel(), Save()]} />
+        <Flex fill>
+            <CreateForm title="Añadir nuevo bosque urbano" children={[Data()]} actions={[Save(), Cancel()]} navigation={navigation} loading={modalLoading}/>
+
+            <ModalMessage title="¡Listo!" description="El bosque urbano ha sido añadido exitosamente" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline"/>
+
+            <ModalMessage title="Ocurrió un problema" description={`No pudimos añadir el bosque urbano, intentalo más tarde. (${reponseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline"/>
+        
+            <ModalMessage title="Sin conexión a internet" description={`Parece que no tienes conexión a internet, conectate e intenta de nuevo`} handler={[modalFatal, () => setModalFatal(!modalFatal)]} actions={[['Aceptar']]} dismissable={true} icon="wifi-alert"/>
+        </Flex>
     )
 }

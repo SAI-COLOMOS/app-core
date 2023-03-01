@@ -27,8 +27,8 @@ export default Header = ({options, navigation, children}) => {
                     <HStack>
                         {
                             children?.length > 0 ? (
-                                children.map(child => (
-                                    child
+                                children.map((child, index)=> (
+                                    <Flex key={index.toString()} children={child}/>
                                 ))
                             ) : (
                                 null
