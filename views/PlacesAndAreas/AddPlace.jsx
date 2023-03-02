@@ -13,7 +13,7 @@ export default AddPlace = ({navigation, route}) => {
 
     const [place_name, setPlace_name] = useState('')
     const [street, setStreet] = useState('')
-    const [number,  setNumber] = useState('')
+    const [exterior_number,  setExterior_number] = useState('')
     const [colony, setColony] = useState('')
     const [municipality, setMunicipality] = useState('')
     const [postal_code, setPostal_code] = useState('')
@@ -42,7 +42,7 @@ export default AddPlace = ({navigation, route}) => {
                 body: JSON.stringify({
                     place_name,
                     street,
-                    number, 
+                    exterior_number, 
                     colony,
                     municipality,
                     postal_code,
@@ -51,7 +51,7 @@ export default AddPlace = ({navigation, route}) => {
                 })
             }
         ).then(
-            response => response.JSON
+            response => response.status
         ).catch(
             _ => null
         )
@@ -75,7 +75,7 @@ export default AddPlace = ({navigation, route}) => {
 
         place_name.length > 0 ? null : check = false
         street.length > 0 ? null : check = false
-        number.length > 0 ? null : check = false
+        exterior_number.length > 0 ? null : check = false
         colony.length > 0 ? null : check = false
         municipality.length > 0 ? null : check = false
         postal_code.length == 5 ? null : check = false
@@ -87,7 +87,7 @@ export default AddPlace = ({navigation, route}) => {
             setVerified(false)
         }
 
-    }, [place_name, street, number, colony, municipality, postal_code, phone])
+    }, [place_name, street, exterior_number, colony, municipality, postal_code, phone])
 
     
     const Data = () => {
@@ -99,7 +99,7 @@ export default AddPlace = ({navigation, route}) => {
                 <VStack spacing={10}>
                 <TextInput mode="outlined" value={place_name} onChangeText={setPlace_name} label="Nombre del bosque urbano" maxLength={50} />
                 <TextInput mode="outlined" value={street} onChangeText={setStreet} label="Nombre de la calle" maxLength={50} />
-                <TextInput mode="outlined" value={number} onChangeText={setNumber} label="Número del domicilio" maxLength={50} keyboardType="number-pad"/>
+                <TextInput mode="outlined" value={exterior_number} onChangeText={setExterior_number} label="Número del domicilio" maxLength={50} keyboardType="number-pad"/>
                 <TextInput mode="outlined" value={colony} onChangeText={setColony} label="Nombre de la colonia" maxLength={50} />
                 <TextInput mode="outlined" value={municipality} onChangeText={setMunicipality} label="Nombre del municipio" maxLength={50} />
                 <TextInput mode="outlined" value={postal_code} onChangeText={setPostal_code} label="Codigo postal" maxLength={5} keyboardType="number-pad" />
