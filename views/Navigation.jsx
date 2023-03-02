@@ -10,7 +10,6 @@ import SetNewPassword from "./Authentication/SetNewPassword";
 
 // Dashboard
 import Dashboard from "./Dashboard/Dashboard";
-import AddUser from "./Users/AddUser";
 
 // Profile
 import Profile from "./Profile/Profile";
@@ -29,6 +28,9 @@ import EditSchool from "./Schools/EditSchool";
 
 // Users
 import Users from "./Users/Users";
+import AddUser from "./Users/AddUser";
+import UserDetails from "./Users/UserDetails";
+import EditUser from "./Users/EditUser";
 
 export default Navigation = () => {
     const Stack = createNativeStackNavigator()
@@ -61,7 +63,9 @@ export default Navigation = () => {
 
             <Stack.Group navigationKey="UsersAdmon" screenOptions={{headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom"}}>
                 <Stack.Screen name="Users" component={Users}/>
+                <Stack.Screen name="UserDetails" component={UserDetails}/>
                 <Stack.Screen name="AddUser" component={AddUser} options={{headerShown: false, presentation: "containedTransparentModal"}}/>
+                <Stack.Screen name="EditUser" component={EditUser} options={{headerShown: false, presentation: "containedTransparentModal"}}/>
             </Stack.Group>
 
             <Stack.Group navigationKey="Profile" screenOptions={{headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom"}}>
