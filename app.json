@@ -45,7 +45,7 @@
       "favicon": "./assets/favicon.png"
     },
     "extra": {
-      "API_LOCAL": "http://192.168.137.151:3000"
+      "API_LOCAL": "http://192.168.100.14:3000"
     }
   }
 }
