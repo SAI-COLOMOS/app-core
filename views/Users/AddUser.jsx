@@ -32,75 +32,56 @@ export default AddUser = ({navigation, route}) => {
     const [role, setRole] = useState('')
     const [status, setStatus] = useState('')
     const [total_hours, setTotal_hours] = useState('')
+    const [verified, setVerified] = useState();
 
-    const [providerTypesDialogState, setProviderTypesDialogState] = useState(false)
-    const changeStateProviderTypeDialog = _ => setProviderTypesDialogState(!providerTypesDialogState)
     const providerTypes = [
         {
-            opcion: "Servicio social",
-            id: "servicio social"
+            option: "Servicio social",
         },
         {
-            opcion: "Prácticas profesionales",
-            id: "prácticas profesionales"
+            option: "Prácticas profesionales",
         },
         {
-            opcion: "No aplica",
-            id: "no aplica"
+            option: "No aplica",
         }
     ]
 
-    const [roleTypesDialogState, setRoleTypesDialogState] = useState(false)
-    const changeStateRoleTypeDialog = _ => setRoleTypesDialogState(!roleTypesDialogState)
     const roleTypes = [
         {
-            opcion: "Administrador",
-            id: "administrador"
+            option: "Administrador",
         },
         {
-            opcion: "Encargado",
-            id: "encargado"
+            option: "Encargado",
         },
         {
-            opcion: "Prestador",
-            id: "prestador"
+            option: "Prestador",
         }
     ]
 
-    const [bloodTypesDialogState, setBloodTypesDialogState] = useState(false)
-    const changeStateBloodTypeDialog = _ => setBloodTypesDialogState(!bloodTypesDialogState)
     const bloodTypes = [
         {
             option: "O+",
-            id: "o+"
         },
         {
             option: "O-",
-            id: "o-"
         },
         {
             option: "A+",
-            id: "a+"
         },
         {
             option: "A-",
-            id: "a-"
         },
         {
             option: "B+",
-            id: "b+"
         },
         {
             option: "B-",
-            id: "b-"
         },
         {
             option: "AB+",
-            id: "ab+"
         },
         {
             option: "AB-",
-            id: "ab-"
         }
     ]
 
@@ -124,17 +105,18 @@ export default AddUser = ({navigation, route}) => {
                 body: JSON.stringify({
                     first_name: first_name.trim(),
                     first_last_name: first_last_name.trim(),
+                    second_last_name: second_last_name.trim(),
                     age: age.trim(),
                     email: email.trim(),
                     phone: phone.trim(),
                     emergency_contact: emergency_contact.trim(),
                     emergency_phone: emergency_phone.trim(),
-                    blood_type: blood_type.opcion,
-                    provider_type: provider_type.opcion,
+                    blood_type: blood_type,
+                    provider_type: provider_type,
                     place: place.trim(),
                     assigned_area: assigned_area.trim(),
                     school: school.trim(),
-                    role: role.opcion,
+                    role: role,
                     status: status.trim(),
                     total_hours: Number(total_hours)
                 })
@@ -148,7 +130,7 @@ export default AddUser = ({navigation, route}) => {
         console.log(request)
         setModalLoading(false)
         
-        if(request==201) {
+        if(request == 201) {
             setModalSuccess(true)
             navigation.pop()
         }else if(request != null){
@@ -159,6 +141,32 @@ export default AddUser = ({navigation, route}) => {
         }
 
     }
+
+    useEffect(() => {
+        let check = true
+
+        first_name.length > 0 ? null : check = false
+        first_last_name.length > 0 ? null : check = false
+        age.length > 0 ? null : check = false
+        blood_type.length > 0 ? null : check = false
+        email.length > 0 ? null : check = false
+        phone.length > 0 ? null : check = false
+        emergency_contact.length > 0 ? null : check = false
+        emergency_phone.length > 0 ? null : check = false
+        provider_type.length > 0 ? null : check = false
+        place.length > 0 ? null : check = false
+        assigned_area.length > 0 ? null : check = false
+        school.length > 0 ? null : check = false
+        role.length > 0 ? null : check = false
+        status.length > 0 ? null : check = false
+        total_hours.length > 0 ? null : check = false
+
+        if(check){
+            setVerified(true)
+        }else{
+            setVerified(false)
+        }
+    },[first_name, first_last_name, age, blood_type, email, phone, emergency_contact, emergency_phone, provider_type, place, assigned_area, school, role, status, total_hours])
 
     const PersonalData = () => {
         return (
@@ -174,7 +182,6 @@ export default AddUser = ({navigation, route}) => {
                     <TextInput mode="outlined" value={age} onChangeText={setAge} label="Edad" keyboardType="numeric" maxLength={2} autoComplete="off" autoCorrect={false}/>
                     <Dropdown title="Grupo sanguíneo" options={bloodTypes} value={blood_type} selected={setBlood_type}/>
                 </VStack>
-                <BloodTypesDialog titulo="Grupo sanguíneo" icono="alert" opciones={[bloodTypes, setBlood_type]} handler={[bloodTypesDialogState, changeStateBloodTypeDialog]} botonUno={['Aceptar']}/>
             </VStack>
             
             
@@ -188,7 +195,7 @@ export default AddUser = ({navigation, route}) => {
                     Datos de contacto
                 </Text>
                 <VStack spacing={10}>
-                    <TextInput mode="outlined" value={email} onChangeText={setEmail} label="Correo electrónico" maxLength={50} autoComplete="off" autoCorrect={false}/>
+                    <TextInput mode="outlined" value={email} onChangeText={setEmail} label="Correo electrónico" keyboardType="email-address" autoCapitalize="none" maxLength={50} autoComplete="off" autoCorrect={false}/>
                     <TextInput mode="outlined" value={phone} onChangeText={setPhone} label="Teléfono" keyboardType="numeric" maxLength={10} autoComplete="off" autoCorrect={false}/>
                     <TextInput mode="outlined" value={emergency_contact} onChangeText={setEmergency_contact} label="Contacto de emergencia" maxLength={50} autoComplete="off" autoCorrect={false}/>
                     <TextInput mode="outlined" value={emergency_phone} onChangeText={setEmergency_phone} label="Teléfono de emergencia" keyboardType="numeric" maxLength={10} autoComplete="off" autoCorrect={false}/>
@@ -204,33 +211,21 @@ export default AddUser = ({navigation, route}) => {
                     Datos del usuario
                 </Text>
                 <VStack spacing={10}>
-                    <TouchableRipple onPress={_ => {
-                        changeStateProviderTypeDialog()
-                    }}>
-                        <TextInput mode="outlined" editable={false} value={provider_type.opcion} label="Tipo de prestador" right={<TextInput.Icon disabled={true} icon="menu-down"/>} />
-                    </TouchableRipple>
-                    <TextInput mode="outlined" value={place} onChangeText={setPlace} label="Parque" maxLength={100} autoComplete="off" autoCorrect={false}/>
+                    <Dropdown title={"Tipo de prestador"} options={providerTypes} value={provider_type} selected={setProvider_type} />
+                    <TextInput mode="outlined" value={place} onChangeText={setPlace} label="Parque" autoCapitalize="words" maxLength={100} autoComplete="off" autoCorrect={false}/>
                     <TextInput mode="outlined" value={assigned_area} onChangeText={setAssigned_area} label="Área asignada" maxLength={100} autoComplete="off" autoCorrect={false}/>
                     <TextInput mode="outlined" value={school} onChangeText={setSchool} label="Escuela" maxLength={100} autoComplete="off" autoCorrect={false}/>
-                    <TouchableRipple onPress={_ => {
-                        changeStateRoleTypeDialog()
-                    }}>
-                        <TextInput mode="outlined" editable={false} value={role.opcion} label="Rol" right={<TextInput.Icon disabled={true} icon="menu-down"/>} />
-                    </TouchableRipple>
+                    <Dropdown title={"Rol"} options={roleTypes} value={role} selected={setRole} />
                     <TextInput mode="outlined" value={status} onChangeText={setStatus} label="Status" maxLength={15} autoComplete="off" autoCorrect={false}/>
                     <TextInput mode="outlined" value={total_hours} onChangeText={setTotal_hours} label="Total de horas" keyboardType="number-pad" maxLength={5} autoComplete="off" autoCorrect={false}/>
                 </VStack>
-                <BloodTypesDialog titulo="Tipo de prestador" icono="alert" opciones={[providerTypes, setProvider_type]} handler={[providerTypesDialogState, changeStateProviderTypeDialog]} botonUno={['Aceptar']}/>
-                <BloodTypesDialog titulo="Tipo de rol" icono="alert" opciones={[roleTypes, setRole]} handler={[roleTypesDialogState, changeStateRoleTypeDialog]} botonUno={['Aceptar']}/>
-
             </VStack>
         )
     }
 
     const Save = _ => {
         return (
-            <Button mode="contained" onPress={() => {
-                // console.log(request)
+            <Button mode="contained" icon="content-save-outline" disabled={modalLoading || !verified} loading={modalLoading} onPress={() => {
                 SaveUser()
             }}>
                 Guardar
@@ -247,10 +242,6 @@ export default AddUser = ({navigation, route}) => {
             </Button>
         )
     }
-
-    // useEffect(() => {
-    //     console.log(first_name)
-    // }, [first_name])
 
     return (
         <Flex fill>
