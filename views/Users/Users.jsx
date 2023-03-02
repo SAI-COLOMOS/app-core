@@ -1,11 +1,12 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
-import { useEffect, useState } from "react"
-import { Card, IconButton, Text, TextInput, useTheme, Avatar, FAB, Button } from "react-native-paper"
+import { useCallback, useEffect, useState } from "react"
+import { Card, IconButton, TouchableRipple, Text, TextInput, useTheme, Avatar, FAB, Button } from "react-native-paper"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useHeaderHeight } from "@react-navigation/elements";
 import Header from "../Shared/Header";
 import Constants from "expo-constants"
-import { RefreshControl, ScrollView } from "react-native";
+import { RefreshControl, ScrollView, FlatList } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default Users = ({navigation, route}) => {
     const headerMargin = useHeaderHeight()
@@ -33,14 +34,14 @@ export default Users = ({navigation, route}) => {
         ).catch(
             _ => null
         )
+        
+        setLoading(false)
 
         if(request?.users) {
             setUsers(request.users)
+        }else{
+            setUsers(request)
         }
-
-        console.log(users)
-
-        setLoading(false)
     }
 
     useEffect(() => {
@@ -56,57 +57,87 @@ export default Users = ({navigation, route}) => {
             getUsers()
         }
     }, [users])
+    
+    useFocusEffect(useCallback(() => {
+        getUsers()
+        return () => {}
+    }, []))
 
-    const Item = ({user}) => {
+    const Item = ({first_name, role, status, register}) => {
         return (
-            <Card>
-                <Card.Title
-                    title={`${user.first_name} ${user.first_last_name} ${user.second_last_name}`}
-                    subtitle={`${user.role} - ${user.status}`}
-                    left={props => <Avatar.Icon {...props} icon="account"/>}
-                />
-            </Card>
+            <Flex ph={20} pv={5} onPress={() => {}}>
+                <Card mode="outlined" style={{overflow: "hidden"}}>
+                    <TouchableRipple onPress={() => {
+                        navigation.navigate("UserDetails", {token, register})
+                    }}>
+                        <Flex p={10}>
+                            <Card.Title title={first_name} titleNumberOfLines={2} subtitle={role} subtitleNumberOfLines={1} left={(props) => <Avatar.Icon {...props} icon="account"/>}  />
+                        </Flex>
+                    </TouchableRipple>
+                </Card>
+            </Flex>
+        )
+    }
+
+    const EmptyList = _ => {
+        return (
+            <VStack center spacing={20} p={30}>
+                <Icon name="pencil-plus-outline" color={theme.colors.onBackground} size={50}/>
+                <VStack center>
+                    <Text variant="headlineSmall">
+                        Sin usuarios
+                    </Text>
+                    <Text variant="bodyMedium" style={{textAlign: "center"}}>
+                        No hay ningun usuario registrado, ¿qué te parece si hacemos el primero?
+                    </Text>
+                </VStack>
+                <Flex>
+                    <Button icon="plus" mode="outlined" onPress={_ => {
+                        navigation.navigate("AddUser", {
+                            user,
+                            token
+                        })
+                    }}>
+                        Agregar
+                    </Button>
+                </Flex>
+            </VStack>
+        )
+    }
+
+    const NoConection = _ => {
+        return (
+            <VStack center spacing={20} p={30}>
+                <Icon name="wifi-alert" color={theme.colors.onBackground} size={50}/>
+                <VStack center>
+                    <Text variant="headlineSmall">
+                        Sin conexión
+                    </Text>
+                    <Text variant="bodyMedium" style={{textAlign: "center"}}>
+                        Parece que no tienes conexión a internet, conectate e intenta de nuevo
+                    </Text>
+                </VStack>
+                <Flex>
+                    <Button icon="reload" mode="outlined" onPress={_ => {
+                        setUsers(undefined)
+                        getUsers()
+                    }}>
+                        Reintentar
+                    </Button>
+                </Flex>
+            </VStack>
         )
     }
 
     return (
         <Flex fill pt={headerMargin}>
-            <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={() => {getUsers()}}/>}>
-                <VStack p={10} spacing={10}>
-                    {
-                        users !== undefined ? (
-                            users?.length > 0 ? (
-                                users.map(user => (
-                                    <Flex key={user.register}>
-                                        <Item user={user}/>
-                                    </Flex>
-                                ))
-                            ) : (
-                                <Text>
-                                    Hola
-                                </Text>
-                            )
-                        ) : (
-                            <VStack center spacing={20}>
-                                <IconButton icon="wifi-alert" size={50}/>
-                                <VStack center>
-                                    <Text variant="headlineSmall">
-                                        Ocurrió un problema
-                                    </Text>
-                                    <Text variant="bodyMedium" style={{textAlign: "center"}}>
-                                        No podemos recuperar los usuarios, revisa tu conexión a internet e intentalo de nuevo
-                                    </Text>
-                                </VStack>
-                                <Flex>
-                                    <Button mode="outlined" onPress={_ => {getUsers()}}>
-                                        Reintentar
-                                    </Button>
-                                </Flex>
-                            </VStack>
-                        )
-                    }
-                </VStack>
-            </ScrollView>
+            <FlatList 
+                data={users} 
+                ListEmptyComponent={() => users === undefined ? null : users === null ? <NoConection/> : <EmptyList/>}
+                refreshing={loading}
+                onRefresh={_ => getUsers()}
+                renderItem={({item}) => <Item onPress={() => {}} first_name={`${item.first_name} ${item.first_last_name}`} role={`${item.role} - ${item.register} - ${item.status}`} register={item.register}/>}
+            />
 
             <FAB icon="plus" style={{position: "absolute", margin: 16, right: 0, bottom: 0}} onPress={() => {
                 navigation.navigate("AddUser", {
