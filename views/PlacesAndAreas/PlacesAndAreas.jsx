@@ -58,7 +58,6 @@ export default PlaceAndAreas = ({navigation, route}) => {
 
     useFocusEffect(useCallback(() => {
         getPlaces()
-
         return () => {}
     }, []))
 
@@ -70,7 +69,7 @@ export default PlaceAndAreas = ({navigation, route}) => {
                         navigation.navigate("PlaceDetails", {token, place_identifier})
                     }}>
                         <Flex p={10}>
-                            <Card.Title title={place_name} titleNumberOfLines={2} subtitle={place_address} subtitleNumberOfLines={1} left={(props) => <Avatar.Icon {...props} icon="town-hall"/>}/>
+                            <Card.Title title={place_name} titleNumberOfLines={2} subtitle={place_address} subtitleNumberOfLines={1} left={(props) => <Avatar.Icon {...props} icon="map-marker-radius-outline"/>}/>
                         </Flex>
                     </TouchableRipple>
                 </Card>
@@ -136,7 +135,7 @@ export default PlaceAndAreas = ({navigation, route}) => {
                 ListEmptyComponent={() => places === undefined ? null : places === null ? <NoConection/> : <EmptyList/>}
                 refreshing={loading}
                 onRefresh={_ => getPlaces()}
-                renderItem={({item}) => <Item place_name={item.place_name} place_address="A" place_identifier={1} />}
+                renderItem={({item}) => <Item place_name={item.place_name} place_address={`${item.street} #${item.exterior_number}, ${item.colony}, ${item.municipality}, ${item.postal_code}`} place_identifier={item.place_identifier} />}
             />
 
             {

@@ -88,7 +88,6 @@ export default AddPlace = ({navigation, route}) => {
         }
 
     }, [place_name, street, exterior_number, colony, municipality, postal_code, phone])
-
     
     const Data = () => {
         return (

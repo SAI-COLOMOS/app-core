@@ -5,19 +5,19 @@ import Constants from "expo-constants";
 import CreateForm from "../Shared/CreateForm"
 import ModalMessage from "../Shared/ModalMessage";
 
-export default EditSchool = ({navigation, route}) => {
+export default EditPlace = ({navigation, route}) => {
     const localhost = Constants.expoConfig.extra.API_LOCAL
     const theme = useTheme()
-    const {token, school} = route.params
+    const {token, places} = route.params
 
-    const [school_name, setSchool_name] = useState(`${school.school_name}`)
-    const [municipality, setMunicipality] = useState(`${school.municipality}`)
-    const [street, setStreet] = useState(`${school.street}`)
-    const [postal_code, setPostal_code] = useState(`${school.postal_code}`)
-    const [exterior_number, setExterior_number] = useState(`${school.exterior_number}`)
-    const [colony, setColony] = useState(`${school.colony}`)
-    const [phone, setPhone] = useState(`${school.phone}`)
-    const [reference, setReference] = useState(`${school.reference}`)
+    const [place_name, setPlace_name] = useState(`${places.place_name}`)
+    const [street, setStreet] = useState(`${places.street}`)
+    const [exterior_number, setExterior_number] = useState(`${places.exterior_number}`)
+    const [colony, setColony] = useState(`${places.colony}`)
+    const [municipality, setMunicipality] = useState(`${places.municipality}`)
+    const [postal_code, setPostal_code] = useState(`${places.postal_code}`)
+    const [phone, setPhone] = useState(`${places.phone}`)
+    const [reference, setReference] = useState(`${places.reference}`)
     const [verified, setVerified] = useState(false)
 
     const [modalConfirm, setModalConfirm] = useState(false)
@@ -30,11 +30,11 @@ export default EditSchool = ({navigation, route}) => {
     const [responseCode, setResponseCode] = useState("")
 
 
-    async function saveSchool() {
+    async function savePlace() {
         setModalLoading(true)
 
         const request = await fetch(
-            `${localhost}/schools/${school.school_identifier}`,
+            `${localhost}/places/${places.place_identifier}`,
             {
                 method: "PATCH",
                 headers: {
@@ -43,7 +43,7 @@ export default EditSchool = ({navigation, route}) => {
                     "Cache-Control": "no-cache"
                 },
                 body: JSON.stringify({
-                    school_name,
+                    place_name,
                     municipality,
                     street,
                     exterior_number,
@@ -73,11 +73,11 @@ export default EditSchool = ({navigation, route}) => {
         }
     }
 
-    async function deleteSchool() {
+    async function deletePlace() {
         setModalLoading(true)
 
         const request = await fetch(
-            `${localhost}/schools/${school.school_identifier}`,
+            `${localhost}/places/${places.place_identifier}`,
             {
                 method: "DELETE",
                 headers: {
@@ -109,11 +109,11 @@ export default EditSchool = ({navigation, route}) => {
     useEffect(() => {
         let check = true
 
-        school_name.length > 0 ? null : check = false
-        municipality.length > 0 ? null : check = false
+        place_name.length > 0 ? null : check = false
         street.length > 0 ? null : check = false
         exterior_number.length > 0 ? null : check = false
         colony.length > 0 ? null : check = false
+        municipality.length > 0 ? null : check = false
         postal_code.length == 5 ? null : check = false
         phone.length == 10 ? null : check = false
 
@@ -123,42 +123,23 @@ export default EditSchool = ({navigation, route}) => {
             setVerified(false)
         }
 
-    }, [school_name, municipality, street, postal_code, exterior_number, colony, phone])
+    }, [place_name, street, exterior_number, colony, municipality, postal_code, phone])
 
     const Data = () => {
         return (
             <VStack spacing={5}>
                 <Text variant="labelLarge">
-                    Datos de la escuela
+                    Datos del bosque urbano
                 </Text>
                 <VStack spacing={10}>
-                    <TextInput mode="outlined" multiline={true} value={school_name} onChangeText={setSchool_name} label="Nombre de la escuela" maxLength={150} autoComplete="off" autoCapitalize="words"/>
-                    
-                    <TextInput mode="outlined" value={phone} onChangeText={setPhone} label="Teléfono de la escuela" maxLength={10} autoComplete="off" keyboardType="phone-pad"/>
-                </VStack>
-            </VStack>
-        )
-    }
-
-    const Address = () => {
-        return (
-            <VStack spacing={5}>
-                <Text variant="labelLarge">
-                    Dirección de la escuela
-                </Text>
-                <VStack spacing={10}>
-                    <TextInput mode="outlined" value={street} onChangeText={setStreet} label="Calle de la escuela" maxLength={150} autoComplete="off" autoCapitalize="words"/>
-
-                    <TextInput mode="outlined" value={exterior_number} onChangeText={setExterior_number} label="Número de la escuela" keyboardType="number-pad" maxLength={10} autoComplete="off"/>
-
-                    <TextInput mode="outlined" value={colony} onChangeText={setColony} label="Colonia de la escuela" maxLength={150} autoComplete="off" autoCapitalize="words"/>
-
-                    <TextInput mode="outlined" value={municipality} onChangeText={setMunicipality} label="Municipio de la escuela" maxLength={150} autoComplete="off" autoCapitalize="words"/>
-
-                    <TextInput mode="outlined" value={postal_code} onChangeText={setPostal_code} label="Código postal de la escuela" maxLength={5} autoComplete="off" keyboardType="number-pad"/>
-
-                    <TextInput mode="outlined" value={reference} onChangeText={setReference} label="Referencias de la escuela" maxLength={250} autoComplete="off" numberOfLines={3}  multiline={true}/>
-
+                <TextInput mode="outlined" value={place_name} onChangeText={setPlace_name} label="Nombre del bosque urbano" maxLength={50} />
+                <TextInput mode="outlined" value={street} onChangeText={setStreet} label="Nombre de la calle" maxLength={50} />
+                <TextInput mode="outlined" value={exterior_number} onChangeText={setExterior_number} label="Número del domicilio" maxLength={50} keyboardType="number-pad"/>
+                <TextInput mode="outlined" value={colony} onChangeText={setColony} label="Nombre de la colonia" maxLength={50} />
+                <TextInput mode="outlined" value={municipality} onChangeText={setMunicipality} label="Nombre del municipio" maxLength={50} />
+                <TextInput mode="outlined" value={postal_code} onChangeText={setPostal_code} label="Codigo postal" maxLength={5} keyboardType="number-pad" />
+                <TextInput mode="outlined" value={phone} onChangeText={setPhone} label="Número telefónico" maxLength={10} keyboardType="phone-pad" />
+                <TextInput mode="outlined" value={reference} onChangeText={setReference} label="Referencia del lugar" maxLength={250} />
                 </VStack>
             </VStack>
         )
@@ -168,7 +149,7 @@ export default EditSchool = ({navigation, route}) => {
         return (
             <VStack spacing={5}>
                 <Text variant="labelLarge">
-                    Eliminar la escuela
+                    Eliminar bosque urbano
                 </Text>
                 <VStack spacing={10}>
                     <Button textColor={theme.colors.error}  icon="trash-can-outline" mode="outlined" onPress={() => {
@@ -184,7 +165,7 @@ export default EditSchool = ({navigation, route}) => {
     const Save = _ => {
         return (
             <Button icon="content-save-outline" disabled={modalLoading || !verified} loading={modalLoading} mode="contained" onPress={() => {
-                saveSchool()
+                savePlace()
             }}>
                 Guardar
             </Button>
@@ -203,17 +184,17 @@ export default EditSchool = ({navigation, route}) => {
     
     return (
         <Flex fill>
-            <CreateForm title="Editar escuela" children={[Data(), Address(), Delete()]} actions={[Save(), Cancel()]} navigation={navigation} loading={modalLoading}/>
+            <CreateForm title="Editar bosque urbano" children={[Data(), Delete()]} actions={[Save(), Cancel()]} navigation={navigation} loading={modalLoading}/>
 
-            <ModalMessage title="Eliminar escuela" description="¿Seguro que deseas eliminar esta escuela? La acción no se podrá deshacer" handler={[modalConfirm, () => setModalConfirm(!modalConfirm)]} actions={[["Cancelar", () => setModalConfirm(!modalConfirm)], ['Aceptar', () => {setModalConfirm(!modalConfirm), deleteSchool()}]]} dismissable={true} icon="help-circle-outline"/>
+            <ModalMessage title="Eliminar bosque urbano" description="¿Seguro que deseas eliminar este lugar? La acción no se podrá deshacer" handler={[modalConfirm, () => setModalConfirm(!modalConfirm)]} actions={[["Cancelar", () => setModalConfirm(!modalConfirm)], ['Aceptar', () => {setModalConfirm(!modalConfirm), deletePlace()}]]} dismissable={true} icon="help-circle-outline"/>
             
-            <ModalMessage title="¡Listo!" description="La escuela ha sido actualizada" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline"/>
+            <ModalMessage title="¡Listo!" description="El lugar ha sido actualizado" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline"/>
             
-            <ModalMessage title="¡Listo!" description="La escuela ha sido eliminada" handler={[modalSuccessDelete, () => setModalSuccessDelete(!modalSuccessDelete)]} actions={[['Aceptar', () => navigation.pop(2)]]} dismissable={false} icon="check-circle-outline"/>
+            <ModalMessage title="¡Listo!" description="El lugar ha sido eliminado" handler={[modalSuccessDelete, () => setModalSuccessDelete(!modalSuccessDelete)]} actions={[['Aceptar', () => navigation.pop(2)]]} dismissable={false} icon="check-circle-outline"/>
 
-            <ModalMessage title="Ocurrió un problema" description={`No pudimos actualizar la escuela, intentalo más tarde (${responseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline"/>
+            <ModalMessage title="Ocurrió un problema" description={`No pudimos actualizar el lugar, intentalo más tarde (${responseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline"/>
             
-            <ModalMessage title="Ocurrió un problema" description={`No pudimos eliminar la escuela, intentalo más tarde (${responseCode})`} handler={[modalErrorDelete, () => setModalErrorDelete(!modalErrorDelete)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline"/>
+            <ModalMessage title="Ocurrió un problema" description={`No pudimos eliminar el lugar, intentalo más tarde (${responseCode})`} handler={[modalErrorDelete, () => setModalErrorDelete(!modalErrorDelete)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline"/>
         
             <ModalMessage title="Sin conexión a internet" description={`Parece que no tienes conexión a internet, conectate e intenta de nuevo`} handler={[modalFatal, () => setModalFatal(!modalFatal)]} actions={[['Aceptar']]} dismissable={true} icon="wifi-alert"/>
         </Flex>

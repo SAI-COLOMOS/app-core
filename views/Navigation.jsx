@@ -19,6 +19,7 @@ import UpdatePassword from "./Profile/UpdatePassword";
 // Places and areas
 import PlacesAndAreas from "./PlacesAndAreas/PlacesAndAreas";
 import PlaceDetails from "./PlacesAndAreas/PlaceDetails";
+import EditPlace from "./PlacesAndAreas/EditPlace";
 import AddPlace from "./PlacesAndAreas/AddPlace";
 import AddArea from "./PlacesAndAreas/AddArea";
 
@@ -58,6 +59,7 @@ export default Navigation = () => {
                 <Stack.Screen name="PlacesAndAreas" component={PlacesAndAreas}/>
                 <Stack.Screen name="PlaceDetails" component={PlaceDetails}/>
                 <Stack.Screen name="AddPlace" component={AddPlace} options={{headerShown: false, presentation: "containedTransparentModal"}}/>
+                <Stack.Screen name="EditPlace" component={EditPlace} options={{headerShown: false, presentation: "containedTransparentModal"}}/>                
                 <Stack.Screen name="AddArea" component={AddArea}/>
             </Stack.Group>
 
