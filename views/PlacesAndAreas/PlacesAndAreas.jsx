@@ -1,22 +1,25 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
-import { useCallback, useEffect, useState } from "react"
-import { Card, IconButton, Text, TextInput, useTheme, Avatar, FAB, Button, TouchableRipple } from "react-native-paper"
+import { useState, useEffect, useCallback } from "react"
+import { ActivityIndicator, Avatar, Button, Card, Divider, FAB, IconButton, List, ProgressBar, Text, TouchableRipple, useTheme } from "react-native-paper"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useHeaderHeight } from "@react-navigation/elements";
-import Header from "../Shared/Header";
-import Constants from "expo-constants"
-import { RefreshControl, ScrollView } from "react-native";
+import Header from "../Shared/Header"
+import Constants from "expo-constants";
+import { FlatList } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
-export default Places = ({navigation, route}) => {
-    const headerMargin = useHeaderHeight()
-    const {user, token} = route.params
+export default PlaceAndAreas = ({navigation, route}) => {
     const localhost = Constants.expoConfig.extra.API_LOCAL
+    const theme = useTheme()
+    const {user, token} = route.params
+    const insets = useSafeAreaInsets()
+    const headerMargin = useHeaderHeight()
 
-    const [loading, setLoading] = useState(false)
     const [places, setPlaces] = useState(undefined)
+    const [loading, setLoading] = useState(false)
 
-    const getPlaces = async _ => {
+    async function getPlaces() {
         setLoading(true)
 
         const request = await fetch(
@@ -26,7 +29,7 @@ export default Places = ({navigation, route}) => {
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`,
-                    'Cache-Control': 'no-cache'
+                    "Cache-Control": "no-cache"
                 }
             }
         ).then(
@@ -35,22 +38,21 @@ export default Places = ({navigation, route}) => {
             _ => null
         )
 
+        setLoading(false)
+
         if(request?.places) {
             setPlaces(request.places)
+            console.log(request)
         } else {
             setPlaces(request)
         }
-
-        console.log(places)
-
-        setLoading(false)
     }
 
     useEffect(() => {
         navigation.setOptions({
             header: (props) => <Header {...props}/>,
             headerTransparent: true,
-            headerTitle: "Lugares y áreas"
+            headerTitle: "Bosques urbanos"
         })
     }, [])
 
@@ -60,103 +62,96 @@ export default Places = ({navigation, route}) => {
         return () => {}
     }, []))
 
-    const Item = ({place}) => {
+    const Item = ({place_name, place_address, place_identifier}) => {
         return (
-            <Card>
-                <TouchableRipple onPress={() => {
-                    navigation.navigate("PlaceDetails", {place})
-                }}>
-                    <Card.Title
-                        title={`${place.place_name}`}
-                        subtitle={`${place.place_areas?.length === 1 ? 'Un área' : `${place.place_areas?.length} áreas`}`}
-                        left={props => <Avatar.Icon {...props} icon="account"/>}
-                    />
-                </TouchableRipple>
-            </Card>
+            <Flex ph={20} pv={5} onPress={() => {}}>
+                <Card mode="outlined" style={{overflow: "hidden"}}>
+                    <TouchableRipple onPress={() => {
+                        navigation.navigate("PlaceDetails", {token, place_identifier})
+                    }}>
+                        <Flex p={10}>
+                            <Card.Title title={place_name} titleNumberOfLines={2} subtitle={place_address} subtitleNumberOfLines={1} left={(props) => <Avatar.Icon {...props} icon="town-hall"/>}/>
+                        </Flex>
+                    </TouchableRipple>
+                </Card>
+            </Flex>
+        )
+    }
+
+    const EmptyList = _ => {
+        return (
+            <VStack center spacing={20} p={30}>
+                <Icon name="pencil-plus-outline" color={theme.colors.onBackground} size={50}/>
+                <VStack center>
+                    <Text variant="headlineSmall">
+                        Sin bosques urbanos
+                    </Text>
+                    <Text variant="bodyMedium" style={{textAlign: "center"}}>
+                        No hay ningun bosque urbano registrado, ¿qué te parece si hacemos el primero?
+                    </Text>
+                </VStack>
+                <Flex>
+                    <Button icon="plus" mode="outlined" onPress={_ => {
+                        navigation.navigate("AddPlace", {
+                            user,
+                            token
+                        })
+                    }}>
+                        Agregar
+                    </Button>
+                </Flex>
+            </VStack>
+        )
+    }
+
+    const NoConection = _ => {
+        return (
+            <VStack center spacing={20} p={30}>
+                <Icon name="wifi-alert" color={theme.colors.onBackground} size={50}/>
+                <VStack center>
+                    <Text variant="headlineSmall">
+                        Sin conexión
+                    </Text>
+                    <Text variant="bodyMedium" style={{textAlign: "center"}}>
+                        Parece que no tienes conexión a internet, conectate e intenta de nuevo
+                    </Text>
+                </VStack>
+                <Flex>
+                    <Button icon="reload" mode="outlined" onPress={_ => {
+                        setPlaces(undefined)
+                        getPlaces()
+                    }}>
+                        Reintentar
+                    </Button>
+                </Flex>
+            </VStack>
         )
     }
 
     return (
         <Flex fill pt={headerMargin}>
-            <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={() => {getPlaces()}}/>}>
-                <VStack p={10} spacing={10}>
-                    {
-                        places !== undefined ? (
-                            places !== null ? (
-                                isNaN(places) ? (
-                                    places?.length > 0 ? (
-                                        places.map(place => (
-                                            <Flex key={place.place_identifier}>
-                                                <Item place={place}/>
-                                            </Flex>
-                                        ))
-                                    ) : (
-                                        <VStack center spacing={20} p={30}>
-                                            <IconButton icon="pencil-plus-outline" size={50}/>
-                                            <VStack center>
-                                                <Text variant="headlineSmall">
-                                                    Sin lugares
-                                                </Text>
-                                                <Text variant="bodyMedium" style={{textAlign: "center"}}>
-                                                    No hay ningun lugar registrado, ¿qué te parece si hacemos el primero?
-                                                </Text>
-                                            </VStack>
-                                            <Flex>
-                                                <Button mode="outlined" onPress={_ => {getPlaces()}}>
-                                                    Reintentar
-                                                </Button>
-                                            </Flex>
-                                        </VStack>
-                                    )
-                                ) : (
-                                    <VStack p={30} center spacing={20}>
-                                        <IconButton icon="alert-circle-outline" size={50}/>
-                                        <VStack center>
-                                            <Text variant="headlineSmall">
-                                                Ocurrió un problema
-                                            </Text>
-                                            <Text variant="bodyMedium" style={{textAlign: "center"}}>
-                                                No podemos recuperar los lugares y áreas, intentalo de nuevo más tarde (Error: {places})
-                                            </Text>
-                                        </VStack>
-                                        <Flex>
-                                            <Button mode="outlined" onPress={_ => {getPlaces()}}>
-                                                Reintentar
-                                            </Button>
-                                        </Flex>
-                                    </VStack>
-                                )
-                            ) : (
-                                <VStack center spacing={20} p={30}>
-                                    <IconButton icon="wifi-alert" size={50}/>
-                                    <VStack center>
-                                        <Text variant="headlineSmall">
-                                            Sin internet
-                                        </Text>
-                                        <Text variant="bodyMedium" style={{textAlign: "center"}}>
-                                            No podemos recuperar los lugares y áreas, revisa tu conexión a internet e intentalo de nuevo
-                                        </Text>
-                                    </VStack>
-                                    <Flex>
-                                        <Button mode="outlined" onPress={_ => {getPlaces()}}>
-                                            Reintentar
-                                        </Button>
-                                    </Flex>
-                                </VStack>
-                            )
-                        ) : (
-                            null
-                        )
-                    }
-                </VStack>
-            </ScrollView>
 
-            <FAB icon="plus" style={{position: "absolute", margin: 16, right: 0, bottom: 0}} onPress={() => {
-                navigation.navigate("AddPlace", {
-                    user,
-                    token
-                })
-            }}/>
+            <FlatList 
+                data={places} 
+                ListEmptyComponent={() => places === undefined ? null : places === null ? <NoConection/> : <EmptyList/>}
+                refreshing={loading}
+                onRefresh={_ => getPlaces()}
+                renderItem={({item}) => <Item place_name={item.place_name} place_address="A" place_identifier={1} />}
+            />
+
+            {
+                !(places === undefined || places === null) ? (
+                    <FAB icon="plus" style={{position: "absolute", margin: 16, right: 0, bottom: 0}} onPress={() => {
+                        navigation.navigate("AddPlace", {
+                            user,
+                            token
+                        })
+                    }}/>
+                ) : (
+                    null
+                )
+            }
+
         </Flex>
     )
 }

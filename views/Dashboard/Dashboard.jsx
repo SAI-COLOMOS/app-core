@@ -3,13 +3,14 @@ import { useState, useEffect, useCallback } from "react"
 import * as SecureStore from 'expo-secure-store';
 import { Button, Card, Text, useTheme, Avatar, TouchableRipple } from "react-native-paper"
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Image, ScrollView } from "react-native";
+import { Image, ScrollView, useWindowDimensions } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect } from "@react-navigation/native";
 
 export default Dashboard = ({navigation, route}) => {
     const insets = useSafeAreaInsets()
     const theme = useTheme()
+    const {width} = useWindowDimensions()
 
     const [greeting, setGreeting] = useState("Hola")
     const [timeToSleep, setTimeToSleep] = useState(false)
@@ -25,6 +26,9 @@ export default Dashboard = ({navigation, route}) => {
         if(actualUser === undefined) {
             getUser()
         }
+
+        console.log("From acá", actualUser)
+
     }, [actualUser])
 
     useEffect(() => {
@@ -129,7 +133,6 @@ export default Dashboard = ({navigation, route}) => {
                         <Flex direction="row" wrap="wrap" pr={25} pl={25} pb={50}>
                             
                             <Item screen="Profile" payload={{user: actualUser, token: actualToken}} icon="account-outline" title="Tu perfil"/>
-
 
                             {
                                 actualUser?.role == "Administrador" || actualUser?.role == "Encargado" ? (

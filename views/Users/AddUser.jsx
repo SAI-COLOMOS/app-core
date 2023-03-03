@@ -9,6 +9,7 @@ import CreateForm from "../Shared/CreateForm";
 import Constants from "expo-constants";
 import ModalMessage from "../Shared/ModalMessage";
 import Dropdown from "../Shared/Dropdown";
+import ImageSelector from "../Shared/ImageSelector";
 
 export default AddUser = ({navigation, route}) => {
     const insets = useSafeAreaInsets()
@@ -19,6 +20,7 @@ export default AddUser = ({navigation, route}) => {
     const [first_name, setFirst_name] = useState('')
     const [first_last_name, setFirst_last_name] = useState('')
     const [second_last_name, setSecond_last_name] = useState('')
+    const [avatar, setAvatar] = useState(null)
     const [age, setAge] = useState('')
     const [email, setEmail] = useState('')
     const [phone, setPhone] = useState('')
@@ -118,11 +120,12 @@ export default AddUser = ({navigation, route}) => {
                     school: school.trim(),
                     role: role,
                     status: status.trim(),
+                    avatar: avatar,
                     total_hours: Number(total_hours)
                 })
             }
         ).then(
-            response => response.status
+            response => response.json()
         ).catch(
             error => console.error("Error: ", error)
         )
@@ -223,6 +226,19 @@ export default AddUser = ({navigation, route}) => {
         )
     }
 
+    const ImageData = () => {
+        return (
+            <VStack spacing={5}>
+                <Text variant="labelLarge">
+                    Foto de perfil
+                </Text>
+                <VStack spacing={10}>
+                    <ImageSelector value={avatar} setter={setAvatar}/>
+                </VStack>
+            </VStack>
+        )
+    }
+
     const Save = _ => {
         return (
             <Button mode="contained" icon="content-save-outline" disabled={modalLoading || !verified} loading={modalLoading} onPress={() => {
@@ -245,7 +261,7 @@ export default AddUser = ({navigation, route}) => {
 
     return (
         <Flex fill>
-            <CreateForm navigation={navigation} title={"Añadir nuevo usuario"} children={[PersonalData(), ContactData(), UserData()]} actions={[Cancel(), Save()]} />
+            <CreateForm navigation={navigation} title={"Añadir nuevo usuario"} children={[PersonalData(), ContactData(), UserData(), ImageData()]} actions={[Cancel(), Save()]} />
             
             <ModalMessage title="¡Listo!" description="El usuario ha sido creado" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.replace("Dashboard")]]} dismissable={false} icon="check-circle-outline"/>
             <ModalMessage title="Ocurrió un problema" description={`No pudimos crear al usuario, intentalo más tarde. (${reponseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline"/>

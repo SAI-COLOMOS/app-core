@@ -133,7 +133,7 @@ export default SchoolDetails = ({navigation, route}) => {
     }
 
     return (
-        <Flex fill pt={headerMargin}> 
+        <Flex fill pt={headerMargin - 20}> 
             <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={_ => getSchool()}/>}>
                 {
                     school !== undefined ? (

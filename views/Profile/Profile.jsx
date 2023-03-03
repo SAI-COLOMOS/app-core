@@ -9,6 +9,8 @@ import { LinearGradient } from 'expo-linear-gradient'
 import Constants from "expo-constants";
 import DisplayDetails from '../Shared/DisplayDetails'
 import { useFocusEffect } from '@react-navigation/native'
+import * as ImagePicker from 'expo-image-picker';
+import { manipulateAsync, FlipType, SaveFormat } from 'expo-image-manipulator';
 
 export default Profile = ({navigation, route}) => {
     const localhost = Constants.expoConfig.extra.API_LOCAL
@@ -18,6 +20,7 @@ export default Profile = ({navigation, route}) => {
 
     const [loading, setLoading] = useState(false)
     const [profile, setProfile] = useState(undefined)
+    const [photo, setPhoto] = useState(null)
 
     async function getProfile() {
         setLoading(true)
@@ -47,10 +50,29 @@ export default Profile = ({navigation, route}) => {
         }
     }
 
+    async function pickPhoto() {
+        let selectedPhoto = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 1
+        })
+
+        if(!selectedPhoto.canceled) {
+            const compressPhoto = await manipulateAsync(
+                selectedPhoto.assets[0].uri,
+                [{resize: {height: 250, width: 250}}],
+                {base64: true}
+            )
+            console.log(compressPhoto)
+            setPhoto(compressPhoto.base64)
+        }
+    }
+
     useEffect(() => {
         navigation.setOptions({
             header: (props) => <Header {...props} children={[
-                <Logout/>
+                Logout()
             ]}/>,
             headerTransparent: true,
             headerTitle: "Tu perfil"
@@ -69,6 +91,7 @@ export default Profile = ({navigation, route}) => {
                 await SecureStore.deleteItemAsync("token")
                 await SecureStore.deleteItemAsync("user")
                 await SecureStore.deleteItemAsync("keepAlive")
+                navigation.popToTop()
                 navigation.replace("Login")
             }}/>
         )
@@ -115,7 +138,7 @@ export default Profile = ({navigation, route}) => {
     const ContactData = () => {
         return (
             <VStack p={20} spacing={5}>
-                <Text variant="labelLarge">
+                <Text variant="bodyLarge">
                     Datos de contacto
                 </Text>
                 <VStack spacing={10}>
@@ -144,7 +167,7 @@ export default Profile = ({navigation, route}) => {
     const EmergencyData = () => {
         return (
             <VStack p={20} spacing={5}>
-                <Text variant="labelLarge">
+                <Text variant="bodyLarge">
                     Datos de emergencia
                 </Text>
                 <VStack spacing={10}>
@@ -173,7 +196,7 @@ export default Profile = ({navigation, route}) => {
     const AccountData = () => {
         return (
             <VStack p={20} spacing={5}>
-                <Text variant="labelLarge">
+                <Text variant="bodyLarge">
                     Datos de la cuenta
                 </Text>
                 <VStack spacing={10}>
@@ -226,15 +249,25 @@ export default Profile = ({navigation, route}) => {
             </Button>
         )
     }
+
+    const UpdatePhoto = () => {
+        return (
+            <Button icon="form-textbox-password" onPress={() => {
+                pickPhoto()
+            }}>
+                Actualizar foto
+            </Button>
+        )
+    }
     
     return (
-        <Flex fill pt={headerMargin}>
+        <Flex fill mt={headerMargin - 20}>
             <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={_ => getProfile()} />}>
                 {
                     profile !== undefined ? (
                         profile !== null ? (
                             isNaN(profile) ? (
-                                <DisplayDetails icon="account-circle-outline" title={`${profile?.first_name} ${profile?.first_last_name} ${profile.second_last_name}`} children={[PersonalData(), ContactData(), EmergencyData(), AccountData()]} actions={[UpdatePassword()]}/>
+                                <DisplayDetails icon="account-circle-outline" photo={profile?.avatar} title={`${profile?.first_name} ${profile?.first_last_name} ${profile?.second_last_name ?? ""}`} children={[PersonalData(), ContactData(), EmergencyData(), AccountData()]} actions={[UpdatePassword(), UpdatePhoto()]}/>
                             ) : (
                                 null
                             )

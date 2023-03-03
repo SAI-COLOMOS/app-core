@@ -86,7 +86,7 @@ export default Schools = ({navigation, route}) => {
                         Sin escuelas
                     </Text>
                     <Text variant="bodyMedium" style={{textAlign: "center"}}>
-                        No hay ninguna escuela registrado, ¿qué te parece si hacemos el primero?
+                        No hay ninguna escuela registrada, ¿qué te parece si hacemos el primero?
                     </Text>
                 </VStack>
                 <Flex>
