@@ -1,40 +1,42 @@
-import { Flex, HStack, VStack } from "@react-native-material/core"
+import { Flex, VStack } from "@react-native-material/core"
 import { useEffect, useState } from "react"
-import { ScrollView } from "react-native"
-import { Button, Card, Text, TextInput, TouchableRipple, useTheme } from "react-native-paper"
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import {Picker} from '@react-native-picker/picker';
-import BloodTypesDialog from "../Shared/Dialog";
-import CreateForm from "../Shared/CreateForm";
+import { Button, Text, TextInput, useTheme } from "react-native-paper"
 import Constants from "expo-constants";
+import CreateForm from "../Shared/CreateForm"
 import ModalMessage from "../Shared/ModalMessage";
 import Dropdown from "../Shared/Dropdown";
-import ImageSelector from "../Shared/ImageSelector";
 
-export default AddUser = ({navigation, route}) => {
-    const insets = useSafeAreaInsets()
-    const theme = useTheme()
-    const {user, token} = route.params
+export default EditUser = ({navigation, route}) => {
     const localhost = Constants.expoConfig.extra.API_LOCAL
+    const theme = useTheme()
+    const {token, user} = route.params
 
-    const [first_name, setFirst_name] = useState('')
-    const [first_last_name, setFirst_last_name] = useState('')
-    const [second_last_name, setSecond_last_name] = useState('')
-    const [avatar, setAvatar] = useState(null)
-    const [age, setAge] = useState('')
-    const [email, setEmail] = useState('')
-    const [phone, setPhone] = useState('')
-    const [emergency_contact, setEmergency_contact] = useState('')
-    const [emergency_phone, setEmergency_phone] = useState('')
-    const [blood_type, setBlood_type] = useState('')
-    const [provider_type, setProvider_type] = useState('')
-    const [place, setPlace] = useState('')
-    const [assigned_area, setAssigned_area] = useState('')
-    const [school, setSchool] = useState('')
-    const [role, setRole] = useState('')
-    const [status, setStatus] = useState('')
-    const [total_hours, setTotal_hours] = useState('')
-    const [verified, setVerified] = useState();
+    const [first_name, setFirst_name] = useState(`${user.first_name}`)
+    const [first_last_name, setFirst_last_name] = useState(`${user.first_last_name}`)
+    const [second_last_name, setSecond_last_name] = useState(`${user.second_last_name}`)
+    const [age, setAge] = useState(`${user.age}`)
+    const [email, setEmail] = useState(`${user.email}`)
+    const [phone, setPhone] = useState(`${user.phone}`)
+    const [emergency_contact, setEmergency_contact] = useState(`${user.emergency_contact}`)
+    const [emergency_phone, setEmergency_phone] = useState(`${user.emergency_phone}`)
+    const [blood_type, setBlood_type] = useState(`${user.blood_type}`)
+    const [provider_type, setProvider_type] = useState(`${user.provider_type}`)
+    const [place, setPlace] = useState(`${user.place}`)
+    const [assigned_area, setAssigned_area] = useState(`${user.assigned_area}`)
+    const [school, setSchool] = useState(`${user.school}`)
+    const [role, setRole] = useState(`${user.role}`)
+    const [status, setStatus] = useState(`${user.status}`)
+    const [total_hours, setTotal_hours] = useState(`${user.total_hours}`)
+    const [verified, setVerified] = useState(false);
+
+    const [modalConfim, setModalConfim] = useState(false)
+    const [modalLoading, setModalLoading] = useState(false)
+    const [modalSuccess, setModalSuccess] = useState(false)
+    const [modalSuccessDelete, setModalSuccessDelete] = useState(false)
+    const [modalError, setModalError] = useState(false)
+    const [modalErrorDelete, setModalErrorDelete] = useState(false)
+    const [modalFatal, setModalFatal] = useState(false)
+    const [reponseCode, setReponseCode] = useState("")
 
     const providerTypes = [
         {
@@ -87,22 +89,16 @@ export default AddUser = ({navigation, route}) => {
         }
     ]
 
-    const [modalSuccess, setModalSuccess] = useState(false)
-    const [modalLoading, setModalLoading] = useState(false)
-    const [modalError, setModalError] = useState(false)
-    const [modalFatal, setModalFatal] = useState(false)
-    const [reponseCode, setReponseCode] = useState("")
-
-    async function SaveUser() {
+    async function saveUser() {
         setModalLoading(true)
         const request = await fetch(
-            `${localhost}/users`,
+            `${localhost}/users/${user.register}`,
             {
-                method: "POST",
+                method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`,
-                    'Cache-Control': 'no-cache',
+                    "Cache-Control": "no-cache"
                 },
                 body: JSON.stringify({
                     first_name: first_name.trim(),
@@ -120,26 +116,57 @@ export default AddUser = ({navigation, route}) => {
                     school: school.trim(),
                     role: role,
                     status: status.trim(),
-                    avatar: avatar,
                     total_hours: Number(total_hours)
                 })
             }
+
         ).then(
-            response => response.json()
+            response => response.status
         ).catch(
-            error => console.error("Error: ", error)
+            _ => null
         )
-        
+
         console.log(request)
+
         setModalLoading(false)
-        
-        if(request == 201) {
+
+        if(request == 200) {
             setModalSuccess(true)
-            navigation.pop()
-        }else if(request != null){
+        } else if(request != null) {
             setReponseCode(request)
             setModalError(true)
-        }else{
+        } else {
+            setModalFatal(true)
+        }
+    }
+
+    async function deleteUser(){
+        setModalLoading(true)
+        const request = await fetch(
+            `${localhost}/users/${user.register}`,
+            {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                    "Cache-Control": "no-cache"
+                }
+            }
+        ).then(
+            response => response.status
+        ).catch(
+            _ => null
+        )
+        
+        setModalLoading(false)
+        console.log(request)
+        
+        if(request == 200) {
+            setModalSuccessDelete(true)
+        } else if(request != null) {
+            setReponseCode(request)
+            setModalErrorDelete(true)
+        } else {
             setModalFatal(true)
         }
 
@@ -173,21 +200,18 @@ export default AddUser = ({navigation, route}) => {
 
     const PersonalData = () => {
         return (
-            
             <VStack spacing={5}>
                 <Text variant="labelLarge">
                     Datos personales
                 </Text>
                 <VStack spacing={10}>
-                    <TextInput mode="outlined" value={first_name} onChangeText={setFirst_name} label="Nombre" maxLength={50} autoComplete="off" autoCorrect={false}/>
-                    <TextInput mode="outlined" value={first_last_name} onChangeText={setFirst_last_name} label="Apellido paterno" maxLength={50} autoComplete="off" autoCorrect={false}/>
-                    <TextInput mode="outlined" value={second_last_name} onChangeText={setSecond_last_name} label="Apellido materno" maxLength={50} autoComplete="off" autoCorrect={false}/>
-                    <TextInput mode="outlined" value={age} onChangeText={setAge} label="Edad" keyboardType="numeric" maxLength={2} autoComplete="off" autoCorrect={false}/>
+                    <TextInput mode="outlined" multiline={true} value={first_name} onChangeText={setFirst_name} label="Nombre" maxLength={150} autoComplete="off" autoCapitalize="words" />
+                    <TextInput mode="outlined" multiline={true} value={first_last_name} onChangeText={setFirst_last_name} label="Apellido paterno" maxLength={150} autoComplete="off" autoCapitalize="words" />
+                    <TextInput mode="outlined" multiline={true} value={second_last_name} onChangeText={setSecond_last_name} label="Apellido materno" maxLength={150} autoComplete="off" autoCapitalize="words" />
+                    <TextInput mode="outlined" multiline={true} value={age} onChangeText={setAge} label="Edad" keyboardType="numeric" maxLength={2} autoComplete="off"/>
                     <Dropdown title="Grupo sanguíneo" options={bloodTypes} value={blood_type} selected={setBlood_type}/>
                 </VStack>
             </VStack>
-            
-            
         )
     }
 
@@ -226,14 +250,18 @@ export default AddUser = ({navigation, route}) => {
         )
     }
 
-    const ImageData = () => {
+    const Delete = () => {
         return (
             <VStack spacing={5}>
                 <Text variant="labelLarge">
-                    Foto de perfil
+                    Eliminar al usuario
                 </Text>
                 <VStack spacing={10}>
-                    <ImageSelector value={avatar} setter={setAvatar}/>
+                    <Button textColor={theme.colors.error}  icon="trash-can-outline" mode="outlined" onPress={() => {
+                        setModalConfim(!modalConfim)
+                    }}>
+                        Eliminar
+                    </Button>
                 </VStack>
             </VStack>
         )
@@ -242,7 +270,7 @@ export default AddUser = ({navigation, route}) => {
     const Save = _ => {
         return (
             <Button mode="contained" icon="content-save-outline" disabled={modalLoading || !verified} loading={modalLoading} onPress={() => {
-                SaveUser()
+                saveUser()
             }}>
                 Guardar
             </Button>
@@ -261,10 +289,18 @@ export default AddUser = ({navigation, route}) => {
 
     return (
         <Flex fill>
-            <CreateForm navigation={navigation} title={"Añadir nuevo usuario"} children={[PersonalData(), ContactData(), UserData(), ImageData()]} actions={[Cancel(), Save()]} />
+            <CreateForm title="Editar usuario" children={[PersonalData(), ContactData(), UserData(), Delete()]} actions={[Save(), Cancel()]} navigation={navigation} loading={modalLoading}/>
+
+            <ModalMessage title="Eliminar usuario" description="¿Seguro que deseas eliminar a este usuario? La acción no se puede deshacer" handler={[modalConfim, () => setModalConfim(!modalConfim)]} actions={[["Cancelar", () => setModalConfim(!modalConfim)], ['Aceptar', () => {setModalConfim(!modalConfim), deleteUser()}]]} dismissable={true} icon="help-circle-outline"/>
             
-            <ModalMessage title="¡Listo!" description="El usuario ha sido creado" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.replace("Dashboard")]]} dismissable={false} icon="check-circle-outline"/>
-            <ModalMessage title="Ocurrió un problema" description={`No pudimos crear al usuario, intentalo más tarde. (${reponseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline"/>
+            <ModalMessage title="¡Listo!" description="El usuario ha sido actualizado" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline"/>
+            
+            <ModalMessage title="¡Listo!" description="El usuario ha sido eliminado" handler={[modalSuccessDelete, () => setModalSuccessDelete(!modalSuccessDelete)]} actions={[['Aceptar', () => navigation.pop(2)]]} dismissable={false} icon="check-circle-outline"/>
+
+            <ModalMessage title="Ocurrió un problema" description={`No pudimos actualizar al usuario, intentalo más tarde. (${reponseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline"/>
+            
+            <ModalMessage title="Ocurrió un problema" description={`No pudimos eliminar al usuario, intentalo más tarde. (${reponseCode})`} handler={[modalErrorDelete, () => setModalErrorDelete(!modalErrorDelete)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline"/>
+        
             <ModalMessage title="Sin conexión a internet" description={`Parece que no tienes conexión a internet, conectate e intenta de nuevo`} handler={[modalFatal, () => setModalFatal(!modalFatal)]} actions={[['Aceptar']]} dismissable={true} icon="wifi-alert"/>
 
         </Flex>
