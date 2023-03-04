@@ -21,6 +21,7 @@ import PlaceDetails from "./PlacesAndAreas/PlaceDetails";
 import EditPlace from "./PlacesAndAreas/EditPlace";
 import AddPlace from "./PlacesAndAreas/AddPlace";
 import AddArea from "./PlacesAndAreas/AddArea";
+import EditArea from "./PlacesAndAreas/EditArea";
 
 // Schools
 import Schools from "./Schools/Schools";
@@ -63,6 +64,7 @@ export default Navigation = () => {
                 <Stack.Screen name="AddPlace" component={AddPlace} options={{headerShown: false, presentation: "containedTransparentModal"}}/>
                 <Stack.Screen name="EditPlace" component={EditPlace} options={{headerShown: false, presentation: "containedTransparentModal"}}/>                
                 <Stack.Screen name="AddArea" component={AddArea}/>
+                <Stack.Screen name="EditArea" component={EditArea} options={{headerShown: false, presentation: "containedTransparentModal"}}/>                
             </Stack.Group>
 
             <Stack.Group navigationKey="UsersAdmon" screenOptions={{headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom"}}>

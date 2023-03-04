@@ -12,19 +12,18 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 export default PlaceDetails = ({navigation, route}) => {
     const localhost = Constants.expoConfig.extra.API_LOCAL
     const headerMargin = useHeaderHeight()
-    const {token, place_identifier, area_identifier} = route.params
+    const {token, place_identifier} = route.params
     const theme = useTheme()
 
     const [loading, setLoading] = useState(false)
     const [places, setPlaces] = useState(undefined)
-    const [areas, setAreas] = useState(undefined)
 
     async function getPlaces() {
         setLoading(true)
 
         const request = await fetch(
             `${localhost}/places/${place_identifier}`,
-            {
+            {   
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -42,7 +41,7 @@ export default PlaceDetails = ({navigation, route}) => {
 
         if(request?.place) {
             setPlaces(request.place)
-            console.log(request)
+            console.log(request.place.place_areas)
         } else {
             setPlaces(request)
         }
@@ -127,20 +126,43 @@ export default PlaceDetails = ({navigation, route}) => {
                     Área urbana
                 </Text>
                 <VStack spacing={10}>
-                    <Flex>
+                {
+                    !(places.place_areas === undefined || places.place_areas === null) ? (
+                        <Flex>
                         <Text variant="labelSmall">
                             Nombre del área
                         </Text>
                         <Text variant="bodyMedium">
-                            {areas?.area_name}
+                            {places.place_areas ? places.place_areas.area_name : ""}
                         </Text>
                         <Text variant="labelSmall">
                             Número de teléfono del área
                         </Text>
                         <Text variant="bodyMedium">
-                            {areas?.phone}
+                            {places.place_areas ? places.place_areas.phone : ""}
                         </Text>
+                        <FAB icon="pencil-outline" style={{position: "absolute", margin: 0, right: -15, bottom: 0}} onPress={() => {
+                            navigation.navigate("EditArea", {
+                                token,
+                                places,
+                                place_identifier
+                            })
+                        }}/>
                     </Flex>
+                    ) : (
+                        <Flex>
+                        <Text variant="labelSmall">
+                            Parece que no hay ninguna área registrada
+                        </Text>
+                            <FAB icon="plus-box" style={{position: "absolute", margin: 0, right: 0, bottom: -6}} onPress={() => {
+                                navigation.navigate("AddArea", {
+                                    token,
+                                    place_identifier
+                                })
+                            }}/>
+                        </Flex>
+                        )
+                }
                 </VStack>
             </VStack>
         )
@@ -153,7 +175,7 @@ export default PlaceDetails = ({navigation, route}) => {
                     places !== undefined ? (
                         places !== null ? (
                             isNaN(places) ? (
-                                <DisplayDetails icon="map-marker-radius-outline" title={places?.place_name} children={[Places(), Areas()]}/>
+                                <DisplayDetails icon="pine-tree" title={places?.place_name} children={[Places(), Areas()]}/>
                             ) : (
                                 <VStack p={30} center spacing={20}>
                                     <Icon color={theme.colors.onBackground} name="alert-circle-outline" size={50}/>

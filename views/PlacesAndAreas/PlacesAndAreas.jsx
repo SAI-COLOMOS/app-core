@@ -61,15 +61,15 @@ export default PlaceAndAreas = ({navigation, route}) => {
         return () => {}
     }, []))
 
-    const Item = ({place_name, place_address, place_identifier}) => {
+    const Item = ({place_name, place_address, place_identifier, area_identifier}) => {
         return (
             <Flex ph={20} pv={5} onPress={() => {}}>
                 <Card mode="outlined" style={{overflow: "hidden"}}>
                     <TouchableRipple onPress={() => {
-                        navigation.navigate("PlaceDetails", {token, place_identifier})
+                        navigation.navigate("PlaceDetails", {token, place_identifier, area_identifier})
                     }}>
                         <Flex p={10}>
-                            <Card.Title title={place_name} titleNumberOfLines={2} subtitle={place_address} subtitleNumberOfLines={1} left={(props) => <Avatar.Icon {...props} icon="map-marker-radius-outline"/>}/>
+                            <Card.Title title={place_name} titleNumberOfLines={2} subtitle={place_address} subtitleNumberOfLines={1} left={(props) => <Avatar.Icon {...props} icon="forest"/>}/>
                         </Flex>
                     </TouchableRipple>
                 </Card>
