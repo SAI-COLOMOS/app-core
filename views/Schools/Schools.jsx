@@ -1,6 +1,6 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useState, useEffect, useCallback } from "react"
-import { ActivityIndicator, Avatar, Button, Card, Divider, FAB, IconButton, List, ProgressBar, Text, TouchableRipple, useTheme } from "react-native-paper"
+import { ActivityIndicator, Avatar, Button, Card, Divider, FAB, IconButton, List, ProgressBar, Text, TextInput, TouchableRipple, useTheme } from "react-native-paper"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useHeaderHeight } from "@react-navigation/elements";
 import Header from "../Shared/Header"
@@ -18,9 +18,11 @@ export default Schools = ({navigation, route}) => {
 
     const [schools, setSchools] = useState(undefined)
     const [loading, setLoading] = useState(false)
+    const [showSearch, setShowSearch] = useState(false)
 
     async function getSchools() {
         setLoading(true)
+        
         const request = await fetch(
             `${localhost}/schools`,
             {
@@ -49,11 +51,11 @@ export default Schools = ({navigation, route}) => {
 
     useEffect(() => {
         navigation.setOptions({
-            header: (props) => <Header {...props}/>,
+            header: (props) => <Header {...props} children={[<IconButton icon="alert"/>, <IconButton icon="pencil" onPress={() => setShowSearch(!showSearch)}/>]}/>,
             headerTransparent: true,
             headerTitle: "Escuelas"
         })
-    }, [])
+    }, [showSearch])
 
     useFocusEffect(useCallback(() => {
         getSchools()
@@ -130,12 +132,22 @@ export default Schools = ({navigation, route}) => {
     return (
         <Flex fill pt={headerMargin}>
 
+            {
+                showSearch ? (
+                    <Flex pv={10} ph={20}>
+                        <TextInput mode="outlined"/>
+                    </Flex>
+                ) : (
+                    null
+                )
+            }
+
             <FlatList 
                 data={schools} 
                 ListEmptyComponent={() => schools === undefined ? null : schools === null ? <NoConection/> : <EmptyList/>}
                 refreshing={loading}
                 onRefresh={_ => getSchools()}
-                renderItem={({item}) => <Item onPress={() => {}} school_name={item.school_name} address={`${item.street} #${item.exterior_number}, ${item.colony}, ${item.municipality}`} school_identifier={item.school_identifier}/>}
+                renderItem={({item}) => <Item school_name={item.school_name} address={`${item.street} #${item.exterior_number}, ${item.colony}, ${item.municipality}`} school_identifier={item.school_identifier}/>}
             />
 
             {

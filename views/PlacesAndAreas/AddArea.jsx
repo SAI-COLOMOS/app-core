@@ -25,7 +25,7 @@ export default AddArea = ({navigation, route}) => {
         setModalLoading(true)
 
         const request = await fetch(
-            `${localhost}/areas/${place_identifier}`,
+            `${localhost}/places/${place_identifier}`,
             {
                 method: "POST",
                 headers: {

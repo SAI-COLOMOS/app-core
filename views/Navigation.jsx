@@ -63,7 +63,7 @@ export default Navigation = () => {
                 <Stack.Screen name="PlaceDetails" component={PlaceDetails}/>
                 <Stack.Screen name="AddPlace" component={AddPlace} options={{headerShown: false, presentation: "containedTransparentModal"}}/>
                 <Stack.Screen name="EditPlace" component={EditPlace} options={{headerShown: false, presentation: "containedTransparentModal"}}/>                
-                <Stack.Screen name="AddArea" component={AddArea}/>
+                <Stack.Screen name="AddArea" component={AddArea} options={{headerShown: false, presentation: "containedTransparentModal"}}/>
                 <Stack.Screen name="EditArea" component={EditArea} options={{headerShown: false, presentation: "containedTransparentModal"}}/>                
             </Stack.Group>
 
