@@ -180,14 +180,14 @@ export default UserDetails = ({navigation, route}) => {
                         {user?.status}
                     </Text>
                 </VStack>
-                <VStack spacing={2}>
+                {/* <VStack spacing={2}>
                 <Text variant="labelSmall">
                         Horas asignadas
                     </Text>
                     <Text variant="bodyMedium">
                         {user?.total_hours}
                     </Text>
-                </VStack>
+                </VStack> */}
             </VStack>
         )
     }
@@ -199,7 +199,7 @@ export default UserDetails = ({navigation, route}) => {
                     user !== undefined ? (
                         user !== null ? (
                             isNaN(user) ? (
-                                <DisplayDetails icon="account" title={user?.user_name} children={[PersonalData(), ContactData(), UserData()]}/>
+                                <DisplayDetails icon="account" title={`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name == undefined ? '' : user?.second_last_name }`} children={[PersonalData(), ContactData(), UserData()]}/>
                             ) : (
                                 <VStack p={30} center spacing={20}>
                                     <Icon color={theme.colors.onBackground} name="alert-circle-outline" size={50}/>
