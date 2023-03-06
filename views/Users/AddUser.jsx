@@ -114,11 +114,11 @@ export default AddUser = ({navigation, route}) => {
                     emergency_contact: emergency_contact.trim(),
                     emergency_phone: emergency_phone.trim(),
                     blood_type: blood_type,
+                    role: role,
                     provider_type: provider_type,
                     place: place.trim(),
                     assigned_area: assigned_area.trim(),
                     school: school.trim(),
-                    role: role,
                     status: status.trim(),
                     avatar: avatar,
                     total_hours: Number(total_hours)
@@ -214,12 +214,12 @@ export default AddUser = ({navigation, route}) => {
                     Datos del usuario
                 </Text>
                 <VStack spacing={10}>
+                    <Dropdown title={"Rol"} options={roleTypes} value={role} selected={setRole} />
                     <Dropdown title={"Tipo de prestador"} options={providerTypes} value={provider_type} selected={setProvider_type} />
                     <TextInput mode="outlined" value={place} onChangeText={setPlace} label="Parque" autoCapitalize="words" maxLength={100} autoComplete="off" autoCorrect={false}/>
                     <TextInput mode="outlined" value={assigned_area} onChangeText={setAssigned_area} label="Área asignada" maxLength={100} autoComplete="off" autoCorrect={false}/>
                     <TextInput mode="outlined" value={school} onChangeText={setSchool} label="Escuela" maxLength={100} autoComplete="off" autoCorrect={false}/>
-                    <Dropdown title={"Rol"} options={roleTypes} value={role} selected={setRole} />
-                    <TextInput mode="outlined" value={status} onChangeText={setStatus} label="Status" maxLength={15} autoComplete="off" autoCorrect={false}/>
+                    <TextInput mode="outlined" value={status} onChangeText={setStatus} label="Status" maxLength={15} autoComplete="off" autoCorrect={false} />
                     <TextInput mode="outlined" value={total_hours} onChangeText={setTotal_hours} label="Total de horas" keyboardType="number-pad" maxLength={5} autoComplete="off" autoCorrect={false}/>
                 </VStack>
             </VStack>
