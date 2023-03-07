@@ -217,14 +217,6 @@ export default Login = ({navigation}) => {
                                 }}>
                                     Recuperar contraseña
                                 </Button>
-
-                                <Button onPress={_ => {
-                                    navigation.navigate("AddArea", {
-                                        usuario: "Owen"
-                                    })
-                                }}>
-                                    Prueba
-                                </Button>
                             </VStack>
                         </VStack>
                     </ScrollView>
