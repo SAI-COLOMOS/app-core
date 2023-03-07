@@ -51,33 +51,33 @@ export default ImageSelector = ({value, setter}) => {
                             <Avatar.Image source={{uri: `data:image/png;base64,${value}`}} size={150}/>
                         </Flex>
 
-                        <Button mode='contained' onPress={() => {
+                        <Button mode='contained' icon='camera-outline' onPress={() => {
                             takePhoto()
                         }}>
                             Tomar otra fotografía
                         </Button>
 
-                        <Button mode='contained' onPress={() => {
+                        <Button mode='contained' icon='image-outline' onPress={() => {
                             selectFromLibrary()
                         }}>
                             Seleccionar otra imágen
                         </Button>
 
-                        <Button mode='outlined' onPress={() => {
+                        <Button mode='outlined' icon='file-image-remove-outline' onPress={() => {
                             setter(null)
                         }}>
-                            Cancelar
+                            Eliminar fotografía
                         </Button>
                     </VStack>
                 ) : (
                     <VStack spacing={20}>
-                        <Button mode='contained' onPress={() => {
+                        <Button mode='contained' icon='camera-outline' onPress={() => {
                             takePhoto()
                         }}>
                             Tomar fotografía
                         </Button>
 
-                        <Button mode='outlined' onPress={() => {
+                        <Button mode='outlined' icon='image-outline' onPress={() => {
                             selectFromLibrary()
                         }}>
                             Seleccionar imágen
