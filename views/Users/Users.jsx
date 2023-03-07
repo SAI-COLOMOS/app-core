@@ -7,11 +7,13 @@ import Header from "../Shared/Header";
 import Constants from "expo-constants"
 import { RefreshControl, ScrollView, FlatList } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 export default Users = ({navigation, route}) => {
     const headerMargin = useHeaderHeight()
     const {user, token} = route.params
     const localhost = Constants.expoConfig.extra.API_LOCAL
+    const theme = useTheme()
 
     const [loading, setLoading] = useState(false)
     const [users, setUsers] = useState(undefined)
