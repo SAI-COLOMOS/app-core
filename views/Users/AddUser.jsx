@@ -164,13 +164,22 @@ export default AddUser = ({navigation, route}) => {
         )
 
         if(request?.places) {
-            setPlaces(request.place_name)
-            console.log(request)
+            let places = []
+            request.place_name.map(place => {
+                places.push({
+                    // option: place.
+                })
+            })
+            setPlaces()
         } else {
             setPlaces(request)
         }
 
     }
+
+    useEffect(() => {
+        //getPlaces()
+    }, []);
 
     useEffect(() => {
         let check = true
