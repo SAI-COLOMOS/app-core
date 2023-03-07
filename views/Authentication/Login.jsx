@@ -130,7 +130,7 @@ export default Login = ({navigation}) => {
         const getActualSession = async _ => {
             const token = await SecureStore.getItemAsync("token")
             const keepAlive = await SecureStore.getItemAsync("keepAlive")
-            
+
             if(keepAlive === "true") {
                 const payload = jwtDecode(token)
                 
@@ -151,6 +151,9 @@ export default Login = ({navigation}) => {
                     ).catch(
                         error => null
                     )
+
+                    console.log("Hola", profile)
+
                     if(profile?.user) {
                         await SecureStore.setItemAsync("user", JSON.stringify({
                             "first_name": profile.user.first_name,
@@ -164,12 +167,10 @@ export default Login = ({navigation}) => {
                         navigation.replace("Dashboard")
                     }
 
-                } else {
-                    setActiveSession(false)
                 }
-            } else {
-                setActiveSession(false)
             }
+            
+            setActiveSession(false)
         }
 
         if(activeSession === undefined) {
