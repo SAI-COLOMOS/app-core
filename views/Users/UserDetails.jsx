@@ -69,7 +69,7 @@ export default UserDetails = ({navigation, route}) => {
                         Nombre
                     </Text>
                     <Text variant="bodyMedium">
-                        {`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name}`}
+                        {`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name == undefined ? '' : user?.second_last_name}`}
                     </Text>
                 </VStack>
                 <VStack spacing={2}>
@@ -193,13 +193,13 @@ export default UserDetails = ({navigation, route}) => {
     }
 
     return(
-        <Flex fill pt={headerMargin}>
+        <Flex fill mt={headerMargin - 20} >
             <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={_ => getUser()}/>}>
                 {
                     user !== undefined ? (
                         user !== null ? (
                             isNaN(user) ? (
-                                <DisplayDetails icon="account" title={`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name == undefined ? '' : user?.second_last_name }`} children={[PersonalData(), ContactData(), UserData()]}/>
+                                <DisplayDetails photo={user?.avatar} icon="account" title={`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name == undefined ? '' : user?.second_last_name }`} children={[PersonalData(), ContactData(), UserData()]}/>
                             ) : (
                                 <VStack p={30} center spacing={20}>
                                     <Icon color={theme.colors.onBackground} name="alert-circle-outline" size={50}/>
