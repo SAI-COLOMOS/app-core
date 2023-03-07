@@ -63,7 +63,7 @@ export default Users = ({navigation, route}) => {
         return () => {}
     }, []))
 
-    const Item = ({first_name, role, status, register}) => {
+    const Item = ({first_name, role, avatar, register}) => {
         return (
             <Flex ph={20} pv={5} onPress={() => {}}>
                 <Card mode="outlined" style={{overflow: "hidden"}}>
@@ -71,7 +71,7 @@ export default Users = ({navigation, route}) => {
                         navigation.navigate("UserDetails", {token, register})
                     }}>
                         <Flex p={10}>
-                            <Card.Title title={first_name} titleNumberOfLines={2} subtitle={role} subtitleNumberOfLines={1} left={(props) => <Avatar.Icon {...props} icon="account"/>}  />
+                            <Card.Title title={first_name} titleNumberOfLines={2} subtitle={role} subtitleNumberOfLines={1} left={(props) => avatar ? <Avatar.Image {...props} source={{uri: `data:image/png;base64,${avatar}`}} /> : <Avatar.Icon {...props} icon="account"/>}  />
                         </Flex>
                     </TouchableRipple>
                 </Card>
@@ -136,7 +136,7 @@ export default Users = ({navigation, route}) => {
                 ListEmptyComponent={() => users === undefined ? null : users === null ? <NoConection/> : <EmptyList/>}
                 refreshing={loading}
                 onRefresh={_ => getUsers()}
-                renderItem={({item}) => <Item onPress={() => {}} first_name={`${item.first_name} ${item.first_last_name}`} role={`${item.role} - ${item.register} - ${item.status}`} register={item.register}/>}
+                renderItem={({item}) => <Item onPress={() => {}} first_name={`${item.first_name} ${item.first_last_name}`} role={`${item.role} - ${item.register} - ${item.status}`} register={item.register} avatar={item?.avatar}/>}
             />
 
             <FAB icon="plus" style={{position: "absolute", margin: 16, right: 0, bottom: 0}} onPress={() => {
