@@ -35,7 +35,7 @@ export default FirstAccess = ({navigation}) => {
         setModalLoading(true)
 
         const request = await fetch(
-            `${localhost}/users/password/${JSON.parse(await SecureStore.getItemAsync("user")).register}`,
+            `${localhost}/users/${JSON.parse(await SecureStore.getItemAsync("user")).register}/password`,
             {
                 method: "PATCH",
                 headers: {
