@@ -1,7 +1,7 @@
-import { Flex, VStack } from "@react-native-material/core"
+import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useEffect, useState, useCallback } from "react"
 import { useHeaderHeight } from "@react-navigation/elements";
-import { Text, Card, Avatar, TouchableRipple, IconButton, Button, FAB, useTheme } from "react-native-paper"
+import { Text, Card, Avatar, TouchableRipple, IconButton, Button, FAB, useTheme, List } from "react-native-paper"
 import Header from "../Shared/Header"
 import Constants from "expo-constants";
 import DisplayDetails from "../Shared/DisplayDetails";
@@ -69,7 +69,7 @@ export default PlaceDetails = ({navigation, route}) => {
                         Sin conexión
                     </Text>
                     <Text variant="bodyMedium" style={{textAlign: "center"}}>
-                        Parece que no tienes conexión a internet, conectate e intenta de nuevo
+                        Parece que no tienes conexión a internet, conéctate e intenta de nuevo
                     </Text>
                 </VStack>
                 <Flex>
@@ -123,47 +123,46 @@ export default PlaceDetails = ({navigation, route}) => {
         return (
             <VStack p={20} spacing={5}>
                 <Text variant="bodyLarge">
-                    Área urbana
+                    Áreas
                 </Text>
-                <VStack spacing={10}>
                 {
-                    !(places.place_areas === undefined || places.place_areas === null) ? (
-                        <Flex>
-                        <Text variant="labelSmall">
-                            Nombre del área
-                        </Text>
-                        <Text variant="bodyMedium">
-                            {places.place_areas ? places.place_areas.area_name : ""}
-                        </Text>
-                        <Text variant="labelSmall">
-                            Número de teléfono del área
-                        </Text>
-                        <Text variant="bodyMedium">
-                            {places.place_areas ? places.place_areas.phone : ""}
-                        </Text>
-                        <FAB icon="pencil-outline" style={{position: "absolute", margin: 0, right: -15, bottom: 0}} onPress={() => {
-                            navigation.navigate("EditArea", {
-                                token,
-                                places,
-                                place_identifier
-                            })
-                        }}/>
-                    </Flex>
+                    places.place_areas.length > 0 ? (
+                        places.place_areas.map(area => (
+                            <List.Item
+                                title={area.area_name}
+                                description={`Teléfono: ${area.phone}`}
+                                right={(props) => <IconButton {...props} icon="pencil-outline" onPress={() => {
+                                    navigation.navigate("EditArea", {
+                                        token,
+                                        area,
+                                        place_identifier
+                                    })
+                                }} />}
+                            />
+                        ))
                     ) : (
-                        <Flex>
-                        <Text variant="labelSmall">
-                            Parece que no hay ninguna área registrada
-                        </Text>
-                            <FAB icon="plus-box" style={{position: "absolute", margin: 0, right: 0, bottom: -6}} onPress={() => {
-                                navigation.navigate("AddArea", {
-                                    token,
-                                    place_identifier
-                                })
-                            }}/>
-                        </Flex>
-                        )
+                        <VStack center spacing={20} p={30}>
+                            <Icon name="pencil-plus-outline" color={theme.colors.onBackground} size={50}/>
+                            <VStack center>
+                                <Text variant="headlineSmall">
+                                    Sin áreas
+                                </Text>
+                                <Text variant="bodyMedium" style={{textAlign: "center"}}>
+                                    No hay ningún área registrada, ¿qué te parece si hacemos el primero?
+                                </Text>
+                            </VStack>
+                        </VStack>
+                    )
                 }
-                </VStack>
+                <Button  icon="plus" onPress={() => {
+                    navigation.navigate("AddArea", {
+                        token,
+                        places,
+                        place_identifier
+                    })
+                }}>
+                    Agregar área
+                </Button>
             </VStack>
         )
     }
@@ -184,7 +183,7 @@ export default PlaceDetails = ({navigation, route}) => {
                                             Ocurrió un problema
                                         </Text>
                                         <Text variant="bodyMedium" style={{textAlign: "center"}}>
-                                            No podemos recuperar del bosque urbano, intentalo de nuevo más tarde (Error: {places})
+                                            No podemos recuperar del bosque urbano, inténtalo de nuevo más tarde (Error: {places})
                                         </Text>
                                     </VStack>
                                     <Flex>

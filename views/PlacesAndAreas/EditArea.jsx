@@ -8,10 +8,10 @@ import ModalMessage from "../Shared/ModalMessage";
 export default EditArea = ({navigation, route}) => {
     const localhost = Constants.expoConfig.extra.API_LOCAL
     const theme = useTheme()
-    const {token, places, place_identifier} = route.params
+    const {token, area, place_identifier} = route.params
 
-    const [area_name, setArea_name] = useState(`${places.place_areas.area_name}`)
-    const [phone, setPhone] = useState(`${places.place_areas.phone}`)
+    const [area_name, setArea_name] = useState(`${area.area_name}`)
+    const [phone, setPhone] = useState(`${area.phone}`)
     const [verified, setVerified] = useState(false)
 
     const [modalConfirm, setModalConfirm] = useState(false)
@@ -28,7 +28,7 @@ export default EditArea = ({navigation, route}) => {
         setModalLoading(true)
 
         const request = await fetch(
-            `${localhost}/places/${place_identifier}`,
+            `${localhost}/places/${place_identifier}/areas/${area.area_identifier}`,
             {
                 method: "PATCH",
                 headers: {
@@ -37,8 +37,8 @@ export default EditArea = ({navigation, route}) => {
                     "Cache-Control": "no-cache"
                 },
                 body: JSON.stringify({
-                    area_name,
-                    phone
+                    area_name: area_name.trim(),
+                    phone: phone.trim()
                 })
             }
         ).then(
@@ -65,7 +65,7 @@ export default EditArea = ({navigation, route}) => {
         setModalLoading(true)
 
         const request = await fetch(
-            `${localhost}/places/${place_identifier}`,
+            `${localhost}/places/${place_identifier}/areas/${area.area_identifier}`,
             {
                 method: "DELETE",
                 headers: {
@@ -167,13 +167,13 @@ export default EditArea = ({navigation, route}) => {
             
             <ModalMessage title="¡Listo!" description="El área ha sido actualizada" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline"/>
             
-            <ModalMessage title="¡Listo!" description="El área ha sido eliminada" handler={[modalSuccessDelete, () => setModalSuccessDelete(!modalSuccessDelete)]} actions={[['Aceptar', () => navigation.pop(2)]]} dismissable={false} icon="check-circle-outline"/>
+            <ModalMessage title="¡Listo!" description="El área ha sido eliminada" handler={[modalSuccessDelete, () => setModalSuccessDelete(!modalSuccessDelete)]} actions={[['Aceptar', () => navigation.pop(1)]]} dismissable={false} icon="check-circle-outline"/>
 
-            <ModalMessage title="Ocurrió un problema" description={`No pudimos actualizar el área, intentalo más tarde (${responseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline"/>
+            <ModalMessage title="Ocurrió un problema" description={`No pudimos actualizar el área, inténtalo más tarde (${responseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline"/>
             
-            <ModalMessage title="Ocurrió un problema" description={`No pudimos eliminar el lugar, intentalo más tarde (${responseCode})`} handler={[modalErrorDelete, () => setModalErrorDelete(!modalErrorDelete)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline"/>
+            <ModalMessage title="Ocurrió un problema" description={`No pudimos eliminar el lugar, inténtalo más tarde (${responseCode})`} handler={[modalErrorDelete, () => setModalErrorDelete(!modalErrorDelete)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline"/>
         
-            <ModalMessage title="Sin conexión a internet" description={`Parece que no tienes conexión a internet, conectate e intenta de nuevo`} handler={[modalFatal, () => setModalFatal(!modalFatal)]} actions={[['Aceptar']]} dismissable={true} icon="wifi-alert"/>
+            <ModalMessage title="Sin conexión a internet" description={`Parece que no tienes conexión a internet, conéctate e intenta de nuevo`} handler={[modalFatal, () => setModalFatal(!modalFatal)]} actions={[['Aceptar']]} dismissable={true} icon="wifi-alert"/>
         </Flex>
     
     )

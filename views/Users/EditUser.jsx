@@ -27,7 +27,8 @@ export default EditUser = ({navigation, route}) => {
     const [role, setRole] = useState(`${user.role}`)
     const [status, setStatus] = useState(`${user.status}`)
     const [total_hours, setTotal_hours] = useState(`${user.total_hours}`)
-    const [verified, setVerified] = useState(false);
+    const [verified, setVerified] = useState(false)
+    const [avatar, setAvatar] = useState(user?.avatar ?? null);
 
     const [modalConfim, setModalConfim] = useState(false)
     const [modalLoading, setModalLoading] = useState(false)
@@ -116,7 +117,8 @@ export default EditUser = ({navigation, route}) => {
                     school: school.trim(),
                     role: role,
                     status: status.trim(),
-                    total_hours: Number(total_hours)
+                    total_hours: Number(total_hours),
+                    avatar: avatar
                 })
             }
 
@@ -250,6 +252,19 @@ export default EditUser = ({navigation, route}) => {
         )
     }
 
+    const ImageData = () => {
+        return (
+            <VStack spacing={5}>
+                <Text variant="labelLarge">
+                    Foto de perfil
+                </Text>
+                <VStack spacing={10}>
+                    <ImageSelector value={avatar} setter={setAvatar}/>
+                </VStack>
+            </VStack>
+        )
+    }
+
     const Delete = () => {
         return (
             <VStack spacing={5}>
@@ -279,7 +294,7 @@ export default EditUser = ({navigation, route}) => {
 
     const Cancel = _ => {
         return (
-            <Button mode="outlined" onPress={_ => {
+            <Button mode="outlined" icon='close' onPress={_ => {
                 navigation.pop()
             }}>
                 Cancelar
@@ -289,7 +304,7 @@ export default EditUser = ({navigation, route}) => {
 
     return (
         <Flex fill>
-            <CreateForm title="Editar usuario" children={[PersonalData(), ContactData(), UserData(), Delete()]} actions={[Save(), Cancel()]} navigation={navigation} loading={modalLoading}/>
+            <CreateForm title="Editar usuario" children={[PersonalData(), ContactData(), UserData(), ImageData(), Delete()]} actions={[Save(), Cancel()]} navigation={navigation} loading={modalLoading}/>
 
             <ModalMessage title="Eliminar usuario" description="¿Seguro que deseas eliminar a este usuario? La acción no se puede deshacer" handler={[modalConfim, () => setModalConfim(!modalConfim)]} actions={[["Cancelar", () => setModalConfim(!modalConfim)], ['Aceptar', () => {setModalConfim(!modalConfim), deleteUser()}]]} dismissable={true} icon="help-circle-outline"/>
             
