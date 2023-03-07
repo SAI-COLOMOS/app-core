@@ -34,7 +34,8 @@ export default AddUser = ({navigation, route}) => {
     const [role, setRole] = useState('')
     const [status, setStatus] = useState('')
     const [total_hours, setTotal_hours] = useState('')
-    const [verified, setVerified] = useState();
+    const [verified, setVerified] = useState()
+    const [places, setPlaces] = useState();
 
     const providerTypes = [
         {
@@ -145,6 +146,32 @@ export default AddUser = ({navigation, route}) => {
 
     }
 
+    async function getPlaces() {
+        const request = await fetch (
+            `${localhost}/places`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                    "Cache-Control": "no-cache"
+                }
+            }
+        ).then(
+            response => response.ok ? response.json() : response.status
+        ).catch(
+            _ => null
+        )
+
+        if(request?.places) {
+            setPlaces(request.place_name)
+            console.log(request)
+        } else {
+            setPlaces(request)
+        }
+
+    }
+
     useEffect(() => {
         let check = true
 
@@ -214,8 +241,12 @@ export default AddUser = ({navigation, route}) => {
                     Datos del usuario
                 </Text>
                 <VStack spacing={10}>
+                    <Flex fill>
                     <Dropdown title={"Rol"} options={roleTypes} value={role} selected={setRole} />
+                    </Flex>
+                    <Flex>
                     <Dropdown title={"Tipo de prestador"} options={providerTypes} value={provider_type} selected={setProvider_type} />
+                    </Flex>
                     <TextInput mode="outlined" value={place} onChangeText={setPlace} label="Parque" autoCapitalize="words" maxLength={100} autoComplete="off" autoCorrect={false}/>
                     <TextInput mode="outlined" value={assigned_area} onChangeText={setAssigned_area} label="Área asignada" maxLength={100} autoComplete="off" autoCorrect={false}/>
                     <TextInput mode="outlined" value={school} onChangeText={setSchool} label="Escuela" maxLength={100} autoComplete="off" autoCorrect={false}/>
@@ -251,7 +282,7 @@ export default AddUser = ({navigation, route}) => {
 
     const Cancel = _ => {
         return (
-            <Button mode="outlined" onPress={_ => {
+            <Button mode="outlined" icon='close' onPress={_ => {
                 navigation.pop()
             }}>
                 Cancelar
@@ -261,7 +292,7 @@ export default AddUser = ({navigation, route}) => {
 
     return (
         <Flex fill>
-            <CreateForm navigation={navigation} title={"Añadir nuevo usuario"} children={[PersonalData(), ContactData(), UserData(), ImageData()]} actions={[Cancel(), Save()]} />
+            <CreateForm navigation={navigation} title={"Añadir nuevo usuario"} children={[PersonalData(), ContactData(), UserData(), ImageData()]} actions={[Save(), Cancel()]} />
             
             <ModalMessage title="¡Listo!" description="El usuario ha sido creado" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.replace("Dashboard")]]} dismissable={false} icon="check-circle-outline"/>
             <ModalMessage title="Ocurrió un problema" description={`No pudimos crear al usuario, intentalo más tarde. (${reponseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline"/>
