@@ -54,8 +54,6 @@ export default Login = ({navigation}) => {
             _ => null
         )
 
-        console.log(session)
-
         if(session && isNaN(session)) {
             payload = jwtDecode(session.token)
         } else if(session != null) {
@@ -121,7 +119,6 @@ export default Login = ({navigation}) => {
             const {hostname, path, queryParams} = Linking.parse(url)
             if(path === "recovery" && queryParams?.token) {
                 navigation.navigate("SetNewPassword", {token: queryParams.token})
-                console.log(queryParams)
             }
         }
     }, [url])
@@ -152,8 +149,6 @@ export default Login = ({navigation}) => {
                         error => null
                     )
 
-                    console.log("Hola", profile)
-
                     if(profile?.user) {
                         await SecureStore.setItemAsync("user", JSON.stringify({
                             "first_name": profile.user.first_name,
@@ -169,7 +164,7 @@ export default Login = ({navigation}) => {
 
                 }
             }
-            
+
             setActiveSession(false)
         }
 
