@@ -6,7 +6,7 @@ export default Dropdown = ({title, options, selected, value}) => {
     const [show, setShow] = useState(false)
     return (
         <Flex fill>
-                <Menu contentStyle={false} visible={show} onDismiss={() => setShow(!show)} anchor={
+                <Menu anchorPosition='bottom' contentStyle={false} visible={show} onDismiss={() => setShow(!show)} anchor={
                     <TouchableRipple onPress={() => setShow(!show)} style={{zIndex: 10}}>
                         <TextInput label={title} value={value} mode='outlined' editable={false} style={{zIndex: -5}} right={<TextInput.Icon disabled={true} icon="menu-down"/>} />
                     </TouchableRipple>

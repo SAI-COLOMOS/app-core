@@ -8,6 +8,7 @@ import Constants from "expo-constants";
 import { FlatList } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import SearchBar from "../Shared/SearchBar";
 
 export default Schools = ({navigation, route}) => {
     const localhost = Constants.expoConfig.extra.API_LOCAL
@@ -19,12 +20,13 @@ export default Schools = ({navigation, route}) => {
     const [schools, setSchools] = useState(undefined)
     const [loading, setLoading] = useState(false)
     const [showSearch, setShowSearch] = useState(false)
+    const [search, setSearch] = useState("")
 
     async function getSchools() {
         setLoading(true)
         
         const request = await fetch(
-            `${localhost}/schools`,
+            `${localhost}/schools?search=${search}&filter=${JSON.stringify({municipality:"gua"})}`,
             {
                 method: "GET",
                 headers: {
@@ -51,7 +53,10 @@ export default Schools = ({navigation, route}) => {
 
     useEffect(() => {
         navigation.setOptions({
-            header: (props) => <Header {...props} children={[<IconButton icon="alert"/>, <IconButton icon="pencil" onPress={() => setShowSearch(!showSearch)}/>]}/>,
+            header: (props) => <Header {...props} children={[
+                <IconButton icon="filter-outline"/>,
+                <IconButton icon="magnify" onPress={() => setShowSearch(!showSearch)}/>
+            ]}/>,
             headerTransparent: true,
             headerTitle: "Escuelas"
         })
@@ -105,6 +110,22 @@ export default Schools = ({navigation, route}) => {
         )
     }
 
+    const NoResults = _ => {
+        return (
+            <VStack center spacing={20} p={30}>
+                <Icon name="magnify" color={theme.colors.onBackground} size={50}/>
+                <VStack center>
+                    <Text variant="headlineSmall">
+                        Sin resultados
+                    </Text>
+                    <Text variant="bodyMedium" style={{textAlign: "center"}}>
+                        No hay ninguna escuela registrada que cumpla con los parámetros de tu búsqueda
+                    </Text>
+                </VStack>
+            </VStack>
+        )
+    }
+
     const NoConection = _ => {
         return (
             <VStack center spacing={20} p={30}>
@@ -132,19 +153,11 @@ export default Schools = ({navigation, route}) => {
     return (
         <Flex fill pt={headerMargin}>
 
-            {
-                showSearch ? (
-                    <Flex pv={10} ph={20}>
-                        <TextInput mode="outlined"/>
-                    </Flex>
-                ) : (
-                    null
-                )
-            }
+            <SearchBar show={showSearch} label="Busca por nombre de la escuela" value={search} setter={setSearch} action={getSchools}/>
 
             <FlatList 
                 data={schools} 
-                ListEmptyComponent={() => schools === undefined ? null : schools === null ? <NoConection/> : <EmptyList/>}
+                ListEmptyComponent={() => schools === undefined ? null : schools === null ? <NoConection/> : search ? <NoResults/> : <EmptyList/>}
                 refreshing={loading}
                 onRefresh={_ => getSchools()}
                 renderItem={({item}) => <Item school_name={item.school_name} address={`${item.street} #${item.exterior_number}, ${item.colony}, ${item.municipality}`} school_identifier={item.school_identifier}/>}

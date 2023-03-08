@@ -8,6 +8,9 @@ import Constants from "expo-constants"
 import { RefreshControl, ScrollView, FlatList } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import SearchBar from "../Shared/SearchBar";
+import ModalFilters from "../Shared/ModalFilters";
+import Dropdown from "../Shared/Dropdown";
 
 export default Users = ({navigation, route}) => {
     const headerMargin = useHeaderHeight()
@@ -17,12 +20,18 @@ export default Users = ({navigation, route}) => {
 
     const [loading, setLoading] = useState(false)
     const [users, setUsers] = useState(undefined)
+    const [search, setSearch] = useState("")
+    const [showSearch, setShowSearch] = useState(false)
+
+    const [placeFilter, setPlaceFilter] = useState("Sin filtro")
+
+    const [modalFilters, setModalFilters] = useState(true)
 
     const getUsers = async _ => {
         setLoading(true)
 
         const request = await fetch(
-            `${localhost}/users`,
+            `${localhost}/users?search=${search}&filter=${JSON.stringify({})}`,
             {
                 method: "GET",
                 headers: {
@@ -48,11 +57,14 @@ export default Users = ({navigation, route}) => {
 
     useEffect(() => {
         navigation.setOptions({
-            header: (props) => <Header {...props}/>,
+            header: (props) => <Header {...props} children={[
+                <IconButton icon="filter-outline"/>,
+                <IconButton icon="magnify" onPress={() => setShowSearch(!showSearch)}/>
+            ]}/>,
             headerTransparent: true,
             headerTitle: "Usuarios"
         })
-    }, [])
+    }, [showSearch])
 
     useEffect(() => {
         if(users === undefined) {
@@ -73,7 +85,7 @@ export default Users = ({navigation, route}) => {
                         navigation.navigate("UserDetails", {token, register})
                     }}>
                         <Flex p={10}>
-                            <Card.Title title={first_name} titleNumberOfLines={2} subtitle={role} subtitleNumberOfLines={1} left={(props) => avatar ? <Avatar.Image {...props} source={{uri: `data:image/png;base64,${avatar}`}} /> : <Avatar.Icon {...props} icon="account"/>}  />
+                            <Card.Title title={first_name} titleNumberOfLines={2} subtitle={role} subtitleNumberOfLines={2} left={(props) => avatar ? <Avatar.Image {...props} source={{uri: `data:image/png;base64,${avatar}`}} /> : <Avatar.Icon {...props} icon="account"/>}  />
                         </Flex>
                     </TouchableRipple>
                 </Card>
@@ -131,14 +143,24 @@ export default Users = ({navigation, route}) => {
         )
     }
 
+    const FilterOptions = _ => {
+        return (
+            <Flex>
+                <Dropdown title="Bosque urbano" value={placeFilter} selected={setPlaceFilter} options={[{option: "A"},{option:"B"}]} />
+            </Flex>
+        )
+    }
+
     return (
         <Flex fill pt={headerMargin}>
+            <SearchBar show={showSearch} label="Busca por nombre, registro, correo o teléfono" value={search} setter={setSearch} action={getUsers}/>
+
             <FlatList 
                 data={users} 
                 ListEmptyComponent={() => users === undefined ? null : users === null ? <NoConection/> : <EmptyList/>}
                 refreshing={loading}
                 onRefresh={_ => getUsers()}
-                renderItem={({item}) => <Item onPress={() => {}} first_name={`${item.first_name} ${item.first_last_name}`} role={`${item.role} - ${item.register} - ${item.status}`} register={item.register} avatar={item?.avatar}/>}
+                renderItem={({item}) => <Item onPress={() => {}} first_name={`${item.first_name} ${item.first_last_name}`} role={`${item.register}`} register={item.register} avatar={item?.avatar}/>}
             />
 
             <FAB icon="plus" style={{position: "absolute", margin: 16, right: 0, bottom: 0}} onPress={() => {
@@ -147,6 +169,9 @@ export default Users = ({navigation, route}) => {
                     token
                 })
             }}/>
+
+            <ModalFilters title="Filtros" handler={[modalFilters, () => setModalFilters(!modalFilters)]} children={[FilterOptions()]}/>
+
         </Flex>
     )
 }
