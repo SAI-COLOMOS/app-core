@@ -3,21 +3,24 @@ import React, { useState, useEffect } from 'react'
 import { IconButton, TextInput } from 'react-native-paper'
 
 export default SearchBar = ({label, value, setter, show, action}) => {
-    useEffect(() => {
-        if(value == "") {
-            action()
-        }
-    }, [value]);
+    const [clear, setClear] = useState(false)
 
     useEffect(() => {
-        if(!show) {
+        if(clear === true && value == "") {
+            action()
+            setClear(false)
+        }
+    }, [value, clear]);
+    
+    useEffect(() => {
+        if(show === false) {
             setter("")
+            setClear(true)
         }
     }, [show]);
 
-
     return show ? (
-        <HStack pv={10} ph={20} spacing={10} items="end">
+        <HStack ph={20} spacing={10} items="end">
             <Flex fill>
                 <TextInput mode="outlined" label={label ?? "Búsqueda"} value={value} returnKeyType="search" returnKeyLabel="Buscar" onChangeText={setter} onSubmitEditing={() => action(value)}/>
             </Flex>
@@ -25,6 +28,7 @@ export default SearchBar = ({label, value, setter, show, action}) => {
                 value ? (
                     <IconButton mode="outlined" icon="close" onPress={() => {
                         setter("")
+                        setClear(true)
                     }} />
                 ) : (
                     null

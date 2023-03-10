@@ -219,7 +219,9 @@ export default AddUser = ({navigation, route}) => {
                     <TextInput mode="outlined" value={first_last_name} onChangeText={setFirst_last_name} label="Apellido paterno" maxLength={50} autoComplete="off" autoCorrect={false}/>
                     <TextInput mode="outlined" value={second_last_name} onChangeText={setSecond_last_name} label="Apellido materno" maxLength={50} autoComplete="off" autoCorrect={false}/>
                     <TextInput mode="outlined" value={age} onChangeText={setAge} label="Edad" keyboardType="numeric" maxLength={2} autoComplete="off" autoCorrect={false}/>
-                    <Dropdown title="Grupo sanguíneo" options={bloodTypes} value={blood_type} selected={setBlood_type}/>
+                    <Flex fill>
+                        <Dropdown title="Grupo sanguíneo" options={bloodTypes} value={blood_type} selected={setBlood_type}/>
+                    </Flex>
                 </VStack>
             </VStack>
             
@@ -251,10 +253,10 @@ export default AddUser = ({navigation, route}) => {
                 </Text>
                 <VStack spacing={10}>
                     <Flex fill>
-                    <Dropdown title={"Rol"} options={roleTypes} value={role} selected={setRole} />
+                        <Dropdown title={"Rol"} options={roleTypes} value={role} selected={setRole} />
                     </Flex>
-                    <Flex>
-                    <Dropdown title={"Tipo de prestador"} options={providerTypes} value={provider_type} selected={setProvider_type} />
+                    <Flex fill>
+                        <Dropdown title={"Tipo de prestador"} options={providerTypes} value={provider_type} selected={setProvider_type} />
                     </Flex>
                     <TextInput mode="outlined" value={place} onChangeText={setPlace} label="Parque" autoCapitalize="words" maxLength={100} autoComplete="off" autoCorrect={false}/>
                     <TextInput mode="outlined" value={assigned_area} onChangeText={setAssigned_area} label="Área asignada" maxLength={100} autoComplete="off" autoCorrect={false}/>
