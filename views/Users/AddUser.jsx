@@ -36,6 +36,7 @@ export default AddUser = ({navigation, route}) => {
     const [total_hours, setTotal_hours] = useState('')
     const [verified, setVerified] = useState()
     const [places, setPlaces] = useState();
+    const [curp, setCurp] = useState('');
 
     const providerTypes = [
         {
@@ -122,7 +123,8 @@ export default AddUser = ({navigation, route}) => {
                     school: school.trim(),
                     status: status.trim(),
                     avatar: avatar,
-                    total_hours: Number(total_hours)
+                    total_hours: Number(total_hours),
+                    curp: curp.trim()
                 })
             }
         ).then(
@@ -199,13 +201,13 @@ export default AddUser = ({navigation, route}) => {
         role.length > 0 ? null : check = false
         status.length > 0 ? null : check = false
         total_hours.length > 0 ? null : check = false
-
+        curp.length > 0 ? null : check = false
         if(check){
             setVerified(true)
         }else{
             setVerified(false)
         }
-    },[first_name, first_last_name, age, blood_type, email, phone, emergency_contact, emergency_phone, provider_type, place, assigned_area, school, role, status, total_hours])
+    },[first_name, first_last_name, age, blood_type, email, phone, emergency_contact, emergency_phone, provider_type, place, assigned_area, school, role, status, total_hours, curp])
 
     const PersonalData = () => {
         return (
@@ -222,6 +224,7 @@ export default AddUser = ({navigation, route}) => {
                     <Flex fill>
                         <Dropdown title="Grupo sanguíneo" options={bloodTypes} value={blood_type} selected={setBlood_type}/>
                     </Flex>
+                    <TextInput mode="outlined" value={curp} onChangeText={setCurp} label="CURP" autoCapitalize="characters" maxLength={18} autoComplete="off" autoCorrect={false}/>
                 </VStack>
             </VStack>
             
