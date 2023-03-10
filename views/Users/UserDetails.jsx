@@ -80,6 +80,14 @@ export default UserDetails = ({navigation, route}) => {
                         {`${user?.age}          ${user?.blood_type}`}
                     </Text>
                 </VStack>
+                <VStack spacing={2}>
+                    <Text variant="labelSmall">
+                        CURP
+                    </Text>
+                    <Text variant="bodyMedium">
+                        {`${user?.curp}`}
+                    </Text>
+                </VStack>
             </VStack>
         )
     }

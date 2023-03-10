@@ -29,6 +29,7 @@ export default EditUser = ({navigation, route}) => {
     const [total_hours, setTotal_hours] = useState(`${user.total_hours}`)
     const [verified, setVerified] = useState(false)
     const [avatar, setAvatar] = useState(user?.avatar ?? null);
+    const [curp, setCurp] = useState(`${user.curp}`);
 
     const [modalConfim, setModalConfim] = useState(false)
     const [modalLoading, setModalLoading] = useState(false)
@@ -118,7 +119,8 @@ export default EditUser = ({navigation, route}) => {
                     role: role,
                     status: status.trim(),
                     total_hours: Number(total_hours),
-                    avatar: avatar
+                    avatar: avatar,
+                    curp: curp.trim()
                 })
             }
 
@@ -192,6 +194,7 @@ export default EditUser = ({navigation, route}) => {
         role.length > 0 ? null : check = false
         status.length > 0 ? null : check = false
         total_hours.length > 0 ? null : check = false
+        curp.length > 0 ? null : check = false
 
         if(check){
             setVerified(true)
@@ -211,6 +214,7 @@ export default EditUser = ({navigation, route}) => {
                     <TextInput mode="outlined" multiline={true} value={first_last_name} onChangeText={setFirst_last_name} label="Apellido paterno" maxLength={150} autoComplete="off" autoCapitalize="words" />
                     <TextInput mode="outlined" multiline={true} value={second_last_name} onChangeText={setSecond_last_name} label="Apellido materno" maxLength={150} autoComplete="off" autoCapitalize="words" />
                     <TextInput mode="outlined" multiline={true} value={age} onChangeText={setAge} label="Edad" keyboardType="numeric" maxLength={2} autoComplete="off"/>
+                    <TextInput mode="outlined" multiline={true} value={curp} onChangeText={setCurp} label="CURP" autoCapitalize="characters" maxLength={18} autoComplete="off"/>
                     <Dropdown title="Grupo sanguíneo" options={bloodTypes} value={blood_type} selected={setBlood_type}/>
                 </VStack>
             </VStack>
