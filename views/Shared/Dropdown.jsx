@@ -7,15 +7,16 @@ export default Dropdown = ({title, options, selected, value}) => {
 	return (
 		<Menu anchorPosition='bottom' contentStyle={false} visible={show} onDismiss={() => setShow(!show)} anchor={
 			<TouchableRipple onPress={() => setShow(!show)} style={{zIndex: 10}}>
-				<TextInput label={title} numberOfLines={1} value={value} mode='outlined' editable={false} style={{zIndex: -5}} right={<TextInput.Icon disabled={true} icon="menu-down"/>} />
+				<TextInput label={title} value={value} mode='outlined' editable={false} style={{zIndex: -5}} right={<TextInput.Icon disabled={true} icon="menu-down"/>} />
 			</TouchableRipple>
 		}>
 			{
 				options?.length > 0 ? (
 					options.map(option => (
 							<Menu.Item title={option?.option} onPress={() => {
-									selected(option)
-									setShow(!show)
+								selected(option?.option)
+								console.log("Form selected",option?.option)
+								setShow(!show)
 							}}/>
 					))
 				) : (

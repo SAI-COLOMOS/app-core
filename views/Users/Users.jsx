@@ -21,15 +21,30 @@ export default Users = ({navigation, route}) => {
     const [loading, setLoading] = useState(false)
     const [users, setUsers] = useState(undefined)
     const [places, setPlaces] = useState(undefined)
+    const [schools, setSchools] = useState(undefined)
     const [search, setSearch] = useState("")
     const [showSearch, setShowSearch] = useState(null)
     const [showFilters, setShowFilters] = useState(false)
     
-    const [placesOptions, setPlacesOptions] = useState([{option: "Sin filtro", value: null}])
-    const [areasOptions, setAreasOptions] = useState([{option: "Sin filtro", value: null}]);
+    const [placesOptions, setPlacesOptions] = useState()
+    const [areasOptions, setAreasOptions] = useState();
+    const [schoolsOptions, setSchoolsOptions] = useState()
+    const roleOptions = [
+        {option: "Administrador"},
+        {option: "Encargado"},
+        {option: "Prestador"}
+    ]
+    const periodOptions = [
+        {option: "A"},
+        {option: "B"}
+    ]
 
-    const [placeFilter, setPlaceFilter] = useState({option: "Sin filtro", value: null})
-    const [areaFilter, setAreaFilter] = useState({option: "Sin filtro", value: null})
+    const [placeFilter, setPlaceFilter] = useState("")
+    const [areaFilter, setAreaFilter] = useState("")
+    const [roleFilter, setRoleFilter] = useState("")
+    const [yearFilter, setYearFilter] = useState("")
+    const [periodFilter, setPeriodFilter] = useState("")
+    const [schoolFilter, setSchoolFilter] = useState("")
 
     const [filter, setFilter] = useState({})
 
@@ -82,14 +97,49 @@ export default Users = ({navigation, route}) => {
         if(request?.places) {
             setPlaces(request.places)
 
-            let options = [{option: "Sin filtro", value: null}]
+            let placesData = []
             request.places.forEach(place => {
-                options.push({option: place.place_name, value: place.place_name})
-            });
-            setPlacesOptions(options)
+                let areasData = []
 
+                place.place_areas.map(area => {
+                    areasData.push({option: area.area_name})
+                })
+
+                placesData.push({option: place.place_name, areas: areasData})
+            });
+            setPlacesOptions(placesData)
         }else{
             setPlaces(request)
+        }
+    }
+
+    const getSchools = async _ => {
+        const request = await fetch(
+            `${localhost}/schools`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                    'Cache-Control': 'no-cache',
+                }
+            }
+        ).then(
+            response => response.ok ? response.json() : response.status
+        ).catch(
+            _ => null
+        )
+
+        if(request?.schools) {
+            setSchools(request.schools)
+
+            let schoolsData = []
+            request.schools.forEach(school => {
+                schoolsData.push({option: school.school_name})
+            });
+            setSchoolsOptions(schoolsData)
+        }else{
+            setSchools(request)
         }
     }
 
@@ -105,31 +155,47 @@ export default Users = ({navigation, route}) => {
     }, [showSearch, showFilters])
 
     useEffect(() => {
-        setAreaFilter({option: "Sin filtro", value: null})
-        const placeSelected = places?.find(place => place.place_name == placeFilter.option)
+        setAreaFilter("")
+        const placeSelected = placesOptions?.find(place => place.option == placeFilter)
 
-        let options = [{option: "Sin filtro", value: null}]
-        placeSelected?.place_areas.forEach(place => {
-            options.push({option: place.area_name, value: place.area_name})
+        let areaData = []
+        placeSelected?.areas.forEach(area => {
+            areaData.push({option: area.option})
         });
 
-        setAreasOptions(options)
+        setAreasOptions(areaData)
 
     }, [placeFilter]);
 
     useEffect(() => {
         let filters = {}
 
-        if(placeFilter.value !== null) {
-            filters = {...filters, place: placeFilter.value }
+        if(placeFilter !== "") {
+            filters = {...filters, place: placeFilter}
         }
 
-        if(areaFilter.value !== null) {
-            filters = {...filter, assigned_area: areaFilter.value}
+        if(areaFilter !== "") {
+            filters = {...filter, assigned_area: areaFilter}
+        }
+
+        if(roleFilter !== "") {
+            filters = {...filter, role: roleFilter}
+        }
+
+        if(yearFilter !== "") {
+            filters = {...filter, year: yearFilter}
+        }
+
+        if(periodFilter !== "") {
+            filters = {...filter, period: periodFilter}
+        }
+
+        if(schoolFilter !== "") {
+            filters = {...filter, school: schoolFilter}
         }
 
         setFilter(filters)
-    }, [placeFilter, areaFilter])
+    }, [placeFilter, areaFilter, roleFilter, yearFilter, periodFilter, schoolFilter])
 
     useEffect(() => {
         if(users === undefined) {
@@ -142,6 +208,12 @@ export default Users = ({navigation, route}) => {
             getPlaces()
         }
     }, [places])
+
+    useEffect(() => {
+        if(schools === undefined) {
+            getSchools()
+        }
+    }, [schools])
         
     // useFocusEffect(useCallback(() => {
     //     getUsers()
@@ -216,36 +288,96 @@ export default Users = ({navigation, route}) => {
         )
     }, [])
 
-    const FilterOptions = useCallback(_ => {
+    const FilterOptions =_ => {
         return (
             <VStack spacing={10}>
-                <Flex>
-                    <Dropdown title="Bosque urbano" value={placeFilter.option} selected={setPlaceFilter} options={placesOptions} />
-                </Flex>
+                <HStack items="end">
+                    <Flex fill>
+                        <Dropdown title="Bosque urbano" value={placeFilter} selected={setPlaceFilter} options={placesOptions} />
+                    </Flex>
+                    {
+                        placeFilter ? (
+                            <IconButton icon="delete" mode="outlined" onPress={() => setPlaceFilter("")}/>
+                        ) : (
+                            null
+                        )
+                    }
+                </HStack>
+
                 {
-                    placeFilter.value !== null ? (
-                        <Flex>
-                            <Dropdown title="Área asignada" value={areaFilter.option} selected={setAreaFilter} options={areasOptions} />
-                        </Flex>
+                    placeFilter && areasOptions.length > 0 ? (
+                        <HStack items="end">
+                            <Flex fill>
+                                <Dropdown title="Área asignada" value={areaFilter} selected={setAreaFilter} options={areasOptions} />
+                            </Flex>
+                            {
+                                areaFilter ? (
+                                    <IconButton icon="delete" mode="outlined" onPress={() => setAreaFilter("")}/>
+                                ) : (
+                                    null
+                                )
+                            }
+                        </HStack>
                     ) : (
                         null
                     )
                 }
-                <Flex>
-                    <Dropdown title="Rol" value={placeFilter} selected={setPlaceFilter} options={[{option: "A"},{option:"B"}]} />
-                </Flex>
-                <HStack spacing={20}>
+
+                <HStack items="end">
                     <Flex fill>
-                        <Dropdown title="Año" value={placeFilter} selected={setPlaceFilter} options={[{option: "A"},{option:"B"}]} />
+                        <Dropdown title="Rol" value={roleFilter} selected={setRoleFilter} options={roleOptions} />
                     </Flex>
-                    <Flex fill>
-                        <Dropdown title="Periodo" value={placeFilter} selected={setPlaceFilter} options={[{option: "A"},{option:"B"}]} />
-                    </Flex>
+                    {
+                        roleFilter ? (
+                            <IconButton icon="delete" mode="outlined" onPress={() => setRoleFilter("")}/>
+                        ) : (
+                            null
+                        )
+                    }
                 </HStack>
-                
+
+                <HStack items="end">
+                    <Flex fill>
+                        <TextInput value={yearFilter} onChangeText={setYearFilter} mode="outlined" label="Año de inscripción" maxLength={4} keyboardType="numeric"/>
+                    </Flex>
+                    {
+                        yearFilter ? (
+                            <IconButton icon="delete" mode="outlined" onPress={() => setYearFilter("")}/>
+                        ) : (
+                            null
+                        )
+                    }
+                </HStack>
+
+                <HStack items="end">
+                    <Flex fill>
+                        <Dropdown title="Periodo de inscripción" value={periodFilter} selected={setPeriodFilter} options={periodOptions} />
+                    </Flex>
+                    {
+                        periodFilter ? (
+                            <IconButton icon="delete" mode="outlined" onPress={() => setPeriodFilter("")}/>
+                        ) : (
+                            null
+                        )
+                    }
+                </HStack>
+
+                <HStack items="end">
+                    <Flex fill>
+                        <Dropdown title="Escuela" value={schoolFilter} selected={setSchoolFilter} options={schoolsOptions} />
+                    </Flex>
+                    {
+                        schoolFilter ? (
+                            <IconButton icon="delete" mode="outlined" onPress={() => setSchoolFilter("")}/>
+                        ) : (
+                            null
+                        )
+                    }
+                </HStack>
+
             </VStack>
         )
-    }, [filter])
+    }
 
     return (
         <Flex fill pt={headerMargin}>

@@ -19,13 +19,13 @@ export default ModalFilters = ({handler, child, action}) => {
                 </Dialog.Title>
 
                 <Dialog.Content>
-                    <ScrollView>
-                        {/* <Card mode="outlined"> */}
-                            {
-                                child
-                            }
-                        {/* </Card> */}
-                    </ScrollView>
+                        <ScrollView>
+                            {/* <Card mode="outlined"> */}
+                                {
+                                    child
+                                }
+                            {/* </Card> */}
+                        </ScrollView>
                 </Dialog.Content>
 
                 <Dialog.Actions>
