@@ -8,16 +8,16 @@ import ModalMessage from "../Shared/ModalMessage";
 export default EditPlace = ({navigation, route}) => {
     const localhost = Constants.expoConfig.extra.API_LOCAL
     const theme = useTheme()
-    const {token, places} = route.params
+    const {token, place} = route.params
 
-    const [place_name, setPlace_name] = useState(`${places.place_name}`)
-    const [street, setStreet] = useState(`${places.street}`)
-    const [exterior_number, setExterior_number] = useState(`${places.exterior_number}`)
-    const [colony, setColony] = useState(`${places.colony}`)
-    const [municipality, setMunicipality] = useState(`${places.municipality}`)
-    const [postal_code, setPostal_code] = useState(`${places.postal_code}`)
-    const [phone, setPhone] = useState(`${places.phone}`)
-    const [reference, setReference] = useState(`${places.reference}`)
+    const [place_name, setPlace_name] = useState(`${place.place_name}`)
+    const [street, setStreet] = useState(`${place.street}`)
+    const [exterior_number, setExterior_number] = useState(`${place.exterior_number}`)
+    const [colony, setColony] = useState(`${place.colony}`)
+    const [municipality, setMunicipality] = useState(`${place.municipality}`)
+    const [postal_code, setPostal_code] = useState(`${place.postal_code}`)
+    const [phone, setPhone] = useState(`${place.phone}`)
+    const [reference, setReference] = useState(`${place.reference}`)
     const [verified, setVerified] = useState(false)
 
     const [modalConfirm, setModalConfirm] = useState(false)
@@ -34,7 +34,7 @@ export default EditPlace = ({navigation, route}) => {
         setModalLoading(true)
 
         const request = await fetch(
-            `${localhost}/places/${places.place_identifier}`,
+            `${localhost}/places/${place.place_identifier}`,
             {
                 method: "PATCH",
                 headers: {
@@ -77,7 +77,7 @@ export default EditPlace = ({navigation, route}) => {
         setModalLoading(true)
 
         const request = await fetch(
-            `${localhost}/places/${places.place_identifier}`,
+            `${localhost}/places/${place.place_identifier}`,
             {
                 method: "DELETE",
                 headers: {

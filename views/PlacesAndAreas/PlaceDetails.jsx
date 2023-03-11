@@ -16,7 +16,7 @@ export default PlaceDetails = ({navigation, route}) => {
     const theme = useTheme()
 
     const [loading, setLoading] = useState(false)
-    const [places, setPlaces] = useState(undefined)
+    const [place, setPlaces] = useState(undefined)
 
     async function getPlaces() {
         setLoading(true)
@@ -94,7 +94,7 @@ export default PlaceDetails = ({navigation, route}) => {
                             Domicilio
                         </Text>
                         <Text variant="bodyLarge">
-                            {`${places?.street} #${places?.exterior_number}\n${places?.colony}, ${places?.municipality}, ${places?.postal_code}`}
+                            {`${place?.street} #${place?.exterior_number}\n${place?.colony}, ${place?.municipality}, ${place?.postal_code}`}
                         </Text>
                     
                     <Flex>
@@ -102,7 +102,7 @@ export default PlaceDetails = ({navigation, route}) => {
                             Referencia
                         </Text>
                         <Text variant="bodyMedium">
-                            {places?.reference ? places?.reference : "Sin referencia"}
+                            {place?.reference ? place?.reference : "Sin referencia"}
                         </Text>
                     </Flex>
                     
@@ -111,7 +111,7 @@ export default PlaceDetails = ({navigation, route}) => {
                             Número de teléfono
                         </Text>
                         <Text variant="bodyMedium">
-                            {places?.phone}
+                            {place?.phone}
                         </Text>
                     </Flex>
                 </VStack>
@@ -126,8 +126,8 @@ export default PlaceDetails = ({navigation, route}) => {
                     Áreas
                 </Text>
                 {
-                    places.place_areas.length > 0 ? (
-                        places.place_areas.map(area => (
+                    place.place_areas.length > 0 ? (
+                        place.place_areas.map(area => (
                             <List.Item
                                 title={area.area_name}
                                 description={`Teléfono: ${area.phone}`}
@@ -157,7 +157,7 @@ export default PlaceDetails = ({navigation, route}) => {
                 <Button  icon="plus" onPress={() => {
                     navigation.navigate("AddArea", {
                         token,
-                        places,
+                        place,
                         place_identifier
                     })
                 }}>
@@ -171,10 +171,10 @@ export default PlaceDetails = ({navigation, route}) => {
         <Flex fill pt={headerMargin - 20}> 
             <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={_ => getPlaces()}/>}>
                 {
-                    places !== undefined ? (
-                        places !== null ? (
-                            isNaN(places) ? (
-                                <DisplayDetails icon="pine-tree" title={places?.place_name} children={[Places(), Areas()]}/>
+                    place !== undefined ? (
+                        place !== null ? (
+                            isNaN(place) ? (
+                                <DisplayDetails icon="pine-tree" title={place?.place_name} children={[Places(), Areas()]}/>
                             ) : (
                                 <VStack p={30} center spacing={20}>
                                     <Icon color={theme.colors.onBackground} name="alert-circle-outline" size={50}/>
@@ -183,7 +183,7 @@ export default PlaceDetails = ({navigation, route}) => {
                                             Ocurrió un problema
                                         </Text>
                                         <Text variant="bodyMedium" style={{textAlign: "center"}}>
-                                            No podemos recuperar del bosque urbano, inténtalo de nuevo más tarde (Error: {places})
+                                            No podemos recuperar del bosque urbano, inténtalo de nuevo más tarde (Error: {place})
                                         </Text>
                                     </VStack>
                                     <Flex>
@@ -218,11 +218,11 @@ export default PlaceDetails = ({navigation, route}) => {
             </ScrollView>
 
             {
-                !(places === undefined || places === null) ? (
+                !(place === undefined || place === null) ? (
                     <FAB icon="pencil-outline" style={{position: "absolute", margin: 16, right: 0, bottom: 0}} onPress={() => {
                         navigation.navigate("EditPlace", {
                             token,
-                            places
+                            place
                         })
                     }}/>
                 ) : (
