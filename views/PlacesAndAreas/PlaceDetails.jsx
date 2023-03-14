@@ -1,7 +1,7 @@
-import { Flex, HStack, VStack } from '@react-native-material/core'
+import { Flex, VStack } from '@react-native-material/core'
 import { useEffect, useState, useCallback } from 'react'
 import { useHeaderHeight } from '@react-navigation/elements'
-import { Text, Card, Avatar, TouchableRipple, IconButton, Button, FAB, useTheme, List, Divider } from 'react-native-paper'
+import { Text, Card, Button, FAB, useTheme } from 'react-native-paper'
 import Header from '../Shared/Header'
 import Constants from 'expo-constants'
 import DisplayDetails from '../Shared/DisplayDetails'
@@ -30,7 +30,7 @@ export default PlaceDetails = ({ navigation, route }) => {
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
-      .catch((_) => null)
+      .catch(() => null)
 
     setLoading(false)
 
@@ -57,38 +57,13 @@ export default PlaceDetails = ({ navigation, route }) => {
     }, [])
   )
 
-  const NoConection = (_) => {
-    return (
-      <VStack center spacing={20} p={30}>
-        <Icon name="wifi-alert" color={theme.colors.onBackground} size={50} />
-        <VStack center>
-          <Text variant="headlineSmall">Sin conexión</Text>
-          <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
-            Parece que no tienes conexión a internet, conéctate e intenta de nuevo
-          </Text>
-        </VStack>
-        <Flex>
-          <Button
-            icon="reload"
-            mode="outlined"
-            onPress={(_) => {
-              getPlaces()
-            }}
-          >
-            Reintentar
-          </Button>
-        </Flex>
-      </VStack>
-    )
-  }
-
   const Places = () => {
     return (
       <VStack p={20} spacing={5}>
         <Text variant="bodyLarge">Bosque urbano</Text>
         <VStack spacing={10}>
           <Text variant="labelSmall">Domicilio</Text>
-          <Text variant="bodyLarge">{`${places?.street} #${places?.exterior_number}\n${places?.colony}, ${places?.municipality}, ${places?.postal_code}`}</Text>
+          <Text variant="bodyMedium">{`${places?.street} #${places?.exterior_number}\n${places?.colony}, ${places?.municipality}, ${places?.postal_code}`}</Text>
 
           <Flex>
             <Text variant="labelSmall">Referencia</Text>
@@ -113,19 +88,16 @@ export default PlaceDetails = ({ navigation, route }) => {
             places.place_areas.map((area) => (
               <Card mode="outlined" key={area.area_name}>
                 <VStack spacing={10} p={20}>
-                  <HStack spacing={20}>
-                    <Avatar.Icon icon="folder" />
-                    <VStack fill spacing={10}>
-                      <Flex>
-                        <Text variant="labelSmall">Nombre del área</Text>
-                        <Text variant="bodyMedium">{area?.area_name}</Text>
-                      </Flex>
-                      <Flex>
-                        <Text variant="labelSmall">Teléfono de contacto</Text>
-                        <Text variant="bodyMedium">{area?.phone}</Text>
-                      </Flex>
-                    </VStack>
-                  </HStack>
+                  <VStack fill spacing={10}>
+                    <Flex>
+                      <Text variant="labelSmall">Nombre del área</Text>
+                      <Text variant="bodyMedium">{area?.area_name}</Text>
+                    </Flex>
+                    <Flex>
+                      <Text variant="labelSmall">Teléfono de contacto</Text>
+                      <Text variant="bodyMedium">{area?.phone}</Text>
+                    </Flex>
+                  </VStack>
                   <Button
                     icon="pencil-outline"
                     onPress={() => {
@@ -171,7 +143,7 @@ export default PlaceDetails = ({ navigation, route }) => {
 
   return (
     <Flex fill pt={headerMargin - 20}>
-      <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={(_) => getPlaces()} />}>
+      <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={() => getPlaces()} />}>
         {places !== undefined ? (
           places !== null ? (
             isNaN(places) ? (
@@ -188,11 +160,11 @@ export default PlaceDetails = ({ navigation, route }) => {
                 <Flex>
                   <Button
                     mode="outlined"
-                    onPress={(_) => {
+                    onPress={() => {
                       getPlaces()
                     }}
                   >
-                    Reintentar
+                    Volver a intentar
                   </Button>
                 </Flex>
               </VStack>
@@ -203,17 +175,17 @@ export default PlaceDetails = ({ navigation, route }) => {
               <VStack center>
                 <Text variant="headlineSmall">Sin internet</Text>
                 <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
-                  No podemos recuperar los datos del bosque urbano, revisa tu conexión a internet e intentalo de nuevo
+                  No podemos recuperar los datos del bosque urbano, revisa tu conexión a internet e inténtalo de nuevo
                 </Text>
               </VStack>
               <Flex>
                 <Button
                   mode="outlined"
-                  onPress={(_) => {
+                  onPress={() => {
                     getPlace()
                   }}
                 >
-                  Reintentar
+                  Volver a intentar
                 </Button>
               </Flex>
             </VStack>

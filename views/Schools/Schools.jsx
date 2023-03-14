@@ -1,6 +1,6 @@
 import { Flex, HStack, VStack } from '@react-native-material/core'
-import { useState, useEffect, useCallback } from 'react'
-import { ActivityIndicator, Avatar, Button, Card, Divider, FAB, IconButton, List, ProgressBar, Text, TextInput, TouchableRipple, useTheme } from 'react-native-paper'
+import { useState, useEffect } from 'react'
+import { Avatar, Button, Card, FAB, IconButton, Text, TouchableRipple, useTheme } from 'react-native-paper'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useHeaderHeight } from '@react-navigation/elements'
 import Header from '../Shared/Header'
@@ -14,7 +14,6 @@ export default Schools = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const theme = useTheme()
   const { user, token } = route.params
-  const insets = useSafeAreaInsets()
   const headerMargin = useHeaderHeight()
 
   const [schools, setSchools] = useState(undefined)
@@ -34,7 +33,7 @@ export default Schools = ({ navigation, route }) => {
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
-      .catch((_) => null)
+      .catch(() => null)
 
     setLoading(false)
 
@@ -48,7 +47,7 @@ export default Schools = ({ navigation, route }) => {
 
   useEffect(() => {
     navigation.setOptions({
-      header: (props) => <Header {...props} children={[<IconButton icon="filter-outline" />, <IconButton icon="magnify" onPress={() => setShowSearch(!showSearch)} />]} />,
+      header: (props) => <Header {...props} children={[<IconButton icon="magnify" onPress={() => setShowSearch(!showSearch)} />]} />,
       headerTransparent: true,
       headerTitle: 'Escuelas'
     })
@@ -84,7 +83,7 @@ export default Schools = ({ navigation, route }) => {
     )
   }
 
-  const EmptyList = (_) => {
+  const EmptyList = () => {
     return (
       <VStack center spacing={20} p={30}>
         <Icon name="pencil-plus-outline" color={theme.colors.onBackground} size={50} />
@@ -98,7 +97,7 @@ export default Schools = ({ navigation, route }) => {
           <Button
             icon="plus"
             mode="outlined"
-            onPress={(_) => {
+            onPress={() => {
               navigation.navigate('AddSchool', {
                 user,
                 token
@@ -112,7 +111,7 @@ export default Schools = ({ navigation, route }) => {
     )
   }
 
-  const NoResults = (_) => {
+  const NoResults = () => {
     return (
       <VStack center spacing={20} p={30}>
         <Icon name="magnify" color={theme.colors.onBackground} size={50} />
@@ -126,26 +125,26 @@ export default Schools = ({ navigation, route }) => {
     )
   }
 
-  const NoConection = (_) => {
+  const NoConnection = () => {
     return (
       <VStack center spacing={20} p={30}>
         <Icon name="wifi-alert" color={theme.colors.onBackground} size={50} />
         <VStack center>
           <Text variant="headlineSmall">Sin conexión</Text>
           <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
-            Parece que no tienes conexión a internet, conectate e intenta de nuevo
+            Parece que no tienes conexión a internet, conéctate e intenta de nuevo
           </Text>
         </VStack>
         <Flex>
           <Button
             icon="reload"
             mode="outlined"
-            onPress={(_) => {
+            onPress={() => {
               setSchools(undefined)
               getSchools()
             }}
           >
-            Reintentar
+            Volver a intentar
           </Button>
         </Flex>
       </VStack>
@@ -156,7 +155,7 @@ export default Schools = ({ navigation, route }) => {
     <Flex fill pt={headerMargin}>
       <SearchBar show={showSearch} label="Busca por nombre de la escuela" value={search} setter={setSearch} action={getSchools} />
 
-      <FlatList data={schools} ListEmptyComponent={() => (schools === undefined ? null : schools === null ? <NoConection /> : search ? <NoResults /> : <EmptyList />)} refreshing={loading} onRefresh={(_) => getSchools()} renderItem={({ item }) => <Item school_name={item.school_name} address={`${item.street} #${item.exterior_number}, ${item.colony}, ${item.municipality}`} school_identifier={item.school_identifier} />} />
+      <FlatList data={schools} ListEmptyComponent={() => (schools === undefined ? null : schools === null ? <NoConnection /> : search ? <NoResults /> : <EmptyList />)} refreshing={loading} onRefresh={() => getSchools()} renderItem={({ item }) => <Item school_name={item.school_name} address={`${item.street} #${item.exterior_number}, ${item.colony}, ${item.municipality}`} school_identifier={item.school_identifier} />} />
 
       {!(schools === undefined || schools === null) ? (
         <FAB

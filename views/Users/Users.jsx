@@ -14,14 +14,12 @@ import Dropdown from '../Shared/Dropdown'
 
 export default Users = ({ navigation, route }) => {
   const headerMargin = useHeaderHeight()
-  const { user, token } = route.params
+  const { actualUser, token } = route.params
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const theme = useTheme()
 
   const [loading, setLoading] = useState(false)
   const [users, setUsers] = useState(undefined)
-  const [places, setPlaces] = useState(undefined)
-  const [schools, setSchools] = useState(undefined)
   const [search, setSearch] = useState('')
   const [showSearch, setShowSearch] = useState(null)
   const [showFilters, setShowFilters] = useState(false)
@@ -43,9 +41,7 @@ export default Users = ({ navigation, route }) => {
   const [statusFilter, setStatusFilter] = useState('')
   const [providerFilter, setProviderFilter] = useState('')
 
-  const [filter, setFilter] = useState({})
-
-  const getUsers = async (_) => {
+  const getUsers = async () => {
     setLoading(true)
 
     let filters = {}
@@ -91,7 +87,7 @@ export default Users = ({ navigation, route }) => {
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
-      .catch((_) => null)
+      .catch(() => null)
 
     setLoading(false)
 
@@ -102,7 +98,7 @@ export default Users = ({ navigation, route }) => {
     }
   }
 
-  const getPlaces = async (_) => {
+  const getPlaces = async () => {
     const request = await fetch(`${localhost}/places`, {
       method: 'GET',
       headers: {
@@ -112,11 +108,9 @@ export default Users = ({ navigation, route }) => {
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
-      .catch((_) => null)
+      .catch(() => null)
 
     if (request?.places) {
-      setPlaces(request.places)
-
       let placesData = []
       request.places.forEach((place) => {
         let areasData = []
@@ -129,11 +123,10 @@ export default Users = ({ navigation, route }) => {
       })
       setPlacesOptions(placesData)
     } else {
-      setPlaces(request)
     }
   }
 
-  const getSchools = async (_) => {
+  const getSchools = async () => {
     const request = await fetch(`${localhost}/schools`, {
       method: 'GET',
       headers: {
@@ -143,18 +136,15 @@ export default Users = ({ navigation, route }) => {
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
-      .catch((_) => null)
+      .catch(() => null)
 
     if (request?.schools) {
-      setSchools(request.schools)
-
       let schoolsData = []
       request.schools.forEach((school) => {
         schoolsData.push({ option: school.school_name })
       })
       setSchoolsOptions(schoolsData)
     } else {
-      setSchools(request)
     }
   }
 
@@ -178,66 +168,75 @@ export default Users = ({ navigation, route }) => {
     setAreasOptions(areaData)
   }, [placeFilter])
 
-  useEffect(() => {
-    if (users === undefined) {
-      getUsers()
-    }
-  }, [users])
-
-  useEffect(() => {
-    if (places === undefined) {
-      getPlaces()
-    }
-  }, [places])
-
-  useEffect(() => {
-    if (schools === undefined) {
-      getSchools()
-    }
-  }, [schools])
-
-  // useFocusEffect(useCallback(() => {
+  // useEffect(() => {
+  //   if (users === undefined) {
   //     getUsers()
+  //   }
+  // }, [users])
+
+  // useEffect(() => {
+  //   if (places === undefined) {
   //     getPlaces()
-  //     console.log("from focus effect", filter)
-  //     return () => {}
-  // },[filter], []))
+  //   }
+  // }, [places])
 
-  const Item = useCallback(({ first_name, role, avatar, register }) => {
-    return (
-      <Flex ph={20} pv={5} onPress={() => {}}>
-        <Card mode="outlined" style={{ overflow: 'hidden' }}>
-          <TouchableRipple
-            onPress={() => {
-              navigation.navigate('UserDetails', { token, register, placesOptions, schoolsOptions })
-            }}
-          >
-            <Flex p={10}>
-              <Card.Title title={first_name} titleNumberOfLines={2} subtitle={role} subtitleNumberOfLines={2} left={(props) => (avatar ? <Avatar.Image {...props} source={{ uri: `data:image/png;base64,${avatar}` }} /> : <Avatar.Icon {...props} icon="account" />)} />
-            </Flex>
-          </TouchableRipple>
-        </Card>
-      </Flex>
+  // useEffect(() => {
+  //   if (schools === undefined) {
+  //     getSchools()
+  //   }
+  // }, [schools])
+
+  useFocusEffect(
+    useCallback(
+      () => {
+        getUsers()
+        getPlaces()
+        getSchools()
+        return () => {}
+      },
+      [],
+      []
     )
-  }, [])
+  )
 
-  const EmptyList = useCallback((_) => {
+  const Item = useCallback(
+    ({ first_name, role, avatar, register }) => {
+      return (
+        <Flex ph={20} pv={5} onPress={() => {}}>
+          <Card mode="outlined" style={{ overflow: 'hidden' }}>
+            <TouchableRipple
+              onPress={() => {
+                navigation.navigate('UserDetails', { actualUser, token, register, placesOptions, schoolsOptions })
+              }}
+            >
+              <Flex p={10}>
+                <Card.Title title={first_name} titleNumberOfLines={2} subtitle={role} subtitleNumberOfLines={2} left={(props) => (avatar ? <Avatar.Image {...props} source={{ uri: `data:image/png;base64,${avatar}` }} /> : <Avatar.Icon {...props} icon="account" />)} />
+              </Flex>
+            </TouchableRipple>
+          </Card>
+        </Flex>
+      )
+    },
+    [placesOptions]
+  )
+
+  const EmptyList = useCallback(() => {
     return (
       <VStack center spacing={20} p={30}>
         <Icon name="pencil-plus-outline" color={theme.colors.onBackground} size={50} />
         <VStack center>
           <Text variant="headlineSmall">Sin usuarios</Text>
           <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
-            No hay ningun usuario registrado, ¿qué te parece si hacemos el primero?
+            No hay ningún usuario registrado, ¿qué te parece si hacemos el primero?
           </Text>
         </VStack>
         <Flex>
           <Button
             icon="plus"
             mode="outlined"
-            onPress={(_) => {
+            onPress={() => {
               navigation.navigate('AddUser', {
-                user,
+                actualUser,
                 token
               })
             }}
@@ -249,36 +248,36 @@ export default Users = ({ navigation, route }) => {
     )
   }, [])
 
-  const NoConection = useCallback((_) => {
+  const NoConnection = useCallback(() => {
     return (
       <VStack center spacing={20} p={30}>
         <Icon name="wifi-alert" color={theme.colors.onBackground} size={50} />
         <VStack center>
           <Text variant="headlineSmall">Sin conexión</Text>
           <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
-            Parece que no tienes conexión a internet, conectate e intenta de nuevo
+            Parece que no tienes conexión a internet, conéctate e intenta de nuevo
           </Text>
         </VStack>
         <Flex>
           <Button
             icon="reload"
             mode="outlined"
-            onPress={(_) => {
+            onPress={() => {
               setUsers(undefined)
               getUsers()
             }}
           >
-            Reintentar
+            Volver a intentar
           </Button>
         </Flex>
       </VStack>
     )
   }, [])
 
-  const FilterOptions = (_) => {
+  const FilterOptions = () => {
     return (
       <VStack spacing={10}>
-        {user.role == 'Administrador' ? (
+        {actualUser.role == 'Administrador' ? (
           <HStack items="end">
             <Flex fill>
               <Dropdown title="Bosque urbano" value={placeFilter} selected={setPlaceFilter} options={placesOptions} />
@@ -296,7 +295,7 @@ export default Users = ({ navigation, route }) => {
           </HStack>
         ) : null}
 
-        {user.role == 'Administrador' ? (
+        {actualUser.role == 'Administrador' ? (
           <HStack items="end">
             <Flex fill>
               <Dropdown title="Rol" value={roleFilter} selected={setRoleFilter} options={roleOptions} />
@@ -333,7 +332,7 @@ export default Users = ({ navigation, route }) => {
           {statusFilter ? <IconButton icon="delete" mode="outlined" onPress={() => setStatusFilter('')} /> : null}
         </HStack>
 
-        {user.role == 'Administrador' ? (
+        {actualUser.role == 'Administrador' ? (
           <HStack items="end">
             <Flex fill>
               <Dropdown title="Tipo de prestador" value={providerFilter} selected={setProviderFilter} options={providerOptions} />
@@ -351,14 +350,14 @@ export default Users = ({ navigation, route }) => {
         <SearchBar show={showSearch} label="Busca por nombre, registro, correo o teléfono" value={search} setter={setSearch} action={getUsers} />
       </Flex>
 
-      <FlatList data={users} ListEmptyComponent={() => (users === undefined ? null : users === null ? <NoConection /> : <EmptyList />)} refreshing={loading} onRefresh={(_) => getUsers()} renderItem={({ item }) => <Item onPress={() => {}} first_name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ''}`} role={`${item.register}`} register={item.register} avatar={item?.avatar} />} />
+      <FlatList data={users} ListEmptyComponent={() => (users === undefined ? null : users === null ? <NoConnection /> : <EmptyList />)} refreshing={loading} onRefresh={() => getUsers()} renderItem={({ item }) => <Item onPress={() => {}} first_name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ''}`} role={`${item.register}`} register={item.register} avatar={item?.avatar} />} />
 
       <FAB
         icon="plus"
         style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
         onPress={() => {
           navigation.navigate('AddUser', {
-            user,
+            actualUser,
             token,
             placesOptions,
             schoolsOptions
