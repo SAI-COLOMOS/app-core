@@ -5,22 +5,6 @@ import Constants from 'expo-constants'
 import CreateForm from '../Shared/CreateForm'
 import ModalMessage from '../Shared/ModalMessage'
 
-<<<<<<< HEAD
-export default EditPlace = ({navigation, route}) => {
-    const localhost = Constants.expoConfig.extra.API_LOCAL
-    const theme = useTheme()
-    const {token, place} = route.params
-
-    const [place_name, setPlace_name] = useState(`${place.place_name}`)
-    const [street, setStreet] = useState(`${place.street}`)
-    const [exterior_number, setExterior_number] = useState(`${place.exterior_number}`)
-    const [colony, setColony] = useState(`${place.colony}`)
-    const [municipality, setMunicipality] = useState(`${place.municipality}`)
-    const [postal_code, setPostal_code] = useState(`${place.postal_code}`)
-    const [phone, setPhone] = useState(`${place.phone}`)
-    const [reference, setReference] = useState(`${place.reference}`)
-    const [verified, setVerified] = useState(false)
-=======
 export default EditPlace = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const theme = useTheme()
@@ -35,7 +19,6 @@ export default EditPlace = ({ navigation, route }) => {
   const [phone, setPhone] = useState(`${places.phone}`)
   const [reference, setReference] = useState(`${places.reference}`)
   const [verified, setVerified] = useState(false)
->>>>>>> 2c1a550974e22924dd69af0ef895ef2ce994613b
 
   const [modalConfirm, setModalConfirm] = useState(false)
   const [modalLoading, setModalLoading] = useState(false)
@@ -70,35 +53,7 @@ export default EditPlace = ({ navigation, route }) => {
       .then((response) => response.status)
       .catch(() => null)
 
-<<<<<<< HEAD
-        const request = await fetch(
-            `${localhost}/places/${place.place_identifier}`,
-            {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`,
-                    "Cache-Control": "no-cache"
-                },
-                body: JSON.stringify({
-                    place_name,
-                    municipality,
-                    street,
-                    exterior_number,
-                    colony,
-                    postal_code,
-                    phone,
-                    reference
-                })
-            }
-        ).then(
-            response => response.status
-        ).catch(
-            _ => null
-        )
-=======
     console.log(request)
->>>>>>> 2c1a550974e22924dd69af0ef895ef2ce994613b
 
     setModalLoading(false)
 
@@ -115,23 +70,6 @@ export default EditPlace = ({ navigation, route }) => {
   async function deletePlace() {
     setModalLoading(true)
 
-<<<<<<< HEAD
-        const request = await fetch(
-            `${localhost}/places/${place.place_identifier}`,
-            {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`,
-                    "Cache-Control": "no-cache"
-                }
-            }
-        ).then(
-            response => response.status
-        ).catch(
-            _ => null
-        )
-=======
     const request = await fetch(`${localhost}/places/${places.place_identifier}`, {
       method: 'DELETE',
       headers: {
@@ -142,7 +80,6 @@ export default EditPlace = ({ navigation, route }) => {
     })
       .then((response) => response.status)
       .catch(() => null)
->>>>>>> 2c1a550974e22924dd69af0ef895ef2ce994613b
 
     console.log(request)
 

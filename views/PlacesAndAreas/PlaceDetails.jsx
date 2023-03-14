@@ -63,7 +63,7 @@ export default PlaceDetails = ({ navigation, route }) => {
         <Text variant="bodyLarge">Bosque urbano</Text>
         <VStack spacing={10}>
           <Text variant="labelSmall">Domicilio</Text>
-          <Text variant="bodyMedium">{`${places?.street} #${places?.exterior_number}\n${places?.colony}, ${places?.municipality}, ${places?.postal_code}`}</Text>
+          <Text variant="bodyMedium">{`${place?.street} #${place?.exterior_number}\n${place?.colony}, ${place?.municipality}, ${place?.postal_code}`}</Text>
 
           <Flex>
             <Text variant="labelSmall">Referencia</Text>
@@ -100,7 +100,7 @@ export default PlaceDetails = ({ navigation, route }) => {
                   </VStack>
                   <Button
                     icon="pencil-outline"
-                    onPress={() => {
+                    onPrpess={() => {
                       navigation.navigate('EditArea', {
                         token,
                         area,
@@ -143,19 +143,11 @@ export default PlaceDetails = ({ navigation, route }) => {
 
   return (
     <Flex fill pt={headerMargin - 20}>
-<<<<<<< HEAD
-      <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={(_) => getPlace()} />}>
+      <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={() => getPlaces()} />}>
         {place !== undefined ? (
           place !== null ? (
             isNaN(place) ? (
-              <DisplayDetails icon="pine-tree" title={place?.place_name} children={[place(), Areas()]} />
-=======
-      <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={() => getPlaces()} />}>
-        {places !== undefined ? (
-          places !== null ? (
-            isNaN(places) ? (
-              <DisplayDetails icon="pine-tree" title={places?.place_name} children={[Places(), Areas()]} />
->>>>>>> 2c1a550974e22924dd69af0ef895ef2ce994613b
+              <DisplayDetails icon="pine-tree" title={place?.place_name} children={[Places(), Areas()]} />
             ) : (
               <VStack p={30} center spacing={20}>
                 <Icon color={theme.colors.onBackground} name="alert-circle-outline" size={50} />
@@ -168,13 +160,8 @@ export default PlaceDetails = ({ navigation, route }) => {
                 <Flex>
                   <Button
                     mode="outlined"
-<<<<<<< HEAD
-                    onPress={(_) => {
-                      getPlace()
-=======
                     onPress={() => {
                       getPlaces()
->>>>>>> 2c1a550974e22924dd69af0ef895ef2ce994613b
                     }}
                   >
                     Volver a intentar
