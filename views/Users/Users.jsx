@@ -11,6 +11,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import SearchBar from '../Shared/SearchBar'
 import ModalFilters from '../Shared/ModalFilters'
 import Dropdown from '../Shared/Dropdown'
+import InformationMessage from '../Shared/InformationMessage'
 
 export default Users = ({ navigation, route }) => {
   const headerMargin = useHeaderHeight()
@@ -20,8 +21,10 @@ export default Users = ({ navigation, route }) => {
 
   const [loading, setLoading] = useState(false)
   const [users, setUsers] = useState(undefined)
+  const [foundUsers, setFoundUsers] = useState(undefined)
   const [search, setSearch] = useState('')
   const [showSearch, setShowSearch] = useState(null)
+  const [areFilters, setAreFilters] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
 
   const [placesOptions, setPlacesOptions] = useState()
@@ -44,41 +47,7 @@ export default Users = ({ navigation, route }) => {
   const getUsers = async () => {
     setLoading(true)
 
-    let filters = {}
-
-    if (placeFilter !== '') {
-      filters = { ...filters, place: placeFilter }
-    }
-
-    if (areaFilter !== '') {
-      filters = { ...filter, assigned_area: areaFilter }
-    }
-
-    if (roleFilter !== '') {
-      filters = { ...filter, role: roleFilter }
-    }
-
-    if (yearFilter !== '') {
-      filters = { ...filter, year: yearFilter }
-    }
-
-    if (periodFilter !== '') {
-      filters = { ...filter, period: periodFilter }
-    }
-
-    if (schoolFilter !== '') {
-      filters = { ...filter, school: schoolFilter }
-    }
-
-    if (statusFilter !== '') {
-      filters = { ...filter, status: statusFilter }
-    }
-
-    if (providerFilter !== '') {
-      filters = { ...filter, provider_type: providerFilter }
-    }
-
-    const request = await fetch(`${localhost}/users?search=${search}&filter=${JSON.stringify(filters)}`, {
+    const request = await fetch(`${localhost}/users`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -95,6 +64,72 @@ export default Users = ({ navigation, route }) => {
       setUsers(request.users)
     } else {
       setUsers(request)
+    }
+  }
+
+  const searchUsers = async () => {
+    setLoading(true)
+
+    let filters = {}
+
+    if (placeFilter !== '') {
+      filters = { ...filters, place: placeFilter }
+    }
+
+    if (areaFilter !== '') {
+      filters = { ...filters, assigned_area: areaFilter }
+    }
+
+    if (roleFilter !== '') {
+      filters = { ...filters, role: roleFilter }
+    }
+
+    if (yearFilter !== '') {
+      filters = { ...filters, year: yearFilter }
+    }
+
+    if (periodFilter !== '') {
+      filters = { ...filters, period: periodFilter }
+    }
+
+    if (schoolFilter !== '') {
+      filters = { ...filters, school: schoolFilter }
+    }
+
+    if (statusFilter !== '') {
+      filters = { ...filters, status: statusFilter }
+    }
+
+    if (providerFilter !== '') {
+      filters = { ...filters, provider_type: providerFilter }
+    }
+
+    console.log(filters)
+    setAreFilters(filters)
+
+    if (Object.keys(filters).length === 0 && search === '') {
+      setFoundUsers(undefined)
+      setLoading(false)
+      return
+    }
+
+    const request = await fetch(`${localhost}/users?search=${search}&filter=${JSON.stringify(filters)}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Cache-Control': 'no-cache'
+      }
+    })
+      .then((response) => (response.ok ? response.json() : response.status))
+      .catch(() => null)
+
+    setLoading(false)
+
+    if (request?.users) {
+      setFoundUsers(request.users)
+    } else {
+      setFoundUsers(request)
     }
   }
 
@@ -210,7 +245,7 @@ export default Users = ({ navigation, route }) => {
               }}
             >
               <Flex p={10}>
-                <Card.Title title={first_name} titleNumberOfLines={2} subtitle={role} subtitleNumberOfLines={2} left={(props) => (avatar ? <Avatar.Image {...props} source={{ uri: `data:image/png;base64,${avatar}` }} /> : <Avatar.Icon {...props} icon="account" />)} />
+                <Card.Title title={first_name} titleNumberOfLines={1} subtitle={role} subtitleNumberOfLines={2} left={(props) => (avatar ? <Avatar.Image {...props} source={{ uri: `data:image/png;base64,${avatar}` }} /> : <Avatar.Icon {...props} icon="account" />)} />
               </Flex>
             </TouchableRipple>
           </Card>
@@ -219,60 +254,6 @@ export default Users = ({ navigation, route }) => {
     },
     [placesOptions]
   )
-
-  const EmptyList = useCallback(() => {
-    return (
-      <VStack center spacing={20} p={30}>
-        <Icon name="pencil-plus-outline" color={theme.colors.onBackground} size={50} />
-        <VStack center>
-          <Text variant="headlineSmall">Sin usuarios</Text>
-          <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
-            No hay ningún usuario registrado, ¿qué te parece si hacemos el primero?
-          </Text>
-        </VStack>
-        <Flex>
-          <Button
-            icon="plus"
-            mode="outlined"
-            onPress={() => {
-              navigation.navigate('AddUser', {
-                actualUser,
-                token
-              })
-            }}
-          >
-            Agregar
-          </Button>
-        </Flex>
-      </VStack>
-    )
-  }, [])
-
-  const NoConnection = useCallback(() => {
-    return (
-      <VStack center spacing={20} p={30}>
-        <Icon name="wifi-alert" color={theme.colors.onBackground} size={50} />
-        <VStack center>
-          <Text variant="headlineSmall">Sin conexión</Text>
-          <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
-            Parece que no tienes conexión a internet, conéctate e intenta de nuevo
-          </Text>
-        </VStack>
-        <Flex>
-          <Button
-            icon="reload"
-            mode="outlined"
-            onPress={() => {
-              setUsers(undefined)
-              getUsers()
-            }}
-          >
-            Volver a intentar
-          </Button>
-        </Flex>
-      </VStack>
-    )
-  }, [])
 
   const FilterOptions = () => {
     return (
@@ -344,28 +325,187 @@ export default Users = ({ navigation, route }) => {
     )
   }
 
+  useEffect(() => {
+    console.log('---------------------')
+    console.log('Found', isNaN(foundUsers))
+    console.log('Normal', isNaN(users))
+    console.log(Object.keys(areFilters).length === 0, areFilters)
+  }, [foundUsers, users, areFilters])
+
   return (
     <Flex fill pt={headerMargin}>
       <Flex>
-        <SearchBar show={showSearch} label="Busca por nombre, registro, correo o teléfono" value={search} setter={setSearch} action={getUsers} />
+        <SearchBar show={showSearch} label="Busca por nombre, registro, correo o teléfono" value={search} setter={setSearch} action={searchUsers} />
       </Flex>
 
-      <FlatList data={users} ListEmptyComponent={() => (users === undefined ? null : users === null ? <NoConnection /> : <EmptyList />)} refreshing={loading} onRefresh={() => getUsers()} renderItem={({ item }) => <Item onPress={() => {}} first_name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ''}`} role={`${item.register}`} register={item.register} avatar={item?.avatar} />} />
+      {Object.keys(areFilters).length === 0 && search == '' ? (
+        users !== null ? (
+          users?.length >= 0 || users === undefined ? (
+            <Flex fill>
+              <FlatList
+                data={users}
+                ListEmptyComponent={() =>
+                  users === undefined ? null : (
+                    <InformationMessage
+                      icon="pencil-plus-outline"
+                      title="Sin usuarios"
+                      description="No hay ningún usuario registrado, ¿qué te parece si hacemos el primero?"
+                      buttonIcon="plus"
+                      buttonTitle="Agregar"
+                      action={() => {
+                        navigation.navigate('AddUser', {
+                          actualUser,
+                          token
+                        })
+                      }}
+                    />
+                  )
+                }
+                refreshing={loading}
+                onRefresh={() => getUsers()}
+                renderItem={({ item }) => <Item onPress={() => {}} first_name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ''}`} role={`${item.register}`} register={item.register} avatar={item?.avatar} />}
+              />
 
-      <FAB
-        icon="plus"
-        style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
-        onPress={() => {
-          navigation.navigate('AddUser', {
-            actualUser,
-            token,
-            placesOptions,
-            schoolsOptions
-          })
-        }}
-      />
+              <FAB
+                icon="plus"
+                style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
+                onPress={() => {
+                  navigation.navigate('AddUser', {
+                    actualUser,
+                    token,
+                    placesOptions,
+                    schoolsOptions
+                  })
+                }}
+              />
+            </Flex>
+          ) : (
+            <InformationMessage
+              icon="bug-outline"
+              title="¡Ups! Error nuestro"
+              description="Algo falló de nuestra parte. Inténtalo nuevamente más tarde, si el problema persiste, comunícate con tu encargado"
+              buttonTitle="Volver a cargar"
+              buttonIcon="reload"
+              action={() => {
+                setUsers(undefined)
+                getUsers()
+              }}
+            />
+          )
+        ) : (
+          <InformationMessage
+            icon="wifi-alert"
+            title="Sin conexión"
+            description="Parece que no tienes conexión a internet, conéctate e intenta de nuevo"
+            buttonTitle="Volver a cargar"
+            buttonIcon="reload"
+            action={() => {
+              setUsers(undefined)
+              getUsers()
+            }}
+          />
+        )
+      ) : foundUsers !== null ? (
+        foundUsers?.length >= 0 || foundUsers === undefined ? (
+          <Flex fill>
+            <FlatList data={foundUsers} ListEmptyComponent={() => (foundUsers === undefined ? null : <InformationMessage icon="magnify" title="Sin resultados" description="No hay ningún usuario registrado que cumpla con los parámetros de tu búsqueda" />)} refreshing={loading} onRefresh={() => getUsers()} renderItem={({ item }) => <Item onPress={() => {}} first_name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ''}`} role={`${item.register}`} register={item.register} avatar={item?.avatar} />} />
+          </Flex>
+        ) : (
+          <InformationMessage
+            icon="bug-outline"
+            title="¡Ups! Error nuestro"
+            description="Algo falló de nuestra parte. Inténtalo nuevamente más tarde, si el problema persiste, comunícate con tu encargado"
+            buttonTitle="Volver a cargar"
+            buttonIcon="reload"
+            action={() => {
+              setUsers(undefined)
+              getUsers()
+            }}
+          />
+        )
+      ) : (
+        <InformationMessage
+          icon="wifi-alert"
+          title="Sin conexión"
+          description="Parece que no tienes conexión a internet, conéctate e intenta de nuevo"
+          buttonTitle="Volver a cargar"
+          buttonIcon="reload"
+          action={() => {
+            setUsers(undefined)
+            getUsers()
+          }}
+        />
+      )}
 
-      <ModalFilters handler={[showFilters, () => setShowFilters(!showFilters)]} child={FilterOptions()} action={() => getUsers()} />
+      {/* {!(Number(users) >= 100 && Number(users) <= 600 ) ? (
+        <Flex fill>
+          <FlatList
+            data={isNaN(users) ? users : null}
+            ListEmptyComponent={() =>
+              users === undefined ? null : users === null ? (
+                <InformationMessage
+                  icon="wifi-alert"
+                  title="Sin conexión"
+                  description="Parece que no tienes conexión a internet, conéctate e intenta de nuevo"
+                  buttonTitle="Volver a cargar"
+                  buttonIcon="reload"
+                  action={() => {
+                    setUsers(undefined)
+                    getUsers()
+                  }}
+                />
+              ) : search ? (
+                <InformationMessage icon="magnify" title="Sin resultados" description="No hay ningún usuario registrado que cumpla con los parámetros de tu búsqueda" />
+              ) : (
+                <InformationMessage
+                  icon="pencil-plus-outline"
+                  title="Sin usuarios"
+                  description="No hay ningún usuario registrado, ¿qué te parece si hacemos el primero?"
+                  buttonIcon="plus"
+                  buttonTitle="Agregar"
+                  action={() => {
+                    navigation.navigate('AddUser', {
+                      actualUser,
+                      token
+                    })
+                  }}
+                />
+              )
+            }
+            refreshing={loading}
+            onRefresh={() => getUsers()}
+            renderItem={({ item }) => <Item onPress={() => {}} first_name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ''}`} role={`${item.register}`} register={item.register} avatar={item?.avatar} />}
+          />
+          {!(users === undefined || users === null) ? (
+            <FAB
+              icon="plus"
+              style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
+              onPress={() => {
+                navigation.navigate('AddUser', {
+                  actualUser,
+                  token,
+                  placesOptions,
+                  schoolsOptions
+                })
+              }}
+            />
+          ) : null}
+        </Flex>
+      ) : (
+        <InformationMessage
+          icon="bug-outline"
+          title="¡Ups! Error nuestro"
+          description="Algo falló de nuestra parte. Inténtalo nuevamente más tarde, si el problema persiste, comunícate con tu encargado"
+          buttonTitle="Volver a cargar"
+          buttonIcon="reload"
+          action={() => {
+            setUsers(undefined)
+            getUsers()
+          }}
+        />
+      )} */}
+
+      <ModalFilters handler={[showFilters, () => setShowFilters(!showFilters)]} child={FilterOptions()} action={() => searchUsers()} />
     </Flex>
   )
 }
