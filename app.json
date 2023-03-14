@@ -9,7 +9,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#390761"
+      "backgroundColor": "#000000"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -53,7 +53,7 @@
       ]
     ],
     "extra": {
-      "API_LOCAL": "http://192.168.137.151:3000"
+      "API_LOCAL": "http://192.168.100.36:3000"
     }
   }
 }

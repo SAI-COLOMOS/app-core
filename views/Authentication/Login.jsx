@@ -155,7 +155,9 @@ export default Login = ({navigation}) => {
                             "first_last_name": profile.user.first_last_name,
                             "second_last_name": profile.user.second_last_name ?? null,
                             "register": profile.user.register,
-                            "role": profile.user.role
+                            "role": profile.user.role,
+                            "place": profile.user.place,
+                            "assigned_area": profile.user.assigned_area
                         }))
             
                         setActiveSession(true)
