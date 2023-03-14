@@ -53,7 +53,7 @@
       ]
     ],
     "extra": {
-      "API_LOCAL": "https://3819-2806-261-498-8799-e65f-1ff-fef6-c3de.ngrok.io"
+      "API_LOCAL": "http://192.168.137.100:3000"
     }
   }
 }

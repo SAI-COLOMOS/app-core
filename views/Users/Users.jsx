@@ -104,7 +104,6 @@ export default Users = ({ navigation, route }) => {
       filters = { ...filters, provider_type: providerFilter }
     }
 
-    console.log(filters)
     setAreFilters(filters)
 
     if (Object.keys(filters).length === 0 && search === '') {
@@ -113,7 +112,7 @@ export default Users = ({ navigation, route }) => {
       return
     }
 
-    const request = await fetch(`${localhost}/users?search=${search}&filter=${JSON.stringify(filters)}`, {
+    const request = await fetch(`${localhost}/users?search=${search.trim()}&filter=${JSON.stringify(filters)}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -334,9 +333,7 @@ export default Users = ({ navigation, route }) => {
 
   return (
     <Flex fill pt={headerMargin}>
-      <Flex>
-        <SearchBar show={showSearch} label="Busca por nombre, registro, correo o teléfono" value={search} setter={setSearch} action={searchUsers} />
-      </Flex>
+      <SearchBar show={showSearch} label="Busca por nombre, registro, correo o teléfono" value={search} setter={setSearch} action={searchUsers} />
 
       {Object.keys(areFilters).length === 0 && search == '' ? (
         users !== null ? (
@@ -355,7 +352,9 @@ export default Users = ({ navigation, route }) => {
                       action={() => {
                         navigation.navigate('AddUser', {
                           actualUser,
-                          token
+                          token,
+                          placesOptions,
+                          schoolsOptions
                         })
                       }}
                     />
@@ -418,8 +417,8 @@ export default Users = ({ navigation, route }) => {
             buttonTitle="Volver a cargar"
             buttonIcon="reload"
             action={() => {
-              setUsers(undefined)
-              getUsers()
+              setFoundUsers(undefined)
+              searchUsers()
             }}
           />
         )
@@ -431,79 +430,11 @@ export default Users = ({ navigation, route }) => {
           buttonTitle="Volver a cargar"
           buttonIcon="reload"
           action={() => {
-            setUsers(undefined)
-            getUsers()
+            setFoundUsers(undefined)
+            searchUsers()
           }}
         />
       )}
-
-      {/* {!(Number(users) >= 100 && Number(users) <= 600 ) ? (
-        <Flex fill>
-          <FlatList
-            data={isNaN(users) ? users : null}
-            ListEmptyComponent={() =>
-              users === undefined ? null : users === null ? (
-                <InformationMessage
-                  icon="wifi-alert"
-                  title="Sin conexión"
-                  description="Parece que no tienes conexión a internet, conéctate e intenta de nuevo"
-                  buttonTitle="Volver a cargar"
-                  buttonIcon="reload"
-                  action={() => {
-                    setUsers(undefined)
-                    getUsers()
-                  }}
-                />
-              ) : search ? (
-                <InformationMessage icon="magnify" title="Sin resultados" description="No hay ningún usuario registrado que cumpla con los parámetros de tu búsqueda" />
-              ) : (
-                <InformationMessage
-                  icon="pencil-plus-outline"
-                  title="Sin usuarios"
-                  description="No hay ningún usuario registrado, ¿qué te parece si hacemos el primero?"
-                  buttonIcon="plus"
-                  buttonTitle="Agregar"
-                  action={() => {
-                    navigation.navigate('AddUser', {
-                      actualUser,
-                      token
-                    })
-                  }}
-                />
-              )
-            }
-            refreshing={loading}
-            onRefresh={() => getUsers()}
-            renderItem={({ item }) => <Item onPress={() => {}} first_name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ''}`} role={`${item.register}`} register={item.register} avatar={item?.avatar} />}
-          />
-          {!(users === undefined || users === null) ? (
-            <FAB
-              icon="plus"
-              style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
-              onPress={() => {
-                navigation.navigate('AddUser', {
-                  actualUser,
-                  token,
-                  placesOptions,
-                  schoolsOptions
-                })
-              }}
-            />
-          ) : null}
-        </Flex>
-      ) : (
-        <InformationMessage
-          icon="bug-outline"
-          title="¡Ups! Error nuestro"
-          description="Algo falló de nuestra parte. Inténtalo nuevamente más tarde, si el problema persiste, comunícate con tu encargado"
-          buttonTitle="Volver a cargar"
-          buttonIcon="reload"
-          action={() => {
-            setUsers(undefined)
-            getUsers()
-          }}
-        />
-      )} */}
 
       <ModalFilters handler={[showFilters, () => setShowFilters(!showFilters)]} child={FilterOptions()} action={() => searchUsers()} />
     </Flex>
