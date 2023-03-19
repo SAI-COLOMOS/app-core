@@ -76,7 +76,7 @@ export default SchoolDetails = ({navigation, route}) => {
                     <Button icon="reload" mode="outlined" onPress={_ => {
                         getSchool()
                     }}>
-                        Reintentar
+                        Volver a intentar
                     </Button>
                 </Flex>
             </VStack>
@@ -153,7 +153,7 @@ export default SchoolDetails = ({navigation, route}) => {
                                     </VStack>
                                     <Flex>
                                         <Button mode="outlined" onPress={_ => {getSchool()}}>
-                                            Reintentar
+                                            Volver a intentar
                                         </Button>
                                     </Flex>
                                 </VStack>
@@ -171,7 +171,7 @@ export default SchoolDetails = ({navigation, route}) => {
                                 </VStack>
                                 <Flex>
                                     <Button mode="outlined" onPress={_ => {getSchool()}}>
-                                        Reintentar
+                                        Volver a intentar
                                     </Button>
                                 </Flex>
                             </VStack>

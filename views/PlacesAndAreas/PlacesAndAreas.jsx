@@ -1,6 +1,6 @@
-import { Flex, HStack, VStack } from '@react-native-material/core'
+import { Flex, VStack } from '@react-native-material/core'
 import { useState, useEffect, useCallback } from 'react'
-import { ActivityIndicator, Avatar, Button, Card, Divider, FAB, IconButton, List, ProgressBar, Text, TouchableRipple, useTheme } from 'react-native-paper'
+import { Avatar, Button, Card, FAB, IconButton, Text, TouchableRipple, useTheme } from 'react-native-paper'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useHeaderHeight } from '@react-navigation/elements'
 import Header from '../Shared/Header'
@@ -14,7 +14,6 @@ export default PlaceAndAreas = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const theme = useTheme()
   const { user, token } = route.params
-  const insets = useSafeAreaInsets()
   const headerMargin = useHeaderHeight()
 
   const [places, setPlaces] = useState(undefined)
@@ -34,7 +33,7 @@ export default PlaceAndAreas = ({ navigation, route }) => {
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
-      .catch((_) => null)
+      .catch(() => null)
 
     setLoading(false)
 
@@ -79,7 +78,7 @@ export default PlaceAndAreas = ({ navigation, route }) => {
     )
   }
 
-  const EmptyList = (_) => {
+  const EmptyList = () => {
     return (
       <VStack center spacing={20} p={30}>
         <Icon name="pencil-plus-outline" color={theme.colors.onBackground} size={50} />
@@ -93,7 +92,7 @@ export default PlaceAndAreas = ({ navigation, route }) => {
           <Button
             icon="plus"
             mode="outlined"
-            onPress={(_) => {
+            onPress={() => {
               navigation.navigate('AddPlace', {
                 user,
                 token
@@ -107,7 +106,7 @@ export default PlaceAndAreas = ({ navigation, route }) => {
     )
   }
 
-  const NoConection = (_) => {
+  const NoConection = () => {
     return (
       <VStack center spacing={20} p={30}>
         <Icon name="wifi-alert" color={theme.colors.onBackground} size={50} />
@@ -121,12 +120,12 @@ export default PlaceAndAreas = ({ navigation, route }) => {
           <Button
             icon="reload"
             mode="outlined"
-            onPress={(_) => {
+            onPress={() => {
               setPlaces(undefined)
               getPlaces()
             }}
           >
-            Reintentar
+            Volver a intentar
           </Button>
         </Flex>
       </VStack>
@@ -137,7 +136,7 @@ export default PlaceAndAreas = ({ navigation, route }) => {
     <Flex fill pt={headerMargin}>
       <SearchBar show={showSearch} label="Busca por nombre del bosque urbano" value={search} setter={setSearch} action={getPlaces} />
 
-      <FlatList data={places} ListEmptyComponent={() => (places === undefined ? null : places === null ? <NoConection /> : <EmptyList />)} refreshing={loading} onRefresh={(_) => getPlaces()} renderItem={({ item }) => <Item place_name={item.place_name} place_address={`${item.street} #${item.exterior_number}, ${item.colony}, ${item.municipality}, ${item.postal_code}`} place_identifier={item.place_identifier} />} />
+      <FlatList data={places} ListEmptyComponent={() => (places === undefined ? null : places === null ? <NoConection /> : <EmptyList />)} refreshing={loading} onRefresh={() => getPlaces()} renderItem={({ item }) => <Item place_name={item.place_name} place_address={`${item.street} #${item.exterior_number}, ${item.colony}, ${item.municipality}, ${item.postal_code}`} place_identifier={item.place_identifier} />} />
 
       {!(places === undefined || places === null) ? (
         <FAB

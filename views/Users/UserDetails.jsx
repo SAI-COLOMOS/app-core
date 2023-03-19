@@ -11,7 +11,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
 export default UserDetails = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
-  const { token, register, placesOptions, schoolsOptions } = route.params
+  const { actualUser, token, register, placesOptions, schoolsOptions } = route.params
   const headerMargin = useHeaderHeight()
   const theme = useTheme()
 
@@ -29,14 +29,12 @@ export default UserDetails = ({ navigation, route }) => {
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
-      .catch((_) => null)
+      .catch(() => null)
 
     setLoading(false)
-    console.log(request)
 
     if (request?.user) {
       setUser(request.user)
-      console.log(request)
     }
   }
 
@@ -55,27 +53,36 @@ export default UserDetails = ({ navigation, route }) => {
     }, [])
   )
 
+  useEffect(() => {
+    console.log(placesOptions)
+  }, [])
+
   const PersonalData = () => {
     return (
-      <VStack p={20} spacing={10}>
+      <VStack p={20} spacing={5}>
         <Text variant="bodyLarge">Datos personales</Text>
-        <VStack spacing={2}>
-          <Text variant="labelSmall">Registro</Text>
-          <Text variant="bodyMedium">{user?.register}</Text>
-        </VStack>
-        <HStack spacing={20}>
+        <VStack spacing={10}>
           <Flex>
             <Text variant="labelSmall">Edad</Text>
-            <Text variant="bodyMedium">{user?.age}</Text>
+            <Text variant="bodyMedium">{user?.age} años</Text>
           </Flex>
+
           <Flex>
-            <Text variant="labelSmall">Tipo de sangre</Text>
-            <Text variant="bodyMedium">{user?.blood_type}</Text>
+            <Text variant="labelSmall">CURP</Text>
+            <Text variant="bodyMedium">{user?.curp}</Text>
           </Flex>
-        </HStack>
-        <VStack spacing={2}>
-          <Text variant="labelSmall">CURP</Text>
-          <Text variant="bodyMedium">{`${user?.curp}`}</Text>
+
+          <Flex>
+            <Text variant="labelSmall">Grupo sanguíneo</Text>
+            <Text variant="bodyMedium">RH {user?.blood_type}</Text>
+          </Flex>
+
+          {user?.school != 'No aplica' ? (
+            <Flex>
+              <Text variant="labelSmall">Escuela de procedencia</Text>
+              <Text variant="bodyMedium">{user?.school}</Text>
+            </Flex>
+          ) : null}
         </VStack>
       </VStack>
     )
@@ -83,55 +90,85 @@ export default UserDetails = ({ navigation, route }) => {
 
   const ContactData = () => {
     return (
-      <VStack p={20} spacing={10}>
+      <VStack p={20} spacing={5}>
         <Text variant="bodyLarge">Datos de contacto</Text>
-        <VStack spacing={2}>
-          <Text variant="labelSmall">email</Text>
-          <Text variant="bodyMedium">{user?.email}</Text>
-        </VStack>
-        <VStack spacing={2}>
-          <Text variant="labelSmall">Teléfono personal</Text>
-          <Text variant="bodyMedium">{user?.phone}</Text>
-        </VStack>
-        <VStack spacing={2}>
-          <Text variant="labelSmall">Contacto de emergencia</Text>
-          <Text variant="bodyMedium">{user?.emergency_contact}</Text>
-        </VStack>
-        <VStack spacing={2}>
-          <Text variant="labelSmall">Teléfono de emergencia</Text>
-          <Text variant="bodyMedium">{user?.emergency_phone}</Text>
+        <VStack spacing={10}>
+          <Flex>
+            <Text variant="labelSmall">Teléfono</Text>
+            <Text variant="bodyMedium">{user?.phone}</Text>
+          </Flex>
+
+          <Flex>
+            <Text variant="labelSmall">Correo electrónico</Text>
+            <Text variant="bodyMedium">{user?.email}</Text>
+          </Flex>
         </VStack>
       </VStack>
     )
   }
 
-  const UserData = () => {
+  const EmergencyData = () => {
     return (
-      <VStack p={20} spacing={10}>
-        <Text variant="bodyLarge">Datos de usuario</Text>
-        <VStack spacing={2}>
-          <Text variant="labelSmall">Tipo de prestador</Text>
-          <Text variant="bodyMedium">{user?.provider_type}</Text>
+      <VStack p={20} spacing={5}>
+        <Text variant="bodyLarge">Datos de emergencia</Text>
+        <VStack spacing={10}>
+          <Flex>
+            <Text variant="labelSmall">Contacto de emergencia</Text>
+            <Text variant="bodyMedium">{user?.emergency_contact}</Text>
+          </Flex>
+
+          <Flex>
+            <Text variant="labelSmall">Teléfono de emergencia</Text>
+            <Text variant="bodyMedium">{user?.emergency_phone}</Text>
+          </Flex>
         </VStack>
-        <VStack spacing={2}>
-          <Text variant="labelSmall">Parque</Text>
-          <Text variant="bodyMedium">{user?.place}</Text>
-        </VStack>
-        <VStack spacing={2}>
-          <Text variant="labelSmall">Area asignada</Text>
-          <Text variant="bodyMedium">{user?.assigned_area}</Text>
-        </VStack>
-        <VStack spacing={2}>
-          <Text variant="labelSmall">Escuela</Text>
-          <Text variant="bodyMedium">{user?.school}</Text>
-        </VStack>
-        <VStack spacing={2}>
-          <Text variant="labelSmall">Rol</Text>
-          <Text variant="bodyMedium">{user?.role}</Text>
-        </VStack>
-        <VStack spacing={2}>
-          <Text variant="labelSmall">Estatus</Text>
-          <Text variant="bodyMedium">{user?.status}</Text>
+      </VStack>
+    )
+  }
+
+  const AccountData = () => {
+    return (
+      <VStack p={20} spacing={5}>
+        <Text variant="bodyLarge">Datos de la cuenta</Text>
+        <VStack spacing={10}>
+          <Flex>
+            <Text variant="labelSmall">Registro</Text>
+            <Text variant="bodyMedium">{user?.register}</Text>
+          </Flex>
+
+          <Flex>
+            <Text variant="labelSmall">Estado</Text>
+            <Text variant="bodyMedium">{user?.status}</Text>
+          </Flex>
+
+          <Flex>
+            <Text variant="labelSmall">Rol</Text>
+            <Text variant="bodyMedium">{user?.role}</Text>
+          </Flex>
+
+          {user?.provider_type != 'No aplica' ? (
+            <Flex>
+              <Text variant="labelSmall">Tipo de prestador</Text>
+              <Text variant="bodyMedium">{user?.provider_type}</Text>
+            </Flex>
+          ) : null}
+
+          {user?.provider_type != 'No aplica' ? (
+            <Flex>
+              <Text variant="labelSmall">Horas asignadas</Text>
+              <Text variant="bodyMedium">{user?.total_hours}</Text>
+            </Flex>
+          ) : null}
+
+          <Flex>
+            <Text variant="labelSmall">Bosque urbano</Text>
+            <Text variant="bodyMedium">{user?.place}</Text>
+          </Flex>
+
+          <Flex>
+            <Text variant="labelSmall">Área asignada</Text>
+            <Text variant="bodyMedium">{user?.assigned_area}</Text>
+          </Flex>
         </VStack>
       </VStack>
     )
@@ -139,11 +176,11 @@ export default UserDetails = ({ navigation, route }) => {
 
   return (
     <Flex fill mt={headerMargin - 20}>
-      <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={(_) => getUser()} />}>
+      <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={() => getUser()} />}>
         {user !== undefined ? (
           user !== null ? (
             isNaN(user) ? (
-              <DisplayDetails photo={user?.avatar} icon="account" title={`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name == undefined ? '' : user?.second_last_name}`} children={[PersonalData(), ContactData(), UserData()]} />
+              <DisplayDetails photo={user?.avatar} icon="account" title={`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name == undefined ? '' : user?.second_last_name}`} children={[PersonalData(), ContactData(), EmergencyData(), AccountData()]} />
             ) : (
               <VStack p={30} center spacing={20}>
                 <Icon color={theme.colors.onBackground} name="alert-circle-outline" size={50} />
@@ -156,11 +193,11 @@ export default UserDetails = ({ navigation, route }) => {
                 <Flex>
                   <Button
                     mode="outlined"
-                    onPress={(_) => {
+                    onPress={() => {
                       getUser()
                     }}
                   >
-                    Reintentar
+                    Volver a intentar
                   </Button>
                 </Flex>
               </VStack>
@@ -177,11 +214,11 @@ export default UserDetails = ({ navigation, route }) => {
               <Flex>
                 <Button
                   mode="outlined"
-                  onPress={(_) => {
+                  onPress={() => {
                     getUser()
                   }}
                 >
-                  Reintentar
+                  Volver a intentar
                 </Button>
               </Flex>
             </VStack>
@@ -196,6 +233,7 @@ export default UserDetails = ({ navigation, route }) => {
           onPress={() => {
             navigation.navigate('EditUser', {
               token,
+              actualUser,
               user,
               placesOptions,
               schoolsOptions

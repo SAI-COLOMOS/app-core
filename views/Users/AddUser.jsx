@@ -1,10 +1,6 @@
 import { Flex, HStack, VStack } from '@react-native-material/core'
 import { useEffect, useState } from 'react'
-import { ScrollView } from 'react-native'
-import { Button, Card, Text, TextInput, TouchableRipple, useTheme } from 'react-native-paper'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Picker } from '@react-native-picker/picker'
-import BloodTypesDialog from '../Shared/Dialog'
+import { Button, Text, TextInput, useTheme } from 'react-native-paper'
 import CreateForm from '../Shared/CreateForm'
 import Constants from 'expo-constants'
 import ModalMessage from '../Shared/ModalMessage'
@@ -13,9 +9,8 @@ import ImageSelector from '../Shared/ImageSelector'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
 export default AddUser = ({ navigation, route }) => {
-  const insets = useSafeAreaInsets()
   const theme = useTheme()
-  const { user, token, placesOptions, schoolsOptions } = route.params
+  const { actualUser, token, placesOptions, schoolsOptions } = route.params
   const localhost = Constants.expoConfig.extra.API_LOCAL
 
   const [first_name, setFirst_name] = useState('')
@@ -29,15 +24,13 @@ export default AddUser = ({ navigation, route }) => {
   const [emergency_phone, setEmergency_phone] = useState('')
   const [blood_type, setBlood_type] = useState('')
   const [provider_type, setProvider_type] = useState('')
-  const [place, setPlace] = useState(user.role == 'Encargado' ? user.place : '')
-  const [assigned_area, setAssigned_area] = useState(user.role == 'Encargado' ? user.assigned_area : '')
+  const [place, setPlace] = useState('')
+  const [assigned_area, setAssigned_area] = useState('')
   const [school, setSchool] = useState('')
-  const [role, setRole] = useState(user.role == 'Encargado' ? 'Prestador' : '')
-  const [status, setStatus] = useState('Activo')
+  const [role, setRole] = useState('')
   const [total_hours, setTotal_hours] = useState('')
-  const [verified, setVerified] = useState()
-  const [places, setPlaces] = useState()
   const [curp, setCurp] = useState('')
+  const [verified, setVerified] = useState()
 
   const providerTypes = [
     {
@@ -90,7 +83,7 @@ export default AddUser = ({ navigation, route }) => {
   const [modalLoading, setModalLoading] = useState(false)
   const [modalError, setModalError] = useState(false)
   const [modalFatal, setModalFatal] = useState(false)
-  const [reponseCode, setReponseCode] = useState('')
+  const [responseCode, setResponseCode] = useState('')
 
   async function SaveUser() {
     setModalLoading(true)
@@ -112,11 +105,10 @@ export default AddUser = ({ navigation, route }) => {
         emergency_phone: emergency_phone.trim(),
         blood_type: blood_type,
         role: role,
-        provider_type: role != 'Prestador' ? 'No aplica' : provider_type,
+        provider_type: provider_type.trim(),
         place: place.trim(),
         assigned_area: assigned_area.trim(),
         school: school.trim(),
-        status: status.trim(),
         avatar: avatar,
         total_hours: Number(total_hours),
         curp: curp.trim()
@@ -130,7 +122,7 @@ export default AddUser = ({ navigation, route }) => {
     if (request == 201) {
       setModalSuccess(true)
     } else if (request != null) {
-      setReponseCode(request)
+      setResponseCode(request)
       setModalError(true)
     } else {
       setModalFatal(true)
@@ -138,11 +130,28 @@ export default AddUser = ({ navigation, route }) => {
   }
 
   useEffect(() => {
-    console.log('schoolsOptions', schoolsOptions)
-  }, [schoolsOptions])
-
-  useEffect(() => {
     let check = true
+
+    if(actualUser?.role == 'Encargado') {
+      total_hours?.length > 0 ? null : (check = false)
+    }
+
+    if(actualUser?.role == 'Administrador') {
+      if(role == 'Encargado') {
+        place?.length > 0 ? null : (check = false)
+        assigned_area?.length > 0 ? null : (check = false)
+      }
+
+      if(role == 'Prestador') {
+        provider_type?.length > 0 ? null : (check = false)
+        school?.length > 0 ? null : (check = false)
+        total_hours?.length > 0 ? null : (check = false)
+        place?.length > 0 ? null : (check = false)
+        assigned_area?.length > 0 ? null : (check = false)
+      }
+
+      role?.length > 0 ? null : (check = false)
+    }
 
     first_name?.length > 0 ? null : (check = false)
     first_last_name?.length > 0 ? null : (check = false)
@@ -152,13 +161,6 @@ export default AddUser = ({ navigation, route }) => {
     phone?.length == 10 ? null : (check = false)
     emergency_contact?.length > 0 ? null : (check = false)
     emergency_phone?.length == 10 ? null : (check = false)
-    provider_type?.length > 0 ? null : role != 'Prestador' ? null : (check = false)
-    place?.length > 0 ? null : (check = false)
-    assigned_area?.length > 0 ? null : (check = false)
-    school?.length > 0 ? null : role != 'Prestador' ? null : (check = false)
-    role?.length > 0 ? null : (check = false)
-    status?.length > 0 ? null : (check = false)
-    total_hours?.length > 0 ? null : role != 'Prestador' ? null : (check = false)
     curp?.length == 18 ? null : (check = false)
 
     if (check) {
@@ -166,16 +168,18 @@ export default AddUser = ({ navigation, route }) => {
     } else {
       setVerified(false)
     }
+  }, [first_name, first_last_name, age, blood_type, email, phone, emergency_contact, emergency_phone, provider_type, place, assigned_area, school, role, total_hours, curp])
 
+  useEffect(() => {
     if (role != 'Prestador') {
       setProvider_type('')
       setSchool('')
       setTotal_hours('')
     }
-  }, [first_name, first_last_name, age, blood_type, email, phone, emergency_contact, emergency_phone, provider_type, place, assigned_area, school, role, status, total_hours, curp])
+  }, [role])
 
   useEffect(() => {
-    setAssigned_area(user.role == 'Encargado' ? user.assigned_area : '')
+    setAssigned_area('')
     const placeSelected = placesOptions?.find((item) => item.option == place)
 
     let areaData = []
@@ -213,7 +217,7 @@ export default AddUser = ({ navigation, route }) => {
         <VStack spacing={10}>
           <TextInput mode="outlined" value={email} onChangeText={setEmail} label="Correo electrónico" keyboardType="email-address" autoCapitalize="none" maxLength={50} autoComplete="off" autoCorrect={false} />
           <TextInput mode="outlined" value={phone} onChangeText={setPhone} label="Teléfono" keyboardType="numeric" maxLength={10} autoComplete="off" autoCorrect={false} />
-          <TextInput mode="outlined" value={emergency_contact} onChangeText={setEmergency_contact} label="Contacto de emergencia" maxLength={50} autoComplete="off" autoCorrect={false} />
+          <TextInput mode="outlined" value={emergency_contact} onChangeText={setEmergency_contact} label="Contacto de emergencia" maxLength={50} autoCapitalize="words" autoComplete="off" autoCorrect={false} />
           <TextInput mode="outlined" value={emergency_phone} onChangeText={setEmergency_phone} label="Teléfono de emergencia" keyboardType="numeric" maxLength={10} autoComplete="off" autoCorrect={false} />
         </VStack>
       </VStack>
@@ -225,22 +229,22 @@ export default AddUser = ({ navigation, route }) => {
       <VStack spacing={5}>
         <Text variant="labelLarge">Datos del usuario</Text>
         <VStack spacing={10}>
-          {user.role == 'Administrador' ? (
+          {actualUser.role == 'Administrador' ? (
             <Flex fill>
-              <Dropdown title={'Rol'} options={roleTypes} value={role} selected={setRole} />
+              <Dropdown title="Rol" options={roleTypes} value={role} selected={setRole} />
             </Flex>
           ) : null}
-          {role == 'Prestador' ? (
+          {actualUser.role == 'Encargado' ? (
             <Flex fill>
-              <Dropdown title={'Tipo de prestador'} options={providerTypes} value={provider_type} selected={setProvider_type} />
+              <Dropdown title="Tipo de prestador" options={providerTypes} value={provider_type} selected={setProvider_type} />
             </Flex>
           ) : null}
-          {user.role == 'Administrador' ? (
+          {actualUser.role == 'Administrador' ? (
             <Flex>
               <Dropdown value={place} selected={setPlace} title="Bosque urbano" options={placesOptions} />
             </Flex>
           ) : null}
-          {user.role == 'Administrador' ? (
+          {actualUser.role == 'Administrador' ? (
             place != '' && areasOptions.length > 0 ? (
               <Flex>
                 <Dropdown value={assigned_area} selected={setAssigned_area} title="Área asignada" options={areasOptions} />
@@ -261,12 +265,12 @@ export default AddUser = ({ navigation, route }) => {
               </HStack>
             ) : null
           ) : null}
-          {role == 'Prestador' ? (
+          {actualUser.role == 'Encargado' ? (
             <Flex>
               <Dropdown value={school} selected={setSchool} title="Escuela" options={schoolsOptions} />
             </Flex>
           ) : null}
-          {role == 'Prestador' ? <TextInput mode="outlined" value={total_hours} onChangeText={setTotal_hours} label="Total de horas" keyboardType="number-pad" maxLength={3} autoComplete="off" autoCorrect={false} /> : null}
+          {actualUser.role == 'Encargado' ? <TextInput mode="outlined" value={total_hours} onChangeText={setTotal_hours} label="Total de horas" keyboardType="number-pad" maxLength={3} autoComplete="off" autoCorrect={false} /> : null}
         </VStack>
       </VStack>
     )
@@ -283,7 +287,7 @@ export default AddUser = ({ navigation, route }) => {
     )
   }
 
-  const Save = (_) => {
+  const Save = () => {
     return (
       <Button
         mode="contained"
@@ -299,12 +303,12 @@ export default AddUser = ({ navigation, route }) => {
     )
   }
 
-  const Cancel = (_) => {
+  const Cancel = () => {
     return (
       <Button
         mode="outlined"
         icon="close"
-        onPress={(_) => {
+        onPress={() => {
           navigation.pop()
         }}
       >
@@ -318,7 +322,7 @@ export default AddUser = ({ navigation, route }) => {
       <CreateForm navigation={navigation} title={'Añadir nuevo usuario'} children={[PersonalData(), ContactData(), UserData(), ImageData()]} actions={[Save(), Cancel()]} />
 
       <ModalMessage title="¡Listo!" description="El usuario ha sido creado" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline" />
-      <ModalMessage title="Ocurrió un problema" description={`No pudimos crear al usuario, inténtalo más tarde. (${reponseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline" />
+      <ModalMessage title="Ocurrió un problema" description={`No pudimos crear al usuario, inténtalo más tarde. (${responseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline" />
       <ModalMessage title="Sin conexión a internet" description={`Parece que no tienes conexión a internet, conéctate e intenta de nuevo`} handler={[modalFatal, () => setModalFatal(!modalFatal)]} actions={[['Aceptar']]} dismissable={true} icon="wifi-alert" />
     </Flex>
   )

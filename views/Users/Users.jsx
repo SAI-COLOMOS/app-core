@@ -11,19 +11,20 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import SearchBar from '../Shared/SearchBar'
 import ModalFilters from '../Shared/ModalFilters'
 import Dropdown from '../Shared/Dropdown'
+import InformationMessage from '../Shared/InformationMessage'
 
 export default Users = ({ navigation, route }) => {
   const headerMargin = useHeaderHeight()
-  const { user, token } = route.params
+  const { actualUser, token } = route.params
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const theme = useTheme()
 
   const [loading, setLoading] = useState(false)
   const [users, setUsers] = useState(undefined)
-  const [places, setPlaces] = useState(undefined)
-  const [schools, setSchools] = useState(undefined)
+  const [foundUsers, setFoundUsers] = useState(undefined)
   const [search, setSearch] = useState('')
   const [showSearch, setShowSearch] = useState(null)
+  const [areFilters, setAreFilters] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
 
   const [placesOptions, setPlacesOptions] = useState()
@@ -43,46 +44,10 @@ export default Users = ({ navigation, route }) => {
   const [statusFilter, setStatusFilter] = useState('')
   const [providerFilter, setProviderFilter] = useState('')
 
-  const [filter, setFilter] = useState({})
-
-  const getUsers = async (_) => {
+  const getUsers = async () => {
     setLoading(true)
 
-    let filters = {}
-
-    if (placeFilter !== '') {
-      filters = { ...filters, place: placeFilter }
-    }
-
-    if (areaFilter !== '') {
-      filters = { ...filter, assigned_area: areaFilter }
-    }
-
-    if (roleFilter !== '') {
-      filters = { ...filter, role: roleFilter }
-    }
-
-    if (yearFilter !== '') {
-      filters = { ...filter, year: yearFilter }
-    }
-
-    if (periodFilter !== '') {
-      filters = { ...filter, period: periodFilter }
-    }
-
-    if (schoolFilter !== '') {
-      filters = { ...filter, school: schoolFilter }
-    }
-
-    if (statusFilter !== '') {
-      filters = { ...filter, status: statusFilter }
-    }
-
-    if (providerFilter !== '') {
-      filters = { ...filter, provider_type: providerFilter }
-    }
-
-    const request = await fetch(`${localhost}/users?search=${search}&filter=${JSON.stringify(filters)}`, {
+    const request = await fetch(`${localhost}/users`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -91,7 +56,7 @@ export default Users = ({ navigation, route }) => {
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
-      .catch((_) => null)
+      .catch(() => null)
 
     setLoading(false)
 
@@ -102,7 +67,72 @@ export default Users = ({ navigation, route }) => {
     }
   }
 
-  const getPlaces = async (_) => {
+  const searchUsers = async () => {
+    setLoading(true)
+
+    let filters = {}
+
+    if (placeFilter !== '') {
+      filters = { ...filters, place: placeFilter }
+    }
+
+    if (areaFilter !== '') {
+      filters = { ...filters, assigned_area: areaFilter }
+    }
+
+    if (roleFilter !== '') {
+      filters = { ...filters, role: roleFilter }
+    }
+
+    if (yearFilter !== '') {
+      filters = { ...filters, year: yearFilter }
+    }
+
+    if (periodFilter !== '') {
+      filters = { ...filters, period: periodFilter }
+    }
+
+    if (schoolFilter !== '') {
+      filters = { ...filters, school: schoolFilter }
+    }
+
+    if (statusFilter !== '') {
+      filters = { ...filters, status: statusFilter }
+    }
+
+    if (providerFilter !== '') {
+      filters = { ...filters, provider_type: providerFilter }
+    }
+
+    setAreFilters(filters)
+
+    if (Object.keys(filters).length === 0 && search === '') {
+      setFoundUsers(undefined)
+      setLoading(false)
+      return
+    }
+
+    const request = await fetch(`${localhost}/users?search=${search.trim()}&filter=${JSON.stringify(filters)}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Cache-Control': 'no-cache'
+      }
+    })
+      .then((response) => (response.ok ? response.json() : response.status))
+      .catch(() => null)
+
+    setLoading(false)
+
+    if (request?.users) {
+      setFoundUsers(request.users)
+    } else {
+      setFoundUsers(request)
+    }
+  }
+
+  const getPlaces = async () => {
     const request = await fetch(`${localhost}/places`, {
       method: 'GET',
       headers: {
@@ -112,11 +142,9 @@ export default Users = ({ navigation, route }) => {
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
-      .catch((_) => null)
+      .catch(() => null)
 
     if (request?.places) {
-      setPlaces(request.places)
-
       let placesData = []
       request.places.forEach((place) => {
         let areasData = []
@@ -129,11 +157,10 @@ export default Users = ({ navigation, route }) => {
       })
       setPlacesOptions(placesData)
     } else {
-      setPlaces(request)
     }
   }
 
-  const getSchools = async (_) => {
+  const getSchools = async () => {
     const request = await fetch(`${localhost}/schools`, {
       method: 'GET',
       headers: {
@@ -143,18 +170,15 @@ export default Users = ({ navigation, route }) => {
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
-      .catch((_) => null)
+      .catch(() => null)
 
     if (request?.schools) {
-      setSchools(request.schools)
-
       let schoolsData = []
       request.schools.forEach((school) => {
         schoolsData.push({ option: school.school_name })
       })
       setSchoolsOptions(schoolsData)
     } else {
-      setSchools(request)
     }
   }
 
@@ -178,107 +202,62 @@ export default Users = ({ navigation, route }) => {
     setAreasOptions(areaData)
   }, [placeFilter])
 
-  useEffect(() => {
-    if (users === undefined) {
-      getUsers()
-    }
-  }, [users])
-
-  useEffect(() => {
-    if (places === undefined) {
-      getPlaces()
-    }
-  }, [places])
-
-  useEffect(() => {
-    if (schools === undefined) {
-      getSchools()
-    }
-  }, [schools])
-
-  // useFocusEffect(useCallback(() => {
+  // useEffect(() => {
+  //   if (users === undefined) {
   //     getUsers()
+  //   }
+  // }, [users])
+
+  // useEffect(() => {
+  //   if (places === undefined) {
   //     getPlaces()
-  //     console.log("from focus effect", filter)
-  //     return () => {}
-  // },[filter], []))
+  //   }
+  // }, [places])
 
-  const Item = useCallback(({ first_name, role, avatar, register }) => {
-    return (
-      <Flex ph={20} pv={5} onPress={() => {}}>
-        <Card mode="outlined" style={{ overflow: 'hidden' }}>
-          <TouchableRipple
-            onPress={() => {
-              navigation.navigate('UserDetails', { token, register, placesOptions, schoolsOptions })
-            }}
-          >
-            <Flex p={10}>
-              <Card.Title title={first_name} titleNumberOfLines={2} subtitle={role} subtitleNumberOfLines={2} left={(props) => (avatar ? <Avatar.Image {...props} source={{ uri: `data:image/png;base64,${avatar}` }} /> : <Avatar.Icon {...props} icon="account" />)} />
-            </Flex>
-          </TouchableRipple>
-        </Card>
-      </Flex>
+  // useEffect(() => {
+  //   if (schools === undefined) {
+  //     getSchools()
+  //   }
+  // }, [schools])
+
+  useFocusEffect(
+    useCallback(
+      () => {
+        getUsers()
+        getPlaces()
+        getSchools()
+        return () => {}
+      },
+      [],
+      []
     )
-  }, [])
+  )
 
-  const EmptyList = useCallback((_) => {
-    return (
-      <VStack center spacing={20} p={30}>
-        <Icon name="pencil-plus-outline" color={theme.colors.onBackground} size={50} />
-        <VStack center>
-          <Text variant="headlineSmall">Sin usuarios</Text>
-          <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
-            No hay ningun usuario registrado, ¿qué te parece si hacemos el primero?
-          </Text>
-        </VStack>
-        <Flex>
-          <Button
-            icon="plus"
-            mode="outlined"
-            onPress={(_) => {
-              navigation.navigate('AddUser', {
-                user,
-                token
-              })
-            }}
-          >
-            Agregar
-          </Button>
+  const Item = useCallback(
+    ({ first_name, role, avatar, register }) => {
+      return (
+        <Flex ph={20} pv={5} onPress={() => {}}>
+          <Card mode="outlined" style={{ overflow: 'hidden' }}>
+            <TouchableRipple
+              onPress={() => {
+                navigation.navigate('UserDetails', { actualUser, token, register, placesOptions, schoolsOptions })
+              }}
+            >
+              <Flex p={10}>
+                <Card.Title title={first_name} titleNumberOfLines={1} subtitle={role} subtitleNumberOfLines={2} left={(props) => (avatar ? <Avatar.Image {...props} source={{ uri: `data:image/png;base64,${avatar}` }} /> : <Avatar.Icon {...props} icon="account" />)} />
+              </Flex>
+            </TouchableRipple>
+          </Card>
         </Flex>
-      </VStack>
-    )
-  }, [])
+      )
+    },
+    [placesOptions]
+  )
 
-  const NoConection = useCallback((_) => {
-    return (
-      <VStack center spacing={20} p={30}>
-        <Icon name="wifi-alert" color={theme.colors.onBackground} size={50} />
-        <VStack center>
-          <Text variant="headlineSmall">Sin conexión</Text>
-          <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
-            Parece que no tienes conexión a internet, conectate e intenta de nuevo
-          </Text>
-        </VStack>
-        <Flex>
-          <Button
-            icon="reload"
-            mode="outlined"
-            onPress={(_) => {
-              setUsers(undefined)
-              getUsers()
-            }}
-          >
-            Reintentar
-          </Button>
-        </Flex>
-      </VStack>
-    )
-  }, [])
-
-  const FilterOptions = (_) => {
+  const FilterOptions = () => {
     return (
       <VStack spacing={10}>
-        {user.role == 'Administrador' ? (
+        {actualUser.role == 'Administrador' ? (
           <HStack items="end">
             <Flex fill>
               <Dropdown title="Bosque urbano" value={placeFilter} selected={setPlaceFilter} options={placesOptions} />
@@ -296,7 +275,7 @@ export default Users = ({ navigation, route }) => {
           </HStack>
         ) : null}
 
-        {user.role == 'Administrador' ? (
+        {actualUser.role == 'Administrador' ? (
           <HStack items="end">
             <Flex fill>
               <Dropdown title="Rol" value={roleFilter} selected={setRoleFilter} options={roleOptions} />
@@ -333,7 +312,7 @@ export default Users = ({ navigation, route }) => {
           {statusFilter ? <IconButton icon="delete" mode="outlined" onPress={() => setStatusFilter('')} /> : null}
         </HStack>
 
-        {user.role == 'Administrador' ? (
+        {actualUser.role == 'Administrador' ? (
           <HStack items="end">
             <Flex fill>
               <Dropdown title="Tipo de prestador" value={providerFilter} selected={setProviderFilter} options={providerOptions} />
@@ -345,28 +324,119 @@ export default Users = ({ navigation, route }) => {
     )
   }
 
+  useEffect(() => {
+    console.log('---------------------')
+    console.log('Found', isNaN(foundUsers))
+    console.log('Normal', isNaN(users))
+    console.log(Object.keys(areFilters).length === 0, areFilters)
+  }, [foundUsers, users, areFilters])
+
   return (
     <Flex fill pt={headerMargin}>
-      <Flex>
-        <SearchBar show={showSearch} label="Busca por nombre, registro, correo o teléfono" value={search} setter={setSearch} action={getUsers} />
-      </Flex>
+      <SearchBar show={showSearch} label="Busca por nombre, registro, correo o teléfono" value={search} setter={setSearch} action={searchUsers} />
 
-      <FlatList data={users} ListEmptyComponent={() => (users === undefined ? null : users === null ? <NoConection /> : <EmptyList />)} refreshing={loading} onRefresh={(_) => getUsers()} renderItem={({ item }) => <Item onPress={() => {}} first_name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ''}`} role={`${item.register}`} register={item.register} avatar={item?.avatar} />} />
+      {Object.keys(areFilters).length === 0 && search == '' ? (
+        users !== null ? (
+          users?.length >= 0 || users === undefined ? (
+            <Flex fill>
+              <FlatList
+                data={users}
+                ListEmptyComponent={() =>
+                  users === undefined ? null : (
+                    <InformationMessage
+                      icon="pencil-plus-outline"
+                      title="Sin usuarios"
+                      description="No hay ningún usuario registrado, ¿qué te parece si hacemos el primero?"
+                      buttonIcon="plus"
+                      buttonTitle="Agregar"
+                      action={() => {
+                        navigation.navigate('AddUser', {
+                          actualUser,
+                          token,
+                          placesOptions,
+                          schoolsOptions
+                        })
+                      }}
+                    />
+                  )
+                }
+                refreshing={loading}
+                onRefresh={() => getUsers()}
+                renderItem={({ item }) => <Item onPress={() => {}} first_name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ''}`} role={`${item.register}`} register={item.register} avatar={item?.avatar} />}
+              />
 
-      <FAB
-        icon="plus"
-        style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
-        onPress={() => {
-          navigation.navigate('AddUser', {
-            user,
-            token,
-            placesOptions,
-            schoolsOptions
-          })
-        }}
-      />
+              <FAB
+                icon="plus"
+                style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
+                onPress={() => {
+                  navigation.navigate('AddUser', {
+                    actualUser,
+                    token,
+                    placesOptions,
+                    schoolsOptions
+                  })
+                }}
+              />
+            </Flex>
+          ) : (
+            <InformationMessage
+              icon="bug-outline"
+              title="¡Ups! Error nuestro"
+              description="Algo falló de nuestra parte. Inténtalo nuevamente más tarde, si el problema persiste, comunícate con tu encargado"
+              buttonTitle="Volver a cargar"
+              buttonIcon="reload"
+              action={() => {
+                setUsers(undefined)
+                getUsers()
+              }}
+            />
+          )
+        ) : (
+          <InformationMessage
+            icon="wifi-alert"
+            title="Sin conexión"
+            description="Parece que no tienes conexión a internet, conéctate e intenta de nuevo"
+            buttonTitle="Volver a cargar"
+            buttonIcon="reload"
+            action={() => {
+              setUsers(undefined)
+              getUsers()
+            }}
+          />
+        )
+      ) : foundUsers !== null ? (
+        foundUsers?.length >= 0 || foundUsers === undefined ? (
+          <Flex fill>
+            <FlatList data={foundUsers} ListEmptyComponent={() => (foundUsers === undefined ? null : <InformationMessage icon="magnify" title="Sin resultados" description="No hay ningún usuario registrado que cumpla con los parámetros de tu búsqueda" />)} refreshing={loading} onRefresh={() => getUsers()} renderItem={({ item }) => <Item onPress={() => {}} first_name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ''}`} role={`${item.register}`} register={item.register} avatar={item?.avatar} />} />
+          </Flex>
+        ) : (
+          <InformationMessage
+            icon="bug-outline"
+            title="¡Ups! Error nuestro"
+            description="Algo falló de nuestra parte. Inténtalo nuevamente más tarde, si el problema persiste, comunícate con tu encargado"
+            buttonTitle="Volver a cargar"
+            buttonIcon="reload"
+            action={() => {
+              setFoundUsers(undefined)
+              searchUsers()
+            }}
+          />
+        )
+      ) : (
+        <InformationMessage
+          icon="wifi-alert"
+          title="Sin conexión"
+          description="Parece que no tienes conexión a internet, conéctate e intenta de nuevo"
+          buttonTitle="Volver a cargar"
+          buttonIcon="reload"
+          action={() => {
+            setFoundUsers(undefined)
+            searchUsers()
+          }}
+        />
+      )}
 
-      <ModalFilters handler={[showFilters, () => setShowFilters(!showFilters)]} child={FilterOptions()} action={() => getUsers()} />
+      <ModalFilters handler={[showFilters, () => setShowFilters(!showFilters)]} child={FilterOptions()} action={() => searchUsers()} />
     </Flex>
   )
 }
