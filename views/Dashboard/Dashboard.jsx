@@ -92,11 +92,11 @@ export default Dashboard = ({ navigation, route }) => {
       <Flex w={'100%'} h={'35%'} style={{ backgroundColor: '#ff0099', position: 'absolute' }}>
         {
           {
-            0: <Image source={require('../../assets/imagees/cover/1.jpg')} style={{ width: '100%', height: '100%' }} />,
-            1: <Image source={require('../../assets/imagees/cover/2.jpg')} style={{ width: '100%', height: '100%' }} />,
-            2: <Image source={require('../../assets/imagees/cover/3.jpg')} style={{ width: '100%', height: '100%' }} />,
-            3: <Image source={require('../../assets/imagees/cover/4.jpg')} style={{ width: '100%', height: '100%' }} />,
-            4: <Image source={require('../../assets/imagees/cover/5.jpg')} style={{ width: '100%', height: '100%' }} />
+            0: <Image source={require('../../assets/images/cover/1.jpg')} style={{ width: '100%', height: '100%' }} />,
+            1: <Image source={require('../../assets/images/cover/2.jpg')} style={{ width: '100%', height: '100%' }} />,
+            2: <Image source={require('../../assets/images/cover/3.jpg')} style={{ width: '100%', height: '100%' }} />,
+            3: <Image source={require('../../assets/images/cover/4.jpg')} style={{ width: '100%', height: '100%' }} />,
+            4: <Image source={require('../../assets/images/cover/5.jpg')} style={{ width: '100%', height: '100%' }} />
           }[Math.floor(Math.random() * 4)]
         }
 
