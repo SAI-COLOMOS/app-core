@@ -35,6 +35,12 @@ import AddUser from "./Users/AddUser";
 import UserDetails from "./Users/UserDetails";
 import EditUser from "./Users/EditUser";
 
+// Cards
+import Cards from "./Cards/Cards"
+import CardDetails from "./Cards/CardDetails";
+import AddCard from "./Cards/AddCard";
+import EditCard from "./Cards/EditCard";
+
 export default Navigation = () => {
     const Stack = createNativeStackNavigator()
 
@@ -72,6 +78,13 @@ export default Navigation = () => {
                 <Stack.Screen name="UserDetails" component={UserDetails}/>
                 <Stack.Screen name="AddUser" component={AddUser} options={{headerShown: false, presentation: "containedTransparentModal"}}/>
                 <Stack.Screen name="EditUser" component={EditUser} options={{headerShown: false, presentation: "containedTransparentModal"}}/>
+            </Stack.Group>
+
+            <Stack.Group navigationKey="Cards" screenOptions={{headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom"}}>
+                <Stack.Screen name="Cards" component={Cards}/>
+                <Stack.Screen name="CardDetails" component={CardDetails}/>
+                <Stack.Screen name="AddCard" component={AddCard} options={{headerShown: false, presentation: "containedTransparentModal"}}/>
+                <Stack.Screen name="EditCard" component={EditCard} options={{headerShown: false, presentation: "containedTransparentModal"}}/>
             </Stack.Group>
 
             <Stack.Group navigationKey="Profile" screenOptions={{headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom"}}>

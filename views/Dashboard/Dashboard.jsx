@@ -158,6 +158,14 @@ export default Dashboard = ({navigation, route}) => {
                                 )
                             }
 
+                            {
+                                actualUser?.role == "Administrador" ? (
+                                    <Item screen="Cards" payload={{user: actualUser, token: actualToken}} icon="clock-time-four-outline" title="Horas"/>
+                                ) : (
+                                    null
+                                )
+                            }
+
 
 
                         </Flex>
