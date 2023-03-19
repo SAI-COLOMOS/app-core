@@ -143,19 +143,11 @@ export default PlaceDetails = ({ navigation, route }) => {
 
   return (
     <Flex fill pt={headerMargin - 20}>
-<<<<<<< HEAD
       <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={(_) => getPlace()} />}>
         {place !== undefined ? (
           place !== null ? (
             isNaN(place) ? (
               <DisplayDetails icon="pine-tree" title={place?.place_name} children={[place(), Areas()]} />
-=======
-      <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={() => getPlaces()} />}>
-        {places !== undefined ? (
-          places !== null ? (
-            isNaN(places) ? (
-              <DisplayDetails icon="pine-tree" title={places?.place_name} children={[Places(), Areas()]} />
->>>>>>> 2c1a550974e22924dd69af0ef895ef2ce994613b
             ) : (
               <VStack p={30} center spacing={20}>
                 <Icon color={theme.colors.onBackground} name="alert-circle-outline" size={50} />
@@ -168,13 +160,8 @@ export default PlaceDetails = ({ navigation, route }) => {
                 <Flex>
                   <Button
                     mode="outlined"
-<<<<<<< HEAD
                     onPress={(_) => {
                       getPlace()
-=======
-                    onPress={() => {
-                      getPlaces()
->>>>>>> 2c1a550974e22924dd69af0ef895ef2ce994613b
                     }}
                   >
                     Volver a intentar
