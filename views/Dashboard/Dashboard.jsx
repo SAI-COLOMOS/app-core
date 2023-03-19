@@ -1,4 +1,4 @@
-import { Flex, VStack } from '@react-native-material/core'
+import { Flex, HStack, VStack } from '@react-native-material/core'
 import { useState, useEffect, useCallback } from 'react'
 import * as SecureStore from 'expo-secure-store'
 import { Button, Card, Text, useTheme, Avatar, TouchableRipple } from 'react-native-paper'
@@ -125,6 +125,38 @@ export default Dashboard = ({ navigation, route }) => {
             </Flex>
 
             <Flex direction="row" wrap="wrap" pr={25} pl={25} pb={50}>
+              
+              <Flex w={'100%'} p={10}>
+                <VStack spacing={10}>
+                  <Text variant="headlineSmall">En este momento</Text>
+                  <Card mode="outlined">
+                    <TouchableRipple
+                      onPress={() => {
+                        navigation.navigate('AttendanceDetails', { actualUser: actualUser, token: actualToken })
+                      }}
+                    >
+                      <HStack p={20} spacing={20}>
+                        <Flex items="center">
+                          <Avatar.Text label="12" size={50} />
+                          <Text>mayo</Text>
+                        </Flex>
+                        <VStack fill spacing={10}>
+                          <Text variant="bodyLarge" numberOfLines={2}>
+                            Presentación de proyecto de titulación
+                          </Text>
+                          <Flex fill>
+                            <Text variant="bodyMedium">De 10:00 a 15:00</Text>
+                            <Text variant="bodyMedium" numberOfLines={1}>
+                              Centro de Enseñanza Técnica Industrial
+                            </Text>
+                          </Flex>
+                        </VStack>
+                      </HStack>
+                    </TouchableRipple>
+                  </Card>
+                </VStack>
+              </Flex>
+
               <Item screen="Profile" payload={{ actualUser: actualUser, token: actualToken }} icon="account-outline" title="Tu perfil" />
 
               {actualUser?.role == 'Administrador' || actualUser?.role == 'Encargado' ? <Item screen="Users" payload={{ actualUser: actualUser, token: actualToken }} icon="account-supervisor-outline" title="Usuarios" /> : null}
@@ -132,6 +164,14 @@ export default Dashboard = ({ navigation, route }) => {
               {actualUser?.role == 'Administrador' ? <Item screen="PlacesAndAreas" payload={{ actualUser: actualUser, token: actualToken }} icon="map-marker-radius-outline" title="Lugares y áreas" /> : null}
 
               {actualUser?.role == 'Administrador' ? <Item screen="Schools" payload={{ user: actualUser, token: actualToken }} icon="town-hall" title="Escuelas" /> : null}
+
+              <Button
+                onPress={() => {
+                  navigation.navigate('AttendanceRegister')
+                }}
+              >
+                Ir a AttendanceRegister
+              </Button>
             </Flex>
           </Flex>
         </VStack>
