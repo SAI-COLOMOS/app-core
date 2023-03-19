@@ -172,6 +172,13 @@ export default Dashboard = ({ navigation, route }) => {
               >
                 Ir a AttendanceRegister
               </Button>
+              <Button
+                onPress={() => {
+                  navigation.navigate('AttendanceProximityClient')
+                }}
+              >
+                Ir a AttendanceProximityClient
+              </Button>
             </Flex>
           </Flex>
         </VStack>

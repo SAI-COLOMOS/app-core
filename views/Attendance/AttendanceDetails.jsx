@@ -71,10 +71,11 @@ export default AttendanceDetails = ({ navigation, route }) => {
       <VStack fill ph={20} pv={50}>
         <ScrollView>
           <VStack spacing={20}>
-            <Flex self="center" w={250} h={250} style={{ borderRadius: 125, overflow: 'hidden' }} center>
-              {profile?.avatar ? <Avatar.Image source={{ uri: `data:image/png;base64,${profile?.avatar}` }} size={250} style={{ position: 'absolute' }} /> : <Avatar.Icon icon="account-circle-outline" size={250} style={{ position: 'absolute' }} />}
+            <Flex self="center" w={150} h={150} style={{ borderRadius: 125, overflow: 'hidden' }} center>
 
-              <QRCode value={profile?.register} backgroundColor={theme.colors.cover} color={theme.colors.onBackground} quietZone={75} size={250} />
+              {profile?.avatar ? <Avatar.Image source={{ uri: `data:image/png;base64,${profile?.avatar}` }} size={150} style={{ position: 'absolute' }} /> : <Avatar.Icon icon="account-circle-outline" size={150} style={{ position: 'absolute' }} />}
+              <QRCode value={profile?.register} backgroundColor={theme.colors.cover} color={theme.colors.onBackground} quietZone={50} size={150} />
+
             </Flex>
 
             <Flex>
@@ -100,7 +101,15 @@ export default AttendanceDetails = ({ navigation, route }) => {
           </VStack>
         </ScrollView>
 
-        <Button mode="contained" icon="human-greeting-proximity">
+        <Button
+          mode="contained"
+          icon="human-greeting-proximity"
+          onPress={() => {
+            navigation.navigate('AttendanceProximityClient', {
+              avatar: profile?.avatar
+            })
+          }}
+        >
           Asistencia por proximidad
         </Button>
       </VStack>
