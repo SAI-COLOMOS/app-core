@@ -4,16 +4,26 @@ import { KeyboardAvoidingView, Pressable, ScrollView, StatusBar } from 'react-na
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Avatar, Button, IconButton, Text, useTheme } from 'react-native-paper'
 import Animated, { useSharedValue, Easing, useAnimatedStyle, withTiming, withSpring, withRepeat, withSequence } from 'react-native-reanimated'
-import { BleManager } from "react-native-ble-plx";
+import BleManager, {
+  BleDisconnectPeripheralEvent,
+  BleManagerDidUpdateValueForCharacteristicEvent,
+  BleScanCallbackType,
+  BleScanMatchMode,
+  BleScanMode,
+  Peripheral,
+} from 'react-native-ble-manager';
 
 export default AttendanceProximityClient = ({ navigation, route }) => {
   const theme = useTheme()
   const insets = useSafeAreaInsets()
   const { avatar } = route.params
-  const bluetooth = new BleManager()
 
   useEffect(() => {
-    navigation.setOptions({})
+    try {
+      BleManager.start({showAlert: false}).then(() => console.log("Si jala"))
+    } catch (error) {
+      console.log("Error:", error)
+    }
   }, [])
 
   const UserAvatar = () => {

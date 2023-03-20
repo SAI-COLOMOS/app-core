@@ -3,43 +3,129 @@ import { useState, useEffect, useCallback } from 'react'
 import * as SecureStore from 'expo-secure-store'
 import { Button, Card, Text, useTheme, Avatar, TouchableRipple } from 'react-native-paper'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Image, ScrollView, useWindowDimensions } from 'react-native'
+import { Image, RefreshControl, ScrollView, useWindowDimensions } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useFocusEffect } from '@react-navigation/native'
+import CircularProgress from 'react-native-circular-progress-indicator'
+import Constants from 'expo-constants'
+import Animated from 'react-native-reanimated'
 
 export default Dashboard = ({ navigation, route }) => {
   const insets = useSafeAreaInsets()
   const theme = useTheme()
   const { width } = useWindowDimensions()
+  const localhost = Constants.expoConfig.extra.API_LOCAL
 
   const [greeting, setGreeting] = useState('Hola')
   const [timeToSleep, setTimeToSleep] = useState(false)
   const [actualUser, setActualUser] = useState(undefined)
   const [actualToken, setActualToken] = useState(undefined)
+  const [token, setToken] = useState(undefined)
+  const [register, setRegister] = useState(undefined)
+  const [user, setUser] = useState(undefined)
+  const [progress, setProgress] = useState(undefined)
+  const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    const getUser = async (_) => {
-      const user = JSON.parse(await SecureStore.getItemAsync('user'))
-      user ? setActualUser(user) : setActualUser(undefined)
+  async function getUser() {
+    if (loading == false) {
+      setLoading(true)
     }
 
-    if (actualUser === undefined) {
-      getUser()
+    const request = await fetch(`${localhost}/profile/${register}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Cache-Control': 'no-cache'
+      }
+    })
+      .then((response) => (response.ok ? response.json() : response.status))
+      .catch((_) => null)
+
+    setLoading(false)
+
+    if (request?.user) {
+      setUser(request.user)
+    } else {
+      setUser(request)
+    }
+  }
+
+  async function getFeed() {
+    if (loading == false) {
+      setLoading(true)
     }
 
-    console.log('From acá', actualUser)
-  }, [actualUser])
+    const request = await fetch(`${localhost}/feed`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Cache-Control': 'no-cache'
+      }
+    })
+      .then((response) => (response.ok ? response.json() : response.status))
+      .catch((error) => error)
+
+    setLoading(false)
+
+    if (request?.total_hours) {
+      setProgress({ achieved_hours: Number(request.achieved_hours), total_hours: Number(request.total_hours) })
+    } else {
+      setProgress(null)
+    }
+  }
+
+  // useEffect(() => {
+  //   const getUser = async (_) => {
+  //     const user = JSON.parse(await SecureStore.getItemAsync('user'))
+  //     user ? setActualUser(user) : setActualUser(undefined)
+  //   }
+
+  //   if (actualUser === undefined) {
+  //     getUser()
+  //   }
+  // }, [actualUser])
+
+  // useEffect(() => {
+  //   const getToken = async (_) => {
+  //     const token = await SecureStore.getItemAsync('token')
+  //     token ? setActualToken(token) : setActualToken(undefined)
+  //   }
+
+  //   if (actualToken === undefined) {
+  //     getToken()
+  //   }
+  // }, [actualToken])
 
   useEffect(() => {
     const getToken = async (_) => {
       const token = await SecureStore.getItemAsync('token')
-      token ? setActualToken(token) : setActualToken(undefined)
+      token ? setToken(token) : setToken(undefined)
     }
 
-    if (actualToken === undefined) {
+    if (token == undefined) {
       getToken()
     }
-  }, [actualToken])
+  }, [token])
+
+  useEffect(() => {
+    const getRegister = async (_) => {
+      const register = await SecureStore.getItemAsync('register')
+      register ? setRegister(register) : setRegister(undefined)
+    }
+
+    if (register == undefined) {
+      getRegister()
+    }
+  }, [register])
+
+  useEffect(() => {
+    if (token !== undefined && register !== undefined) {
+      getUser()
+      getFeed()
+    }
+  }, [token, register])
 
   useFocusEffect(
     useCallback(() => {
@@ -76,10 +162,32 @@ export default Dashboard = ({ navigation, route }) => {
               navigation.navigate(screen, { ...payload })
             }}
           >
-            <VStack center p={20} spacing={10}>
-              <Avatar.Icon icon={icon} size={50} />
-
+            <VStack ph={20} pv={10} h={175} spacing={10}>
               <Text>{title}</Text>
+              <Flex fill center>
+                <Avatar.Icon icon={icon} size={100} />
+              </Flex>
+            </VStack>
+          </TouchableRipple>
+        </Card>
+      </Flex>
+    )
+  }
+
+  const WidgetMedium = ({ screen, payload, child, title }) => {
+    return (
+      <Flex w={'50%'} p={10}>
+        <Card mode="outlined">
+          <TouchableRipple
+            onPress={() => {
+              navigation.navigate(screen, { ...payload })
+            }}
+          >
+            <VStack ph={20} pv={10} h={175} spacing={10}>
+              <Text variant='bodyMedium'>{title}</Text>
+              <Flex fill center>
+                {child}
+              </Flex>
             </VStack>
           </TouchableRipple>
         </Card>
@@ -103,14 +211,14 @@ export default Dashboard = ({ navigation, route }) => {
         <LinearGradient colors={[theme.colors.cover, theme.colors.background]} locations={[0.75, 1]} style={{ width: '100%', height: '100%', position: 'absolute' }} />
       </Flex>
 
-      <ScrollView>
+      <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={() => getFeed()} />}>
         <VStack pb={50} spacing={50}>
           <VStack items="center" pt={50}>
             <Text variant="headlineLarge" style={{ color: theme.colors.primary }}>
               {greeting}
             </Text>
             <Text variant="headlineSmall" numberOfLines={1}>
-              {actualUser?.first_name}
+              {user?.first_name}
             </Text>
             {timeToSleep ? (
               <Text variant="bodyMedium" numberOfLines={1}>
@@ -124,46 +232,68 @@ export default Dashboard = ({ navigation, route }) => {
               <Text variant="headlineSmall">Tu centro de control</Text>
             </Flex>
 
-            <Flex direction="row" wrap="wrap" pr={25} pl={25} pb={50}>
-              
+            <Flex direction="row" wrap="wrap" ph={10} pb={50}>
               <Flex w={'100%'} p={10}>
                 <VStack spacing={10}>
-                  <Text variant="headlineSmall">En este momento</Text>
                   <Card mode="outlined">
                     <TouchableRipple
                       onPress={() => {
-                        navigation.navigate('AttendanceDetails', { actualUser: actualUser, token: actualToken })
+                        navigation.navigate('AttendanceDetails', { actualUser: user, token: token })
                       }}
                     >
-                      <HStack p={20} spacing={20}>
-                        <Flex items="center">
-                          <Avatar.Text label="12" size={50} />
-                          <Text>mayo</Text>
-                        </Flex>
-                        <VStack fill spacing={10}>
-                          <Text variant="bodyLarge" numberOfLines={2}>
-                            Presentación de proyecto de titulación
-                          </Text>
-                          <Flex fill>
-                            <Text variant="bodyMedium">De 10:00 a 15:00</Text>
-                            <Text variant="bodyMedium" numberOfLines={1}>
-                              Centro de Enseñanza Técnica Industrial
-                            </Text>
+                      <VStack ph={20} pv={10} h={175} spacing={10}>
+                        <Text variant='bodyMedium'>Evento próximo</Text>
+                        <HStack fill spacing={20}>
+                          <Flex items="center">
+                            <Avatar.Text label="12" size={50} />
+                            <Text variant='bodyMedium'>mayo</Text>
                           </Flex>
-                        </VStack>
-                      </HStack>
+                          <VStack fill spacing={10}>
+                            <Text variant="bodyLarge" numberOfLines={2}>
+                              Presentación de proyecto de titulación
+                            </Text>
+                            <Flex fill>
+                              <Text variant="bodyMedium">De 10:00 a 15:00</Text>
+                              <Text variant="bodyMedium" numberOfLines={1}>
+                                Centro de Enseñanza Técnica Industrial
+                              </Text>
+                            </Flex>
+                          </VStack>
+                        </HStack>
+                      </VStack>
                     </TouchableRipple>
                   </Card>
                 </VStack>
               </Flex>
 
-              <Item screen="Profile" payload={{ actualUser: actualUser, token: actualToken }} icon="account-outline" title="Tu perfil" />
+              <WidgetMedium
+                screen="Profile"
+                payload={{ actualUser: user, token }}
+                child={
+                  <Flex fill center>
+                    <Flex fill center style={{ position: 'absolute' }}>
+                      <Text variant="headlineSmall" style={{ fontWeight: 'bold', color: theme.colors.primary }}>
+                        {progress?.achieved_hours} /
+                      </Text>
+                      <Text variant="bodyMedium">{progress?.total_hours}</Text>
+                    </Flex>
+                    {progress?.total_hours ? (
+                      <Animated.View>
+                        <CircularProgress value={progress?.achieved_hours} showProgressValue={false} progressValueColor={theme.colors.primary} activeStrokeColor={theme.colors.primary} inActiveStrokeColor={theme.colors.backdrop} rotation={180} titleColor={theme.colors.onBackground} radius={50} maxValue={progress?.total_hours} />
+                      </Animated.View>
+                    ) : null}
+                  </Flex>
+                }
+                title="Tu progreso"
+              />
 
-              {actualUser?.role == 'Administrador' || actualUser?.role == 'Encargado' ? <Item screen="Users" payload={{ actualUser: actualUser, token: actualToken }} icon="account-supervisor-outline" title="Usuarios" /> : null}
+              <WidgetMedium screen="Profile" payload={{ actualUser: user, token }} child={user?.avatar ? <Avatar.Image source={{ uri: `data:image/png;base64,${user.avatar}` }} size={100} /> : <Avatar.Icon icon="account-circle-outline" size={100} />} title="Tu perfil" />
 
-              {actualUser?.role == 'Administrador' ? <Item screen="PlacesAndAreas" payload={{ actualUser: actualUser, token: actualToken }} icon="map-marker-radius-outline" title="Lugares y áreas" /> : null}
+              {user?.role == 'Administrador' || user?.role == 'Encargado' ? <Item screen="Users" payload={{ actualUser: user, token }} icon="account-supervisor-outline" title="Usuarios" /> : null}
 
-              {actualUser?.role == 'Administrador' ? <Item screen="Schools" payload={{ user: actualUser, token: actualToken }} icon="town-hall" title="Escuelas" /> : null}
+              {user?.role == 'Administrador' ? <Item screen="PlacesAndAreas" payload={{ actualUser: user, token }} icon="map-marker-radius-outline" title="Lugares y áreas" /> : null}
+
+              {user?.role == 'Administrador' ? <Item screen="Schools" payload={{ user, token }} icon="town-hall" title="Escuelas" /> : null}
 
               <Button
                 onPress={() => {
@@ -171,13 +301,6 @@ export default Dashboard = ({ navigation, route }) => {
                 }}
               >
                 Ir a AttendanceRegister
-              </Button>
-              <Button
-                onPress={() => {
-                  navigation.navigate('AttendanceProximityClient')
-                }}
-              >
-                Ir a AttendanceProximityClient
               </Button>
             </Flex>
           </Flex>
