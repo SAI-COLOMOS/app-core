@@ -1,5 +1,5 @@
 import { Flex, HStack, VStack } from '@react-native-material/core'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Avatar, Button, Card, FAB, IconButton, Text, TouchableRipple, useTheme } from 'react-native-paper'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useHeaderHeight } from '@react-navigation/elements'
@@ -50,14 +50,13 @@ export default Schools = ({ navigation, route }) => {
   async function searchSchools() {
     setLoading(true)
 
-    
     if (search === '') {
       setFoundSchools(undefined)
       setLoading(false)
       return
     }
 
-    const request = await fetch(`${localhost}/schools?search=${search}&filter=${JSON.stringify({})}`, {
+    const request = await fetch(`${localhost}/schools?search=${search}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -85,17 +84,13 @@ export default Schools = ({ navigation, route }) => {
     })
   }, [showSearch])
 
-  useEffect(() => {
-    if (schools === undefined) {
+  useFocusEffect(
+    useCallback(() => {
       getSchools()
-    }
-  }, [schools])
 
-  // useFocusEffect(useCallback(() => {
-  //     getSchools()
-
-  //     return () => {}
-  // }, []))
+      return () => {}
+    }, [])
+  )
 
   const Item = ({ school_name, address, school_identifier }) => {
     return (
@@ -110,7 +105,7 @@ export default Schools = ({ navigation, route }) => {
               <Card.Title title={school_name} titleNumberOfLines={2} subtitle={address} subtitleNumberOfLines={1} left={(props) => <Avatar.Icon {...props} icon="town-hall" />} />
             </Flex>
           </TouchableRipple>
-        </Card> 
+        </Card>
       </Flex>
     )
   }
@@ -136,9 +131,7 @@ export default Schools = ({ navigation, route }) => {
                       action={() => {
                         navigation.navigate('AddSchool', {
                           actualUser,
-                          token,
-                          placesOptions,
-                          schoolsOptions
+                          token
                         })
                       }}
                     />
@@ -155,9 +148,7 @@ export default Schools = ({ navigation, route }) => {
                 onPress={() => {
                   navigation.navigate('AddSchools', {
                     actualUser,
-                    token,
-                    placesOptions,
-                    schoolsOptions
+                    token
                   })
                 }}
               />
@@ -219,21 +210,6 @@ export default Schools = ({ navigation, route }) => {
           }}
         />
       )}
-
-      {/* <FlatList data={schools} ListEmptyComponent={() => (schools === undefined ? null : schools === null ? <NoConnection /> : search ? <NoResults /> : <EmptyList />)} refreshing={loading} onRefresh={() => getSchools()} renderItem={({ item }) => <Item school_name={item.school_name} address={`${item.street} #${item.exterior_number}, ${item.colony}, ${item.municipality}`} school_identifier={item.school_identifier} />} />
-
-      {!(schools === undefined || schools === null) ? (
-        <FAB
-          icon="plus"
-          style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
-          onPress={() => {
-            navigation.navigate('AddSchool', {
-              user,
-              token
-            })
-          }}
-        />
-      ) : null} */}
     </Flex>
   )
 }

@@ -234,7 +234,7 @@ export default AddUser = ({ navigation, route }) => {
               <Dropdown title="Rol" options={roleTypes} value={role} selected={setRole} />
             </Flex>
           ) : null}
-          {actualUser.role == 'Encargado' ? (
+          {role == 'Prestador' ? (
             <Flex fill>
               <Dropdown title="Tipo de prestador" options={providerTypes} value={provider_type} selected={setProvider_type} />
             </Flex>
@@ -265,12 +265,12 @@ export default AddUser = ({ navigation, route }) => {
               </HStack>
             ) : null
           ) : null}
-          {actualUser.role == 'Encargado' ? (
+          {role == 'Prestador' ? (
             <Flex>
               <Dropdown value={school} selected={setSchool} title="Escuela" options={schoolsOptions} />
             </Flex>
           ) : null}
-          {actualUser.role == 'Encargado' ? <TextInput mode="outlined" value={total_hours} onChangeText={setTotal_hours} label="Total de horas" keyboardType="number-pad" maxLength={3} autoComplete="off" autoCorrect={false} /> : null}
+          {role == 'Prestador' ? <TextInput mode="outlined" value={total_hours} onChangeText={setTotal_hours} label="Total de horas" keyboardType="number-pad" maxLength={3} autoComplete="off" autoCorrect={false} /> : null}
         </VStack>
       </VStack>
     )

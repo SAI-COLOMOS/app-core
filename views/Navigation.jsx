@@ -40,6 +40,7 @@ import AttendanceDetails from './Attendance/AttendanceDetails'
 import AttendanceRegister from './Attendance/AttendanceRegister'
 import AttendanceScan from './Attendance/AttendanceScan'
 import AttendanceProximityClient from './Attendance/AttendanceProximityClient'
+import ShowAttendanceCode from './Attendance/ShowAttendanceCode'
 
 export default Navigation = () => {
   const Stack = createNativeStackNavigator()
@@ -90,6 +91,7 @@ export default Navigation = () => {
         <Stack.Screen name="AttendanceRegister" component={AttendanceRegister} />
         <Stack.Screen name="AttendanceScan" component={AttendanceScan} options={{ headerShown: false, presentation: 'containedTransparentModal' }} />
         <Stack.Screen name="AttendanceProximityClient" component={AttendanceProximityClient} options={{ headerShown: false, presentation: 'containedTransparentModal' }} />
+        <Stack.Screen name="ShowAttendanceCode" component={ShowAttendanceCode} options={{ headerShown: false, presentation: 'containedTransparentModal' }} />
 
         {/* <Stack.Screen name="UpdatePassword" component={UpdatePassword} options={{ headerShown: false, presentation: 'containedTransparentModal' }} /> */}
       </Stack.Group>

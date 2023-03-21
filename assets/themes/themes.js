@@ -43,7 +43,8 @@ export let darkTheme = {
         "surfaceDisabled": "rgba(233, 224, 228, 0.12)",
         "onSurfaceDisabled": "rgba(233, 224, 228, 0.38)",
         "backdrop": "rgba(55, 46, 52, 0.4)",
-        "cover": "rgba(55, 46, 52, 0.60)"
+        "cover": "rgba(55, 46, 52, 0.60)",
+        "code": "rgba(200, 209, 203, 0.25)"
     }
 }
 
@@ -92,6 +93,7 @@ export let lightTheme = {
         "surfaceDisabled": "rgba(30, 26, 29, 0.12)",
         "onSurfaceDisabled": "rgba(30, 26, 29, 0.38)",
         "backdrop": "rgba(55, 46, 52, 0.4)",
-        "cover": "rgba(200, 209, 203, 0.60)"
+        "cover": "rgba(200, 209, 203, 0.60)",
+        "code": "rgba(55, 46, 52, 0.25)"
     }
 }

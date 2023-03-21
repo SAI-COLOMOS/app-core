@@ -202,35 +202,13 @@ export default Users = ({ navigation, route }) => {
     setAreasOptions(areaData)
   }, [placeFilter])
 
-  // useEffect(() => {
-  //   if (users === undefined) {
-  //     getUsers()
-  //   }
-  // }, [users])
-
-  // useEffect(() => {
-  //   if (places === undefined) {
-  //     getPlaces()
-  //   }
-  // }, [places])
-
-  // useEffect(() => {
-  //   if (schools === undefined) {
-  //     getSchools()
-  //   }
-  // }, [schools])
-
   useFocusEffect(
-    useCallback(
-      () => {
-        getUsers()
-        getPlaces()
-        getSchools()
-        return () => {}
-      },
-      [],
-      []
-    )
+    useCallback(() => {
+      getUsers()
+      getPlaces()
+      getSchools()
+      return () => {}
+    }, [])
   )
 
   const Item = useCallback(
@@ -323,13 +301,6 @@ export default Users = ({ navigation, route }) => {
       </VStack>
     )
   }
-
-  useEffect(() => {
-    console.log('---------------------')
-    console.log('Found', isNaN(foundUsers))
-    console.log('Normal', isNaN(users))
-    console.log(Object.keys(areFilters).length === 0, areFilters)
-  }, [foundUsers, users, areFilters])
 
   return (
     <Flex fill pt={headerMargin}>

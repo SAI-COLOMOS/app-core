@@ -147,7 +147,7 @@ export default PlaceDetails = ({ navigation, route }) => {
         {place !== undefined ? (
           place !== null ? (
             isNaN(place) ? (
-              <DisplayDetails icon="pine-tree" title={place?.place_name} children={[place(), Areas()]} />
+              <DisplayDetails icon="pine-tree" title={place?.place_name} children={[Places(), Areas()]} />
             ) : (
               <VStack p={30} center spacing={20}>
                 <Icon color={theme.colors.onBackground} name="alert-circle-outline" size={50} />
