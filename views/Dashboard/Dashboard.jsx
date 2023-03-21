@@ -304,6 +304,8 @@ export default Dashboard = ({ navigation, route }) => {
 
                     {user?.role === 'Administrador' ? <WidgetSmall screen="Events" payload={{ user, token }} child={<Avatar.Icon icon={'bulletin-board'} size={50} />} /> : null}
 
+                    {user?.role === 'Encargado' ? <WidgetSmall screen="Cards" payload={{ user, token }} child={<Avatar.Icon icon={'clock-time-four-outline'} size={50} />} /> : null}
+                    
                     <WidgetSmall screen="Users" payload={{ actualUser: user, token }} child={<Avatar.Icon icon={'account-supervisor-outline'} size={50} />} />
                     
                   </Flex>
