@@ -63,7 +63,7 @@ export default PlaceDetails = ({ navigation, route }) => {
         <Text variant="bodyLarge">Bosque urbano</Text>
         <VStack spacing={10}>
           <Text variant="labelSmall">Domicilio</Text>
-          <Text variant="bodyMedium">{`${places?.street} #${places?.exterior_number}\n${places?.colony}, ${places?.municipality}, ${places?.postal_code}`}</Text>
+          <Text variant="bodyMedium">{`${place?.street} #${place?.exterior_number}\n${place?.colony}, ${place?.municipality}, ${place?.postal_code}`}</Text>
 
           <Flex>
             <Text variant="labelSmall">Referencia</Text>
@@ -147,7 +147,7 @@ export default PlaceDetails = ({ navigation, route }) => {
         {place !== undefined ? (
           place !== null ? (
             isNaN(place) ? (
-              <DisplayDetails icon="pine-tree" title={place?.place_name} children={[place(), Areas()]} />
+              <DisplayDetails icon="pine-tree" title={place?.place_name} children={[Places(), Areas()]} />
             ) : (
               <VStack p={30} center spacing={20}>
                 <Icon color={theme.colors.onBackground} name="alert-circle-outline" size={50} />
