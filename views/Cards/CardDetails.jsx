@@ -19,60 +19,50 @@ export default CardDetails = ({navigation, route}) => {
     const [loading, setLoading] = useState(false)
     const [card, setCard] = useState(undefined)
     const [user, setUser] = useState(undefined)
+    const [activities, setActivities] = useState();
 
     const getCard = async(_) => {
         setLoading(true)
-        const request = await fetch (
-            `${localhost}/cards/${user?.register}`,
-            {
-                method: "GET",
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                    'Cache-Control': 'no-cache'
-                }
-            }
-        ).then(
-            (response) => (response.ok ? response.json() : response.status)
-        ).catch(
-            (_) => null
-        )
+        const request = await fetch (`${localhost}/cards/${user?.register}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+            'Cache-Control': 'no-cache'
+        }
+        })
+        .then((response) => (response.ok ? response.json() : response.status))
+        .catch(() => null)
+
         setLoading(false)
         
-        // console.log(request)
+        // console.log(request.activities)
+        // console.log(activities.hours)
 
-        if(request?.card){
-            setCard(request.card)
+        if (request?.activities){
+            setCard(request.activities)
             console.log("Aqui es")
-        }else{
-            setCard(request)
-            console.log(request)
-            console.log("xd")
-
         }
 
     }
-    const getUser = async(_) => {
+
+    async function getUser() {
         setLoading(true)
-        const request = await fetch (
-            `${localhost}/users/${user?.register}`,
-            {
-                method: "GET",
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                    'Cache-Control': 'no-cache'
-                }
-            }
-        ).then(
-            (response) => (response.ok ? response.json() : response.status)
-        ).catch(
-            (_) => null
-        )
+        const request = await fetch(`${localhost}/users/${register}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+            'Cache-Control': 'no-cache'
+        }
+        })
+        .then((response) => (response.ok ? response.json() : response.status))
+        .catch(() => null)
+
         setLoading(false)
 
-        if(request?.user){
-            setUser(request.user)
+        if (request?.user) {
+        setUser(request.user)
         }
     }
 
@@ -92,10 +82,10 @@ export default CardDetails = ({navigation, route}) => {
     // )
   
     useEffect(() => {
-        if(card === undefined){
+        if(activities === undefined){
             getCard()
         }
-    },[card])
+    },[activities])
 
     useEffect(() => {
         if(user === undefined){
@@ -141,11 +131,11 @@ export default CardDetails = ({navigation, route}) => {
                 <Card mode="outlined" style={{ overflow: 'hidden' }}>
                     <TouchableRipple
                     onPress={() => {
-                        navigation.navigate('EditCard', { token, register })
+                        navigation.navigate('EditCard', { token, register, activities})
                       }}
                     >
-                    <Flex>
-                        <Card.Title title={Name} titleNumberOfLines={2} subtitle={`${Hours} ${Responsible} ${Date}`} subtitleNumberOfLines={3} />
+                    <Flex pt={5} pb={10}>
+                        <Card.Title title={Name} titleNumberOfLines={2} subtitle={`Horas asignadas: ${Hours}  \nRegistro del responsable: ${Responsible} \nFecha ${Date}`} subtitleNumberOfLines={3} />
                     </Flex>
                     </TouchableRipple>
                 </Card>
@@ -196,7 +186,7 @@ export default CardDetails = ({navigation, route}) => {
                 icon="reload"
                 mode="outlined"
                 onPress={(_) => {
-                  setCard(undefined)
+                  setActivities(undefined)
                   getCard()
                 }}
               >
@@ -211,12 +201,8 @@ export default CardDetails = ({navigation, route}) => {
         <Flex fill pt={headerMargin - 20}>
             <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={(_) => getCard()}/>}>
                 <DisplayDetails photo={user?.avatar} icon={"account"} title={`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name == undefined ? '' : user?.second_last_name}`} children={[/*Actividades()*/]}/>
-                {/* <VStack spacing={2}>
-                    <Text variant="labelSmall">Nombre de actividad</Text>
-                    <Text variant="bodyMedium">{card?.activity_name}</Text>
-                </VStack> */}
             </ScrollView>
-                <FlatList data={card} /*ListEmptyComponent={() => (card === undefined ? null : card === null ? <NoConection /> : <EmptyList />)}*/ refreshing={loading} onRefresh={(_) => getCard} renderItem={({item}) => <Item onPress={() => {}} Name={`${item.activity_name}`} Hours={`${item.hours}`} Responsible={`${item.responsible_register}`} Date={`${item.assignation_date}`}/>} />
+                <FlatList data={card} ListEmptyComponent={() => (card === undefined ? null : card === null ? <NoConection /> : <EmptyList />)} refreshing={loading} onRefresh={(_) => getCard} renderItem={({item}) => <Item onPress={() => {}} Name={`${item.activity_name}`} Hours={`${item.hours}`} Responsible={`${item.responsible_register}`} Date={`${item.assignation_date}`}/>} />
                { <FAB
                     icon="plus"
                     style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}

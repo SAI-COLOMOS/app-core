@@ -46,6 +46,24 @@ export default Cards = ({navigation, route}) => {
       }
   }
 
+  const getCard = async (_) => {
+    const request = await fetch (
+      `${localhost}/cards`,{
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          'Cache-Control': 'no-cache'
+        }
+      }
+    ).then((response) => (response.ok ? response.json() : response.status)
+    ).catch((_) => null)
+
+    if(request?.cards){
+      setCards(request.cards)
+    }
+  }
+
   useEffect(() => {
     navigation.setOptions({
       header: (props) => <Header {...props} /*children={[<IconButton icon="filter-outline" onPress={() => setShowFilters(!showFilters)} />, <IconButton icon="magnify" onPress={() => setShowSearch(!showSearch)} />]}*/ />,
@@ -60,6 +78,12 @@ export default Cards = ({navigation, route}) => {
             getUsers()
         }
   }, [users])
+
+//   useEffect(() => {
+//     if (cards === undefined) {
+//         getCard()
+//     }
+// }, [cards])
 
   const Item = useCallback(({ first_name, role, avatar, register }) => {
     return (
@@ -136,6 +160,7 @@ export default Cards = ({navigation, route}) => {
   return (
     <Flex fill pt={headerMargin}>
         <FlatList data={users} ListEmptyComponent={() => (users === undefined ? null : users === null ? <NoConection /> : <EmptyList />)} refreshing={loading} onRefresh={(_) => getUsers()} renderItem={({ item }) => <Item onPress={() => {}} first_name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ''}`} role={`${item.register}`} register={item.register} avatar={item?.avatar} />}/>
+        {/* <FlatList data={cards} ListEmptyComponent={() => (cards === undefined ? null : cards === null ? <NoConection /> : <EmptyList />)} refreshing={loading} onRefresh={(_) => getCard()} renderItem={({ item }) => <Item onPress={() => {}} first_name={`${item.activity_name} ${item.hours}`} role={`${item.responsible_register}`} register={item.assignation_date} />}/> */}
     </Flex>
   )
 }

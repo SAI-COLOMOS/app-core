@@ -8,23 +8,27 @@ import { useCallback, useEffect, useState } from 'react'
 
 
 export default EditCard = ({navigation, route}) => {
-    const { user, token, register } = route.params
+    const { user, token, register, activities, activity_identifier, card} = route.params
     const localhost = Constants.expoConfig.extra.API_LOCAL
     const theme = useTheme()
 
-    const [activity_name, setActivity_name] = useState('')
-    const [hours, setHours] = useState()
-    const [responsible_register, setResponsible_register] = useState('')
-    const [assignation_date, setAssignation_date] = useState('')
+    const [activity_name, setActivity_name] = useState(`${activities?.activity_name ?? ''}`)
+    const [hours, setHours] = useState(`${card?.hours ?? ''}`)
+    const [responsible_register, setResponsible_register] = useState(`${card?.responsible_register ?? ''}`)
+    const [assignation_date, setAssignation_date] = useState(`${card?.assignation_date ?? ''}`)
 
     const [modalSuccess, setModalSuccess] = useState(false)
     const [modalLoading, setModalLoading] = useState(false)
     const [modalError, setModalError] = useState(false)
     const [modalFatal, setModalFatal] = useState(false)
+    const [modalSuccessDelete, setModalSuccessDelete] = useState(false)
+    const [modalErrorDelete, setModalErrorDelete] = useState(false)
+    const [responseCode, setResponseCode] = useState('')
+
 
     async function UpdateCard() {
         const request = await fetch (
-            `${localhost}/cards/${user?.register}/${card?.activity_identifier}`,
+            `${localhost}/cards/${register}/activity/${activity_name}`,
             {
                 method: "PATCH",
                 headers: {
@@ -45,6 +49,15 @@ export default EditCard = ({navigation, route}) => {
             (_) => null
         )
 
+        if(request == 200){
+            setModalSuccess(true)
+        }else if (request != null) {
+            setResponseCode(request)
+            setModalError(true)
+          } else {
+            setModalFatal(true)
+          }
+        
 
     }
     
@@ -55,7 +68,7 @@ export default EditCard = ({navigation, route}) => {
                 <VStack spacing={10}>
                     <TextInput mode="outlined" value={activity_name} onChangeText={setActivity_name} label="Nombre de actividad" maxLength={50} autoComplete="off" autoCorrect={false} />
                     <TextInput mode="outlined" value={hours} onChangeText={setHours} label="Horas a asignar" keyboardType="numeric" maxLength={3} autoComplete="off" autoCorrect={false} />
-                    <TextInput mode="outlined" value={responsible_register} onChangeText={setResponsible_register} label="Registro del responsable" maxLength={12} autoComplete="off" autoCorrect={false} />
+                    <TextInput mode="outlined" value={responsible_register} onChangeText={setResponsible_register} label="Registro del responsable" autoCapitalize="characters" maxLength={12} autoComplete="off" autoCorrect={false} />
                     <TextInput mode="outlined" value={assignation_date} onChangeText={setAssignation_date} label="Fecha de asignación" autoComplete="off" autoCorrect={false} />
                 </VStack>
             </VStack>
@@ -92,7 +105,17 @@ export default EditCard = ({navigation, route}) => {
 
     return (
         <Flex fill>
-            <CreateForm navigation={navigation} title={'Añadir actividad'} children={[Actividades()]} actions={[Update(), Cancel()]}/>
+            <CreateForm navigation={navigation} title={'Editar actividad'} children={[Actividades()]} actions={[Update(), Cancel()]}/>
+
+            <ModalMessage title="¡Listo!" description="La actividad ha sido actualizada" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline" />
+
+            <ModalMessage title="¡Listo!" description="La actividad ha sido eliminada" handler={[modalSuccessDelete, () => setModalSuccessDelete(!modalSuccessDelete)]} actions={[['Aceptar', () => navigation.pop(2)]]} dismissable={false} icon="check-circle-outline" />
+
+            <ModalMessage title="Ocurrió un problema" description={`No pudimos actualizar la actividad, intentalo más tarde. (${responseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline" />
+
+            <ModalMessage title="Ocurrió un problema" description={`No pudimos eliminar la actividad, intentalo más tarde. (${responseCode})`} handler={[modalErrorDelete, () => setModalErrorDelete(!modalErrorDelete)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline" />
+
+            <ModalMessage title="Sin conexión a internet" description={`Parece que no tienes conexión a internet, conectate e intenta de nuevo`} handler={[modalFatal, () => setModalFatal(!modalFatal)]} actions={[['Aceptar']]} dismissable={true} icon="wifi-alert" />
 
         </Flex>
     )

@@ -128,10 +128,12 @@ export default Dashboard = ({ navigation, route }) => {
               <Item screen="Profile" payload={{ actualUser: actualUser, token: actualToken }} icon="account-outline" title="Tu perfil" />
 
               {actualUser?.role == 'Administrador' || actualUser?.role == 'Encargado' ? <Item screen="Users" payload={{ actualUser: actualUser, token: actualToken }} icon="account-supervisor-outline" title="Usuarios" /> : null}
-
+              
               {actualUser?.role == 'Administrador' ? <Item screen="PlacesAndAreas" payload={{ actualUser: actualUser, token: actualToken }} icon="map-marker-radius-outline" title="Lugares y áreas" /> : null}
 
               {actualUser?.role == 'Administrador' ? <Item screen="Schools" payload={{ user: actualUser, token: actualToken }} icon="town-hall" title="Escuelas" /> : null}
+              
+              {actualUser?.role == 'Administrador' || actualUser?.role == 'Encargado' ? <Item screen="Cards" payload={{ actualUser: actualUser, token: actualToken }} icon="clock-time-four-outline" title="Horas" /> : null}
             </Flex>
           </Flex>
         </VStack>
