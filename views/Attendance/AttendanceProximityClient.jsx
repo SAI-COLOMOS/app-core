@@ -4,7 +4,7 @@ import { KeyboardAvoidingView, Pressable, ScrollView, StatusBar } from 'react-na
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Avatar, Button, IconButton, Text, useTheme } from 'react-native-paper'
 import Animated, { useSharedValue, Easing, useAnimatedStyle, withTiming, withSpring, withRepeat, withSequence } from 'react-native-reanimated'
-import { BleManager } from "react-native-ble-plx";
+//import { BleManager } from "react-native-ble-plx";
 
 export default AttendanceProximityClient = ({ navigation, route }) => {
   const theme = useTheme()
