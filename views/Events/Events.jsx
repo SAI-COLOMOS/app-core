@@ -22,6 +22,10 @@ export default Events = ({ navigation, route }) => {
   const [belonging_place, setBelonging_place] = useState(undefined)
   const [events, setEvents] = useState(undefined)
 
+  const [filter, setFilter] = useState(undefined)
+  const [items, setItem] = useState(undefined)
+  const [page, setPage] = useState(undefined)
+
   const [loading, setLoading] = useState(false)
   const [showSearch, setShowSearch] = useState(null)
   const [search, setSearch] = useState('')
@@ -30,7 +34,7 @@ export default Events = ({ navigation, route }) => {
   async function getEvents() {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/agenda`, {
+    const request = await fetch(`${localhost}/agenda`,{
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -79,6 +83,7 @@ export default Events = ({ navigation, route }) => {
     }
   }
 
+
   useEffect(() => {
     navigation.setOptions({
       header: (props) => <Header {...props} children={[<IconButton icon="magnify" onPress={() => setShowSearch(!showSearch)} />]} />,
@@ -87,6 +92,7 @@ export default Events = ({ navigation, route }) => {
     })
   }, [showSearch])
 
+
   useFocusEffect(
     useCallback(() => {
       getEvents()
@@ -94,7 +100,7 @@ export default Events = ({ navigation, route }) => {
     }, [])
   )
 
-  const Item = ({ place, belonging_area, belonging_place }) => {
+  const Item = ({ name, description, event_identifier }) => {
     return (
       <Flex key={`ID-${event_identifier}`} ph={20} pv={5} onPress={() => {}}>
         <Card mode="outlined" style={{ overflow: 'hidden' }}>
@@ -104,13 +110,14 @@ export default Events = ({ navigation, route }) => {
             }}
           >
             <Flex p={10}>
-              <Card.Title title={place} titleNumberOfLines={2} subtitle={belonging_area} subtitleNumberOfLines={1} left={(props) => <Avatar.Icon {...props} icon="bulletin-board" />} />
+              <Card.Title title={name} titleNumberOfLines={2} subtitle={description} subtitleNumberOfLines={1} left={(props) => <Avatar.Icon {...props} icon="bulletin-board" />} />
             </Flex>
           </TouchableRipple>
         </Card>
       </Flex>
     )
   }
+
 
   return (
     <Flex fill pt={headerMargin}>
@@ -141,7 +148,7 @@ export default Events = ({ navigation, route }) => {
                 }
                 refreshing={loading}
                 onRefresh={() => getEvents()}
-                renderItem={({ item }) => <Item place={item.place} belonging_area={item.belonging_area} belonging_place={item.belonging_place} />}
+                renderItem={({ item }) => <Item name={item.name} description={item.description} event_identifier={item.event_identifier} />}
               />
 
               <FAB

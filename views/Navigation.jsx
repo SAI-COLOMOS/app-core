@@ -78,7 +78,7 @@ export default Navigation = () => {
 
       <Stack.Group navigationKey="events" screenOptions={{ headerShown: true, animationTypeForReplace: 'push', animation: 'fade_from_bottom' }}>
       <Stack.Screen name="Events" component={Events} />
-      <Stack.Screen name="EventDetails" component={EventDetails} />
+      <Stack.Screen name="EventDetails" component={AddEvent} />
       <Stack.Screen name="AddEvent" component={AddEvent} options={{ headerShown: false, presentation: 'containedTransparentModal' }} />
       </Stack.Group>
 

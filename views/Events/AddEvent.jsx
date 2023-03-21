@@ -12,7 +12,7 @@ export default AddEvent = ({ navigation, route }) => {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [offered_hours, setOfered_hours] = useState('')
-  const [penalty_hours, setPenalty_hours] = useState('')
+  const [tolerance, setTolerance] = useState('')
   const [vacancy, setVacancy] = useState('')
   const [starting_date, setStarting_date] = useState('')
   const [ending_date, setEnding_date] = useState('')
@@ -42,9 +42,9 @@ export default AddEvent = ({ navigation, route }) => {
       body: JSON.stringify({
         name: name.trim(),
         description: description.trim(),
-        offered_hours: offered_hours.trim(),
-        penalty_hours: penalty_hours.trim(),
-        vacancy: vacancy.trim(),
+        offered_hours: Number(offered_hours.trim()),
+        tolerance: Number(tolerance.trim()),
+        vacancy: Number(vacancy.trim()),
         starting_date: starting_date.trim(),
         ending_date: ending_date.trim(),
         author_register: author_register.trim(),
@@ -54,8 +54,11 @@ export default AddEvent = ({ navigation, route }) => {
         belonging_place: belonging_place.trim()
       })
     })
-      .then((response) => response.status)
-      .catch(() => null)
+     //  .then((response) => response.status)
+       //.catch(() => null)
+
+      const json = await request.json()
+      console.log(json)
 
     setModalLoading(false)
 
@@ -75,7 +78,7 @@ export default AddEvent = ({ navigation, route }) => {
     name.length > 0 ? null : (check = false)
     description.length > 0 ? null : (check = false)
     offered_hours.length > 0 ? null : (check = false)
-    penalty_hours.length > 0 ? null : (check = false)
+    tolerance.length > 0 ? null : (check = false)
     vacancy.length > 0 ? null : (check = false)
     starting_date.length > 0 ? null : (check = false)
     ending_date.length > 0 ? null : (check = false)
@@ -90,7 +93,7 @@ export default AddEvent = ({ navigation, route }) => {
     } else {
       setVerified(false)
     }
-  }, [name, description, offered_hours, penalty_hours, vacancy, starting_date, ending_date, author_register, publishing_date, place, belonging_area, belonging_place])
+  }, [name, description, offered_hours, tolerance, vacancy, starting_date, ending_date, author_register, publishing_date, place, belonging_area, belonging_place])
   
   const Data = () => {
     return (
@@ -100,7 +103,7 @@ export default AddEvent = ({ navigation, route }) => {
           <TextInput mode="outlined" value={name} onChangeText={setName} autoCapitalize="words" label="Nombre del evento" maxLength={50} />
           <TextInput mode="outlined" value={description} onChangeText={setDescription} label="Descripción del evento" maxLength={250} />
           <TextInput mode="outlined" value={offered_hours} onChangeText={setOfered_hours} label="Número de horas ofertadas" maxLength={3} keyboardType="number-pad" autoComplete="off" />
-          <TextInput mode="outlined" value={penalty_hours} onChangeText={setPenalty_hours} label="Número de horas removidas" maxLength={3} keyboardType="number-pad" autoComplete="off" />
+          <TextInput mode="outlined" value={tolerance} onChangeText={setTolerance} label="Minutos de tolerancia" maxLength={3} keyboardType="number-pad" autoComplete="off" />
           <TextInput mode="outlined" value={vacancy} onChangeText={setVacancy} label="Número de vacantes" maxLength={3} keyboardType="number-pad" autoComplete="off" />
           <TextInput mode="outlined" value={starting_date} onChangeText={setStarting_date} label="Fecha de inicio" maxLength={10} keyboardType="number-pad" autoComplete="off"/>
           <TextInput mode="outlined" value={ending_date} onChangeText={setEnding_date} label="Fecha de termino" maxLength={10} keyboardType="number-pad" autoComplete="off"/>

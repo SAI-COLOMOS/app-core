@@ -21,7 +21,7 @@ export default EventDetails = ({ navigation, route }) => {
   async function getEvent() {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/users/${event_identifier}`, {
+    const request = await fetch(`${localhost}/agenda`,{
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
