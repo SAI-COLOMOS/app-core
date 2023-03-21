@@ -235,7 +235,7 @@ export default Dashboard = ({ navigation, route }) => {
                       <Card mode="outlined">
                         <TouchableRipple
                           onPress={() => {
-                            navigation.navigate('AttendanceDetails', { actualUser: user, token: token })
+                            navigation.navigate('ShowAttendanceCode', { register: user?.register, avatar: user?.avatar })
                           }}
                         >
                           <VStack ph={20} pv={10} h={175} spacing={10}>
