@@ -189,7 +189,7 @@ export default Dashboard = ({ navigation, route }) => {
   return (
     <Flex fill pt={insets.top}>
       {user !== undefined && user !== null && feed !== undefined && feed !== null ? (
-        <Flex w={'100%'} h={'35%'} style={{ backgroundColor: '#ff0099', position: 'absolute' }}>
+        <Flex w={'100%'} h={250 + insets.top} style={{ backgroundColor: '#ff0099', position: 'absolute' }}>
           {
             {
               0: <Image source={require('../../assets/images/cover/1.jpg')} style={{ width: '100%', height: '100%' }} />,
@@ -206,8 +206,8 @@ export default Dashboard = ({ navigation, route }) => {
 
       <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={() => fetchData()} />}>
         {user !== undefined && user !== null && feed !== undefined && feed !== null ? (
-          <VStack pb={50} spacing={50}>
-            <VStack items="center" pt={50}>
+          <VStack pb={50}>
+            <VStack h={200} center>
               <Text variant="headlineLarge" style={{ color: theme.colors.primary }}>
                 {greeting}
               </Text>
@@ -227,7 +227,9 @@ export default Dashboard = ({ navigation, route }) => {
               </Flex>
 
               <VStack pb={50} spacing={20}>
+                {/* Sección común */}
                 <Flex direction="row" wrap="wrap" ph={10}>
+                  {/* Widget de evento */}
                   <Flex w={'100%'} p={10}>
                     <VStack spacing={10}>
                       <Card mode="outlined">
@@ -261,6 +263,7 @@ export default Dashboard = ({ navigation, route }) => {
                     </VStack>
                   </Flex>
 
+                  {/* Widget de progreso */}
                   {user?.role === 'Prestador' ? (
                     <WidgetMedium
                       screen="Profile"
@@ -284,20 +287,24 @@ export default Dashboard = ({ navigation, route }) => {
                     />
                   ) : null}
 
+                  {/* Widget de perfil */}
                   <WidgetMedium screen="Profile" payload={{ user, token }} child={user?.avatar ? <Avatar.Image source={{ uri: `data:image/png;base64,${user.avatar}` }} size={100} /> : <Avatar.Icon icon="account-circle-outline" size={100} />} title="Tu perfil" />
                 </Flex>
 
-                <Flex direction="row" wrap="wrap" ph={10}>
-                  <Flex w={'100%'} ph={10}>
-                    <Text variant="bodyLarge">Herramientas del administrador</Text>
+                {/* Sección de herramientas del administrador */}
+                {user?.role === 'Administrador' || user?.role === 'Encargado' ? (
+                  <Flex direction="row" wrap="wrap" ph={10}>
+                    <Flex w={'100%'} ph={10}>
+                      <Text variant="bodyLarge">Herramientas del {user?.role}</Text>
+                    </Flex>
+
+                    {user?.role === 'Administrador' ? <WidgetSmall screen="PlacesAndAreas" payload={{ user, token }} child={<Avatar.Icon icon={'map-marker-radius-outline'} size={50} />} /> : null}
+
+                    {user?.role === 'Administrador' ? <WidgetSmall screen="Schools" payload={{ user, token }} child={<Avatar.Icon icon={'town-hall'} size={50} />} /> : null}
+
+                    <WidgetSmall screen="Users" payload={{ actualUser: user, token }} child={<Avatar.Icon icon={'account-supervisor-outline'} size={50} />} />
                   </Flex>
-
-                  <WidgetSmall screen="Users" payload={{ actualUser: user, token }} child={<Avatar.Icon icon={'account-supervisor-outline'} size={50} />} />
-
-                  <WidgetSmall screen="PlacesAndAreas" payload={{ actualUser: user, token }} child={<Avatar.Icon icon={'map-marker-radius-outline'} size={50} />} />
-
-                  <WidgetSmall screen="Schools" payload={{ user, token }} child={<Avatar.Icon icon={'town-hall'} size={50} />} />
-                </Flex>
+                ) : null}
               </VStack>
             </Flex>
           </VStack>

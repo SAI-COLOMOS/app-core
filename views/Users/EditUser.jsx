@@ -224,6 +224,7 @@ export default EditUser = ({ navigation, route }) => {
   }, [first_name, first_last_name, age, blood_type, email, phone, emergency_contact, emergency_phone, provider_type, place, assigned_area, school, role, status, total_hours, curp])
 
   useEffect(() => {
+    console.log(user)
     if (role != 'Prestador') {
       setProvider_type('')
       setSchool('')
@@ -231,7 +232,6 @@ export default EditUser = ({ navigation, route }) => {
     } else {
       setProvider_type(user?.provider_type)
       setSchool(user?.school)
-      setTotal_hours(user?.total_hours)
     }
   }, [role])
 
