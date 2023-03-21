@@ -92,7 +92,7 @@ export default PlaceAndAreas = ({ navigation, route }) => {
 
   const Item = ({ place_name, place_address, place_identifier }) => {
     return (
-      <Flex ph={20} pv={5} onPress={() => {}}>
+      <Flex key={`ID-${place_identifier}`} ph={20} pv={5} onPress={() => {}}>
         <Card mode="outlined" style={{ overflow: 'hidden' }}>
           <TouchableRipple
             onPress={() => {
@@ -128,7 +128,7 @@ export default PlaceAndAreas = ({ navigation, route }) => {
                       buttonTitle="Agregar"
                       action={() => {
                         navigation.navigate('AddPlace', {
-                          actualUser,
+                          user,
                           token
                         })
                       }}
@@ -145,7 +145,7 @@ export default PlaceAndAreas = ({ navigation, route }) => {
                 style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
                 onPress={() => {
                   navigation.navigate('AddPlace', {
-                    actualUser,
+                    user,
                     token
                   })
                 }}
