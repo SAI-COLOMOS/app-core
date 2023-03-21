@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Image, RefreshControl, ScrollView, useWindowDimensions } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useFocusEffect } from '@react-navigation/native'
-import CircularProgress from 'react-native-circular-progress-indicator'
+//import CircularProgress from 'react-native-circular-progress-indicator'
 import Constants from 'expo-constants'
 import Animated from 'react-native-reanimated'
 import InformationMessage from '../Shared/InformationMessage'
@@ -302,7 +302,10 @@ export default Dashboard = ({ navigation, route }) => {
 
                     {user?.role === 'Administrador' ? <WidgetSmall screen="Schools" payload={{ user, token }} child={<Avatar.Icon icon={'town-hall'} size={50} />} /> : null}
 
+                    {user?.role === 'Administrador' ? <WidgetSmall screen="Events" payload={{ user, token }} child={<Avatar.Icon icon={'bulletin-board'} size={50} />} /> : null}
+
                     <WidgetSmall screen="Users" payload={{ actualUser: user, token }} child={<Avatar.Icon icon={'account-supervisor-outline'} size={50} />} />
+                    
                   </Flex>
                 ) : null}
               </VStack>
