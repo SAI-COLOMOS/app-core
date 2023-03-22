@@ -1,6 +1,6 @@
 import { Flex, VStack } from '@react-native-material/core'
 import { useState, useEffect, useCallback } from 'react'
-import { Button, IconButton, Text, TextInput, useTheme } from 'react-native-paper'
+import { Button, Card, IconButton, Text, TextInput, useTheme } from 'react-native-paper'
 import { useHeaderHeight } from '@react-navigation/elements'
 import Header from '../Shared/Header'
 import * as SecureStore from 'expo-secure-store'
@@ -19,30 +19,27 @@ export default Profile = ({ navigation, route }) => {
 
   useEffect(() => {
     navigation.setOptions({
-      header: (props) => <Header {...props} children={[Logout()]} />,
+      header: (props) => <Header {...props} children={[<Logout key="Logout"/>]} />,
       headerTransparent: true,
       headerTitle: 'Tu perfil'
     })
   }, [])
 
-  const Logout = () => {
-    return (
-      <IconButton
-        key="logout"
-        icon="logout"
-        onPress={async (_) => {
-          await SecureStore.deleteItemAsync('token')
-          await SecureStore.deleteItemAsync('user')
-          await SecureStore.deleteItemAsync('keepAlive')
-          navigation.popToTop()
-          navigation.replace('Login')
-        }}
-      />
-    )
-  }
+  const Logout = () => (
+    <IconButton
+      icon="logout"
+      onPress={async (_) => {
+        await SecureStore.deleteItemAsync('token')
+        await SecureStore.deleteItemAsync('user')
+        await SecureStore.deleteItemAsync('keepAlive')
+        navigation.popToTop()
+        navigation.replace('Login')
+      }}
+    />
+  )
 
-  const PersonalData = () => {
-    return (
+  const PersonalData = () => (
+    <Card mode="outlined">
       <VStack p={20} spacing={5}>
         <Text variant="bodyLarge">Datos personales</Text>
         <VStack spacing={10}>
@@ -69,11 +66,11 @@ export default Profile = ({ navigation, route }) => {
           ) : null}
         </VStack>
       </VStack>
-    )
-  }
+    </Card>
+  )
 
-  const ContactData = () => {
-    return (
+  const ContactData = () => (
+    <Card mode="outlined">
       <VStack p={20} spacing={5}>
         <Text variant="bodyLarge">Datos de contacto</Text>
         <VStack spacing={10}>
@@ -88,11 +85,11 @@ export default Profile = ({ navigation, route }) => {
           </Flex>
         </VStack>
       </VStack>
-    )
-  }
+    </Card>
+  )
 
-  const EmergencyData = () => {
-    return (
+  const EmergencyData = () => (
+    <Card mode="outlined">
       <VStack p={20} spacing={5}>
         <Text variant="bodyLarge">Datos de emergencia</Text>
         <VStack spacing={10}>
@@ -107,11 +104,11 @@ export default Profile = ({ navigation, route }) => {
           </Flex>
         </VStack>
       </VStack>
-    )
-  }
+    </Card>
+  )
 
-  const AccountData = () => {
-    return (
+  const AccountData = () => (
+    <Card mode="outlined">
       <VStack p={20} spacing={5}>
         <Text variant="bodyLarge">Datos de la cuenta</Text>
         <VStack spacing={10}>
@@ -148,26 +145,24 @@ export default Profile = ({ navigation, route }) => {
           </Flex>
         </VStack>
       </VStack>
-    )
-  }
+    </Card>
+  )
 
-  const UpdatePassword = () => {
-    return (
-      <Button
-        icon="form-textbox-password"
-        onPress={() => {
-          navigation.navigate('UpdatePassword', { token, register: user?.register })
-        }}
-      >
-        Actualizar contraseña
-      </Button>
-    )
-  }
+  const UpdatePassword = () => (
+    <Button
+      icon="form-textbox-password"
+      onPress={() => {
+        navigation.navigate('UpdatePassword', { token, register: user?.register })
+      }}
+    >
+      Actualizar contraseña
+    </Button>
+  )
 
   return (
     <Flex fill mt={headerMargin - 20}>
       <ScrollView>
-        <DisplayDetails icon="account-circle-outline" photo={user?.avatar} title={`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name ?? ''}`} children={[PersonalData(), ContactData(), EmergencyData(), AccountData()]} actions={[UpdatePassword()]} />
+        <DisplayDetails icon="account-circle-outline" photo={user?.avatar} title={`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name ?? ''}`} children={[<PersonalData key="Personal"/>, <ContactData key="Contact" />, <EmergencyData key="Emergency" />, <AccountData key="Account" />]} actions={[<UpdatePassword key="UpdatePassword" />]} />
       </ScrollView>
     </Flex>
   )

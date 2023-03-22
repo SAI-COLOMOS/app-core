@@ -79,58 +79,52 @@ export default AddPlace = ({ navigation, route }) => {
     }
   }, [place_name, street, exterior_number, colony, municipality, postal_code, phone])
 
-  const Data = () => {
-    return (
-      <VStack spacing={5}>
-        <Text variant="labelLarge">Datos del bosque urbano</Text>
-        <VStack spacing={10}>
-          <TextInput mode="outlined" value={place_name} onChangeText={setPlace_name} autoCapitalize="words" label="Nombre del bosque urbano" maxLength={50} />
-          <TextInput mode="outlined" value={street} onChangeText={setStreet} label="Nombre de la calle" maxLength={50} />
-          <TextInput mode="outlined" value={exterior_number} onChangeText={setExterior_number} label="Número del domicilio" maxLength={50} keyboardType="number-pad" autoComplete="off" />
-          <TextInput mode="outlined" value={colony} onChangeText={setColony} autoCapitalize="words" label="Nombre de la colonia" maxLength={50} />
-          <TextInput mode="outlined" value={municipality} onChangeText={setMunicipality} autoCapitalize="words" label="Nombre del municipio" maxLength={50} />
-          <TextInput mode="outlined" value={postal_code} onChangeText={setPostal_code} label="Código postal" maxLength={5} keyboardType="number-pad" autoComplete="off" />
-          <TextInput mode="outlined" value={phone} onChangeText={setPhone} label="Número telefónico" maxLength={10} keyboardType="phone-pad" autoComplete="off" />
-          <TextInput mode="outlined" value={reference} onChangeText={setReference} label="Referencia del lugar" maxLength={250} />
-        </VStack>
+  const Data = () => (
+    <VStack spacing={5}>
+      <Text variant="labelLarge">Datos del bosque urbano</Text>
+      <VStack spacing={10}>
+        <TextInput mode="outlined" value={place_name} onChangeText={setPlace_name} autoCapitalize="words" label="Nombre del bosque urbano" maxLength={50} />
+        <TextInput mode="outlined" value={street} onChangeText={setStreet} label="Nombre de la calle" maxLength={50} />
+        <TextInput mode="outlined" value={exterior_number} onChangeText={setExterior_number} label="Número del domicilio" maxLength={50} keyboardType="number-pad" autoComplete="off" />
+        <TextInput mode="outlined" value={colony} onChangeText={setColony} autoCapitalize="words" label="Nombre de la colonia" maxLength={50} />
+        <TextInput mode="outlined" value={municipality} onChangeText={setMunicipality} autoCapitalize="words" label="Nombre del municipio" maxLength={50} />
+        <TextInput mode="outlined" value={postal_code} onChangeText={setPostal_code} label="Código postal" maxLength={5} keyboardType="number-pad" autoComplete="off" />
+        <TextInput mode="outlined" value={phone} onChangeText={setPhone} label="Número telefónico" maxLength={10} keyboardType="phone-pad" autoComplete="off" />
+        <TextInput mode="outlined" value={reference} onChangeText={setReference} label="Referencia del lugar" maxLength={250} />
       </VStack>
-    )
-  }
+    </VStack>
+  )
 
-  const Save = () => {
-    return (
-      <Button
-        icon="content-save-outline"
-        disabled={modalLoading || !verified}
-        loading={modalLoading}
-        mode="contained"
-        onPress={() => {
-          savePlace()
-        }}
-      >
-        Guardar
-      </Button>
-    )
-  }
+  const Save = () => (
+    <Button
+      icon="content-save-outline"
+      disabled={modalLoading || !verified}
+      loading={modalLoading}
+      mode="contained"
+      onPress={() => {
+        savePlace()
+      }}
+    >
+      Guardar
+    </Button>
+  )
 
-  const Cancel = () => {
-    return (
-      <Button
-        icon="close"
-        disabled={modalLoading}
-        mode="outlined"
-        onPress={() => {
-          navigation.pop()
-        }}
-      >
-        Cancelar
-      </Button>
-    )
-  }
+  const Cancel = () => (
+    <Button
+      icon="close"
+      disabled={modalLoading}
+      mode="outlined"
+      onPress={() => {
+        navigation.pop()
+      }}
+    >
+      Cancelar
+    </Button>
+  )
 
   return (
     <Flex fill>
-      <CreateForm title="Añadir nuevo bosque urbano" children={[Data()]} actions={[Save(), Cancel()]} navigation={navigation} loading={modalLoading} />
+      <CreateForm title="Añadir nuevo bosque urbano" children={[<Data key="Data" />]} actions={[<Save key="Save" />, <Cancel key="Cancel" />]} navigation={navigation} loading={modalLoading} />
 
       <ModalMessage title="¡Listo!" description="El bosque urbano ha sido añadido exitosamente" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline" />
 

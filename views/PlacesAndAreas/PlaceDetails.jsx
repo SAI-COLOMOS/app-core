@@ -57,8 +57,8 @@ export default PlaceDetails = ({ navigation, route }) => {
     }, [])
   )
 
-  const Places = () => {
-    return (
+  const Places = () => (
+    <Card mode="outlined">
       <VStack p={20} spacing={5}>
         <Text variant="bodyLarge">Bosque urbano</Text>
         <VStack spacing={10}>
@@ -76,55 +76,56 @@ export default PlaceDetails = ({ navigation, route }) => {
           </Flex>
         </VStack>
       </VStack>
-    )
-  }
+    </Card>
+  )
 
-  const Areas = () => {
-    return (
-      <VStack p={20} spacing={5}>
+  const Areas = () => (
+    <Flex>
+      <Flex p={20}>
         <Text variant="bodyLarge">Áreas</Text>
-        <VStack spacing={10}>
-          {place.place_areas.length > 0 ? (
-            place.place_areas.map((area) => (
-              <Card mode="outlined" key={area.area_name}>
-                <VStack spacing={10} p={20}>
-                  <VStack fill spacing={10}>
-                    <Flex>
-                      <Text variant="labelSmall">Nombre del área</Text>
-                      <Text variant="bodyMedium">{area?.area_name}</Text>
-                    </Flex>
-                    <Flex>
-                      <Text variant="labelSmall">Teléfono de contacto</Text>
-                      <Text variant="bodyMedium">{area?.phone}</Text>
-                    </Flex>
-                  </VStack>
-                  <Button
-                    icon="pencil-outline"
-                    onPress={() => {
-                      navigation.navigate('EditArea', {
-                        token,
-                        area,
-                        place_identifier
-                      })
-                    }}
-                  >
-                    Editar área
-                  </Button>
+      </Flex>
+
+      <VStack spacing={10}>
+        {place.place_areas.length > 0 ? (
+          place.place_areas.map((area) => (
+            <Card mode="outlined" key={area.area_name}>
+              <VStack spacing={10} p={20}>
+                <VStack fill spacing={10}>
+                  <Flex>
+                    <Text variant="labelSmall">Nombre del área</Text>
+                    <Text variant="bodyMedium">{area?.area_name}</Text>
+                  </Flex>
+                  <Flex>
+                    <Text variant="labelSmall">Teléfono de contacto</Text>
+                    <Text variant="bodyMedium">{area?.phone}</Text>
+                  </Flex>
                 </VStack>
-              </Card>
-            ))
-          ) : (
-            <VStack center spacing={20} p={30}>
-              <Icon name="pencil-plus-outline" color={theme.colors.onBackground} size={50} />
-              <VStack center>
-                <Text variant="headlineSmall">Sin áreas</Text>
-                <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
-                  No hay ningún área registrada, ¿qué te parece si hacemos el primero?
-                </Text>
+                <Button
+                  icon="pencil-outline"
+                  onPress={() => {
+                    navigation.navigate('EditArea', {
+                      token,
+                      area,
+                      place_identifier
+                    })
+                  }}
+                >
+                  Editar área
+                </Button>
               </VStack>
+            </Card>
+          ))
+        ) : (
+          <VStack center spacing={20} p={30}>
+            <Icon name="pencil-plus-outline" color={theme.colors.onBackground} size={50} />
+            <VStack center>
+              <Text variant="headlineSmall">Sin áreas</Text>
+              <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
+                No hay ningún área registrada, ¿qué te parece si hacemos el primero?
+              </Text>
             </VStack>
-          )}
-        </VStack>
+          </VStack>
+        )}
         <Button
           icon="plus"
           onPress={() => {
@@ -138,8 +139,8 @@ export default PlaceDetails = ({ navigation, route }) => {
           Agregar área
         </Button>
       </VStack>
-    )
-  }
+    </Flex>
+  )
 
   return (
     <Flex fill pt={headerMargin - 20}>
@@ -147,7 +148,7 @@ export default PlaceDetails = ({ navigation, route }) => {
         {place !== undefined ? (
           place !== null ? (
             isNaN(place) ? (
-              <DisplayDetails icon="pine-tree" title={place?.place_name} children={[Places(), Areas()]} />
+              <DisplayDetails icon="pine-tree" title={place?.place_name} children={[<Places key="Places" />, <Areas key="Areas" />]} />
             ) : (
               <VStack p={30} center spacing={20}>
                 <Icon color={theme.colors.onBackground} name="alert-circle-outline" size={50} />

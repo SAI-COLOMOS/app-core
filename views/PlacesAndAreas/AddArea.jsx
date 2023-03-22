@@ -62,52 +62,46 @@ export default AddArea = ({ navigation, route }) => {
     }
   }, [area_name, phone])
 
-  const Data = () => {
-    return (
-      <VStack spacing={5}>
-        <Text variant="labelLarge">Datos del área</Text>
-        <VStack spacing={10}>
-          <TextInput mode="outlined" value={area_name} onChangeText={setArea_name} label="Nombre del área" maxLength={50} autoCapitalize="words" autoComplete="off" />
-          <TextInput mode="outlined" value={phone} onChangeText={setPhone} label="Número telefónico" maxLength={10} keyboardType="phone-pad" autoComplete="off" />
-        </VStack>
+  const Data = () => (
+    <VStack spacing={5}>
+      <Text variant="labelLarge">Datos del área</Text>
+      <VStack spacing={10}>
+        <TextInput mode="outlined" value={area_name} onChangeText={setArea_name} label="Nombre del área" maxLength={50} autoCapitalize="words" autoComplete="off" />
+        <TextInput mode="outlined" value={phone} onChangeText={setPhone} label="Número telefónico" maxLength={10} keyboardType="phone-pad" autoComplete="off" />
       </VStack>
-    )
-  }
+    </VStack>
+  )
 
-  const Save = () => {
-    return (
-      <Button
-        icon="content-save-outline"
-        disabled={modalLoading || !verified}
-        loading={modalLoading}
-        mode="contained"
-        onPress={() => {
-          saveArea()
-        }}
-      >
-        Guardar
-      </Button>
-    )
-  }
+  const Save = () => (
+    <Button
+      icon="content-save-outline"
+      disabled={modalLoading || !verified}
+      loading={modalLoading}
+      mode="contained"
+      onPress={() => {
+        saveArea()
+      }}
+    >
+      Guardar
+    </Button>
+  )
 
-  const Cancel = () => {
-    return (
-      <Button
-        icon="close"
-        disabled={modalLoading}
-        mode="outlined"
-        onPress={() => {
-          navigation.pop()
-        }}
-      >
-        Cancelar
-      </Button>
-    )
-  }
+  const Cancel = () => (
+    <Button
+      icon="close"
+      disabled={modalLoading}
+      mode="outlined"
+      onPress={() => {
+        navigation.pop()
+      }}
+    >
+      Cancelar
+    </Button>
+  )
 
   return (
     <Flex fill>
-      <CreateForm title="Añadir nueva área" children={[Data()]} actions={[Save(), Cancel()]} navigation={navigation} loading={modalLoading} />
+      <CreateForm title="Añadir nueva área" children={[<Data key="Data"/>]} actions={[<Save key="Save"/>, <Cancel key="Cancel"/>]} navigation={navigation} loading={modalLoading} />
 
       <ModalMessage title="¡Listo!" description="El área ha sido añadida exitosamente" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline" />
 
