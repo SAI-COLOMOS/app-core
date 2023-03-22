@@ -150,7 +150,7 @@ export default Dashboard = ({ navigation, route }) => {
   const WidgetSmall = useCallback(({ screen, payload, child }) => {
     return (
       <Flex w={'25%'} p={10}>
-        <Card mode="outlined">
+        <Card mode="outlined" style={{ overflow: 'hidden' }}>
           <TouchableRipple
             onPress={() => {
               navigation.navigate(screen, { ...payload })
@@ -168,7 +168,7 @@ export default Dashboard = ({ navigation, route }) => {
   const WidgetMedium = useCallback(({ screen, payload, child, title }) => {
     return (
       <Flex w={'50%'} p={10}>
-        <Card mode="outlined">
+        <Card mode="outlined" style={{ overflow: 'hidden' }}>
           <TouchableRipple
             onPress={() => {
               navigation.navigate(screen, { ...payload })
@@ -187,7 +187,7 @@ export default Dashboard = ({ navigation, route }) => {
   }, [])
 
   return (
-    <Flex fill pt={insets.top}>
+    <Flex fill>
       {user !== undefined && user !== null && feed !== undefined && feed !== null ? (
         <Flex w={'100%'} h={250 + insets.top} style={{ backgroundColor: '#ff0099', position: 'absolute' }}>
           {
@@ -204,7 +204,8 @@ export default Dashboard = ({ navigation, route }) => {
         </Flex>
       ) : null}
 
-      <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={() => fetchData()} />}>
+      <ScrollView style={{}} refreshControl={<RefreshControl refreshing={loading} onRefresh={() => fetchData()} />}>
+        <Flex h={insets.top} w={'100%'} />
         {user !== undefined && user !== null && feed !== undefined && feed !== null ? (
           <VStack pb={50}>
             <VStack h={200} center>
@@ -303,7 +304,7 @@ export default Dashboard = ({ navigation, route }) => {
                     {user?.role === 'Administrador' ? <WidgetSmall screen="Schools" payload={{ user, token }} child={<Avatar.Icon icon={'town-hall'} size={50} />} /> : null}
 
                     {user?.role === 'Encargado' ? <WidgetSmall screen="Cards" payload={{ user, token }} child={<Avatar.Icon icon={'clock-time-four-outline'} size={50} />} /> : null}
-                    
+
                     <WidgetSmall screen="Users" payload={{ actualUser: user, token }} child={<Avatar.Icon icon={'account-supervisor-outline'} size={50} />} />
 
                     <WidgetSmall screen="TakeAttendance" payload={{ actualUser: user, token }} child={<Avatar.Icon icon={'alert'} size={50} />} />
