@@ -19,7 +19,7 @@ export default Profile = ({ navigation, route }) => {
 
   useEffect(() => {
     navigation.setOptions({
-      header: (props) => <Header {...props} children={[<Logout key="Logout"/>]} />,
+      header: (props) => <Header {...props} children={[<Logout key="Logout" />]} />,
       headerTransparent: true,
       headerTitle: 'Tu perfil'
     })
@@ -39,7 +39,7 @@ export default Profile = ({ navigation, route }) => {
   )
 
   const PersonalData = () => (
-    <Card mode="outlined">
+    <Card key="Personal" mode="outlined">
       <VStack p={20} spacing={5}>
         <Text variant="bodyLarge">Datos personales</Text>
         <VStack spacing={10}>
@@ -70,7 +70,7 @@ export default Profile = ({ navigation, route }) => {
   )
 
   const ContactData = () => (
-    <Card mode="outlined">
+    <Card key="Contact" mode="outlined">
       <VStack p={20} spacing={5}>
         <Text variant="bodyLarge">Datos de contacto</Text>
         <VStack spacing={10}>
@@ -89,7 +89,7 @@ export default Profile = ({ navigation, route }) => {
   )
 
   const EmergencyData = () => (
-    <Card mode="outlined">
+    <Card key="Emergency" mode="outlined">
       <VStack p={20} spacing={5}>
         <Text variant="bodyLarge">Datos de emergencia</Text>
         <VStack spacing={10}>
@@ -108,7 +108,7 @@ export default Profile = ({ navigation, route }) => {
   )
 
   const AccountData = () => (
-    <Card mode="outlined">
+    <Card key="Account" mode="outlined">
       <VStack p={20} spacing={5}>
         <Text variant="bodyLarge">Datos de la cuenta</Text>
         <VStack spacing={10}>
@@ -150,6 +150,7 @@ export default Profile = ({ navigation, route }) => {
 
   const UpdatePassword = () => (
     <Button
+      key="UpdatePasswordButton"
       icon="form-textbox-password"
       onPress={() => {
         navigation.navigate('UpdatePassword', { token, register: user?.register })
@@ -162,7 +163,7 @@ export default Profile = ({ navigation, route }) => {
   return (
     <Flex fill mt={headerMargin - 20}>
       <ScrollView>
-        <DisplayDetails icon="account-circle-outline" photo={user?.avatar} title={`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name ?? ''}`} children={[<PersonalData key="Personal"/>, <ContactData key="Contact" />, <EmergencyData key="Emergency" />, <AccountData key="Account" />]} actions={[<UpdatePassword key="UpdatePassword" />]} />
+        <DisplayDetails icon="account-circle-outline" photo={user?.avatar} title={`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name ?? ''}`} children={[PersonalData(), ContactData(), EmergencyData(), AccountData()]} actions={[UpdatePassword()]} />
       </ScrollView>
     </Flex>
   )
