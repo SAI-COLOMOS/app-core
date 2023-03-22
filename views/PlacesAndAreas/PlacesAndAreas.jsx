@@ -77,7 +77,7 @@ export default PlaceAndAreas = ({ navigation, route }) => {
 
   useEffect(() => {
     navigation.setOptions({
-      header: (props) => <Header {...props} children={[<IconButton icon="magnify" onPress={() => setShowSearch(!showSearch)} />]} />,
+      header: (props) => <Header {...props} children={[<IconButton key="SearchButton" icon="magnify" onPress={() => setShowSearch(!showSearch)} />]} />,
       headerTransparent: true,
       headerTitle: 'Bosques urbanos'
     })
@@ -92,7 +92,7 @@ export default PlaceAndAreas = ({ navigation, route }) => {
 
   const Item = ({ place_name, place_address, place_identifier }) => {
     return (
-      <Flex key={`ID-${place_identifier}`} ph={20} pv={5} onPress={() => {}}>
+      <Flex ph={20} pv={5} onPress={() => {}}>
         <Card mode="outlined" style={{ overflow: 'hidden' }}>
           <TouchableRipple
             onPress={() => {
@@ -118,6 +118,7 @@ export default PlaceAndAreas = ({ navigation, route }) => {
             <Flex fill>
               <FlatList
                 data={places}
+
                 ListEmptyComponent={() =>
                   places === undefined ? null : (
                     <InformationMessage
@@ -137,7 +138,7 @@ export default PlaceAndAreas = ({ navigation, route }) => {
                 }
                 refreshing={loading}
                 onRefresh={() => getPlaces()}
-                renderItem={({ item }) => <Item place_name={item.place_name} place_address={`${item.street} #${item.exterior_number}, ${item.colony}, ${item.municipality}, ${item.postal_code}`} place_identifier={item.place_identifier} />}
+                renderItem={({ item }) => <Item key={item.place_name} place_name={item.place_name} place_address={`${item.street} #${item.exterior_number}, ${item.colony}, ${item.municipality}, ${item.postal_code}`} place_identifier={item.place_identifier} />}
               />
 
               <FAB
@@ -180,7 +181,7 @@ export default PlaceAndAreas = ({ navigation, route }) => {
       ) : foundPlaces !== null ? (
         foundPlaces?.length >= 0 || foundPlaces === undefined ? (
           <Flex fill>
-            <FlatList data={foundPlaces} ListEmptyComponent={() => (foundPlaces === undefined ? null : <InformationMessage icon="magnify" title="Sin resultados" description="No hay ningún bosque urbano registrado que cumpla con los parámetros de tu búsqueda" />)} refreshing={loading} onRefresh={() => searchPlaces()} renderItem={({ item }) => <Item place_name={item.place_name} place_address={`${item.street} #${item.exterior_number}, ${item.colony}, ${item.municipality}, ${item.postal_code}`} place_identifier={item.place_identifier} />} />
+            <FlatList data={foundPlaces} ListEmptyComponent={() => (foundPlaces === undefined ? null : <InformationMessage icon="magnify" title="Sin resultados" description="No hay ningún bosque urbano registrado que cumpla con los parámetros de tu búsqueda" />)} refreshing={loading} onRefresh={() => searchPlaces()} renderItem={({ item }) => <Item key={item.place_name} place_name={item.place_name} place_address={`${item.street} #${item.exterior_number}, ${item.colony}, ${item.municipality}, ${item.postal_code}`} place_identifier={item.place_identifier} />} />
           </Flex>
         ) : (
           <InformationMessage

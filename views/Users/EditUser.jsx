@@ -253,153 +253,141 @@ export default EditUser = ({ navigation, route }) => {
     setAreasOptions(areaData)
   }, [place])
 
-  const PersonalData = () => {
-    return (
-      <VStack spacing={5}>
-        <Text variant="labelLarge">Datos personales</Text>
-        <VStack spacing={10}>
-          <TextInput mode="outlined" value={first_name} onChangeText={setFirst_name} label="Nombre" maxLength={50} autoComplete="off" autoCorrect={false} />
-          <TextInput mode="outlined" value={first_last_name} onChangeText={setFirst_last_name} label="Apellido paterno" maxLength={50} autoComplete="off" autoCorrect={false} />
-          <TextInput mode="outlined" value={second_last_name} onChangeText={setSecond_last_name} label="Apellido materno" maxLength={50} autoComplete="off" autoCorrect={false} />
-          <TextInput mode="outlined" value={age} onChangeText={setAge} label="Edad" keyboardType="numeric" maxLength={2} autoComplete="off" autoCorrect={false} />
+  const PersonalData = () => (
+    <VStack key="Personal" spacing={5}>
+      <Text variant="labelLarge">Datos personales</Text>
+      <VStack spacing={10}>
+        <TextInput mode="outlined" value={first_name} onChangeText={setFirst_name} label="Nombre" maxLength={50} autoComplete="off" autoCorrect={false} />
+        <TextInput mode="outlined" value={first_last_name} onChangeText={setFirst_last_name} label="Apellido paterno" maxLength={50} autoComplete="off" autoCorrect={false} />
+        <TextInput mode="outlined" value={second_last_name} onChangeText={setSecond_last_name} label="Apellido materno" maxLength={50} autoComplete="off" autoCorrect={false} />
+        <TextInput mode="outlined" value={age} onChangeText={setAge} label="Edad" keyboardType="numeric" maxLength={2} autoComplete="off" autoCorrect={false} />
+        <Flex fill>
+          <Dropdown title="Grupo sanguíneo" options={bloodTypes} value={blood_type} selected={setBlood_type} />
+        </Flex>
+        <TextInput mode="outlined" value={curp} onChangeText={setCurp} label="CURP" autoCapitalize="characters" maxLength={18} autoComplete="off" autoCorrect={false} />
+      </VStack>
+    </VStack>
+  )
+
+  const ContactData = () => (
+    <VStack key="Contact" spacing={5}>
+      <Text variant="labelLarge">Datos de contacto</Text>
+      <VStack spacing={10}>
+        <TextInput mode="outlined" value={email} onChangeText={setEmail} label="Correo electrónico" keyboardType="email-address" autoCapitalize="none" maxLength={50} autoComplete="off" autoCorrect={false} />
+        <TextInput mode="outlined" value={phone} onChangeText={setPhone} label="Teléfono" keyboardType="numeric" maxLength={10} autoComplete="off" autoCorrect={false} />
+        <TextInput mode="outlined" value={emergency_contact} onChangeText={setEmergency_contact} label="Contacto de emergencia" maxLength={50} autoCapitalize="words" autoComplete="off" autoCorrect={false} />
+        <TextInput mode="outlined" value={emergency_phone} onChangeText={setEmergency_phone} label="Teléfono de emergencia" keyboardType="numeric" maxLength={10} autoComplete="off" autoCorrect={false} />
+      </VStack>
+    </VStack>
+  )
+
+  const UserData = () => (
+    <VStack key="User" spacing={5}>
+      <Text variant="labelLarge">Datos del usuario</Text>
+      <VStack spacing={10}>
+        {actualUser?.role == 'Administrador' ? (
           <Flex fill>
-            <Dropdown title="Grupo sanguíneo" options={bloodTypes} value={blood_type} selected={setBlood_type} />
+            <Dropdown title="Rol" options={roleTypes} value={role} selected={setRole} />
           </Flex>
-          <TextInput mode="outlined" value={curp} onChangeText={setCurp} label="CURP" autoCapitalize="characters" maxLength={18} autoComplete="off" autoCorrect={false} />
-        </VStack>
-      </VStack>
-    )
-  }
-
-  const ContactData = () => {
-    return (
-      <VStack spacing={5}>
-        <Text variant="labelLarge">Datos de contacto</Text>
-        <VStack spacing={10}>
-          <TextInput mode="outlined" value={email} onChangeText={setEmail} label="Correo electrónico" keyboardType="email-address" autoCapitalize="none" maxLength={50} autoComplete="off" autoCorrect={false} />
-          <TextInput mode="outlined" value={phone} onChangeText={setPhone} label="Teléfono" keyboardType="numeric" maxLength={10} autoComplete="off" autoCorrect={false} />
-          <TextInput mode="outlined" value={emergency_contact} onChangeText={setEmergency_contact} label="Contacto de emergencia" maxLength={50} autoCapitalize="words" autoComplete="off" autoCorrect={false} />
-          <TextInput mode="outlined" value={emergency_phone} onChangeText={setEmergency_phone} label="Teléfono de emergencia" keyboardType="numeric" maxLength={10} autoComplete="off" autoCorrect={false} />
-        </VStack>
-      </VStack>
-    )
-  }
-
-  const UserData = () => {
-    return (
-      <VStack spacing={5}>
-        <Text variant="labelLarge">Datos del usuario</Text>
-        <VStack spacing={10}>
-          {actualUser?.role == 'Administrador' ? (
-            <Flex fill>
-              <Dropdown title="Rol" options={roleTypes} value={role} selected={setRole} />
-            </Flex>
-          ) : null}
-          {actualUser?.role == 'Encargado' ? (
-            <Flex fill>
-              <Dropdown title="Tipo de prestador" options={providerTypes} value={provider_type} selected={setProvider_type} />
-            </Flex>
-          ) : null}
-          {actualUser?.role == 'Administrador' ? (
+        ) : null}
+        {actualUser?.role == 'Encargado' ? (
+          <Flex fill>
+            <Dropdown title="Tipo de prestador" options={providerTypes} value={provider_type} selected={setProvider_type} />
+          </Flex>
+        ) : null}
+        {actualUser?.role == 'Administrador' ? (
+          <Flex>
+            <Dropdown value={place} selected={setPlace} title="Bosque urbano" options={placesOptions} />
+          </Flex>
+        ) : null}
+        {actualUser?.role == 'Administrador' ? (
+          place != '' && areasOptions.length > 0 ? (
             <Flex>
-              <Dropdown value={place} selected={setPlace} title="Bosque urbano" options={placesOptions} />
+              <Dropdown value={assigned_area} selected={setAssigned_area} title="Área asignada" options={areasOptions} />
             </Flex>
-          ) : null}
-          {actualUser?.role == 'Administrador' ? (
-            place != '' && areasOptions.length > 0 ? (
-              <Flex>
-                <Dropdown value={assigned_area} selected={setAssigned_area} title="Área asignada" options={areasOptions} />
+          ) : areasOptions.length == 0 && place != '' ? (
+            <HStack pv={10} items="center" spacing={20}>
+              <Icon name="alert" color={theme.colors.error} size={30} />
+              <Flex fill>
+                <Text
+                  variant="bodyMedium"
+                  style={{
+                    color: theme.colors.error
+                  }}
+                >
+                  El bosque urbano seleccionado no cuenta con áreas registradas, primero cree un área para poder continuar.
+                </Text>
               </Flex>
-            ) : areasOptions.length == 0 && place != '' ? (
-              <HStack pv={10} items="center" spacing={20}>
-                <Icon name="alert" color={theme.colors.error} size={30} />
-                <Flex fill>
-                  <Text
-                    variant="bodyMedium"
-                    style={{
-                      color: theme.colors.error
-                    }}
-                  >
-                    El bosque urbano seleccionado no cuenta con áreas registradas, primero cree un área para poder continuar.
-                  </Text>
-                </Flex>
-              </HStack>
-            ) : null
-          ) : null}
-          {role == 'Prestador' ? (
-            <Flex>
-              <Dropdown value={school} selected={setSchool} title="Escuela" options={schoolsOptions} />
-            </Flex>
-          ) : null}
-          {role == 'Prestador' ? <TextInput mode="outlined" value={total_hours} onChangeText={setTotal_hours} label="Total de horas" keyboardType="number-pad" maxLength={3} autoComplete="off" autoCorrect={false} /> : null}
-          <Flex fill>
-            <Dropdown title="Estado" options={statusTypes} value={status} selected={setStatus} />
+            </HStack>
+          ) : null
+        ) : null}
+        {role == 'Prestador' ? (
+          <Flex>
+            <Dropdown value={school} selected={setSchool} title="Escuela" options={schoolsOptions} />
           </Flex>
-        </VStack>
+        ) : null}
+        {role == 'Prestador' ? <TextInput mode="outlined" value={total_hours} onChangeText={setTotal_hours} label="Total de horas" keyboardType="number-pad" maxLength={3} autoComplete="off" autoCorrect={false} /> : null}
+        <Flex fill>
+          <Dropdown title="Estado" options={statusTypes} value={status} selected={setStatus} />
+        </Flex>
       </VStack>
-    )
-  }
+    </VStack>
+  )
 
-  const ImageData = () => {
-    return (
-      <VStack spacing={5}>
-        <Text variant="labelLarge">Foto de perfil</Text>
-        <VStack spacing={10}>
-          <ImageSelector value={avatar} setter={setAvatar} />
-        </VStack>
+  const ImageData = () => (
+    <VStack key="Image" spacing={5}>
+      <Text variant="labelLarge">Foto de perfil</Text>
+      <VStack spacing={10}>
+        <ImageSelector value={avatar} setter={setAvatar} />
       </VStack>
-    )
-  }
+    </VStack>
+  )
 
-  const Delete = () => {
-    return (
-      <VStack spacing={5}>
-        <Text variant="labelLarge">Eliminar al usuario</Text>
-        <VStack spacing={10}>
-          <Button
-            textColor={theme.colors.error}
-            icon="trash-can-outline"
-            mode="outlined"
-            onPress={() => {
-              setModalConfirm(!modalConfirm)
-            }}
-          >
-            Eliminar
-          </Button>
-        </VStack>
+  const Delete = () => (
+    <VStack key="Delete" spacing={5}>
+      <Text variant="labelLarge">Eliminar al usuario</Text>
+      <VStack spacing={10}>
+        <Button
+          textColor={theme.colors.error}
+          icon="trash-can-outline"
+          mode="outlined"
+          onPress={() => {
+            setModalConfirm(!modalConfirm)
+          }}
+        >
+          Eliminar
+        </Button>
       </VStack>
-    )
-  }
+    </VStack>
+  )
 
-  const Save = () => {
-    return (
-      <Button
-        mode="contained"
-        icon="content-save-outline"
-        disabled={modalLoading || !verified}
-        loading={modalLoading}
-        onPress={() => {
-          saveUser()
-        }}
-      >
-        Guardar
-      </Button>
-    )
-  }
+  const Save = () => (
+    <Button
+      key="SaveButton"
+      mode="contained"
+      icon="content-save-outline"
+      disabled={modalLoading || !verified}
+      loading={modalLoading}
+      onPress={() => {
+        saveUser()
+      }}
+    >
+      Guardar
+    </Button>
+  )
 
-  const Cancel = () => {
-    return (
-      <Button
-        mode="outlined"
-        icon="close"
-        onPress={() => {
-          navigation.pop()
-        }}
-      >
-        Cancelar
-      </Button>
-    )
-  }
+  const Cancel = () => (
+    <Button
+      key="CancelButton"
+      mode="outlined"
+      icon="close"
+      onPress={() => {
+        navigation.pop()
+      }}
+    >
+      Cancelar
+    </Button>
+  )
 
   return (
     <Flex fill>

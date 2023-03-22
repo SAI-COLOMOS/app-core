@@ -42,8 +42,8 @@ import EditUser from './Users/EditUser'
 
 // Attendance
 import AttendanceDetails from './Attendance/AttendanceDetails'
-import AttendanceRegister from './Attendance/AttendanceRegister'
-import AttendanceScan from './Attendance/AttendanceScan'
+import TakeAttendance from './Attendance/TakeAttendance'
+import ScanAttendance from './Attendance/ScanAttendance'
 import AttendanceProximityClient from './Attendance/AttendanceProximityClient'
 import ShowAttendanceCode from './Attendance/ShowAttendanceCode'
 
@@ -112,8 +112,8 @@ export default Navigation = () => {
 
       <Stack.Group navigationKey="attendance" screenOptions={{ headerShown: true, animationTypeForReplace: 'push', animation: 'fade_from_bottom' }}>
         <Stack.Screen name="AttendanceDetails" component={AttendanceDetails} />
-        <Stack.Screen name="AttendanceRegister" component={AttendanceRegister} />
-        <Stack.Screen name="AttendanceScan" component={AttendanceScan} options={{ headerShown: false, presentation: 'containedTransparentModal' }} />
+        <Stack.Screen name="TakeAttendance" component={TakeAttendance} />
+        <Stack.Screen name="ScanAttendance" component={ScanAttendance} options={{ headerShown: false, presentation: 'containedTransparentModal' }} />
         <Stack.Screen name="AttendanceProximityClient" component={AttendanceProximityClient} options={{ headerShown: false, presentation: 'containedTransparentModal' }} />
         <Stack.Screen name="ShowAttendanceCode" component={ShowAttendanceCode} options={{ headerShown: false, presentation: 'containedTransparentModal' }} />
 

@@ -54,11 +54,11 @@ export default AddEvent = ({ navigation, route }) => {
         belonging_place: belonging_place.trim()
       })
     })
-     //  .then((response) => response.status)
-       //.catch(() => null)
+       .then((response) => response.status)
+       .catch(() => null)
 
-      const json = await request.json()
-      console.log(json)
+      //const json = await request.json()
+      //console.log(json)
 
     setModalLoading(false)
 

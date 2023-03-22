@@ -25,9 +25,9 @@ export default SchoolDetails = ({ icon, title, children, actions, photo }) => {
           {title}
         </Text>
 
-        {children?.length > 0 ? children.map((child, index) => <Card key={index.toString()} mode="outlined" children={child} />) : null}
+        <VStack spacing={20}>{children?.length > 0 ? children.map((child, index) => <Flex key={`Item ${index}`}>{child}</Flex>) : null}</VStack>
 
-        {actions?.length > 0 ? actions.map((action, index) => <Flex key={index.toString()} children={action} />) : null}
+        <VStack spacing={20}>{actions?.length > 0 ? actions.map((action, index) => <Flex key={`Action ${index}`}>{action}</Flex>) : null}</VStack>
       </VStack>
     </Flex>
   )

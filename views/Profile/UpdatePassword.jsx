@@ -69,129 +69,123 @@ export default UpdatePassword = ({ navigation, route }) => {
     confirmationNewPassword == newPassword && confirmationNewPassword != '' ? setAreSamePassword(true) : setAreSamePassword(false)
   }, [confirmationNewPassword])
 
-  const Information = () => {
-    return (
-      <VStack spacing={5}>
-        <Text variant="bodyMedium">Para poder actualizar tu contraseña es necesario que cumplas con los siguientes requisitos:</Text>
-        <VStack spacing={0}>
-          <HStack items="center" spacing={5}>
-            <Icon size={20} color={passLength ? theme.colors.onBackground : theme.colors.error} name={passLength ? 'check-circle-outline' : 'alert-circle-outline'} />
-            <Text variant="bodyMedium" style={{ color: passLength ? theme.colors.onBackground : theme.colors.error }}>
-              Tiene al menos ocho caracteres
-            </Text>
-          </HStack>
+  const Information = () => (
+    <VStack key="Information" spacing={5}>
+      <Text variant="bodyMedium">Para poder actualizar tu contraseña es necesario que cumplas con los siguientes requisitos:</Text>
+      <VStack spacing={0}>
+        <HStack items="center" spacing={5}>
+          <Icon size={20} color={passLength ? theme.colors.onBackground : theme.colors.error} name={passLength ? 'check-circle-outline' : 'alert-circle-outline'} />
+          <Text variant="bodyMedium" style={{ color: passLength ? theme.colors.onBackground : theme.colors.error }}>
+            Tiene al menos ocho caracteres
+          </Text>
+        </HStack>
 
-          <HStack items="center" spacing={5}>
-            <Icon size={20} color={hasUppercase ? theme.colors.onBackground : theme.colors.error} name={hasUppercase ? 'check-circle-outline' : 'alert-circle-outline'} />
-            <Text variant="bodyMedium" style={{ color: hasUppercase ? theme.colors.onBackground : theme.colors.error }}>
-              Tiene al menos una letra mayúscula
-            </Text>
-          </HStack>
+        <HStack items="center" spacing={5}>
+          <Icon size={20} color={hasUppercase ? theme.colors.onBackground : theme.colors.error} name={hasUppercase ? 'check-circle-outline' : 'alert-circle-outline'} />
+          <Text variant="bodyMedium" style={{ color: hasUppercase ? theme.colors.onBackground : theme.colors.error }}>
+            Tiene al menos una letra mayúscula
+          </Text>
+        </HStack>
 
-          <HStack items="center" spacing={5}>
-            <Icon size={20} color={hasLowercase ? theme.colors.onBackground : theme.colors.error} name={hasLowercase ? 'check-circle-outline' : 'alert-circle-outline'} />
-            <Text variant="bodyMedium" style={{ color: hasLowercase ? theme.colors.onBackground : theme.colors.error }}>
-              Tiene al menos una letra minúscula
-            </Text>
-          </HStack>
+        <HStack items="center" spacing={5}>
+          <Icon size={20} color={hasLowercase ? theme.colors.onBackground : theme.colors.error} name={hasLowercase ? 'check-circle-outline' : 'alert-circle-outline'} />
+          <Text variant="bodyMedium" style={{ color: hasLowercase ? theme.colors.onBackground : theme.colors.error }}>
+            Tiene al menos una letra minúscula
+          </Text>
+        </HStack>
 
-          <HStack items="center" spacing={5}>
-            <Icon size={20} color={hasNumber ? theme.colors.onBackground : theme.colors.error} name={hasNumber ? 'check-circle-outline' : 'alert-circle-outline'} />
-            <Text variant="bodyMedium" style={{ color: hasNumber ? theme.colors.onBackground : theme.colors.error }}>
-              Tiene al menos un número
-            </Text>
-          </HStack>
+        <HStack items="center" spacing={5}>
+          <Icon size={20} color={hasNumber ? theme.colors.onBackground : theme.colors.error} name={hasNumber ? 'check-circle-outline' : 'alert-circle-outline'} />
+          <Text variant="bodyMedium" style={{ color: hasNumber ? theme.colors.onBackground : theme.colors.error }}>
+            Tiene al menos un número
+          </Text>
+        </HStack>
 
-          <HStack items="center" spacing={5}>
-            <Icon size={20} color={hasSpecial ? theme.colors.onBackground : theme.colors.error} name={hasSpecial ? 'check-circle-outline' : 'alert-circle-outline'} />
-            <Text variant="bodyMedium" style={{ color: hasSpecial ? theme.colors.onBackground : theme.colors.error }}>
-              Tiene al menos un carácter especial
-            </Text>
-          </HStack>
+        <HStack items="center" spacing={5}>
+          <Icon size={20} color={hasSpecial ? theme.colors.onBackground : theme.colors.error} name={hasSpecial ? 'check-circle-outline' : 'alert-circle-outline'} />
+          <Text variant="bodyMedium" style={{ color: hasSpecial ? theme.colors.onBackground : theme.colors.error }}>
+            Tiene al menos un carácter especial
+          </Text>
+        </HStack>
 
-          <HStack items="center" spacing={5}>
-            <Icon size={20} color={areSamePassword ? theme.colors.onBackground : theme.colors.error} name={areSamePassword ? 'check-circle-outline' : 'alert-circle-outline'} />
-            <Text variant="bodyMedium" style={{ color: areSamePassword ? theme.colors.onBackground : theme.colors.error }}>
-              Tienes que confirmar tu nueva contraseña
-            </Text>
-          </HStack>
-        </VStack>
+        <HStack items="center" spacing={5}>
+          <Icon size={20} color={areSamePassword ? theme.colors.onBackground : theme.colors.error} name={areSamePassword ? 'check-circle-outline' : 'alert-circle-outline'} />
+          <Text variant="bodyMedium" style={{ color: areSamePassword ? theme.colors.onBackground : theme.colors.error }}>
+            Tienes que confirmar tu nueva contraseña
+          </Text>
+        </HStack>
       </VStack>
-    )
-  }
+    </VStack>
+  )
 
-  const Form = () => {
-    return (
-      <VStack spacing={5}>
-        <VStack spacing={10}>
-          <TextInput
-            mode="outlined"
-            label="Nueva contraseña"
-            value={newPassword}
-            autoComplete="password-new"
-            onChangeText={setNewPassword}
-            secureTextEntry={!showNewPassword}
-            right={
-              <TextInput.Icon
-                icon="eye"
-                onPress={(_) => {
-                  setShowNewPassword(!showNewPassword)
-                }}
-              />
-            }
-          />
+  const Form = () => (
+    <VStack key="Form" spacing={5}>
+      <VStack spacing={10}>
+        <TextInput
+          mode="outlined"
+          label="Nueva contraseña"
+          value={newPassword}
+          autoComplete="password-new"
+          onChangeText={setNewPassword}
+          secureTextEntry={!showNewPassword}
+          right={
+            <TextInput.Icon
+              icon="eye"
+              onPress={(_) => {
+                setShowNewPassword(!showNewPassword)
+              }}
+            />
+          }
+        />
 
-          <TextInput
-            mode="outlined"
-            label="Confirma tu nueva contraseña"
-            value={confirmationNewPassword}
-            autoComplete="password-new"
-            onChangeText={setConfirmationNewPassword}
-            secureTextEntry={!showConfirmationNewPassword}
-            right={
-              <TextInput.Icon
-                icon="eye"
-                onPress={(_) => {
-                  setShowConfirmationNewPassword(!showConfirmationNewPassword)
-                }}
-              />
-            }
-          />
-        </VStack>
+        <TextInput
+          mode="outlined"
+          label="Confirma tu nueva contraseña"
+          value={confirmationNewPassword}
+          autoComplete="password-new"
+          onChangeText={setConfirmationNewPassword}
+          secureTextEntry={!showConfirmationNewPassword}
+          right={
+            <TextInput.Icon
+              icon="eye"
+              onPress={(_) => {
+                setShowConfirmationNewPassword(!showConfirmationNewPassword)
+              }}
+            />
+          }
+        />
       </VStack>
-    )
-  }
+    </VStack>
+  )
 
-  const Save = (_) => {
-    return (
-      <Button
-        icon="content-save-outline"
-        loading={modalLoading}
-        mode="contained"
-        disabled={!passLength || !hasNumber || !hasUppercase || !hasLowercase || !hasSpecial || !areSamePassword || modalLoading}
-        onPress={() => {
-          updatePassword()
-        }}
-      >
-        Cambiar contraseña
-      </Button>
-    )
-  }
+  const Save = () => (
+    <Button
+      key="SaveButton"
+      icon="content-save-outline"
+      loading={modalLoading}
+      mode="contained"
+      disabled={!passLength || !hasNumber || !hasUppercase || !hasLowercase || !hasSpecial || !areSamePassword || modalLoading}
+      onPress={() => {
+        updatePassword()
+      }}
+    >
+      Cambiar contraseña
+    </Button>
+  )
 
-  const Cancel = (_) => {
-    return (
-      <Button
-        icon="close"
-        disabled={modalLoading}
-        mode="outlined"
-        onPress={(_) => {
-          navigation.pop()
-        }}
-      >
-        Cancelar
-      </Button>
-    )
-  }
+  const Cancel = () => (
+    <Button
+      key="CancelButton"
+      icon="close"
+      disabled={modalLoading}
+      mode="outlined"
+      onPress={() => {
+        navigation.pop()
+      }}
+    >
+      Cancelar
+    </Button>
+  )
 
   return (
     <Flex fill>
