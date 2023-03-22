@@ -22,6 +22,7 @@ export default Dropdown = ({ title, options, selected, value }) => {
       {options?.length > 0
         ? options.map((option) => (
             <Menu.Item
+            key={`Menu item ${option?.option}`}
               title={option?.option}
               onPress={() => {
                 selected(option?.option)

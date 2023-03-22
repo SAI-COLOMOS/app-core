@@ -84,7 +84,7 @@ export default SchoolDetails = ({ navigation, route }) => {
   }
 
   const Contact = () => (
-    <Card mode="outlined">
+    <Card key="Contact" mode="outlined">
       <VStack p={20} spacing={5}>
         <Text variant="bodyLarge">Contacto de la escuela</Text>
         <VStack spacing={10}>
@@ -98,7 +98,7 @@ export default SchoolDetails = ({ navigation, route }) => {
   )
 
   const Address = () => (
-    <Card mode="outlined">
+    <Card key="Address" mode="outlined">
       <VStack p={20} spacing={5}>
         <Text variant="bodyLarge">Dirección de la escuela</Text>
         <VStack spacing={10}>
@@ -122,7 +122,7 @@ export default SchoolDetails = ({ navigation, route }) => {
         {school !== undefined ? (
           school !== null ? (
             isNaN(school) ? (
-              <DisplayDetails icon="town-hall" title={school?.school_name} children={[<Contact key="Contact" />, <Address key="Address" />]} />
+              <DisplayDetails icon="town-hall" title={school?.school_name} children={[Contact(), Address()]} />
             ) : (
               <VStack p={30} center spacing={20}>
                 <Icon color={theme.colors.onBackground} name="alert-circle-outline" size={50} />

@@ -80,7 +80,7 @@ export default AddSchool = ({ navigation, route }) => {
   }, [school_name, municipality, street, postal_code, exterior_number, colony, phone])
 
   const Data = () => (
-    <VStack spacing={5}>
+    <VStack key="Data" spacing={5}>
       <Text variant="labelLarge">Datos de la escuela</Text>
       <VStack spacing={10}>
         <TextInput mode="outlined" value={school_name} onChangeText={setSchool_name} label="Nombre de la escuela" maxLength={150} autoComplete="off" autoCapitalize="words" />
@@ -90,7 +90,7 @@ export default AddSchool = ({ navigation, route }) => {
   )
 
   const Address = () => (
-    <VStack spacing={5}>
+    <VStack key="Address" spacing={5}>
       <Text variant="labelLarge">Dirección de la escuela</Text>
       <VStack spacing={10}>
         <TextInput mode="outlined" value={street} onChangeText={setStreet} label="Calle de la escuela" maxLength={150} autoComplete="off" />
@@ -105,6 +105,7 @@ export default AddSchool = ({ navigation, route }) => {
 
   const Save = () => (
     <Button
+      key="SaveButton"
       icon="content-save-outline"
       disabled={modalLoading || !verified}
       loading={modalLoading}
@@ -119,6 +120,7 @@ export default AddSchool = ({ navigation, route }) => {
 
   const Cancel = () => (
     <Button
+      key="CancelButton"
       icon="close"
       disabled={modalLoading}
       mode="outlined"
@@ -132,8 +134,8 @@ export default AddSchool = ({ navigation, route }) => {
 
   return (
     <Flex fill>
-      <CreateForm title="Añadir escuela" children={[<Data key="Data" />, <Address key="Address" />]} actions={[<Save key="Save" />, <Cancel key="Cancel" />]} navigation={navigation} loading={modalLoading} />
-      <ModalMessage title="¡Listo!" description="La escuela ha sido añadida" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]}   ions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline" />
+      <CreateForm title="Añadir escuela" children={[Data(), Address()]} actions={[Save(), Cancel()]} navigation={navigation} loading={modalLoading} />
+      <ModalMessage title="¡Listo!" description="La escuela ha sido añadida" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} ions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline" />
       <ModalMessage title="Ocurrió un problema" description={`No pudimos añadir la escuela, inténtalo más tarde. (${responseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline" />
       <ModalMessage title="Sin conexión a internet" description={`Parece que no tienes conexión a internet, conéctate e intenta de nuevo`} handler={[modalFatal, () => setModalFatal(!modalFatal)]} actions={[['Aceptar']]} dismissable={true} icon="wifi-alert" />
     </Flex>

@@ -58,7 +58,7 @@ export default PlaceDetails = ({ navigation, route }) => {
   )
 
   const Places = () => (
-    <Card mode="outlined">
+    <Card mode="outlined" key="Place">
       <VStack p={20} spacing={5}>
         <Text variant="bodyLarge">Bosque urbano</Text>
         <VStack spacing={10}>
@@ -80,7 +80,7 @@ export default PlaceDetails = ({ navigation, route }) => {
   )
 
   const Areas = () => (
-    <Flex>
+    <Flex key="Areas">
       <Flex p={20}>
         <Text variant="bodyLarge">Áreas</Text>
       </Flex>
@@ -148,7 +148,7 @@ export default PlaceDetails = ({ navigation, route }) => {
         {place !== undefined ? (
           place !== null ? (
             isNaN(place) ? (
-              <DisplayDetails icon="pine-tree" title={place?.place_name} children={[<Places key="Places" />, <Areas key="Areas" />]} />
+              <DisplayDetails icon="pine-tree" title={place?.place_name} children={[Places(), Areas()]} />
             ) : (
               <VStack p={30} center spacing={20}>
                 <Icon color={theme.colors.onBackground} name="alert-circle-outline" size={50} />

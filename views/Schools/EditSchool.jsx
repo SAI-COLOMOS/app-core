@@ -112,7 +112,7 @@ export default EditSchool = ({ navigation, route }) => {
   }, [school_name, municipality, street, postal_code, exterior_number, colony, phone])
 
   const Data = () => (
-    <VStack spacing={5}>
+    <VStack key="Data" spacing={5}>
       <Text variant="labelLarge">Datos de la escuela</Text>
       <VStack spacing={10}>
         <TextInput mode="outlined" value={school_name} onChangeText={setSchool_name} label="Nombre de la escuela" maxLength={150} autoComplete="off" autoCapitalize="words" />
@@ -122,7 +122,7 @@ export default EditSchool = ({ navigation, route }) => {
   )
 
   const Address = () => (
-    <VStack spacing={5}>
+    <VStack key="Address" spacing={5}>
       <Text variant="labelLarge">Dirección de la escuela</Text>
       <VStack spacing={10}>
         <TextInput mode="outlined" value={street} onChangeText={setStreet} label="Calle de la escuela" maxLength={150} autoComplete="off" />
@@ -136,7 +136,7 @@ export default EditSchool = ({ navigation, route }) => {
   )
 
   const Delete = () => (
-    <VStack spacing={5}>
+    <VStack key="Delete" spacing={5}>
       <Text variant="labelLarge">Eliminar la escuela</Text>
       <VStack spacing={10}>
         <Button
@@ -155,6 +155,7 @@ export default EditSchool = ({ navigation, route }) => {
 
   const Save = () => (
     <Button
+    key="SaveButton"
       icon="content-save-outline"
       disabled={modalLoading || !verified}
       loading={modalLoading}
@@ -169,6 +170,7 @@ export default EditSchool = ({ navigation, route }) => {
 
   const Cancel = () => (
     <Button
+    key="CancelButton"
       icon="close"
       disabled={modalLoading}
       mode="outlined"
@@ -182,7 +184,7 @@ export default EditSchool = ({ navigation, route }) => {
 
   return (
     <Flex fill>
-      <CreateForm title="Editar escuela" children={[<Data key="Data" />, <Address key="Address" />, <Delete key="Delete" />]} actions={[<Save key="Save" />, <Cancel key="Cancel" />]} navigation={navigation} loading={modalLoading} />
+      <CreateForm title="Editar escuela" children={[Data(), Address(), Delete()]} actions={[Save(), Cancel()]} navigation={navigation} loading={modalLoading} />
 
       <ModalMessage
         title="Eliminar escuela"

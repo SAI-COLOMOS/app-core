@@ -95,7 +95,7 @@ export default EditArea = ({ navigation, route }) => {
   }, [area_name, phone])
 
   const Data = () => (
-    <VStack spacing={5}>
+    <VStack key="Data" spacing={5}>
       <Text variant="labelLarge">Datos del área</Text>
       <VStack spacing={10}>
         <TextInput mode="outlined" value={area_name} onChangeText={setArea_name} label="Nombre del área" maxLength={50} autoCapitalize="words" autoComplete="off" />
@@ -105,7 +105,7 @@ export default EditArea = ({ navigation, route }) => {
   )
 
   const Delete = () => (
-    <VStack spacing={5}>
+    <VStack key="Delete" spacing={5}>
       <Text variant="labelLarge">Eliminar área</Text>
       <VStack spacing={10}>
         <Button
@@ -124,6 +124,7 @@ export default EditArea = ({ navigation, route }) => {
 
   const Save = () => (
     <Button
+      key="SaveButton"
       icon="content-save-outline"
       disabled={modalLoading || !verified}
       loading={modalLoading}
@@ -138,6 +139,7 @@ export default EditArea = ({ navigation, route }) => {
 
   const Cancel = () => (
     <Button
+      key="CancelButton"
       icon="close"
       disabled={modalLoading}
       mode="outlined"
@@ -151,7 +153,7 @@ export default EditArea = ({ navigation, route }) => {
 
   return (
     <Flex fill>
-      <CreateForm title="Editar área" children={[<Data key="Data"/>, <Delete key="Delete"/>]} actions={[<Save key="Save"/>, <Cancel key="Cancel"/>]} navigation={navigation} loading={modalLoading} />
+      <CreateForm title="Editar área" children={[Data(), Delete()]} actions={[Save(), Cancel()]} navigation={navigation} loading={modalLoading} />
 
       <ModalMessage
         title="Eliminar área"

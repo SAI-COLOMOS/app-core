@@ -63,7 +63,7 @@ export default AddArea = ({ navigation, route }) => {
   }, [area_name, phone])
 
   const Data = () => (
-    <VStack spacing={5}>
+    <VStack key="Data" spacing={5}>
       <Text variant="labelLarge">Datos del área</Text>
       <VStack spacing={10}>
         <TextInput mode="outlined" value={area_name} onChangeText={setArea_name} label="Nombre del área" maxLength={50} autoCapitalize="words" autoComplete="off" />
@@ -74,6 +74,7 @@ export default AddArea = ({ navigation, route }) => {
 
   const Save = () => (
     <Button
+      key="SaveButton"
       icon="content-save-outline"
       disabled={modalLoading || !verified}
       loading={modalLoading}
@@ -88,6 +89,7 @@ export default AddArea = ({ navigation, route }) => {
 
   const Cancel = () => (
     <Button
+      key="CancelButton"
       icon="close"
       disabled={modalLoading}
       mode="outlined"
@@ -101,7 +103,7 @@ export default AddArea = ({ navigation, route }) => {
 
   return (
     <Flex fill>
-      <CreateForm title="Añadir nueva área" children={[<Data key="Data"/>]} actions={[<Save key="Save"/>, <Cancel key="Cancel"/>]} navigation={navigation} loading={modalLoading} />
+      <CreateForm title="Añadir nueva área" children={[Data()]} actions={[Save(), Cancel()]} navigation={navigation} loading={modalLoading} />
 
       <ModalMessage title="¡Listo!" description="El área ha sido añadida exitosamente" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline" />
 

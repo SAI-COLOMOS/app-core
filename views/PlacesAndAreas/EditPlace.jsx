@@ -112,7 +112,7 @@ export default EditPlace = ({ navigation, route }) => {
   }, [place_name, street, exterior_number, colony, municipality, postal_code, phone])
 
   const Data = () => (
-    <VStack spacing={5}>
+    <VStack key="Data" spacing={5}>
       <Text variant="labelLarge">Datos del bosque urbano</Text>
       <VStack spacing={10}>
         <TextInput mode="outlined" value={place_name} onChangeText={setPlace_name} autoCapitalize="words" label="Nombre del bosque urbano" maxLength={50} />
@@ -128,7 +128,7 @@ export default EditPlace = ({ navigation, route }) => {
   )
 
   const Delete = () => (
-    <VStack spacing={5}>
+    <VStack key="Delete" spacing={5}>
       <Text variant="labelLarge">Eliminar bosque urbano</Text>
       <VStack spacing={10}>
         <Button
@@ -147,6 +147,7 @@ export default EditPlace = ({ navigation, route }) => {
 
   const Save = () => (
     <Button
+    key="SaveButton"
       icon="content-save-outline"
       disabled={modalLoading || !verified}
       loading={modalLoading}
@@ -161,6 +162,7 @@ export default EditPlace = ({ navigation, route }) => {
 
   const Cancel = () => (
     <Button
+    key="CancelButton"
       icon="close"
       disabled={modalLoading}
       mode="outlined"
@@ -174,7 +176,7 @@ export default EditPlace = ({ navigation, route }) => {
 
   return (
     <Flex fill>
-      <CreateForm title="Editar bosque urbano" children={[<Data key="Data" />, <Delete key="Delete"/>]} actions={[<Save key="Save"/>, <Cancel key="Cancel"/>]} navigation={navigation} loading={modalLoading} />
+      <CreateForm title="Editar bosque urbano" children={[Data(), Delete()]} actions={[Save(), Cancel()]} navigation={navigation} loading={modalLoading} />
 
       <ModalMessage
         title="Eliminar bosque urbano"
