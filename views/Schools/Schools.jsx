@@ -78,7 +78,7 @@ export default Schools = ({ navigation, route }) => {
 
   useEffect(() => {
     navigation.setOptions({
-      header: (props) => <Header {...props} children={[<IconButton icon="magnify" onPress={() => setShowSearch(!showSearch)} />]} />,
+      header: (props) => <Header {...props} children={[<IconButton key="SearchButton" icon="magnify" onPress={() => setShowSearch(!showSearch)} />]} />,
       headerTransparent: true,
       headerTitle: 'Escuelas'
     })
@@ -130,7 +130,7 @@ export default Schools = ({ navigation, route }) => {
                       buttonTitle="Agregar"
                       action={() => {
                         navigation.navigate('AddSchool', {
-                          actualUser,
+                          user,
                           token
                         })
                       }}
@@ -139,15 +139,15 @@ export default Schools = ({ navigation, route }) => {
                 }
                 refreshing={loading}
                 onRefresh={() => getSchools()}
-                renderItem={({ item }) => <Item school_name={item.school_name} address={`${item.street} #${item.exterior_number}, ${item.colony}, ${item.municipality}`} school_identifier={item.school_identifier} />}
+                renderItem={({ item }) => <Item key={item.school_name} school_name={item.school_name} address={`${item.street} #${item.exterior_number}, ${item.colony}, ${item.municipality}`} school_identifier={item.school_identifier} />}
               />
 
               <FAB
                 icon="plus"
                 style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
                 onPress={() => {
-                  navigation.navigate('AddSchools', {
-                    actualUser,
+                  navigation.navigate('AddSchool', {
+                    user,
                     token
                   })
                 }}
@@ -182,7 +182,7 @@ export default Schools = ({ navigation, route }) => {
       ) : foundSchools !== null ? (
         foundSchools?.length >= 0 || foundSchools === undefined ? (
           <Flex fill>
-            <FlatList data={foundSchools} ListEmptyComponent={() => (foundSchools === undefined ? null : <InformationMessage icon="magnify" title="Sin resultados" description="No hay ninguna escuela registrada que cumpla con los parámetros de tu búsqueda" />)} refreshing={loading} onRefresh={() => searchSchools()} renderItem={({ item }) => <Item school_name={item.school_name} address={`${item.street} #${item.exterior_number}, ${item.colony}, ${item.municipality}`} school_identifier={item.school_identifier} />} />
+            <FlatList data={foundSchools} ListEmptyComponent={() => (foundSchools === undefined ? null : <InformationMessage icon="magnify" title="Sin resultados" description="No hay ninguna escuela registrada que cumpla con los parámetros de tu búsqueda" />)} refreshing={loading} onRefresh={() => searchSchools()} renderItem={({ item }) => <Item key={item.school_name} school_name={item.school_name} address={`${item.street} #${item.exterior_number}, ${item.colony}, ${item.municipality}`} school_identifier={item.school_identifier} />} />
           </Flex>
         ) : (
           <InformationMessage
