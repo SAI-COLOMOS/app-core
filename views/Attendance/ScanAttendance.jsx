@@ -2,15 +2,14 @@ import { Flex, HStack, VStack } from '@react-native-material/core'
 import { useEffect, useState } from 'react'
 import { KeyboardAvoidingView, Pressable, ScrollView, useWindowDimensions } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Text, useTheme } from 'react-native-paper'
+import { Button, Text, useTheme } from 'react-native-paper'
 import { Camera, CameraType } from 'expo-camera'
 import { BarCodeScanner } from 'expo-barcode-scanner'
 import InformationMessage from '../Shared/InformationMessage'
 
-export default AttendanceScan = ({ navigation, route }) => {
+export default ScanAttendance = ({ navigation, route }) => {
   const theme = useTheme()
   const insets = useSafeAreaInsets()
-  const { width } = useWindowDimensions()
 
   const [codeScanned, setCodeScanned] = useState(false)
   const [cameraPermissions, requestCameraPermission] = Camera.useCameraPermissions()
@@ -65,10 +64,8 @@ export default AttendanceScan = ({ navigation, route }) => {
 
               {cameraPermissions?.granted ? (
                 <VStack pr={25} pl={25} pb={50} spacing={30}>
-                  <Flex fill items="center" style={{borderRadius: 50}}>
-                    {/* <Flex fill> */}
-                      <Camera ratio="16:9" style={{ width: '100%', height: '100%', position: 'absolute' }} type={CameraType.back} barCodeScannerSettings={{ barCodeTypes: [BarCodeScanner.Constants.BarCodeType.qr] }} onBarCodeScanned={codeScanned ? undefined : onCodeScanned}></Camera>
-                    {/* </Flex> */}
+                  <Flex center style={{ borderRadius: 50, width: 300, height: 300, overflow: 'hidden', alignSelf: 'center' }}>
+                    <Camera ratio="4:3" style={{ width: 300, height: (300 * 4) / 3, position: 'absolute' }} type={CameraType.back} barCodeScannerSettings={{ barCodeTypes: [BarCodeScanner.Constants.BarCodeType.qr] }} onBarCodeScanned={codeScanned ? undefined : onCodeScanned}></Camera>
                   </Flex>
                 </VStack>
               ) : (
@@ -78,7 +75,11 @@ export default AttendanceScan = ({ navigation, route }) => {
               )}
             </ScrollView>
 
-            <HStack justify="between" reverse={true} pv={20} ph={20}></HStack>
+            <HStack justify="between" reverse={true} pv={20} ph={20}>
+              <Button icon="close" mode='contained' onPress={() => navigation.pop()}>
+                Cerrar
+              </Button>
+            </HStack>
           </Flex>
         </Flex>
       </KeyboardAvoidingView>

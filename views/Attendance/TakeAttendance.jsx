@@ -3,14 +3,14 @@ import { useEffect } from 'react'
 import { useHeaderHeight } from '@react-navigation/elements'
 import { Button, Text } from 'react-native-paper'
 
-export default AttendanceRegister = ({ navigation, route }) => {
+export default TakeAttendance = ({ navigation, route }) => {
   const headerMargin = useHeaderHeight()
 
   useEffect(() => {
     navigation.setOptions({
       header: (props) => <Header {...props} />,
       headerTransparent: true,
-      headerTitle: 'Registrar asistencias'
+      headerTitle: 'Tomar asistencia'
     })
   }, [])
 
@@ -18,7 +18,7 @@ export default AttendanceRegister = ({ navigation, route }) => {
     <Flex fill mt={headerMargin}>
       <Text>Hola</Text>
       <Button onPress={() => {
-        navigation.navigate("AttendanceScan")
+        navigation.navigate("ScanAttendance")
       }}>
         Scanner
       </Button>
