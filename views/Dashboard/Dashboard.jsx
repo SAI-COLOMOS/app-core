@@ -1,15 +1,15 @@
-import { Flex, HStack, VStack } from '@react-native-material/core'
-import { useState, useEffect, useCallback, useMemo } from 'react'
-import * as SecureStore from 'expo-secure-store'
-import { Button, Card, Text, useTheme, Avatar, TouchableRipple } from 'react-native-paper'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Image, RefreshControl, ScrollView, useWindowDimensions } from 'react-native'
-import { LinearGradient } from 'expo-linear-gradient'
-import { useFocusEffect } from '@react-navigation/native'
-import CircularProgress from 'react-native-circular-progress-indicator'
-import Constants from 'expo-constants'
-import Animated from 'react-native-reanimated'
-import InformationMessage from '../Shared/InformationMessage'
+import { Flex, HStack, VStack } from "@react-native-material/core"
+import { useState, useEffect, useCallback, useMemo } from "react"
+import * as SecureStore from "expo-secure-store"
+import { Button, Card, Text, useTheme, Avatar, TouchableRipple } from "react-native-paper"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { Image, RefreshControl, ScrollView, useWindowDimensions } from "react-native"
+import { LinearGradient } from "expo-linear-gradient"
+import { useFocusEffect } from "@react-navigation/native"
+import CircularProgress from "react-native-circular-progress-indicator"
+import Constants from "expo-constants"
+import Animated from "react-native-reanimated"
+import InformationMessage from "../Shared/InformationMessage"
 
 export default Dashboard = ({ navigation, route }) => {
   const insets = useSafeAreaInsets()
@@ -18,7 +18,7 @@ export default Dashboard = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const selectedImage = useMemo(() => Math.floor(Math.random() * 4), [])
 
-  const [greeting, setGreeting] = useState('Hola')
+  const [greeting, setGreeting] = useState("Hola")
   const [timeToSleep, setTimeToSleep] = useState(false)
   const [token, setToken] = useState(undefined)
   const [register, setRegister] = useState(undefined)
@@ -33,21 +33,21 @@ export default Dashboard = ({ navigation, route }) => {
 
     const requests = await Promise.all([
       fetch(`${localhost}/profile/${register}`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
-          'Cache-Control': 'no-cache'
+          "Cache-Control": "no-cache"
         }
       })
         .then((response) => (response.ok ? response.json() : response.status))
         .catch((_) => null),
       fetch(`${localhost}/feed`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
-          'Cache-Control': 'no-cache'
+          "Cache-Control": "no-cache"
         }
       })
         .then((response) => (response.ok ? response.json() : response.status))
@@ -73,7 +73,7 @@ export default Dashboard = ({ navigation, route }) => {
 
   useEffect(() => {
     const getToken = async (_) => {
-      const token = await SecureStore.getItemAsync('token')
+      const token = await SecureStore.getItemAsync("token")
       token ? setToken(token) : setToken(undefined)
     }
 
@@ -84,7 +84,7 @@ export default Dashboard = ({ navigation, route }) => {
 
   useEffect(() => {
     const getRegister = async (_) => {
-      const register = await SecureStore.getItemAsync('register')
+      const register = await SecureStore.getItemAsync("register")
       register ? setRegister(register) : setRegister(undefined)
     }
 
@@ -104,15 +104,15 @@ export default Dashboard = ({ navigation, route }) => {
       const time = new Date().getHours()
 
       if (time >= 7 && time < 12) {
-        setGreeting('Buen día')
+        setGreeting("Buen día")
       }
 
       if (time >= 12 && time < 19) {
-        setGreeting('Buena tarde')
+        setGreeting("Buena tarde")
       }
 
       if (time >= 19 || time < 7) {
-        setGreeting('Buena noche')
+        setGreeting("Buena noche")
       }
 
       if (time >= 22 || time < 5) {
@@ -128,7 +128,7 @@ export default Dashboard = ({ navigation, route }) => {
   /* Se mantiene debido a compatibilidad, será eliminado en versiones posteriores, se tiene que migrar a los widgets */
   const Item = ({ screen, payload, icon, title }) => {
     return (
-      <Flex w={'50%'} p={10}>
+      <Flex w={"50%"} p={5}>
         <Card mode="outlined">
           <TouchableRipple
             onPress={() => {
@@ -149,8 +149,8 @@ export default Dashboard = ({ navigation, route }) => {
 
   const WidgetSmall = useCallback(({ screen, payload, child }) => {
     return (
-      <Flex w={'25%'} p={10}>
-        <Card mode="outlined" style={{ overflow: 'hidden' }}>
+      <Flex w={"25%"} p={5}>
+        <Card mode="outlined" style={{ overflow: "hidden" }}>
           <TouchableRipple
             onPress={() => {
               navigation.navigate(screen, { ...payload })
@@ -167,8 +167,8 @@ export default Dashboard = ({ navigation, route }) => {
 
   const WidgetMedium = useCallback(({ screen, payload, child, title }) => {
     return (
-      <Flex w={'50%'} p={10}>
-        <Card mode="outlined" style={{ overflow: 'hidden' }}>
+      <Flex w={"50%"} p={10}>
+        <Card mode="outlined" style={{ overflow: "hidden" }}>
           <TouchableRipple
             onPress={() => {
               navigation.navigate(screen, { ...payload })
@@ -189,23 +189,23 @@ export default Dashboard = ({ navigation, route }) => {
   return (
     <Flex fill>
       {user !== undefined && user !== null && feed !== undefined && feed !== null ? (
-        <Flex w={'100%'} h={250 + insets.top} style={{ backgroundColor: '#ff0099', position: 'absolute' }}>
+        <Flex w={"100%"} h={250 + insets.top} style={{ backgroundColor: "#ff0099", position: "absolute" }}>
           {
             {
-              0: <Image source={require('../../assets/images/cover/1.jpg')} style={{ width: '100%', height: '100%' }} />,
-              1: <Image source={require('../../assets/images/cover/2.jpg')} style={{ width: '100%', height: '100%' }} />,
-              2: <Image source={require('../../assets/images/cover/3.jpg')} style={{ width: '100%', height: '100%' }} />,
-              3: <Image source={require('../../assets/images/cover/4.jpg')} style={{ width: '100%', height: '100%' }} />,
-              4: <Image source={require('../../assets/images/cover/5.jpg')} style={{ width: '100%', height: '100%' }} />
+              0: <Image source={require("../../assets/images/cover/1.jpg")} style={{ width: "100%", height: "100%" }} />,
+              1: <Image source={require("../../assets/images/cover/2.jpg")} style={{ width: "100%", height: "100%" }} />,
+              2: <Image source={require("../../assets/images/cover/3.jpg")} style={{ width: "100%", height: "100%" }} />,
+              3: <Image source={require("../../assets/images/cover/4.jpg")} style={{ width: "100%", height: "100%" }} />,
+              4: <Image source={require("../../assets/images/cover/5.jpg")} style={{ width: "100%", height: "100%" }} />
             }[selectedImage]
           }
 
-          <LinearGradient colors={[theme.colors.cover, theme.colors.background]} locations={[0.75, 1]} style={{ width: '100%', height: '100%', position: 'absolute' }} />
+          <LinearGradient colors={[theme.colors.cover, theme.colors.background]} locations={[0.75, 1]} style={{ width: "100%", height: "100%", position: "absolute" }} />
         </Flex>
       ) : null}
 
       <ScrollView style={{}} refreshControl={<RefreshControl refreshing={loading} onRefresh={() => fetchData()} />}>
-        <Flex h={insets.top} w={'100%'} />
+        <Flex h={insets.top} w={"100%"} />
         {user !== undefined && user !== null && feed !== undefined && feed !== null ? (
           <VStack pb={50}>
             <VStack h={200} center>
@@ -231,12 +231,12 @@ export default Dashboard = ({ navigation, route }) => {
                 {/* Sección común */}
                 <Flex direction="row" wrap="wrap" ph={10}>
                   {/* Widget de evento */}
-                  <Flex w={'100%'} p={10}>
+                  <Flex w={"100%"} p={10}>
                     <VStack spacing={10}>
                       <Card mode="outlined">
                         <TouchableRipple
                           onPress={() => {
-                            navigation.navigate('ShowAttendanceCode', { register: user?.register, avatar: user?.avatar })
+                            navigation.navigate("ShowAttendanceCode", { register: user?.register, avatar: user?.avatar })
                           }}
                         >
                           <VStack ph={20} pv={10} h={175} spacing={10}>
@@ -265,14 +265,14 @@ export default Dashboard = ({ navigation, route }) => {
                   </Flex>
 
                   {/* Widget de progreso */}
-                  {user?.role === 'Prestador' ? (
+                  {user?.role === "Prestador" ? (
                     <WidgetMedium
                       screen="Profile"
                       payload={{ actualUser: user, token }}
                       child={
                         <Flex fill center>
-                          <Flex fill center style={{ position: 'absolute' }}>
-                            <Text variant="headlineSmall" style={{ fontWeight: 'bold', color: theme.colors.primary }}>
+                          <Flex fill center style={{ position: "absolute" }}>
+                            <Text variant="headlineSmall" style={{ fontWeight: "bold", color: theme.colors.primary }}>
                               {feed?.achieved_hours} /
                             </Text>
                             <Text variant="bodyMedium">{feed?.total_hours}</Text>
@@ -289,25 +289,29 @@ export default Dashboard = ({ navigation, route }) => {
                   ) : null}
 
                   {/* Widget de perfil */}
-                  <WidgetMedium screen="Profile" payload={{ user, token }} child={user?.avatar ? <Avatar.Image source={{ uri: `data:image/png;base64,${user.avatar}` }} size={100} /> : <Avatar.Icon icon="account-circle-outline" size={100} />} title="Tu perfil" />
+                  <WidgetSmall screen="Profile" payload={{ user, token }} child={user?.avatar ? <Avatar.Image source={{ uri: `data:image/png;base64,${user.avatar}` }} size={50} /> : <Avatar.Icon icon="account-circle-outline" size={100} />} />
                 </Flex>
 
                 {/* Sección de herramientas del administrador */}
-                {user?.role === 'Administrador' || user?.role === 'Encargado' ? (
+                {user?.role === "Administrador" || user?.role === "Encargado" ? (
                   <Flex direction="row" wrap="wrap" ph={10}>
-                    <Flex w={'100%'} ph={10}>
+                    <Flex w={"100%"} ph={10}>
                       <Text variant="bodyLarge">Herramientas del {user?.role}</Text>
                     </Flex>
 
-                    {user?.role === 'Administrador' ? <WidgetSmall screen="PlacesAndAreas" payload={{ user, token }} child={<Avatar.Icon icon={'map-marker-radius-outline'} size={50} />} /> : null}
+                    {user?.role === "Administrador" ? <WidgetSmall screen="PlacesAndAreas" payload={{ user, token }} child={<Avatar.Icon icon={"map-marker-radius-outline"} size={50} />} /> : null}
 
-                    {user?.role === 'Administrador' ? <WidgetSmall screen="Schools" payload={{ user, token }} child={<Avatar.Icon icon={'town-hall'} size={50} />} /> : null}
+                    {user?.role === "Administrador" ? <WidgetSmall screen="Schools" payload={{ user, token }} child={<Avatar.Icon icon={"town-hall"} size={50} />} /> : null}
 
-                    {user?.role === 'Encargado' ? <WidgetSmall screen="Cards" payload={{ user, token }} child={<Avatar.Icon icon={'clock-time-four-outline'} size={50} />} /> : null}
+                    {user?.role === "Encargado" ? <WidgetSmall screen="Cards" payload={{ user, token }} child={<Avatar.Icon icon={"clock-time-four-outline"} size={50} />} /> : null}
 
-                    <WidgetSmall screen="Users" payload={{ actualUser: user, token }} child={<Avatar.Icon icon={'account-supervisor-outline'} size={50} />} />
+                    <WidgetSmall screen="Users" payload={{ actualUser: user, token }} child={<Avatar.Icon icon={"account-supervisor-outline"} size={50} />} />
 
-                    <WidgetSmall screen="TakeAttendance" payload={{ actualUser: user, token }} child={<Avatar.Icon icon={'alert'} size={50} />} />
+                    <WidgetSmall screen="TakeAttendance" payload={{ actualUser: user, token }} child={<Avatar.Icon icon={"alert"} size={50} />} />
+
+                    <WidgetSmall screen="Cards" payload={{ actualUser: user, token }} child={<Avatar.Icon icon={"close"} size={50} />} />
+
+                    <WidgetSmall screen="TakeAttendance" payload={{ actualUser: user, token }} child={<Avatar.Icon icon={"alert"} size={50} />} />
                   </Flex>
                 ) : null}
               </VStack>
