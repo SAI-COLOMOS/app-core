@@ -86,7 +86,7 @@ export default Events = ({ navigation, route }) => {
 
   useEffect(() => {
     navigation.setOptions({
-      header: (props) => <Header {...props} children={[<IconButton icon="magnify" onPress={() => setShowSearch(!showSearch)} />]} />,
+      header: (props) => <Header {...props} children={[<IconButton key="SearchButton" icon="magnify" onPress={() => setShowSearch(!showSearch)} />]} />,
       headerTransparent: true,
       headerTitle: 'Eventos'
     })
@@ -148,7 +148,7 @@ export default Events = ({ navigation, route }) => {
                 }
                 refreshing={loading}
                 onRefresh={() => getEvents()}
-                renderItem={({ item }) => <Item name={item.name} description={item.description} event_identifier={item.event_identifier} />}
+                renderItem={({ item }) => <Item key={item.event_identifier} name={item.name} description={item.description} event_identifier={item.event_identifier} />}
               />
 
               <FAB
@@ -191,7 +191,7 @@ export default Events = ({ navigation, route }) => {
       ) : foundEvents !== null ? (
         foundEvents?.length >= 0 || foundEvents === undefined ? (
           <Flex fill>
-            <FlatList data={foundEvents} ListEmptyComponent={() => (foundEvents === undefined ? null : <InformationMessage icon="magnify" title="Sin resultados" description="No hay ningún evento registrado que cumpla con los parámetros de tu búsqueda" />)} refreshing={loading} onRefresh={() => searchEvents()} renderItem={({ item }) => <Item place={item.place} belonging_area={item.belonging_area} belonging_place={item.belonging_place} />} />
+            <FlatList data={foundEvents} ListEmptyComponent={() => (foundEvents === undefined ? null : <InformationMessage icon="magnify" title="Sin resultados" description="No hay ningún evento registrado que cumpla con los parámetros de tu búsqueda" />)} refreshing={loading} onRefresh={() => searchEvents()} renderItem={({ item }) => <Item key={item.event_identifier} place={item.place} belonging_area={item.belonging_area} belonging_place={item.belonging_place} />} />
           </Flex>
         ) : (
           <InformationMessage

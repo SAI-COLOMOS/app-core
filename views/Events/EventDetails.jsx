@@ -58,7 +58,7 @@ export default EventDetails = ({ navigation, route }) => {
   )
   
   const Event = () => (
-    <Card key="Contact" mode="outlined">
+    <Card key="Event" mode="outlined">
       <VStack p={20} spacing={5}>
         <Text variant="bodyLarge">Datos generales</Text>
         <VStack spacing={10}>
@@ -170,9 +170,10 @@ export default EventDetails = ({ navigation, route }) => {
           icon="pencil-outline"
           style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
           onPress={() => {
-            navigation.navigate('AddEvent', {
+            navigation.navigate('EditEvent', {
               token,
-              event
+              event,
+              event_identifier
             })
           }}
         />

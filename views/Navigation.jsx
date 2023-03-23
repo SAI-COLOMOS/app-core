@@ -15,6 +15,7 @@ import Dashboard from './Dashboard/Dashboard'
 import Events from './Events/Events'
 import EventDetails from './Events/EventDetails'
 import AddEvent from './Events/AddEvent'
+import EditEvent from './Events/EditEvent'
 
 // Profile
 import Profile from './Profile/Profile'
@@ -77,9 +78,10 @@ export default Navigation = () => {
       </Stack.Group>
 
       <Stack.Group navigationKey="events" screenOptions={{ headerShown: true, animationTypeForReplace: 'push', animation: 'fade_from_bottom' }}>
-      <Stack.Screen name="Events" component={Events} />
-      <Stack.Screen name="EventDetails" component={EventDetails} />
-      <Stack.Screen name="AddEvent" component={AddEvent} options={{ headerShown: false, presentation: 'containedTransparentModal' }} />
+        <Stack.Screen name="Events" component={Events} />
+        <Stack.Screen name="EventDetails" component={EventDetails} />
+        <Stack.Screen name="AddEvent" component={AddEvent} options={{ headerShown: false, presentation: 'containedTransparentModal' }} />
+        <Stack.Screen name="EditEvent" component={EditEvent} options={{ headerShown: false, presentation: 'containedTransparentModal' }} />
       </Stack.Group>
 
       <Stack.Group navigationKey="placesAndAreas" screenOptions={{ headerShown: true, animationTypeForReplace: 'push', animation: 'fade_from_bottom' }}>

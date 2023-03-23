@@ -97,7 +97,7 @@ export default AddEvent = ({ navigation, route }) => {
   
   const Data = () => {
     return (
-      <VStack spacing={5}>
+      <VStack key="Data" spacing={5}>
         <Text variant="labelLarge">Datos del evento</Text>
         <VStack spacing={10}>
           <TextInput mode="outlined" value={name} onChangeText={setName} autoCapitalize="words" label="Nombre del evento" maxLength={50} />
@@ -108,7 +108,7 @@ export default AddEvent = ({ navigation, route }) => {
           <TextInput mode="outlined" value={starting_date} onChangeText={setStarting_date} label="Fecha de inicio" maxLength={10} keyboardType="number-pad" autoComplete="off"/>
           <TextInput mode="outlined" value={ending_date} onChangeText={setEnding_date} label="Fecha de termino" maxLength={10} keyboardType="number-pad" autoComplete="off"/>
           <TextInput mode="outlined" value={author_register} onChangeText={setAuthor_register} label="Registro" maxLength={20} keyboardType="number-pad" autoComplete="off"/>
-          <TextInput mode="outlined" value={publishing_date} onChangeText={setPublishing_date} label="Fecha de publiación" maxLength={10} keyboardType="number-pad" autoComplete="off"/>
+          <TextInput mode="outlined" value={publishing_date} onChangeText={setPublishing_date} label="Fecha de publicación" maxLength={10} keyboardType="number-pad" autoComplete="off"/>
           <TextInput mode="outlined" value={place} onChangeText={setPlace} autoCapitalize="words" label="Lugar" maxLength={50} />
           <TextInput mode="outlined" value={belonging_area} onChangeText={setBelonging_area} autoCapitalize="words" label="Área de origen" maxLength={150} />
           <TextInput mode="outlined" value={belonging_place} onChangeText={setBelonging_place} autoCapitalize="words" label="Lugar de origen" maxLength={150} />
@@ -120,6 +120,7 @@ export default AddEvent = ({ navigation, route }) => {
   const Save = () => {
     return (
       <Button
+        key="SaveButton"
         icon="content-save-outline"
         disabled={modalLoading || !verified}
         loading={modalLoading}
@@ -136,6 +137,7 @@ export default AddEvent = ({ navigation, route }) => {
   const Cancel = () => {
     return (
       <Button
+        key="CancelButton"
         icon="close"
         disabled={modalLoading}
         mode="outlined"
