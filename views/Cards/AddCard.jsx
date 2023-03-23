@@ -17,7 +17,7 @@ export default AddCard = ({navigation, route}) => {
     const theme = useTheme()
 
     const [activity_name, setActivity_name] = useState('')
-    const [hours, setHours] = useState()
+    const [hours, setHours] = useState('')
     const [responsible_register, setResponsible_register] = useState('')
     const [assignation_date, setAssignation_date] = useState('')
 
@@ -48,14 +48,17 @@ export default AddCard = ({navigation, route}) => {
                 })
             }
         ).then(
-            (response) => (response.ok ? response.json() : response.status)
+            (response) => (response.status)
+            
         ).catch(
             error => null
         )
         setModalLoading(false)
 
-        console.log(request.status)
+        // console.log(request.status)
         console.log(request)
+        // console.error();
+
         if (request == 201) {
             setModalSuccess(true)
           } else if (request != null) {
@@ -67,20 +70,18 @@ export default AddCard = ({navigation, route}) => {
 
     }
 
-    const Actividades = (_) => {
+    const Actividades = () => {
         return (
-            <ScrollView >
 
             <VStack spacing={5}>
                 <Text variant="labelLarge">Actividad</Text>
                 <VStack spacing={10}>
-                    <TextInput mode="outlined" value={activity_name} onChangeText={setActivity_name} label="Nombre de actividad" maxLength={50} autoComplete="off" autoCorrect={false} />
+                    <TextInput mode="outlined" value={activity_name} onChangeText={setActivity_name} label="Nombre de actividad" maxLength={50} autoCapitalize="words" autoComplete="off" autoCorrect={false} />
                     <TextInput mode="outlined" value={hours} onChangeText={setHours} label="Horas a asignar" keyboardType="numeric" maxLength={3} autoComplete="off" autoCorrect={false} />
-                    <TextInput mode="outlined" value={responsible_register} onChangeText={setResponsible_register} label="Registro del responsable" maxLength={12} autoComplete="off" autoCorrect={false} />
-                    <TextInput mode="outlined" value={assignation_date} onChangeText={setAssignation_date} label="Fecha de asignación" autoComplete="off" autoCorrect={false} />
+                    <TextInput mode="outlined" value={responsible_register} onChangeText={setResponsible_register} label="Registro del responsable" maxLength={12} autoCapitalize="characters" autoComplete="off" autoCorrect={false} />
+                    <TextInput mode="outlined" value={assignation_date} onChangeText={setAssignation_date} label="Fecha de asignación"  autoComplete="off" autoCorrect={false} />
                 </VStack>
             </VStack>
-            </ScrollView>
         )
     }
 

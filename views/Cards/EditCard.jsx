@@ -8,15 +8,16 @@ import { useCallback, useEffect, useState } from 'react'
 
 
 export default EditCard = ({navigation, route}) => {
-    const { user, token, register, activities, activity_identifier, card} = route.params
+    const { user, token, card, activity} = route.params
     const localhost = Constants.expoConfig.extra.API_LOCAL
     const theme = useTheme()
 
-    const [activity_name, setActivity_name] = useState(`${activities?.activity_name ?? ''}`)
-    const [hours, setHours] = useState(`${card?.hours ?? ''}`)
-    const [responsible_register, setResponsible_register] = useState(`${card?.responsible_register ?? ''}`)
-    const [assignation_date, setAssignation_date] = useState(`${card?.assignation_date ?? ''}`)
+    const [activity_name, setActivity_name] = useState(`${activity?.activity_name ?? ''}`)
+    const [hours, setHours] = useState(`${activity?.hours ?? ''}`)
+    const [responsible_register, setResponsible_register] = useState(`${activity?.responsible_register ?? ''}`)
+    const [assignation_date, setAssignation_date] = useState(`${activity?.assignation_date ?? ''}`)
 
+    const [modalConfirm, setModalConfirm] = useState(false)
     const [modalSuccess, setModalSuccess] = useState(false)
     const [modalLoading, setModalLoading] = useState(false)
     const [modalError, setModalError] = useState(false)
@@ -25,10 +26,12 @@ export default EditCard = ({navigation, route}) => {
     const [modalErrorDelete, setModalErrorDelete] = useState(false)
     const [responseCode, setResponseCode] = useState('')
 
+    // console.log("Hey", `${localhost}/cards/${user?.register}/activity/${activity._id}`) 
 
     async function UpdateCard() {
+        setModalLoading(true)
         const request = await fetch (
-            `${localhost}/cards/${register}/activity/${activity_name}`,
+            `${localhost}/cards/${user?.register}/activity/${activity._id}`,
             {
                 method: "PATCH",
                 headers: {
@@ -44,10 +47,13 @@ export default EditCard = ({navigation, route}) => {
                 })
             }
         ).then(
-            (response) => (response.ok ? response.json() : response.status)
+            (response) => response.status
         ).catch(
             (_) => null
         )
+        setModalLoading(false)
+        // console.log("var user ",User)
+        console.log(request);
 
         if(request == 200){
             setModalSuccess(true)
@@ -59,6 +65,33 @@ export default EditCard = ({navigation, route}) => {
           }
         
 
+    }
+
+    async function DeleteCard() {
+        const request = await fetch (
+            `${localhost}/cards/${user?.register}/activity/${activity._id}`,
+            {
+                method: "DELETE",
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                    'Cache-Control': 'no-cache'
+                }
+            })
+        .then(
+            (response) => response.status
+        ).catch(
+            (_) => null
+        )
+
+        if (request == 200) {
+            setModalSuccessDelete(true)
+          } else if (request != null) {
+            setResponseCode(request)
+            setModalErrorDelete(true)
+          } else {
+            setModalFatal(true)
+          }
     }
     
     const Actividades = (_) => {
@@ -103,13 +136,42 @@ export default EditCard = ({navigation, route}) => {
         )
     }
 
+    const Delete = () => {
+        return (
+            <Button
+            mode="contained"
+            icon="trash-can-outline"
+            onPress={() => {
+                setModalConfirm(!modalConfirm)
+            }}
+            >
+                Eliminar actividad
+            </Button>
+        )
+    }
+
     return (
         <Flex fill>
-            <CreateForm navigation={navigation} title={'Editar actividad'} children={[Actividades()]} actions={[Update(), Cancel()]}/>
-
+            <CreateForm navigation={navigation} title={'Editar actividad'} children={[Actividades(), Delete()]} actions={[Update(), Cancel()]}/>
+            <ModalMessage
+                title="Eliminar actividad"
+                description="¿Seguro que deseas eliminar esta actividad? La acción no se podrá deshacer"
+                handler={[modalConfirm, () => setModalConfirm(!modalConfirm)]}
+                actions={[
+                ['Cancelar', () => setModalConfirm(!modalConfirm)],
+                [
+                    'Aceptar',
+                    () => {
+                    setModalConfirm(!modalConfirm), DeleteCard()
+                    }
+                ]
+                ]}
+                dismissable={true}
+                icon="help-circle-outline"
+            />
             <ModalMessage title="¡Listo!" description="La actividad ha sido actualizada" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline" />
 
-            <ModalMessage title="¡Listo!" description="La actividad ha sido eliminada" handler={[modalSuccessDelete, () => setModalSuccessDelete(!modalSuccessDelete)]} actions={[['Aceptar', () => navigation.pop(2)]]} dismissable={false} icon="check-circle-outline" />
+            <ModalMessage title="¡Listo!" description="La actividad ha sido eliminada" handler={[modalSuccessDelete, () => setModalSuccessDelete(!modalSuccessDelete)]} actions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline" />
 
             <ModalMessage title="Ocurrió un problema" description={`No pudimos actualizar la actividad, intentalo más tarde. (${responseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline" />
 
