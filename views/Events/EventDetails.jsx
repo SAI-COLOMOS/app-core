@@ -21,7 +21,7 @@ export default EventDetails = ({ navigation, route }) => {
   async function getEvent() {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/agenda`,{
+    const request = await fetch(`${localhost}/agenda/${event_identifier}`,{
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -56,90 +56,62 @@ export default EventDetails = ({ navigation, route }) => {
       return () => {}
     }, [])
   )
-
-  const Event = () => {
-    return (
+  
+  const Event = () => (
+    <Card key="Contact" mode="outlined">
       <VStack p={20} spacing={5}>
-        <Text variant="bodyLarge">Evento</Text>
+        <Text variant="bodyLarge">Datos generales</Text>
         <VStack spacing={10}>
-          <Text variant="labelSmall">Lugar del evento</Text>
-          <Text variant="bodyMedium">{`${event?.place}`}</Text>
-
           <Flex>
-            <Text variant="labelSmall">Área de creación del evento</Text>
-            <Text variant="bodyMedium">{event?.belonging_area}</Text>
+            <Text variant="labelSmall">Descripción</Text>
+            <Text variant="bodyMedium">{event?.description}</Text>
+          </Flex>
+          
+          <Flex>
+            <Text variant="labelSmall">Lugar</Text>
+            <Text variant="bodyMedium">{event?.place}</Text>
           </Flex>
 
           <Flex>
-            <Text variant="labelSmall">Lugar de creación del evento</Text>
-            <Text variant="bodyMedium">{event?.belonging_place}</Text>
+            <Text variant="labelSmall">Hora de inicio</Text>
+            <Text variant="bodyMedium">{event?.starting_date}</Text>
           </Flex>
-        </VStack>
-      </VStack>
-    )
-  }
 
-  const Events = () => {
-    return (
-      <VStack p={20} spacing={5}>
-        <Text variant="bodyLarge">Áreas</Text>
-        <VStack spacing={10}>
-          {event.place.length > 0 ? (
-            event.belonging_area.map((area) => (
-              <Card mode="outlined" key={area.belonging_area}>
-                <VStack spacing={10} p={20}>
-                  <VStack fill spacing={10}>
-                    <Flex>
-                      <Text variant="labelSmall">Área de creación del evento</Text>
-                      <Text variant="bodyMedium">{area?.belonging_area}</Text>
-                    </Flex>
-                    <Flex>
-                      <Text variant="labelSmall">Lugar de creación del evento</Text>
-                      <Text variant="bodyMedium">{event?.belonging_place}</Text>
-                    </Flex>
-                  </VStack>
-                  <Button
-                    icon="pencil-outline"
-                    onPrpess={() => {
-                      navigation.navigate('AddEvent', {
-                        token,
-                        area,
-                        event_identifier
-                      })
-                    }}
-                  >
-                    Editar evento
-                  </Button>
-                </VStack>
-              </Card>
-            ))
-          ) : (
-            <VStack center spacing={20} p={30}>
-              <Icon name="pencil-plus-outline" color={theme.colors.onBackground} size={50} />
-              <VStack center>
-                <Text variant="headlineSmall">Sin áreas</Text>
-                <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
-                  No hay ningún evento registrado, ¿qué te parece si hacemos el primero?
-                </Text>
-              </VStack>
-            </VStack>
-          )}
         </VStack>
-        <Button
-          icon="plus"
-          onPress={() => {
-            navigation.navigate('AddEvent', {
-              token,
-              place,
-              event_identifier
-            })
-          }}
-        >
-          Agregar evento
-        </Button>
       </VStack>
-    )
-  }
+    </Card>
+  )
+
+  const Info = () => (
+    <Card key="Info" mode="outlined">
+      <VStack p={20} spacing={5}>
+        <Text variant="bodyLarge">Datos técnicos</Text>
+        <VStack spacing={10}>             
+          <Flex>
+            <Text variant="labelSmall">Horas ofertadas</Text>
+            <Text variant="bodyMedium">{event?.offered_hours}</Text>
+          </Flex>
+
+          <Flex>
+            <Text variant="labelSmall">Prestadores requeridos</Text>
+            <Text variant="bodyMedium">{event?.vacancy}</Text>
+          </Flex>
+
+          <Flex>
+            <Text variant="labelSmall">Autor</Text>
+            <Text variant="bodyMedium">{event?.author_register}</Text>
+          </Flex>
+
+          <Flex>
+            <Text variant="labelSmall">Fecha de publicación</Text>
+            <Text variant="bodyMedium">{event?.publishing_date}</Text>
+          </Flex>
+
+        </VStack>
+      </VStack>
+    </Card>
+  )
+
 
   return (
     <Flex fill pt={headerMargin - 20}>
@@ -147,14 +119,14 @@ export default EventDetails = ({ navigation, route }) => {
         {event !== undefined ? (
           event !== null ? (
             isNaN(event) ? (
-              <DisplayDetails icon="bulletin-board" title={event?.place} children={[Event(), Events()]} />
+              <DisplayDetails icon="bulletin-board" title={event?.name} children={[Event(), Info()]} />
             ) : (
               <VStack p={30} center spacing={20}>
                 <Icon color={theme.colors.onBackground} name="alert-circle-outline" size={50} />
                 <VStack center>
                   <Text variant="headlineSmall">Ocurrió un problema</Text>
                   <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
-                    No podemos recuperar el evento, inténtalo de nuevo más tarde (Error: {place})
+                    No podemos recuperar el evento, inténtalo de nuevo más tarde (Error: {event})
                   </Text>
                 </VStack>
                 <Flex>
@@ -198,7 +170,7 @@ export default EventDetails = ({ navigation, route }) => {
           icon="pencil-outline"
           style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
           onPress={() => {
-            navigation.navigate('EditPlace', {
+            navigation.navigate('AddEvent', {
               token,
               event
             })
@@ -208,3 +180,5 @@ export default EventDetails = ({ navigation, route }) => {
     </Flex>
   )
 }
+
+
