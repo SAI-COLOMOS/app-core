@@ -85,13 +85,13 @@ export default Cards = ({navigation, route}) => {
 //     }
 // }, [cards])
 
-  const Item = useCallback(({ first_name, role, avatar, register }) => {
+  const Item = useCallback(({ first_name, role, avatar, user }) => {
     return (
       <Flex ph={20} pv={5} onPress={() => {}}>
         <Card mode="outlined" style={{ overflow: 'hidden' }}>
           <TouchableRipple
             onPress={() => {
-              navigation.navigate('CardDetails', { token, register })
+              navigation.navigate('CardDetailsNex', { token, user })
             }}
           >
             <Flex p={10}>
@@ -159,7 +159,7 @@ export default Cards = ({navigation, route}) => {
 
   return (
     <Flex fill pt={headerMargin}>
-        <FlatList data={users} ListEmptyComponent={() => (users === undefined ? null : users === null ? <NoConection /> : <EmptyList />)} refreshing={loading} onRefresh={(_) => getUsers()} renderItem={({ item }) => <Item onPress={() => {}} first_name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ''}`} role={`${item.register}`} register={item.register} avatar={item?.avatar} />}/>
+        <FlatList data={users} ListEmptyComponent={() => (users === undefined ? null : users === null ? <NoConection /> : <EmptyList />)} refreshing={loading} onRefresh={(_) => getUsers()} renderItem={({ item }) => <Item onPress={() => {}} first_name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ''}`} role={`${item.register}`} user={item} avatar={item?.avatar} />}/>
         {/* <FlatList data={cards} ListEmptyComponent={() => (cards === undefined ? null : cards === null ? <NoConection /> : <EmptyList />)} refreshing={loading} onRefresh={(_) => getCard()} renderItem={({ item }) => <Item onPress={() => {}} first_name={`${item.activity_name} ${item.hours}`} role={`${item.responsible_register}`} register={item.assignation_date} />}/> */}
     </Flex>
   )

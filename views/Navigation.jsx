@@ -50,7 +50,7 @@ import ShowAttendanceCode from './Attendance/ShowAttendanceCode'
 
 // Cards
 import Cards from "./Cards/Cards"
-import CardDetails from "./Cards/CardDetails";
+import CardDetails from "./Cards/CardDetailsNex";
 import AddCard from "./Cards/AddCard";
 import EditCard from "./Cards/EditCard";
 
@@ -107,7 +107,7 @@ export default Navigation = () => {
 
       <Stack.Group navigationKey="cards" screenOptions={{ headerShown: true, animationTypeForReplace: 'push', animation: 'fade_from_bottom' }}>
         <Stack.Screen name="Cards" component={Cards} />
-        <Stack.Screen name="CardDetails" component={CardDetails} />
+        <Stack.Screen name="CardDetailsNex" component={CardDetails} />
         <Stack.Screen name="EditCard" component={EditCard} options={{ headerShown: false, presentation: 'containedTransparentModal' }}/>
         <Stack.Screen name="AddCard" component={AddCard} options={{ headerShown: false, presentation: 'containedTransparentModal' }}/>
       </Stack.Group>
