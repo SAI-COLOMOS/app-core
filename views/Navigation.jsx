@@ -11,6 +11,11 @@ import SetNewPassword from './Authentication/SetNewPassword'
 // Dashboard
 import Dashboard from './Dashboard/Dashboard'
 
+// Events
+import Events from './Events/Events'
+import EventDetails from './Events/EventDetails'
+import AddEvent from './Events/AddEvent'
+
 // Profile
 import Profile from './Profile/Profile'
 import UpdatePassword from './Profile/UpdatePassword'
@@ -69,6 +74,12 @@ export default Navigation = () => {
         <Stack.Screen name="SchoolDetails" component={SchoolDetails} />
         <Stack.Screen name="AddSchool" component={AddSchool} options={{ headerShown: false, presentation: 'containedTransparentModal' }} />
         <Stack.Screen name="EditSchool" component={EditSchool} options={{ headerShown: false, presentation: 'containedTransparentModal' }} />
+      </Stack.Group>
+
+      <Stack.Group navigationKey="events" screenOptions={{ headerShown: true, animationTypeForReplace: 'push', animation: 'fade_from_bottom' }}>
+      <Stack.Screen name="Events" component={Events} />
+      <Stack.Screen name="EventDetails" component={EventDetails} />
+      <Stack.Screen name="AddEvent" component={AddEvent} options={{ headerShown: false, presentation: 'containedTransparentModal' }} />
       </Stack.Group>
 
       <Stack.Group navigationKey="placesAndAreas" screenOptions={{ headerShown: true, animationTypeForReplace: 'push', animation: 'fade_from_bottom' }}>
