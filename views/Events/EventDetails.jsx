@@ -1,27 +1,27 @@
 import { Flex, VStack } from '@react-native-material/core'
-import { useCallback, useEffect, useState } from 'react'
-import { FlatList, RefreshControl, ScrollView } from 'react-native'
-import { ActivityIndicator, Avatar, Button, Card, FAB, ProgressBar, Text, useTheme } from 'react-native-paper'
+import { useEffect, useState, useCallback } from 'react'
 import { useHeaderHeight } from '@react-navigation/elements'
-import Constants from 'expo-constants'
+import { Text, Card, Button, FAB, useTheme } from 'react-native-paper'
 import Header from '../Shared/Header'
+import Constants from 'expo-constants'
 import DisplayDetails from '../Shared/DisplayDetails'
+import { ScrollView, RefreshControl } from 'react-native'
 import { useFocusEffect } from '@react-navigation/native'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
-export default SchoolDetails = ({ navigation, route }) => {
+export default EventDetails = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
-  const { token, school_identifier } = route.params
   const headerMargin = useHeaderHeight()
+  const { token, event_identifier } = route.params
   const theme = useTheme()
 
   const [loading, setLoading] = useState(false)
-  const [school, setSchool] = useState(undefined)
+  const [event, setEvent] = useState(undefined)
 
-  async function getSchool() {
+  async function getEvent() {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/schools/${school_identifier}`, {
+    const request = await fetch(`${localhost}/agenda/${event_identifier}`,{
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -30,15 +30,15 @@ export default SchoolDetails = ({ navigation, route }) => {
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
-      .catch((_) => null)
+      .catch(() => null)
 
     setLoading(false)
 
-    if (request?.school) {
-      setSchool(request.school)
-      console.log(request)
+    if (request?.event) {
+      setEvent(request.event)
+      console.log(request.event.event_identifier)
     } else {
-      setSchool(request)
+      setEvent(request)
     }
   }
 
@@ -46,97 +46,94 @@ export default SchoolDetails = ({ navigation, route }) => {
     navigation.setOptions({
       header: (props) => <Header {...props} />,
       headerTransparent: true,
-      headerTitle: 'Datos de la escuela'
+      headerTitle: 'Datos del evento'
     })
   }, [])
 
   useFocusEffect(
     useCallback(() => {
-      getSchool()
+      getEvent()
       return () => {}
     }, [])
   )
-
-  // TO-DO: Por revisar que onda con esto
-  const NoConection = (_) => {
-    return (
-      <VStack center spacing={20} p={30}>
-        <Icon name="wifi-alert" color={theme.colors.onBackground} size={50} />
-        <VStack center>
-          <Text variant="headlineSmall">Sin conexión</Text>
-          <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
-            Parece que no tienes conexión a internet, conectate e intenta de nuevo
-          </Text>
-        </VStack>
-        <Flex>
-          <Button
-            icon="reload"
-            mode="outlined"
-            onPress={(_) => {
-              getSchool()
-            }}
-          >
-            Volver a intentar
-          </Button>
-        </Flex>
-      </VStack>
-    )
-  }
-
-  const Contact = () => (
+  
+  const Event = () => (
     <Card key="Contact" mode="outlined">
       <VStack p={20} spacing={5}>
-        <Text variant="bodyLarge">Contacto de la escuela</Text>
+        <Text variant="bodyLarge">Datos generales</Text>
         <VStack spacing={10}>
           <Flex>
-            <Text variant="labelSmall">Teléfono de la escuela</Text>
-            <Text variant="bodyMedium">{school?.phone}</Text>
+            <Text variant="labelSmall">Descripción</Text>
+            <Text variant="bodyMedium">{event?.description}</Text>
           </Flex>
+          
+          <Flex>
+            <Text variant="labelSmall">Lugar</Text>
+            <Text variant="bodyMedium">{event?.place}</Text>
+          </Flex>
+
+          <Flex>
+            <Text variant="labelSmall">Hora de inicio</Text>
+            <Text variant="bodyMedium">{event?.starting_date}</Text>
+          </Flex>
+
         </VStack>
       </VStack>
     </Card>
   )
 
-  const Address = () => (
-    <Card key="Address" mode="outlined">
+  const Info = () => (
+    <Card key="Info" mode="outlined">
       <VStack p={20} spacing={5}>
-        <Text variant="bodyLarge">Dirección de la escuela</Text>
-        <VStack spacing={10}>
+        <Text variant="bodyLarge">Datos técnicos</Text>
+        <VStack spacing={10}>             
           <Flex>
-            <Text variant="labelSmall">Domicilio</Text>
-            <Text variant="bodyLarge">{`${school?.street} #${school?.exterior_number}\n${school?.colony}, ${school?.municipality}. ${school?.postal_code}`}</Text>
+            <Text variant="labelSmall">Horas ofertadas</Text>
+            <Text variant="bodyMedium">{event?.offered_hours}</Text>
           </Flex>
 
           <Flex>
-            <Text variant="labelSmall">Referencia</Text>
-            <Text variant="bodyMedium">{school?.reference ? school?.reference : 'Sin referencia'}</Text>
+            <Text variant="labelSmall">Prestadores requeridos</Text>
+            <Text variant="bodyMedium">{event?.vacancy}</Text>
           </Flex>
+
+          <Flex>
+            <Text variant="labelSmall">Autor</Text>
+            <Text variant="bodyMedium">{event?.author_register}</Text>
+          </Flex>
+
+          <Flex>
+            <Text variant="labelSmall">Fecha de publicación</Text>
+            <Text variant="bodyMedium">{event?.publishing_date}</Text>
+          </Flex>
+
         </VStack>
       </VStack>
     </Card>
   )
+
 
   return (
     <Flex fill pt={headerMargin - 20}>
-      <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={(_) => getSchool()} />}>
-        {school !== undefined ? (
-          school !== null ? (
-            isNaN(school) ? (
-              <DisplayDetails icon="town-hall" title={school?.school_name} children={[Contact(), Address()]} />
+      <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={(_) => getEvent()} />}>
+        {event !== undefined ? (
+          event !== null ? (
+            isNaN(event) ? (
+              <DisplayDetails icon="bulletin-board" title={event?.name} children={[Event(), Info()]} />
             ) : (
               <VStack p={30} center spacing={20}>
                 <Icon color={theme.colors.onBackground} name="alert-circle-outline" size={50} />
                 <VStack center>
                   <Text variant="headlineSmall">Ocurrió un problema</Text>
                   <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
-                    No podemos recuperar los datos de la escuela, intentalo de nuevo más tarde (Error: {school})
+                    No podemos recuperar el evento, inténtalo de nuevo más tarde (Error: {event})
                   </Text>
                 </VStack>
                 <Flex>
                   <Button
                     mode="outlined"
                     onPress={(_) => {
-                      getSchool()
+                      getEvent()
                     }}
                   >
                     Volver a intentar
@@ -150,14 +147,14 @@ export default SchoolDetails = ({ navigation, route }) => {
               <VStack center>
                 <Text variant="headlineSmall">Sin internet</Text>
                 <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
-                  No podemos recuperar los datos de la escuela, revisa tu conexión a internet e intentalo de nuevo
+                  No podemos recuperar los datos del evento, revisa tu conexión a internet e inténtalo de nuevo
                 </Text>
               </VStack>
               <Flex>
                 <Button
                   mode="outlined"
-                  onPress={(_) => {
-                    getSchool()
+                  onPress={() => {
+                    getEvent()
                   }}
                 >
                   Volver a intentar
@@ -168,14 +165,14 @@ export default SchoolDetails = ({ navigation, route }) => {
         ) : null}
       </ScrollView>
 
-      {!(school === undefined || school === null) ? (
+      {!(event === undefined || event === null) ? (
         <FAB
           icon="pencil-outline"
           style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
           onPress={() => {
-            navigation.navigate('EditSchool', {
+            navigation.navigate('AddEvent', {
               token,
-              school
+              event
             })
           }}
         />
@@ -183,3 +180,5 @@ export default SchoolDetails = ({ navigation, route }) => {
     </Flex>
   )
 }
+
+

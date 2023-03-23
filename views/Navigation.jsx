@@ -11,6 +11,11 @@ import SetNewPassword from './Authentication/SetNewPassword'
 // Dashboard
 import Dashboard from './Dashboard/Dashboard'
 
+// Events
+import Events from './Events/Events'
+import EventDetails from './Events/EventDetails'
+import AddEvent from './Events/AddEvent'
+
 // Profile
 import Profile from './Profile/Profile'
 import UpdatePassword from './Profile/UpdatePassword'
@@ -37,8 +42,8 @@ import EditUser from './Users/EditUser'
 
 // Attendance
 import AttendanceDetails from './Attendance/AttendanceDetails'
-import AttendanceRegister from './Attendance/AttendanceRegister'
-import AttendanceScan from './Attendance/AttendanceScan'
+import TakeAttendance from './Attendance/TakeAttendance'
+import ScanAttendance from './Attendance/ScanAttendance'
 import AttendanceProximityClient from './Attendance/AttendanceProximityClient'
 import ShowAttendanceCode from './Attendance/ShowAttendanceCode'
 
@@ -71,6 +76,12 @@ export default Navigation = () => {
         <Stack.Screen name="EditSchool" component={EditSchool} options={{ headerShown: false, presentation: 'containedTransparentModal' }} />
       </Stack.Group>
 
+      <Stack.Group navigationKey="events" screenOptions={{ headerShown: true, animationTypeForReplace: 'push', animation: 'fade_from_bottom' }}>
+      <Stack.Screen name="Events" component={Events} />
+      <Stack.Screen name="EventDetails" component={EventDetails} />
+      <Stack.Screen name="AddEvent" component={AddEvent} options={{ headerShown: false, presentation: 'containedTransparentModal' }} />
+      </Stack.Group>
+
       <Stack.Group navigationKey="placesAndAreas" screenOptions={{ headerShown: true, animationTypeForReplace: 'push', animation: 'fade_from_bottom' }}>
         <Stack.Screen name="PlacesAndAreas" component={PlacesAndAreas} />
         <Stack.Screen name="PlaceDetails" component={PlaceDetails} />
@@ -101,8 +112,8 @@ export default Navigation = () => {
 
       <Stack.Group navigationKey="attendance" screenOptions={{ headerShown: true, animationTypeForReplace: 'push', animation: 'fade_from_bottom' }}>
         <Stack.Screen name="AttendanceDetails" component={AttendanceDetails} />
-        <Stack.Screen name="AttendanceRegister" component={AttendanceRegister} />
-        <Stack.Screen name="AttendanceScan" component={AttendanceScan} options={{ headerShown: false, presentation: 'containedTransparentModal' }} />
+        <Stack.Screen name="TakeAttendance" component={TakeAttendance} />
+        <Stack.Screen name="ScanAttendance" component={ScanAttendance} options={{ headerShown: false, presentation: 'containedTransparentModal' }} />
         <Stack.Screen name="AttendanceProximityClient" component={AttendanceProximityClient} options={{ headerShown: false, presentation: 'containedTransparentModal' }} />
         <Stack.Screen name="ShowAttendanceCode" component={ShowAttendanceCode} options={{ headerShown: false, presentation: 'containedTransparentModal' }} />
 

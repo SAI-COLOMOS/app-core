@@ -111,74 +111,68 @@ export default EditPlace = ({ navigation, route }) => {
     }
   }, [place_name, street, exterior_number, colony, municipality, postal_code, phone])
 
-  const Data = () => {
-    return (
-      <VStack spacing={5}>
-        <Text variant="labelLarge">Datos del bosque urbano</Text>
-        <VStack spacing={10}>
-          <TextInput mode="outlined" value={place_name} onChangeText={setPlace_name} autoCapitalize="words" label="Nombre del bosque urbano" maxLength={50} />
-          <TextInput mode="outlined" value={street} onChangeText={setStreet} label="Nombre de la calle" maxLength={50} />
-          <TextInput mode="outlined" value={exterior_number} onChangeText={setExterior_number} label="Número del domicilio" maxLength={50} keyboardType="number-pad" autoComplete="off" />
-          <TextInput mode="outlined" value={colony} onChangeText={setColony} autoCapitalize="words" label="Nombre de la colonia" maxLength={50} />
-          <TextInput mode="outlined" value={municipality} onChangeText={setMunicipality} autoCapitalize="words" label="Nombre del municipio" maxLength={50} />
-          <TextInput mode="outlined" value={postal_code} onChangeText={setPostal_code} label="Código postal" maxLength={5} keyboardType="number-pad" autoComplete="off" />
-          <TextInput mode="outlined" value={phone} onChangeText={setPhone} label="Número telefónico" maxLength={10} keyboardType="phone-pad" autoComplete="off" />
-          <TextInput mode="outlined" value={reference} onChangeText={setReference} label="Referencia del lugar" maxLength={250} />
-        </VStack>
+  const Data = () => (
+    <VStack key="Data" spacing={5}>
+      <Text variant="labelLarge">Datos del bosque urbano</Text>
+      <VStack spacing={10}>
+        <TextInput mode="outlined" value={place_name} onChangeText={setPlace_name} autoCapitalize="words" label="Nombre del bosque urbano" maxLength={50} />
+        <TextInput mode="outlined" value={street} onChangeText={setStreet} label="Nombre de la calle" maxLength={50} />
+        <TextInput mode="outlined" value={exterior_number} onChangeText={setExterior_number} label="Número del domicilio" maxLength={50} keyboardType="number-pad" autoComplete="off" />
+        <TextInput mode="outlined" value={colony} onChangeText={setColony} autoCapitalize="words" label="Nombre de la colonia" maxLength={50} />
+        <TextInput mode="outlined" value={municipality} onChangeText={setMunicipality} autoCapitalize="words" label="Nombre del municipio" maxLength={50} />
+        <TextInput mode="outlined" value={postal_code} onChangeText={setPostal_code} label="Código postal" maxLength={5} keyboardType="number-pad" autoComplete="off" />
+        <TextInput mode="outlined" value={phone} onChangeText={setPhone} label="Número telefónico" maxLength={10} keyboardType="phone-pad" autoComplete="off" />
+        <TextInput mode="outlined" value={reference} onChangeText={setReference} label="Referencia del lugar" maxLength={250} />
       </VStack>
-    )
-  }
+    </VStack>
+  )
 
-  const Delete = () => {
-    return (
-      <VStack spacing={5}>
-        <Text variant="labelLarge">Eliminar bosque urbano</Text>
-        <VStack spacing={10}>
-          <Button
-            textColor={theme.colors.error}
-            icon="trash-can-outline"
-            mode="outlined"
-            onPress={() => {
-              setModalConfirm(!modalConfirm)
-            }}
-          >
-            Eliminar
-          </Button>
-        </VStack>
+  const Delete = () => (
+    <VStack key="Delete" spacing={5}>
+      <Text variant="labelLarge">Eliminar bosque urbano</Text>
+      <VStack spacing={10}>
+        <Button
+          textColor={theme.colors.error}
+          icon="trash-can-outline"
+          mode="outlined"
+          onPress={() => {
+            setModalConfirm(!modalConfirm)
+          }}
+        >
+          Eliminar
+        </Button>
       </VStack>
-    )
-  }
+    </VStack>
+  )
 
-  const Save = () => {
-    return (
-      <Button
-        icon="content-save-outline"
-        disabled={modalLoading || !verified}
-        loading={modalLoading}
-        mode="contained"
-        onPress={() => {
-          savePlace()
-        }}
-      >
-        Guardar
-      </Button>
-    )
-  }
+  const Save = () => (
+    <Button
+    key="SaveButton"
+      icon="content-save-outline"
+      disabled={modalLoading || !verified}
+      loading={modalLoading}
+      mode="contained"
+      onPress={() => {
+        savePlace()
+      }}
+    >
+      Guardar
+    </Button>
+  )
 
-  const Cancel = () => {
-    return (
-      <Button
-        icon="close"
-        disabled={modalLoading}
-        mode="outlined"
-        onPress={() => {
-          navigation.pop()
-        }}
-      >
-        Cancelar
-      </Button>
-    )
-  }
+  const Cancel = () => (
+    <Button
+    key="CancelButton"
+      icon="close"
+      disabled={modalLoading}
+      mode="outlined"
+      onPress={() => {
+        navigation.pop()
+      }}
+    >
+      Cancelar
+    </Button>
+  )
 
   return (
     <Flex fill>

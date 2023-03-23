@@ -79,69 +79,63 @@ export default AddSchool = ({ navigation, route }) => {
     }
   }, [school_name, municipality, street, postal_code, exterior_number, colony, phone])
 
-  const Data = () => {
-    return (
-      <VStack spacing={5}>
-        <Text variant="labelLarge">Datos de la escuela</Text>
-        <VStack spacing={10}>
-          <TextInput mode="outlined" value={school_name} onChangeText={setSchool_name} label="Nombre de la escuela" maxLength={150} autoComplete="off" autoCapitalize="words" />
-          <TextInput mode="outlined" value={phone} onChangeText={setPhone} label="Teléfono de la escuela" maxLength={10} autoComplete="off" keyboardType="phone-pad" />
-        </VStack>
+  const Data = () => (
+    <VStack key="Data" spacing={5}>
+      <Text variant="labelLarge">Datos de la escuela</Text>
+      <VStack spacing={10}>
+        <TextInput mode="outlined" value={school_name} onChangeText={setSchool_name} label="Nombre de la escuela" maxLength={150} autoComplete="off" autoCapitalize="words" />
+        <TextInput mode="outlined" value={phone} onChangeText={setPhone} label="Teléfono de la escuela" maxLength={10} autoComplete="off" keyboardType="phone-pad" />
       </VStack>
-    )
-  }
+    </VStack>
+  )
 
-  const Address = () => {
-    return (
-      <VStack spacing={5}>
-        <Text variant="labelLarge">Dirección de la escuela</Text>
-        <VStack spacing={10}>
-          <TextInput mode="outlined" value={street} onChangeText={setStreet} label="Calle de la escuela" maxLength={150} autoComplete="off" />
-          <TextInput mode="outlined" value={exterior_number} onChangeText={setExterior_number} label="Número de la escuela" keyboardType="number-pad" maxLength={10} autoComplete="off" />
-          <TextInput mode="outlined" value={colony} onChangeText={setColony} label="Colonia de la escuela" maxLength={150} autoComplete="off" autoCapitalize="words" />
-          <TextInput mode="outlined" value={municipality} onChangeText={setMunicipality} label="Municipio de la escuela" maxLength={150} autoComplete="off" autoCapitalize="words" />
-          <TextInput mode="outlined" value={postal_code} onChangeText={setPostal_code} label="Código postal de la escuela" maxLength={5} autoComplete="off" keyboardType="number-pad" />
-          <TextInput mode="outlined" value={reference} onChangeText={setReference} label="Referencias de la escuela" maxLength={250} autoComplete="off" numberOfLines={3} multiline={true} />
-        </VStack>
+  const Address = () => (
+    <VStack key="Address" spacing={5}>
+      <Text variant="labelLarge">Dirección de la escuela</Text>
+      <VStack spacing={10}>
+        <TextInput mode="outlined" value={street} onChangeText={setStreet} label="Calle de la escuela" maxLength={150} autoComplete="off" />
+        <TextInput mode="outlined" value={exterior_number} onChangeText={setExterior_number} label="Número de la escuela" keyboardType="number-pad" maxLength={10} autoComplete="off" />
+        <TextInput mode="outlined" value={colony} onChangeText={setColony} label="Colonia de la escuela" maxLength={150} autoComplete="off" autoCapitalize="words" />
+        <TextInput mode="outlined" value={municipality} onChangeText={setMunicipality} label="Municipio de la escuela" maxLength={150} autoComplete="off" autoCapitalize="words" />
+        <TextInput mode="outlined" value={postal_code} onChangeText={setPostal_code} label="Código postal de la escuela" maxLength={5} autoComplete="off" keyboardType="number-pad" />
+        <TextInput mode="outlined" value={reference} onChangeText={setReference} label="Referencias de la escuela" maxLength={250} autoComplete="off" numberOfLines={3} multiline={true} />
       </VStack>
-    )
-  }
+    </VStack>
+  )
 
-  const Save = (_) => {
-    return (
-      <Button
-        icon="content-save-outline"
-        disabled={modalLoading || !verified}
-        loading={modalLoading}
-        mode="contained"
-        onPress={() => {
-          saveSchool()
-        }}
-      >
-        Guardar
-      </Button>
-    )
-  }
+  const Save = () => (
+    <Button
+      key="SaveButton"
+      icon="content-save-outline"
+      disabled={modalLoading || !verified}
+      loading={modalLoading}
+      mode="contained"
+      onPress={() => {
+        saveSchool()
+      }}
+    >
+      Guardar
+    </Button>
+  )
 
-  const Cancel = (_) => {
-    return (
-      <Button
-        icon="close"
-        disabled={modalLoading}
-        mode="outlined"
-        onPress={(_) => {
-          navigation.pop()
-        }}
-      >
-        Cancelar
-      </Button>
-    )
-  }
+  const Cancel = () => (
+    <Button
+      key="CancelButton"
+      icon="close"
+      disabled={modalLoading}
+      mode="outlined"
+      onPress={(_) => {
+        navigation.pop()
+      }}
+    >
+      Cancelar
+    </Button>
+  )
 
   return (
     <Flex fill>
       <CreateForm title="Añadir escuela" children={[Data(), Address()]} actions={[Save(), Cancel()]} navigation={navigation} loading={modalLoading} />
-      <ModalMessage title="¡Listo!" description="La escuela ha sido añadida" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline" />
+      <ModalMessage title="¡Listo!" description="La escuela ha sido añadida" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} ions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline" />
       <ModalMessage title="Ocurrió un problema" description={`No pudimos añadir la escuela, inténtalo más tarde. (${responseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline" />
       <ModalMessage title="Sin conexión a internet" description={`Parece que no tienes conexión a internet, conéctate e intenta de nuevo`} handler={[modalFatal, () => setModalFatal(!modalFatal)]} actions={[['Aceptar']]} dismissable={true} icon="wifi-alert" />
     </Flex>

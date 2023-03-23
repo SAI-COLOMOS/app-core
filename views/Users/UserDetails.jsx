@@ -53,12 +53,8 @@ export default UserDetails = ({ navigation, route }) => {
     }, [])
   )
 
-  useEffect(() => {
-    console.log(placesOptions)
-  }, [])
-
-  const PersonalData = () => {
-    return (
+  const PersonalData = () => (
+    <Card key="Personal" mode="outlined">
       <VStack p={20} spacing={5}>
         <Text variant="bodyLarge">Datos personales</Text>
         <VStack spacing={10}>
@@ -85,11 +81,11 @@ export default UserDetails = ({ navigation, route }) => {
           ) : null}
         </VStack>
       </VStack>
-    )
-  }
+    </Card>
+  )
 
-  const ContactData = () => {
-    return (
+  const ContactData = () => (
+    <Card key="Contact" mode="outlined">
       <VStack p={20} spacing={5}>
         <Text variant="bodyLarge">Datos de contacto</Text>
         <VStack spacing={10}>
@@ -104,11 +100,11 @@ export default UserDetails = ({ navigation, route }) => {
           </Flex>
         </VStack>
       </VStack>
-    )
-  }
+    </Card>
+  )
 
-  const EmergencyData = () => {
-    return (
+  const EmergencyData = () => (
+    <Card key="Emergency" mode="outlined">
       <VStack p={20} spacing={5}>
         <Text variant="bodyLarge">Datos de emergencia</Text>
         <VStack spacing={10}>
@@ -123,11 +119,11 @@ export default UserDetails = ({ navigation, route }) => {
           </Flex>
         </VStack>
       </VStack>
-    )
-  }
+    </Card>
+  )
 
-  const AccountData = () => {
-    return (
+  const AccountData = () => (
+    <Card key="Account" mode="outlined">
       <VStack p={20} spacing={5}>
         <Text variant="bodyLarge">Datos de la cuenta</Text>
         <VStack spacing={10}>
@@ -171,8 +167,8 @@ export default UserDetails = ({ navigation, route }) => {
           </Flex>
         </VStack>
       </VStack>
-    )
-  }
+    </Card>
+  )
 
   return (
     <Flex fill mt={headerMargin - 20}>

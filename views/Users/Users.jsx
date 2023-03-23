@@ -184,7 +184,7 @@ export default Users = ({ navigation, route }) => {
 
   useEffect(() => {
     navigation.setOptions({
-      header: (props) => <Header {...props} children={[<IconButton icon="filter-outline" onPress={() => setShowFilters(!showFilters)} />, <IconButton icon="magnify" onPress={() => setShowSearch(!showSearch)} />]} />,
+      header: (props) => <Header {...props} children={[<IconButton key="FilterButton" icon="filter-outline" onPress={() => setShowFilters(!showFilters)} />, <IconButton key="SearchButton" icon="magnify" onPress={() => setShowSearch(!showSearch)} />]} />,
       headerTransparent: true,
       headerTitle: 'Usuarios'
     })
@@ -333,7 +333,7 @@ export default Users = ({ navigation, route }) => {
                 }
                 refreshing={loading}
                 onRefresh={() => getUsers()}
-                renderItem={({ item }) => <Item onPress={() => {}} first_name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ''}`} role={`${item.register}`} register={item.register} avatar={item?.avatar} />}
+                renderItem={({ item }) => <Item key={item.register} first_name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ''}`} role={`${item.register}`} register={item.register} avatar={item?.avatar} />}
               />
 
               <FAB
@@ -378,7 +378,7 @@ export default Users = ({ navigation, route }) => {
       ) : foundUsers !== null ? (
         foundUsers?.length >= 0 || foundUsers === undefined ? (
           <Flex fill>
-            <FlatList data={foundUsers} ListEmptyComponent={() => (foundUsers === undefined ? null : <InformationMessage icon="magnify" title="Sin resultados" description="No hay ningún usuario registrado que cumpla con los parámetros de tu búsqueda" />)} refreshing={loading} onRefresh={() => getUsers()} renderItem={({ item }) => <Item onPress={() => {}} first_name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ''}`} role={`${item.register}`} register={item.register} avatar={item?.avatar} />} />
+            <FlatList data={foundUsers} ListEmptyComponent={() => (foundUsers === undefined ? null : <InformationMessage icon="magnify" title="Sin resultados" description="No hay ningún usuario registrado que cumpla con los parámetros de tu búsqueda" />)} refreshing={loading} onRefresh={() => getUsers()} renderItem={({ item }) => <Item key={item.register} first_name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ''}`} role={`${item.register}`} register={item.register} avatar={item?.avatar} />} />
           </Flex>
         ) : (
           <InformationMessage

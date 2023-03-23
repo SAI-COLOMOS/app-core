@@ -1,4 +1,4 @@
-import { Flex, HStack, VStack } from '@react-native-material/core'
+import { even, Flex, VStack } from '@react-native-material/core'
 import { useState, useEffect, useCallback } from 'react'
 import { Avatar, Button, Card, FAB, IconButton, Text, TouchableRipple, useTheme } from 'react-native-paper'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -11,22 +11,30 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import SearchBar from '../Shared/SearchBar'
 import InformationMessage from '../Shared/InformationMessage'
 
-export default Schools = ({ navigation, route }) => {
+export default Events = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const theme = useTheme()
   const { user, token } = route.params
   const headerMargin = useHeaderHeight()
 
-  const [schools, setSchools] = useState(undefined)
+  const [place, setPlace] = useState(undefined)
+  const [belonging_area, setBelonging_area] = useState(undefined)
+  const [belonging_place, setBelonging_place] = useState(undefined)
+  const [events, setEvents] = useState(undefined)
+
+  const [filter, setFilter] = useState(undefined)
+  const [items, setItem] = useState(undefined)
+  const [page, setPage] = useState(undefined)
+
   const [loading, setLoading] = useState(false)
   const [showSearch, setShowSearch] = useState(null)
   const [search, setSearch] = useState('')
-  const [foundSchools, setFoundSchools] = useState(undefined)
+  const [foundEvents, setFoundEvents] = useState(undefined)
 
-  async function getSchools() {
+  async function getEvents() {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/schools`, {
+    const request = await fetch(`${localhost}/agenda`,{
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -39,24 +47,23 @@ export default Schools = ({ navigation, route }) => {
 
     setLoading(false)
 
-    if (request?.schools) {
-      setSchools(request.schools)
+    if (request?.events) {
+      setEvents(request.events)
       console.log(request)
     } else {
-      setSchools(request)
+      setEvents(request)
     }
   }
 
-  async function searchSchools() {
+  async function searchEvents() {
     setLoading(true)
 
     if (search === '') {
-      setFoundSchools(undefined)
+      setFoundEvents(undefined)
       setLoading(false)
       return
     }
-
-    const request = await fetch(`${localhost}/schools?search=${search}`, {
+    const request = await fetch(`${localhost}/agenda?search=${search}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -69,40 +76,41 @@ export default Schools = ({ navigation, route }) => {
 
     setLoading(false)
 
-    if (request?.schools) {
-      setFoundSchools(request.schools)
+    if (request?.events) {
+      setFoundEvents(request.events)
     } else {
-      setFoundSchools(request)
+      setFoundEvents(request)
     }
   }
 
+
   useEffect(() => {
     navigation.setOptions({
-      header: (props) => <Header {...props} children={[<IconButton key="SearchButton" icon="magnify" onPress={() => setShowSearch(!showSearch)} />]} />,
+      header: (props) => <Header {...props} children={[<IconButton icon="magnify" onPress={() => setShowSearch(!showSearch)} />]} />,
       headerTransparent: true,
-      headerTitle: 'Escuelas'
+      headerTitle: 'Eventos'
     })
   }, [showSearch])
 
+
   useFocusEffect(
     useCallback(() => {
-      getSchools()
-
+      getEvents()
       return () => {}
     }, [])
   )
 
-  const Item = ({ school_name, address, school_identifier }) => {
+  const Item = ({ name, description, event_identifier }) => {
     return (
-      <Flex ph={20} pv={5} onPress={() => {}}>
+      <Flex key={`ID-${event_identifier}`} ph={20} pv={5} onPress={() => {}}>
         <Card mode="outlined" style={{ overflow: 'hidden' }}>
           <TouchableRipple
             onPress={() => {
-              navigation.navigate('SchoolDetails', { token, school_identifier })
+              navigation.navigate('EventDetails', { token, event_identifier })
             }}
           >
             <Flex p={10}>
-              <Card.Title title={school_name} titleNumberOfLines={2} subtitle={address} subtitleNumberOfLines={1} left={(props) => <Avatar.Icon {...props} icon="town-hall" />} />
+              <Card.Title title={name} titleNumberOfLines={2} subtitle={description} subtitleNumberOfLines={1} left={(props) => <Avatar.Icon {...props} icon="bulletin-board" />} />
             </Flex>
           </TouchableRipple>
         </Card>
@@ -110,26 +118,27 @@ export default Schools = ({ navigation, route }) => {
     )
   }
 
+
   return (
     <Flex fill pt={headerMargin}>
-      <SearchBar show={showSearch} label="Busca por nombre de la escuela" value={search} setter={setSearch} action={searchSchools} />
+      <SearchBar show={showSearch} label="Busca por nombre del evento" value={search} setter={setSearch} action={searchEvents} />
 
       {search == '' ? (
-        schools !== null ? (
-          schools?.length >= 0 || schools === undefined ? (
+        events !== null ? (
+          events?.length >= 0 || events === undefined ? (
             <Flex fill>
               <FlatList
-                data={schools}
+                data={events}
                 ListEmptyComponent={() =>
-                  schools === undefined ? null : (
+                  events === undefined ? null : (
                     <InformationMessage
                       icon="pencil-plus-outline"
-                      title="Sin escuelas"
-                      description="No hay ninguna escuela registrada, ¿qué te parece si hacemos la primera?"
+                      title="Sin eventos"
+                      description="No hay ningún evento registrado, ¿qué te parece si hacemos el primero?"
                       buttonIcon="plus"
                       buttonTitle="Agregar"
                       action={() => {
-                        navigation.navigate('AddSchool', {
+                        navigation.navigate('AddEvent', {
                           user,
                           token
                         })
@@ -138,15 +147,15 @@ export default Schools = ({ navigation, route }) => {
                   )
                 }
                 refreshing={loading}
-                onRefresh={() => getSchools()}
-                renderItem={({ item }) => <Item key={item.school_name} school_name={item.school_name} address={`${item.street} #${item.exterior_number}, ${item.colony}, ${item.municipality}`} school_identifier={item.school_identifier} />}
+                onRefresh={() => getEvents()}
+                renderItem={({ item }) => <Item name={item.name} description={item.description} event_identifier={item.event_identifier} />}
               />
 
               <FAB
                 icon="plus"
                 style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
                 onPress={() => {
-                  navigation.navigate('AddSchool', {
+                  navigation.navigate('AddEvent', {
                     user,
                     token
                   })
@@ -161,8 +170,8 @@ export default Schools = ({ navigation, route }) => {
               buttonTitle="Volver a cargar"
               buttonIcon="reload"
               action={() => {
-                setSchools(undefined)
-                getSchools()
+                setEvents(undefined)
+                getEvents()
               }}
             />
           )
@@ -174,15 +183,15 @@ export default Schools = ({ navigation, route }) => {
             buttonTitle="Volver a cargar"
             buttonIcon="reload"
             action={() => {
-              setSchools(undefined)
-              getSchools()
+              setEvents(undefined)
+              getEvents()
             }}
           />
         )
-      ) : foundSchools !== null ? (
-        foundSchools?.length >= 0 || foundSchools === undefined ? (
+      ) : foundEvents !== null ? (
+        foundEvents?.length >= 0 || foundEvents === undefined ? (
           <Flex fill>
-            <FlatList data={foundSchools} ListEmptyComponent={() => (foundSchools === undefined ? null : <InformationMessage icon="magnify" title="Sin resultados" description="No hay ninguna escuela registrada que cumpla con los parámetros de tu búsqueda" />)} refreshing={loading} onRefresh={() => searchSchools()} renderItem={({ item }) => <Item key={item.school_name} school_name={item.school_name} address={`${item.street} #${item.exterior_number}, ${item.colony}, ${item.municipality}`} school_identifier={item.school_identifier} />} />
+            <FlatList data={foundEvents} ListEmptyComponent={() => (foundEvents === undefined ? null : <InformationMessage icon="magnify" title="Sin resultados" description="No hay ningún evento registrado que cumpla con los parámetros de tu búsqueda" />)} refreshing={loading} onRefresh={() => searchEvents()} renderItem={({ item }) => <Item place={item.place} belonging_area={item.belonging_area} belonging_place={item.belonging_place} />} />
           </Flex>
         ) : (
           <InformationMessage
@@ -192,8 +201,8 @@ export default Schools = ({ navigation, route }) => {
             buttonTitle="Volver a cargar"
             buttonIcon="reload"
             action={() => {
-              setFoundSchools(undefined)
-              searchSchools()
+              setFoundEvents(undefined)
+              searchEvents()
             }}
           />
         )
@@ -205,8 +214,8 @@ export default Schools = ({ navigation, route }) => {
           buttonTitle="Volver a cargar"
           buttonIcon="reload"
           action={() => {
-            setFoundSchools(undefined)
-            searchSchools()
+            setFoundEvents(undefined)
+            searchEvents()
           }}
         />
       )}

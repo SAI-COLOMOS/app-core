@@ -94,68 +94,62 @@ export default EditArea = ({ navigation, route }) => {
     }
   }, [area_name, phone])
 
-  const Data = () => {
-    return (
-      <VStack spacing={5}>
-        <Text variant="labelLarge">Datos del área</Text>
-        <VStack spacing={10}>
-          <TextInput mode="outlined" value={area_name} onChangeText={setArea_name} label="Nombre del área" maxLength={50} autoCapitalize="words" autoComplete="off" />
-          <TextInput mode="outlined" value={phone} onChangeText={setPhone} label="Número telefónico" maxLength={10} keyboardType="phone-pad" autoComplete="off" />
-        </VStack>
+  const Data = () => (
+    <VStack key="Data" spacing={5}>
+      <Text variant="labelLarge">Datos del área</Text>
+      <VStack spacing={10}>
+        <TextInput mode="outlined" value={area_name} onChangeText={setArea_name} label="Nombre del área" maxLength={50} autoCapitalize="words" autoComplete="off" />
+        <TextInput mode="outlined" value={phone} onChangeText={setPhone} label="Número telefónico" maxLength={10} keyboardType="phone-pad" autoComplete="off" />
       </VStack>
-    )
-  }
+    </VStack>
+  )
 
-  const Delete = () => {
-    return (
-      <VStack spacing={5}>
-        <Text variant="labelLarge">Eliminar área</Text>
-        <VStack spacing={10}>
-          <Button
-            textColor={theme.colors.error}
-            icon="trash-can-outline"
-            mode="outlined"
-            onPress={() => {
-              setModalConfirm(!modalConfirm)
-            }}
-          >
-            Eliminar
-          </Button>
-        </VStack>
+  const Delete = () => (
+    <VStack key="Delete" spacing={5}>
+      <Text variant="labelLarge">Eliminar área</Text>
+      <VStack spacing={10}>
+        <Button
+          textColor={theme.colors.error}
+          icon="trash-can-outline"
+          mode="outlined"
+          onPress={() => {
+            setModalConfirm(!modalConfirm)
+          }}
+        >
+          Eliminar
+        </Button>
       </VStack>
-    )
-  }
+    </VStack>
+  )
 
-  const Save = () => {
-    return (
-      <Button
-        icon="content-save-outline"
-        disabled={modalLoading || !verified}
-        loading={modalLoading}
-        mode="contained"
-        onPress={() => {
-          saveArea()
-        }}
-      >
-        Guardar
-      </Button>
-    )
-  }
+  const Save = () => (
+    <Button
+      key="SaveButton"
+      icon="content-save-outline"
+      disabled={modalLoading || !verified}
+      loading={modalLoading}
+      mode="contained"
+      onPress={() => {
+        saveArea()
+      }}
+    >
+      Guardar
+    </Button>
+  )
 
-  const Cancel = () => {
-    return (
-      <Button
-        icon="close"
-        disabled={modalLoading}
-        mode="outlined"
-        onPress={() => {
-          navigation.pop()
-        }}
-      >
-        Cancelar
-      </Button>
-    )
-  }
+  const Cancel = () => (
+    <Button
+      key="CancelButton"
+      icon="close"
+      disabled={modalLoading}
+      mode="outlined"
+      onPress={() => {
+        navigation.pop()
+      }}
+    >
+      Cancelar
+    </Button>
+  )
 
   return (
     <Flex fill>
