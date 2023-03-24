@@ -16,6 +16,7 @@ export default EditCard = ({navigation, route}) => {
     const [hours, setHours] = useState(`${activity?.hours ?? ''}`)
     const [responsible_register, setResponsible_register] = useState(`${activity?.responsible_register ?? ''}`)
     const [assignation_date, setAssignation_date] = useState(`${activity?.assignation_date ?? ''}`)
+    const [_id, set_id] = useState(`${activity?._id}`)
 
     const [modalConfirm, setModalConfirm] = useState(false)
     const [modalSuccess, setModalSuccess] = useState(false)
@@ -26,12 +27,10 @@ export default EditCard = ({navigation, route}) => {
     const [modalErrorDelete, setModalErrorDelete] = useState(false)
     const [responseCode, setResponseCode] = useState('')
 
-    // console.log("Hey", `${localhost}/cards/${user?.register}/activity/${activity._id}`) 
-
     async function UpdateCard() {
         setModalLoading(true)
         const request = await fetch (
-            `${localhost}/cards/${user?.register}/activity/${activity._id}`,
+            `${localhost}/cards/${user?.register}/activity`,
             {
                 method: "PATCH",
                 headers: {
@@ -43,7 +42,8 @@ export default EditCard = ({navigation, route}) => {
                     activity_name: activity_name.trim(),
                     hours: Number(hours),
                     responsible_register: responsible_register.trim(),
-                    assignation_date: assignation_date.trim()
+                    assignation_date: assignation_date.trim(),
+                    _id: _id.trim()
                 })
             }
         ).then(
@@ -52,8 +52,6 @@ export default EditCard = ({navigation, route}) => {
             (_) => null
         )
         setModalLoading(false)
-        // console.log("var user ",User)
-        console.log(request);
 
         if(request == 200){
             setModalSuccess(true)
@@ -69,14 +67,17 @@ export default EditCard = ({navigation, route}) => {
 
     async function DeleteCard() {
         const request = await fetch (
-            `${localhost}/cards/${user?.register}/activity/${activity._id}`,
+            `${localhost}/cards/${user?.register}/activity`,
             {
                 method: "DELETE",
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                     'Cache-Control': 'no-cache'
-                }
+                },
+                body: JSON.stringify({
+                    _id: _id.trim()
+                })
             })
         .then(
             (response) => response.status
