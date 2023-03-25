@@ -290,6 +290,8 @@ export default Dashboard = ({ navigation, route }) => {
 
                   {/* Widget de perfil */}
                   <WidgetSmall screen="Profile" payload={{ user, token }} child={user?.avatar ? <Avatar.Image source={{ uri: `data:image/png;base64,${user.avatar}` }} size={50} /> : <Avatar.Icon icon="account-circle-outline" size={100} />} />
+
+                  <WidgetSmall screen="TakeAttendance" payload={{ actualUser: user, token }} child={<Avatar.Icon icon={"alert"} size={50} />} />
                 </Flex>
 
                 {/* Sección de herramientas del administrador */}
@@ -309,11 +311,7 @@ export default Dashboard = ({ navigation, route }) => {
 
                     <WidgetSmall screen="Users" payload={{ actualUser: user, token }} child={<Avatar.Icon icon={"account-supervisor-outline"} size={50} />} />
 
-                    <WidgetSmall screen="TakeAttendance" payload={{ actualUser: user, token }} child={<Avatar.Icon icon={"alert"} size={50} />} />
-
                     <WidgetSmall screen="Cards" payload={{ actualUser: user, token }} child={<Avatar.Icon icon={"close"} size={50} />} />
-
-                    <WidgetSmall screen="TakeAttendance" payload={{ actualUser: user, token }} child={<Avatar.Icon icon={"alert"} size={50} />} />
                   </Flex>
                 ) : null}
               </VStack>

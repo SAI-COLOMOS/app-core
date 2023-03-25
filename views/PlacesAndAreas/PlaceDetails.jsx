@@ -1,13 +1,13 @@
-import { Flex, VStack } from '@react-native-material/core'
-import { useEffect, useState, useCallback } from 'react'
-import { useHeaderHeight } from '@react-navigation/elements'
-import { Text, Card, Button, FAB, useTheme } from 'react-native-paper'
-import Header from '../Shared/Header'
-import Constants from 'expo-constants'
-import DisplayDetails from '../Shared/DisplayDetails'
-import { ScrollView, RefreshControl } from 'react-native'
-import { useFocusEffect } from '@react-navigation/native'
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import { Flex, VStack } from "@react-native-material/core"
+import { useEffect, useState, useCallback } from "react"
+import { useHeaderHeight } from "@react-navigation/elements"
+import { Text, Card, Button, FAB, useTheme } from "react-native-paper"
+import Header from "../Shared/Header"
+import Constants from "expo-constants"
+import DisplayDetails from "../Shared/DisplayDetails"
+import { ScrollView, RefreshControl } from "react-native"
+import { useFocusEffect } from "@react-navigation/native"
+import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 
 export default PlaceDetails = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
@@ -22,11 +22,11 @@ export default PlaceDetails = ({ navigation, route }) => {
     setLoading(true)
 
     const request = await fetch(`${localhost}/places/${place_identifier}`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        'Cache-Control': 'no-cache'
+        "Cache-Control": "no-cache"
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
@@ -46,7 +46,7 @@ export default PlaceDetails = ({ navigation, route }) => {
     navigation.setOptions({
       header: (props) => <Header {...props} />,
       headerTransparent: true,
-      headerTitle: 'Datos del bosque urbano'
+      headerTitle: "Datos del bosque urbano"
     })
   }, [])
 
@@ -67,7 +67,7 @@ export default PlaceDetails = ({ navigation, route }) => {
 
           <Flex>
             <Text variant="labelSmall">Referencia</Text>
-            <Text variant="bodyMedium">{place?.reference ? place?.reference : 'Sin referencia'}</Text>
+            <Text variant="bodyMedium">{place?.reference ? place?.reference : "Sin referencia"}</Text>
           </Flex>
 
           <Flex>
@@ -103,7 +103,7 @@ export default PlaceDetails = ({ navigation, route }) => {
                 <Button
                   icon="pencil-outline"
                   onPress={() => {
-                    navigation.navigate('EditArea', {
+                    navigation.navigate("EditArea", {
                       token,
                       area,
                       place_identifier
@@ -120,7 +120,7 @@ export default PlaceDetails = ({ navigation, route }) => {
             <Icon name="pencil-plus-outline" color={theme.colors.onBackground} size={50} />
             <VStack center>
               <Text variant="headlineSmall">Sin áreas</Text>
-              <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
+              <Text variant="bodyMedium" style={{ textAlign: "center" }}>
                 No hay ningún área registrada, ¿qué te parece si hacemos el primero?
               </Text>
             </VStack>
@@ -129,7 +129,7 @@ export default PlaceDetails = ({ navigation, route }) => {
         <Button
           icon="plus"
           onPress={() => {
-            navigation.navigate('AddArea', {
+            navigation.navigate("AddArea", {
               token,
               place,
               place_identifier
@@ -154,7 +154,7 @@ export default PlaceDetails = ({ navigation, route }) => {
                 <Icon color={theme.colors.onBackground} name="alert-circle-outline" size={50} />
                 <VStack center>
                   <Text variant="headlineSmall">Ocurrió un problema</Text>
-                  <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
+                  <Text variant="bodyMedium" style={{ textAlign: "center" }}>
                     No podemos recuperar del bosque urbano, inténtalo de nuevo más tarde (Error: {place})
                   </Text>
                 </VStack>
@@ -175,7 +175,7 @@ export default PlaceDetails = ({ navigation, route }) => {
               <Icon color={theme.colors.onBackground} name="wifi-alert" size={50} />
               <VStack center>
                 <Text variant="headlineSmall">Sin internet</Text>
-                <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
+                <Text variant="bodyMedium" style={{ textAlign: "center" }}>
                   No podemos recuperar los datos del bosque urbano, revisa tu conexión a internet e inténtalo de nuevo
                 </Text>
               </VStack>
@@ -197,9 +197,9 @@ export default PlaceDetails = ({ navigation, route }) => {
       {!(place === undefined || place === null) ? (
         <FAB
           icon="pencil-outline"
-          style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
+          style={{ position: "absolute", margin: 16, right: 0, bottom: 0 }}
           onPress={() => {
-            navigation.navigate('EditPlace', {
+            navigation.navigate("EditPlace", {
               token,
               place
             })
