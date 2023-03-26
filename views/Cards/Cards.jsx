@@ -37,8 +37,6 @@ export default Cards = ({navigation, route}) => {
     ).then((response) => (response.ok ? response.json() : response.status)
     ).catch((_) => null)
 
-    // console.log(request)
-
     if (request?.users) {
         setUsers(request.users)
       } else {
@@ -66,11 +64,11 @@ export default Cards = ({navigation, route}) => {
 
   useEffect(() => {
     navigation.setOptions({
-      header: (props) => <Header {...props} /*children={[<IconButton icon="filter-outline" onPress={() => setShowFilters(!showFilters)} />, <IconButton icon="magnify" onPress={() => setShowSearch(!showSearch)} />]}*/ />,
+      header: (props) => <Header {...props} />,
       headerTransparent: true,
       headerTitle: 'Asignar horas'
     })
-  }, [/*showSearch, showFilters*/])
+  }, [])
 
 
   useEffect(() => {
@@ -78,12 +76,6 @@ export default Cards = ({navigation, route}) => {
             getUsers()
         }
   }, [users])
-
-//   useEffect(() => {
-//     if (cards === undefined) {
-//         getCard()
-//     }
-// }, [cards])
 
   const Item = useCallback(({ first_name, role, avatar, user }) => {
     return (
@@ -160,7 +152,6 @@ export default Cards = ({navigation, route}) => {
   return (
     <Flex fill pt={headerMargin}>
         <FlatList data={users} ListEmptyComponent={() => (users === undefined ? null : users === null ? <NoConection /> : <EmptyList />)} refreshing={loading} onRefresh={(_) => getUsers()} renderItem={({ item }) => <Item onPress={() => {}} first_name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ''}`} role={`${item.register}`} user={item} avatar={item?.avatar} />}/>
-        {/* <FlatList data={cards} ListEmptyComponent={() => (cards === undefined ? null : cards === null ? <NoConection /> : <EmptyList />)} refreshing={loading} onRefresh={(_) => getCard()} renderItem={({ item }) => <Item onPress={() => {}} first_name={`${item.activity_name} ${item.hours}`} role={`${item.responsible_register}`} register={item.assignation_date} />}/> */}
     </Flex>
   )
 }

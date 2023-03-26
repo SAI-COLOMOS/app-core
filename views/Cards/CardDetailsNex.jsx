@@ -8,6 +8,8 @@ import DisplayDetails from '../Shared/DisplayDetails'
 import { ScrollView, RefreshControl } from 'react-native'
 import { useFocusEffect } from '@react-navigation/native'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import { LongDate } from "../Shared/LocaleDate"
+
 
 export default CardDetail = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
@@ -33,13 +35,13 @@ export default CardDetail = ({ navigation, route }) => {
       .catch(() => null)
 
     setLoading(false)
-
+    
     if (request?.activities) {
       setCard(request.activities)
-      console.log(request.activities)
-    } else {
-      setCard(request)
     }
+    // } else {
+    //   setCard(request)
+    // }
   }
 
   useEffect(() => {
@@ -53,35 +55,14 @@ export default CardDetail = ({ navigation, route }) => {
   useFocusEffect(
     useCallback(() => {
       getCard()
+      console.log(user?.role)
       return () => {}
     }, [])
   )
 
-  // const Places = () => {
-  //   return (
-  //     <VStack p={20} spacing={5}>
-  //       <Text variant="bodyLarge">Bosque urbano</Text>
-  //       <VStack spacing={10}>
-  //         <Text variant="labelSmall">Domicilio</Text>
-  //         <Text variant="bodyMedium">{`${place?.street} #${place?.exterior_number}\n${place?.colony}, ${place?.municipality}, ${place?.postal_code}`}</Text>
-
-  //         <Flex>
-  //           <Text variant="labelSmall">Referencia</Text>
-  //           <Text variant="bodyMedium">{place?.reference ? place?.reference : 'Sin referencia'}</Text>
-  //         </Flex>
-
-  //         <Flex>
-  //           <Text variant="labelSmall">Número de teléfono</Text>
-  //           <Text variant="bodyMedium">{place?.phone}</Text>
-  //         </Flex>
-  //       </VStack>
-  //     </VStack>
-  //   )
-  // }
-
   const Activity = () => {
     return (
-      <VStack p={20} spacing={5}>
+      <VStack p={20} spacing={5} key="Activity"> 
         <Text variant="bodyLarge">Actividades</Text>
         <VStack spacing={10}>
           {card.length > 0 ? (
@@ -103,7 +84,7 @@ export default CardDetail = ({ navigation, route }) => {
                     </Flex>
                     <Flex>
                       <Text variant="labelSmall">Fecha</Text>
-                      <Text variant="bodyMedium">{activity?.assignation_date}</Text>
+                      <Text variant="bodyMedium">{LongDate(activity?.assignation_date)}</Text>
                     </Flex>
                   </VStack>
                   <Button
@@ -154,36 +135,36 @@ export default CardDetail = ({ navigation, route }) => {
       <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={(_) => getCard()} />}>
         {card !== undefined ? (
           card !== null ? (
-            isNaN(card) ? (
+            // isNaN(card) ? (
               <DisplayDetails photo={user?.avatar} title={`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name == undefined ? '' : user?.second_last_name}`} children={[Activity()]} />
-            ) : (
-              <VStack p={30} center spacing={20}>
-                <Icon color={theme.colors.onBackground} name="alert-circle-outline" size={50} />
-                <VStack center>
-                  <Text variant="headlineSmall">Ocurrió un problema</Text>
-                  <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
-                    No podemos recuperar el tarjetón, inténtalo de nuevo más tarde (Error: {card})
-                  </Text>
-                </VStack>
-                <Flex>
-                  <Button
-                    mode="outlined"
-                    onPress={(_) => {
-                      getCard()
-                    }}
-                  >
-                    Volver a intentar
-                  </Button>
-                </Flex>
-              </VStack>
-            )
+            /*) : (*/
+              // <VStack p={30} center spacing={20}>
+              //   <Icon color={theme.colors.onBackground} name="alert-circle-outline" size={50} />
+              //   <VStack center>
+              //     <Text variant="headlineSmall">Ocurrió un problema</Text>
+              //     <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
+              //       No podemos recuperar el tarjetón, inténtalo de nuevo más tarde (Error: {card})
+              //     </Text>
+              //   </VStack>
+              //   <Flex>
+              //     <Button
+              //       mode="outlined"
+              //       onPress={(_) => {
+              //         getCard()
+              //       }}
+              //     >
+              //       Volver a intentar
+              //     </Button>
+              //   </Flex>
+              // </VStack>
+            // )
           ) : (
             <VStack center spacing={20} p={30}>
               <Icon color={theme.colors.onBackground} name="wifi-alert" size={50} />
               <VStack center>
                 <Text variant="headlineSmall">Sin internet</Text>
                 <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
-                  No podemos recuperar los datos del bosque urbano, revisa tu conexión a internet e inténtalo de nuevo
+                  No podemos recuperar los datos del usuario, revisa tu conexión a internet e inténtalo de nuevo
                 </Text>
               </VStack>
               <Flex>
@@ -200,7 +181,7 @@ export default CardDetail = ({ navigation, route }) => {
           )
         ) : null}
       </ScrollView>
-
+      
       {!(card === undefined || card === null) ? (
         <FAB
           icon="pencil-outline"
