@@ -2,7 +2,6 @@ import { Flex } from "@react-native-material/core"
 import { Text } from "react-native-paper"
 
 export const LongDate = (date) => {
-  console.log("Tipo de date", typeof date)
   //const originalDate = typeof date == "object" ? date : new Date(date)
   const originalDate = { object: date, string: new Date(date) }[typeof date]
 
@@ -90,10 +89,68 @@ export const LongDate = (date) => {
 
   const year = () => originalDate.getFullYear()
 
-  // const date = new Date("2011-10-05T14:48:00.000Z")
-  console.log(originalDate)
-
   return `${weekDay()} ${day()} de ${month()}, ${year()}`
+}
+
+export const CompactDate = (date) => {
+  const originalDate = { object: date, string: new Date(date) }[typeof date]
+
+  const day = () => {
+    const day = originalDate.getDate()
+
+    if (day <= 9) {
+      return `0${day}`
+    } else {
+      return `${day}`
+    }
+  }
+
+  const month = () => {
+    switch (originalDate.getMonth()) {
+      case 0:
+        return "ene"
+
+      case 1:
+        return "feb"
+
+      case 2:
+        return "mar"
+
+      case 3:
+        return "abr"
+
+      case 4:
+        return "may"
+
+      case 5:
+        return "jun"
+
+      case 6:
+        return "jul"
+
+      case 7:
+        return "ago"
+
+      case 8:
+        return "sep"
+
+      case 9:
+        return "oct"
+
+      case 10:
+        return "nov"
+
+      case 11:
+        return "dic"
+
+      default:
+        return "mes"
+    }
+  }
+
+  const year = () => originalDate.getFullYear()
+
+  return `${day()}/${month()}/${year()}`
 }
 
 export const FormatMonth = (month) => {
@@ -137,4 +194,13 @@ export const FormatMonth = (month) => {
     default:
       return "mes"
   }
+}
+
+export const Time24 = (time) => {
+  const originalTime = { object: time, string: new Date(time) }[typeof time]
+
+  const hours = () => (originalTime.getHours() <= 9 ? `0${originalTime.getHours()}` : originalTime.getHours().toString())
+  const minutes = () => (originalTime.getMinutes() <= 9 ? `0${originalTime.getMinutes()}` : originalTime.getMinutes().toString())
+
+  return `${hours()}:${minutes()}`
 }

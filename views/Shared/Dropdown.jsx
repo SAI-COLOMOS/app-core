@@ -1,7 +1,7 @@
-import { Flex } from '@react-native-material/core'
-import React, { useState, useEffect } from 'react'
-import { Pressable } from 'react-native'
-import { Text, TextInput, TouchableRipple, Menu, Card } from 'react-native-paper'
+import { Flex } from "@react-native-material/core"
+import React, { useState, useEffect } from "react"
+import { Pressable } from "react-native"
+import { Text, TextInput, TouchableRipple, Menu, Card } from "react-native-paper"
 
 export default Dropdown = ({ title, options, selected, value }) => {
   const [show, setShow] = useState(false)
@@ -22,11 +22,11 @@ export default Dropdown = ({ title, options, selected, value }) => {
       {options?.length > 0
         ? options.map((option) => (
             <Menu.Item
-            key={`Menu item ${option?.option}`}
+              key={`Menu item ${option?.value ?? option?.option}`}
               title={option?.option}
               onPress={() => {
-                selected(option?.option)
-                console.log('Form selected', option?.option)
+                selected(option?.value ? { option: option.option, value: option.value } : option.option)
+                console.log({ option: option.option, value: option.value })
                 setShow(!show)
               }}
             />

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { Pressable } from "react-native"
 import { Button, Dialog, Portal, Text, TextInput } from "react-native-paper"
 import Dropdown from "./Dropdown"
-import { FormatMonth, LongDate } from "./LocaleDate"
+import { CompactDate, FormatMonth, LongDate, Time24 } from "./LocaleDate"
 
 export const DatePicker = ({ actualDate, setDate, title, withDay, withMonth }) => {
   const [selectedYear, setSelectedYear] = useState(typeof actualDate == "object" ? actualDate.getFullYear() : new Date().getFullYear())
@@ -72,20 +72,26 @@ export const DatePicker = ({ actualDate, setDate, title, withDay, withMonth }) =
     setSelectedDay(typeof actualDate == "object" ? Number(actualDate.getDate()) : Number(new Date().getDate()))
   }
 
+  useEffect(() => {
+    console.log(setDate)
+  }, [])
+
   function save() {
-    const selectedDate = new Date(selectedYear, withMonth == true ? selectedMonth?.value : 0, withDay == true ? selectedDay : 1)
-    setDate(selectedDate)
+    actualDate.setDate(withDay == true ? selectedDay : 1)
+    actualDate.setMonth(withMonth == true ? selectedMonth?.value : 0)
+    actualDate.setFullYear(selectedYear)
+
+    console.log("Actual date", actualDate)
+
+    setDate(new Date(actualDate))
+
     setShow(false)
   }
-
-  useEffect(() => {
-    console.log(typeof actualDate == true)
-  }, [])
 
   return (
     <Flex>
       <Pressable onPress={() => setShow(true)} style={{ zIndex: 10 }}>
-        <TextInput mode="outlined" label={title ?? "Fecha"} value={typeof actualDate == "object" ? LongDate(actualDate) : ""} editable={false} style={{ zIndex: -5 }} right={<TextInput.Icon disabled={true} icon="menu-down" />} />
+        <TextInput mode="outlined" label={title ?? "Fecha"} value={typeof actualDate == "object" ? CompactDate(actualDate) : ""} editable={false} style={{ zIndex: -5 }} right={<TextInput.Icon disabled={true} icon="menu-down" />} />
       </Pressable>
 
       <Portal>
@@ -141,16 +147,15 @@ export const DatePicker = ({ actualDate, setDate, title, withDay, withMonth }) =
 }
 
 export const TimePicker = ({ actualTime, setTime, title }) => {
-  const time = new Date().getHours
-  const [selectedHours, setSelectedHours] = useState(typeof actualTime == "object" ? actualTime.getHours() : new Date().getHours())
-  const [selectedMinutes, setSelectedMinutes] = useState(typeof actualTime == "object" ? actualTime.getMinutes() : new Date().getMinutes())
+  const generatedDate = new Date()
+  const [selectedHours, setSelectedHours] = useState(typeof actualTime == "object" ? (actualTime.getHours() <= 9 ? `0${actualTime.getHours()}` : actualTime.getHours().toString()) : generatedDate.getHours() <= 9 ? `0${generatedDate.getHours()}` : generatedDate.getHours().toString())
+  const [selectedMinutes, setSelectedMinutes] = useState(typeof actualTime == "object" ? (actualTime.getMinutes() <= 9 ? `0${actualTime.getMinutes()}` : actualTime.getMinutes().toString()) : generatedDate.getMinutes() <= 9 ? `0${generatedDate.getMinutes()}` : generatedDate.getMinutes().toString())
 
   const hours = () => {
     let count = []
     for (let i = 0; i <= 23; i++) {
       count.push({
-        option: i <= 9 ? `0${i}` : i.toString(),
-        value: i
+        option: i <= 9 ? `0${i}` : i.toString()
       })
     }
     return count
@@ -160,8 +165,7 @@ export const TimePicker = ({ actualTime, setTime, title }) => {
     let count = []
     for (let i = 0; i <= 59; i++) {
       count.push({
-        option: i <= 9 ? `0${i}` : i.toString(),
-        value: i
+        option: i <= 9 ? `0${i}` : i.toString()
       })
     }
     return count
@@ -171,21 +175,21 @@ export const TimePicker = ({ actualTime, setTime, title }) => {
 
   function cancel() {
     setShow(false)
-    setSelectedHours(typeof actualTime == "object" ? actualTime.getHours() : new Date().getHours())
-    setSelectedMinutes(typeof actualTime == "object" ? actualTime.getMinutes() : new Date().getMinutes())
+    setSelectedHours(typeof actualTime == "object" ? (actualTime.getHours() <= 9 ? `0${actualTime.getHours()}` : actualTime.getHours().toString()) : generatedDate.getHours() <= 9 ? `0${generatedDate.getHours()}` : generatedDate.getHours().toString())
+    setSelectedMinutes(typeof actualTime == "object" ? (actualTime.getMinutes() <= 9 ? `0${actualTime.getMinutes()}` : actualTime.getMinutes().toString()) : generatedDate.getMinutes() <= 9 ? `0${generatedDate.getMinutes()}` : generatedDate.getMinutes().toString())
   }
 
   function save() {
-    const selectedTime = new Date().setHours(selectedHours.value, selectedMinutes.value)
-    console.log(selectedTime)
-    setTime(selectedTime)
+    actualTime.setHours(Number(selectedHours))
+    actualTime.setMinutes(Number(selectedMinutes))
+    setTime(new Date(actualTime))
     setShow(false)
   }
 
   return (
     <Flex>
       <Pressable onPress={() => setShow(true)} style={{ zIndex: 10 }}>
-        <TextInput mode="outlined" label={title ?? "Hora"} value={typeof actualTime == "object" ? actualTime.toString() : ""} editable={false} style={{ zIndex: -5 }} right={<TextInput.Icon disabled={true} icon="menu-down" />} />
+        <TextInput mode="outlined" label={title ?? "Hora"} value={typeof actualTime == "object" ? Time24(actualTime) : ""} editable={false} style={{ zIndex: -5 }} right={<TextInput.Icon disabled={true} icon="menu-down" />} />
       </Pressable>
 
       <Portal>
@@ -195,10 +199,10 @@ export const TimePicker = ({ actualTime, setTime, title }) => {
           <Dialog.Content>
             <HStack spacing={10}>
               <Flex fill>
-                <Dropdown title="Horas" options={hours()} value={selectedHours.option} selected={setSelectedHours} />
+                <Dropdown title="Horas" options={hours()} value={selectedHours} selected={setSelectedHours} />
               </Flex>
               <Flex fill>
-                <Dropdown title="Minutos" options={minutes()} value={selectedMinutes.option} selected={setSelectedMinutes} />
+                <Dropdown title="Minutos" options={minutes()} value={selectedMinutes} selected={setSelectedMinutes} />
               </Flex>
             </HStack>
           </Dialog.Content>
@@ -228,5 +232,18 @@ export const TimePicker = ({ actualTime, setTime, title }) => {
         </Dialog>
       </Portal>
     </Flex>
+  )
+}
+
+export const DateAndTimerPicker = ({ actualDate, selectedDate }) => {
+  return (
+    <HStack spacing={20}>
+      <Flex fill>
+        <DatePicker actualDate={actualDate} setDate={selectedDate} withMonth={true} withDay={true} />
+      </Flex>
+      <Flex fill>
+        <TimePicker actualTime={actualDate} setTime={selectedDate} />
+      </Flex>
+    </HStack>
   )
 }
