@@ -4,8 +4,8 @@ import CreateForm from "../Shared/CreateForm"
 import Constants from 'expo-constants'
 import ModalMessage from '../Shared/ModalMessage'
 import { useCallback, useEffect, useState } from 'react'
-
-
+import { LongDate } from "../Shared/LocaleDate"
+import { DateAndTimerPicker} from "../Shared/TimeAndDatePicker"
 
 export default EditCard = ({navigation, route}) => {
     const { user, token, card, activity} = route.params
@@ -15,7 +15,7 @@ export default EditCard = ({navigation, route}) => {
     const [activity_name, setActivity_name] = useState(`${activity?.activity_name ?? ''}`)
     const [hours, setHours] = useState(`${activity?.hours ?? ''}`)
     const [responsible_register, setResponsible_register] = useState(`${activity?.responsible_register ?? ''}`)
-    const [assignation_date, setAssignation_date] = useState(`${activity?.assignation_date ?? ''}`)
+    const [assignation_date, setAssignation_date] = useState(new Date(`${activity?.assignation_date}`))
     const [_id, set_id] = useState(`${activity?._id}`)
 
     const [modalConfirm, setModalConfirm] = useState(false)
@@ -42,7 +42,7 @@ export default EditCard = ({navigation, route}) => {
                     activity_name: activity_name.trim(),
                     hours: Number(hours),
                     responsible_register: responsible_register.trim(),
-                    assignation_date: assignation_date.trim(),
+                    assignation_date: assignation_date,
                     _id: _id.trim()
                 })
             }
@@ -95,15 +95,15 @@ export default EditCard = ({navigation, route}) => {
           }
     }
     
-    const Actividades = (_) => {
+    const Activity = (_) => {
         return (
-            <VStack spacing={5}>
+            <VStack spacing={5} key="Activity">
                 <Text variant="labelLarge">Actividad</Text>
                 <VStack spacing={10}>
                     <TextInput mode="outlined" value={activity_name} onChangeText={setActivity_name} label="Nombre de actividad" maxLength={50} autoComplete="off" autoCorrect={false} />
                     <TextInput mode="outlined" value={hours} onChangeText={setHours} label="Horas a asignar" keyboardType="numeric" maxLength={3} autoComplete="off" autoCorrect={false} />
                     <TextInput mode="outlined" value={responsible_register} onChangeText={setResponsible_register} label="Registro del responsable" autoCapitalize="characters" maxLength={12} autoComplete="off" autoCorrect={false} />
-                    <TextInput mode="outlined" value={assignation_date} onChangeText={setAssignation_date} label="Fecha de asignación" autoComplete="off" autoCorrect={false} />
+                    <DateAndTimerPicker actualDate={assignation_date} selectedDate={setAssignation_date} />
                 </VStack>
             </VStack>
         )
@@ -114,6 +114,7 @@ export default EditCard = ({navigation, route}) => {
             <Button 
             mode="contained"
             icon="content-save-outline"
+            key="Update"
             onPress={() => {
                 UpdateCard()
             }}
@@ -128,6 +129,7 @@ export default EditCard = ({navigation, route}) => {
             <Button
             mode="contained"
             icon="close"
+            key="Cancel"
             onPress={() => {
                 navigation.pop()
             }}
@@ -142,6 +144,7 @@ export default EditCard = ({navigation, route}) => {
             <Button
             mode="contained"
             icon="trash-can-outline"
+            key="Delete"
             onPress={() => {
                 setModalConfirm(!modalConfirm)
             }}
@@ -153,7 +156,7 @@ export default EditCard = ({navigation, route}) => {
 
     return (
         <Flex fill>
-            <CreateForm navigation={navigation} title={'Editar actividad'} children={[Actividades(), Delete()]} actions={[Update(), Cancel()]}/>
+            <CreateForm navigation={navigation} title={'Editar actividad'} children={[Activity(), Delete()]} actions={[Update(), Cancel()]}/>
             <ModalMessage
                 title="Eliminar actividad"
                 description="¿Seguro que deseas eliminar esta actividad? La acción no se podrá deshacer"

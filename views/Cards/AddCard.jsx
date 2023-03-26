@@ -7,6 +7,8 @@ import CreateForm from "../Shared/CreateForm"
 import { Button, TextInput, useTheme, Text} from "react-native-paper"
 import ModalMessage from '../Shared/ModalMessage'
 import { ScrollView } from "react-native"
+import { LongDate } from "../Shared/LocaleDate"
+import { DateAndTimerPicker} from "../Shared/TimeAndDatePicker"
 
 
 
@@ -19,7 +21,7 @@ export default AddCard = ({navigation, route}) => {
     const [activity_name, setActivity_name] = useState('')
     const [hours, setHours] = useState('')
     const [responsible_register, setResponsible_register] = useState('')
-    const [assignation_date, setAssignation_date] = useState('')
+    const [assignation_date, setAssignation_date] = useState(new Date())
 
     const [modalSuccess, setModalSuccess] = useState(false)
     const [modalLoading, setModalLoading] = useState(false)
@@ -44,7 +46,7 @@ export default AddCard = ({navigation, route}) => {
                     activity_name: activity_name.trim(),
                     hours: Number(hours),
                     responsible_register: responsible_register.trim(),
-                    assignation_date: assignation_date.trim()
+                    assignation_date: assignation_date
                 })
             }
         ).then(
@@ -54,10 +56,6 @@ export default AddCard = ({navigation, route}) => {
             error => null
         )
         setModalLoading(false)
-
-        // console.log(request.status)
-        console.log(request)
-        // console.error();
 
         if (request == 201) {
             setModalSuccess(true)
@@ -70,16 +68,15 @@ export default AddCard = ({navigation, route}) => {
 
     }
 
-    const Actividades = () => {
+    const Activity = () => {
         return (
-
-            <VStack spacing={5}>
+            <VStack spacing={5} key="Activity">
                 <Text variant="labelLarge">Actividad</Text>
                 <VStack spacing={10}>
                     <TextInput mode="outlined" value={activity_name} onChangeText={setActivity_name} label="Nombre de actividad" maxLength={50} autoCapitalize="words" autoComplete="off" autoCorrect={false} />
                     <TextInput mode="outlined" value={hours} onChangeText={setHours} label="Horas a asignar" keyboardType="numeric" maxLength={3} autoComplete="off" autoCorrect={false} />
                     <TextInput mode="outlined" value={responsible_register} onChangeText={setResponsible_register} label="Registro del responsable" maxLength={12} autoCapitalize="characters" autoComplete="off" autoCorrect={false} />
-                    <TextInput mode="outlined" value={assignation_date} onChangeText={setAssignation_date} label="Fecha de asignación"  autoComplete="off" autoCorrect={false} />
+                    <DateAndTimerPicker actualDate={assignation_date} selectedDate={setAssignation_date} />
                 </VStack>
             </VStack>
         )
@@ -90,6 +87,7 @@ export default AddCard = ({navigation, route}) => {
             <Button 
             mode="contained"
             icon="content-save-outline"
+            key="Save"
             onPress={() => {
                 SaveCard()
             }}
@@ -104,6 +102,7 @@ export default AddCard = ({navigation, route}) => {
             <Button
             mode="contained"
             icon="close"
+            key="Cancel"
             onPress={() => {
                 navigation.pop()
             }}
@@ -116,7 +115,7 @@ export default AddCard = ({navigation, route}) => {
 
     return (
         <Flex fill >
-            <CreateForm navigation={navigation} title={'Añadir actividad'} children={[Actividades()]} actions={[Save(), Cancel()]}/>
+            <CreateForm navigation={navigation} title={'Añadir actividad'} children={[Activity()]} actions={[Save(), Cancel()]}/>
 
             <ModalMessage title="¡Listo!" description="La actividad ha sido creada" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline" />
             <ModalMessage title="Ocurrió un problema" description={`No pudimos crear la actividad, inténtalo más tarde.`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline" />
