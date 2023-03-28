@@ -1,22 +1,24 @@
-import { Flex, HStack, VStack } from '@react-native-material/core'
-import { createContext, useEffect, useState } from 'react'
-import { Image, ScrollView } from 'react-native'
-import { Button, Card, Text, TextInput, Checkbox, ActivityIndicator, useTheme, Switch } from 'react-native-paper'
-import * as SecureStore from 'expo-secure-store'
-import jwtDecode from 'jwt-decode'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import Constants from 'expo-constants'
-import * as Linking from 'expo-linking'
-import ModalMessage from '../Shared/ModalMessage'
+import { Flex, HStack, VStack } from "@react-native-material/core"
+import { createContext, useContext, useEffect, useState } from "react"
+import { Image, ScrollView } from "react-native"
+import { Button, Card, Text, TextInput, Checkbox, ActivityIndicator, useTheme, Switch } from "react-native-paper"
+import * as SecureStore from "expo-secure-store"
+import jwtDecode from "jwt-decode"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
+import Constants from "expo-constants"
+import * as Linking from "expo-linking"
+import ModalMessage from "../Shared/ModalMessage"
+import UserContext from "../UserContext"
 
 export default Login = ({ navigation }) => {
+  const userContext = useContext(UserContext)
   const insets = useSafeAreaInsets()
   const theme = useTheme()
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const url = Linking.useURL()
 
-  const [credential, setCredential] = useState('')
-  const [password, setPassword] = useState('')
+  const [credential, setCredential] = useState("")
+  const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [rememberUser, setRememberUser] = useState(false)
   const [activeSession, setActiveSession] = useState(undefined)
@@ -25,16 +27,16 @@ export default Login = ({ navigation }) => {
   const [modalSuccess, setModalSuccess] = useState(false)
   const [modalError, setModalError] = useState(false)
   const [modalFatal, setModalFatal] = useState(false)
-  const [responseCode, setResponseCode] = useState('')
+  const [responseCode, setResponseCode] = useState("")
 
   async function getSession() {
     setModalLoading(true)
 
-    const session = await fetch(`${localhost}/auth/login`, {
-      method: 'POST',
+    const request = await fetch(`${localhost}/auth/login`, {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': `no-cache`
+        "Content-Type": "application/json",
+        "Cache-Control": `no-cache`
       },
       body: JSON.stringify({
         credential: credential.trim(),
@@ -42,57 +44,58 @@ export default Login = ({ navigation }) => {
         keepAlive: rememberUser
       })
     })
-      .then((response) => (response.ok ? response.json() : response.status))
-      .catch((_) => null)
 
-    if (session && isNaN(session)) {
-      const payload = jwtDecode(session.token)
+    setModalLoading(false)
 
-      await SecureStore.setItemAsync('token', session.token)
-      await SecureStore.setItemAsync('register', payload.register)
+    if (request.ok) {
+      const response = await request.json()
+      const payload = jwtDecode(response.token)
 
-      if (rememberUser) {
-        await SecureStore.setItemAsync('keepAlive', `${rememberUser}`)
+      userContext.setToken(response.token)
+      userContext.setRegister(payload.register)
+
+      if (rememberUser == true) {
+        await SecureStore.setItemAsync("token", response.token)
       }
 
       if (credential === password) {
-        navigation.replace('FirstAccess')
+        navigation.replace("FirstAccess")
       } else {
-        navigation.replace('Dashboard')
+        navigation.replace("Dashboard")
       }
-    } else if (session != null) {
-      setResponseCode(session)
-      setModalLoading(false)
+    } else if (typeof request == "number") {
+      setResponseCode(request.status)
       setModalError(true)
       return
-    } else {
-      setModalLoading(false)
-      setModalFatal(true)
-      return
     }
+
+    setModalFatal(true)
+    return
   }
 
   useEffect(() => {
     if (url) {
       const { hostname, path, queryParams } = Linking.parse(url)
-      if (path === 'recovery' && queryParams?.token) {
-        navigation.navigate('SetNewPassword', { token: queryParams.token })
+      if (path === "recovery" && queryParams?.token) {
+        navigation.navigate("SetNewPassword", { token: queryParams.token })
       }
     }
   }, [url])
 
   useEffect(() => {
-    const getActualSession = async (_) => {
-      const token = await SecureStore.getItemAsync('token')
-      const keepAlive = await SecureStore.getItemAsync('keepAlive')
+    console.log(userContext)
+    const getActualSession = async () => {
+      const token = await SecureStore.getItemAsync("token")
 
-      if (keepAlive === 'true') {
+      if (token != null) {
         const payload = jwtDecode(token)
 
         if (payload.exp > Math.floor(Date.now() / 1000)) {
-          await SecureStore.setItemAsync('register', payload.register)
+          //await SecureStore.setItemAsync("register", payload.register)
+          userContext.setRegister(payload.register)
+          userContext.setToken(token)
           setActiveSession(true)
-          navigation.replace('Dashboard')
+          navigation.replace("Dashboard")
         }
       }
 
@@ -114,7 +117,7 @@ export default Login = ({ navigation }) => {
         <ScrollView>
           <VStack p={20} pb={50} spacing={50}>
             <Flex center>
-              <Image source={require('../../assets/logo.png')} style={{ width: 150, height: 150 }} />
+              <Image source={require("../../assets/logo.png")} style={{ width: 150, height: 150 }} />
             </Flex>
 
             <VStack spacing={10}>
@@ -142,7 +145,7 @@ export default Login = ({ navigation }) => {
                     setRememberUser(!rememberUser)
                   }}
                 />
-                <Text variant="bodyMedium">Mantaner la sesión abierta</Text>
+                <Text variant="bodyMedium">Mantener la sesión abierta</Text>
               </HStack>
             </VStack>
 
@@ -162,7 +165,7 @@ export default Login = ({ navigation }) => {
                 disabled={modalLoading}
                 mode="text"
                 onPress={(_) => {
-                  navigation.navigate('ResetPassword')
+                  navigation.navigate("ResetPassword")
                 }}
               >
                 Recuperar contraseña
@@ -174,11 +177,11 @@ export default Login = ({ navigation }) => {
 
       {/* <ModalLoaading handler={[modalLoading, () => setModalLoading(!modalLoading)]} dismissable={false}/> */}
 
-      <ModalMessage title="¡Listo!" description="La contraseña ha sido actualizada, ahora puedes acceder a la aplicación" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.replace('Dashboard')]]} dismissable={false} icon="check-circle-outline" />
+      <ModalMessage title="¡Listo!" description="La contraseña ha sido actualizada, ahora puedes acceder a la aplicación" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[["Aceptar", () => navigation.replace("Dashboard")]]} dismissable={false} icon="check-circle-outline" />
 
-      <ModalMessage title="Ocurrió un problema" description={`No pudimos iniciar sesión, verifica tu usuario y contraseña e intentalo nuevamente. (${responseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline" />
+      <ModalMessage title="Ocurrió un problema" description={`No pudimos iniciar sesión, verifica tu usuario y contraseña e intentalo nuevamente. (${responseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[["Aceptar"]]} dismissable={true} icon="close-circle-outline" />
 
-      <ModalMessage title="Sin conexión a internet" description={`Parece que no tienes conexión a internet, conectate e intenta de nuevo`} handler={[modalFatal, () => setModalFatal(!modalFatal)]} actions={[['Aceptar']]} dismissable={true} icon="wifi-alert" />
+      <ModalMessage title="Sin conexión a internet" description={`Parece que no tienes conexión a internet, conectate e intenta de nuevo`} handler={[modalFatal, () => setModalFatal(!modalFatal)]} actions={[["Aceptar"]]} dismissable={true} icon="wifi-alert" />
     </Flex>
   )
 }

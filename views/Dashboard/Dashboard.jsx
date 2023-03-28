@@ -1,5 +1,5 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
-import { useState, useEffect, useCallback, useMemo } from "react"
+import { useState, useEffect, useCallback, useMemo, useContext } from "react"
 import * as SecureStore from "expo-secure-store"
 import { Button, Card, Text, useTheme, Avatar, TouchableRipple } from "react-native-paper"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
@@ -10,8 +10,12 @@ import CircularProgress from "react-native-circular-progress-indicator"
 import Constants from "expo-constants"
 import Animated from "react-native-reanimated"
 import InformationMessage from "../Shared/InformationMessage"
+import { GetCompactMonth, GetDay, ShortDate, Time24 } from "../Shared/LocaleDate"
+import UserContext from "../UserContext"
 
 export default Dashboard = ({ navigation, route }) => {
+  const userContext = useContext(UserContext)
+  const { user, token, register } = useContext(UserContext)
   const insets = useSafeAreaInsets()
   const theme = useTheme()
   const { width } = useWindowDimensions()
@@ -20,9 +24,9 @@ export default Dashboard = ({ navigation, route }) => {
 
   const [greeting, setGreeting] = useState("Hola")
   const [timeToSleep, setTimeToSleep] = useState(false)
-  const [token, setToken] = useState(undefined)
-  const [register, setRegister] = useState(undefined)
-  const [user, setUser] = useState(undefined)
+  //const [token, setToken] = useState(undefined)
+  //const [register, setRegister] = useState(undefined)
+  //const [user, setUser] = useState(undefined)
   const [feed, setFeed] = useState(undefined)
   const [loading, setLoading] = useState(false)
 
@@ -32,7 +36,15 @@ export default Dashboard = ({ navigation, route }) => {
     }
 
     const requests = await Promise.all([
-      fetch(`${localhost}/profile/${register}`, {
+      await fetch(`${localhost}/profile/${register}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          "Cache-Control": "no-cache"
+        }
+      }),
+      await fetch(`${localhost}/feed`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -40,64 +52,51 @@ export default Dashboard = ({ navigation, route }) => {
           "Cache-Control": "no-cache"
         }
       })
-        .then((response) => (response.ok ? response.json() : response.status))
-        .catch((_) => null),
-      fetch(`${localhost}/feed`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-          "Cache-Control": "no-cache"
-        }
-      })
-        .then((response) => (response.ok ? response.json() : response.status))
-        .catch((error) => error)
     ])
-      .then((responses) => responses)
-      .catch((error) => error)
 
     setLoading(false)
 
-    if (requests[0]?.user) {
-      setUser(requests[0].user)
-    } else {
-      setUser(null)
+    if (requests[0].ok && requests[1].ok) {
+      const responses = [await requests[0].json(), await requests[1].json()]
+
+      userContext.setUser(responses[0].user)
+      setFeed(responses[1])
     }
 
-    if (requests[1]?.message) {
-      setFeed({ exist: true, events: requests[1].events, achieved_hours: Number(requests[1].achieved_hours), total_hours: Number(requests[1].total_hours) })
-    } else {
-      setFeed(null)
-    }
+    return
   }
 
   useEffect(() => {
-    const getToken = async (_) => {
-      const token = await SecureStore.getItemAsync("token")
-      token ? setToken(token) : setToken(undefined)
-    }
+    fetchData()
+  }, [])
 
-    if (token == undefined) {
-      getToken()
-    }
-  }, [token])
+  // useEffect(() => {
+  //   const getToken = async (_) => {
+  //     const token = await SecureStore.getItemAsync("token")
+  //     token ? setToken(token) : setToken(undefined)
+  //   }
 
-  useEffect(() => {
-    const getRegister = async (_) => {
-      const register = await SecureStore.getItemAsync("register")
-      register ? setRegister(register) : setRegister(undefined)
-    }
+  //   if (token == undefined) {
+  //     getToken()
+  //   }
+  // }, [token])
 
-    if (register == undefined) {
-      getRegister()
-    }
-  }, [register])
+  // useEffect(() => {
+  //   const getRegister = async (_) => {
+  //     const register = await SecureStore.getItemAsync("register")
+  //     register ? setRegister(register) : setRegister(undefined)
+  //   }
 
-  useEffect(() => {
-    if (token !== undefined && register !== undefined) {
-      fetchData()
-    }
-  }, [token, register])
+  //   if (register == undefined) {
+  //     getRegister()
+  //   }
+  // }, [register])
+
+  // useEffect(() => {
+  //   if (token !== undefined && register !== undefined) {
+  //     fetchData()
+  //   }
+  // }, [token, register])
 
   useFocusEffect(
     useCallback(() => {
@@ -125,30 +124,8 @@ export default Dashboard = ({ navigation, route }) => {
     }, [])
   )
 
-  /* Se mantiene debido a compatibilidad, será eliminado en versiones posteriores, se tiene que migrar a los widgets */
-  const Item = ({ screen, payload, icon, title }) => {
-    return (
-      <Flex w={"50%"} p={5}>
-        <Card mode="outlined">
-          <TouchableRipple
-            onPress={() => {
-              navigation.navigate(screen, { ...payload })
-            }}
-          >
-            <VStack ph={20} pv={10} h={175} spacing={10}>
-              <Text>{title}</Text>
-              <Flex fill center>
-                <Avatar.Icon icon={icon} size={100} />
-              </Flex>
-            </VStack>
-          </TouchableRipple>
-        </Card>
-      </Flex>
-    )
-  }
-
-  const WidgetSmall = useCallback(({ screen, payload, child }) => {
-    return (
+  const WidgetSmall = useCallback(
+    ({ screen, payload, child }) => (
       <Flex w={"25%"} p={5}>
         <Card mode="outlined" style={{ overflow: "hidden" }}>
           <TouchableRipple
@@ -162,12 +139,13 @@ export default Dashboard = ({ navigation, route }) => {
           </TouchableRipple>
         </Card>
       </Flex>
-    )
-  }, [])
+    ),
+    []
+  )
 
-  const WidgetMedium = useCallback(({ screen, payload, child, title }) => {
-    return (
-      <Flex w={"50%"} p={10}>
+  const WidgetMedium = useCallback(
+    ({ screen, payload, child, title }) => (
+      <Flex w={"50%"} p={5}>
         <Card mode="outlined" style={{ overflow: "hidden" }}>
           <TouchableRipple
             onPress={() => {
@@ -175,7 +153,9 @@ export default Dashboard = ({ navigation, route }) => {
             }}
           >
             <VStack ph={20} pv={10} h={175} spacing={10}>
-              <Text variant="bodyMedium">{title}</Text>
+              <Text variant="bodyMedium" numberOfLines={1}>
+                {title}
+              </Text>
               <Flex fill center>
                 {child}
               </Flex>
@@ -183,12 +163,33 @@ export default Dashboard = ({ navigation, route }) => {
           </TouchableRipple>
         </Card>
       </Flex>
-    )
-  }, [])
+    ),
+    []
+  )
+
+  const WidgetLarge = useCallback(
+    ({ screen, payload, child, title }) => (
+      <Flex w={"100%"} p={5}>
+        <Card mode="outlined">
+          <TouchableRipple
+            onPress={() => {
+              navigation.navigate(screen, { ...payload })
+            }}
+          >
+            <VStack ph={20} pv={10} h={175} spacing={10}>
+              <Text variant="bodyMedium">{title}</Text>
+              <Flex fill>{child}</Flex>
+            </VStack>
+          </TouchableRipple>
+        </Card>
+      </Flex>
+    ),
+    []
+  )
 
   return (
     <Flex fill>
-      {user !== undefined && user !== null && feed !== undefined && feed !== null ? (
+      {user !== null && feed != null && (
         <Flex w={"100%"} h={250 + insets.top} style={{ backgroundColor: "#ff0099", position: "absolute" }}>
           {
             {
@@ -202,11 +203,11 @@ export default Dashboard = ({ navigation, route }) => {
 
           <LinearGradient colors={[theme.colors.cover, theme.colors.background]} locations={[0.75, 1]} style={{ width: "100%", height: "100%", position: "absolute" }} />
         </Flex>
-      ) : null}
+      )}
 
       <ScrollView style={{}} refreshControl={<RefreshControl refreshing={loading} onRefresh={() => fetchData()} />}>
         <Flex h={insets.top} w={"100%"} />
-        {user !== undefined && user !== null && feed !== undefined && feed !== null ? (
+        {user != null && feed != null ? (
           <VStack pb={50}>
             <VStack h={200} center>
               <Text variant="headlineLarge" style={{ color: theme.colors.primary }}>
@@ -231,44 +232,72 @@ export default Dashboard = ({ navigation, route }) => {
                 {/* Sección común */}
                 <Flex direction="row" wrap="wrap" ph={10}>
                   {/* Widget de evento */}
-                  <Flex w={"100%"} p={10}>
-                    <VStack spacing={10}>
-                      <Card mode="outlined">
-                        <TouchableRipple
-                          onPress={() => {
-                            navigation.navigate("ShowAttendanceCode", { register: user?.register, avatar: user?.avatar })
-                          }}
-                        >
-                          <VStack ph={20} pv={10} h={175} spacing={10}>
-                            <Text variant="bodyMedium">Evento próximo</Text>
-                            <HStack fill spacing={20}>
+                  <WidgetLarge
+                    title="Próximo evento"
+                    screen="ShowAttendanceCode"
+                    payload={{ register: user?.register, avatar: user?.avatar }}
+                    child={
+                      <HStack fill spacing={20}>
+                        <Flex items="center">
+                          <Avatar.Text label="12" size={50} />
+                          <Text variant="bodyMedium">mayo</Text>
+                        </Flex>
+                        <VStack fill spacing={10}>
+                          <Text variant="bodyLarge" numberOfLines={2}>
+                            Presentación de proyecto de titulación
+                          </Text>
+                          <Flex fill>
+                            <Text variant="bodyMedium">De 10:00 a 15:00</Text>
+                            <Text variant="bodyMedium" numberOfLines={1}>
+                              Centro de Enseñanza Técnica Industrial
+                            </Text>
+                          </Flex>
+                        </VStack>
+                      </HStack>
+                    }
+                  />
+
+                  {/* Widget de eventos disponibles */}
+                  {feed?.available_events?.length > 0 && (
+                    <WidgetLarge
+                      title="Eventos disponibles"
+                      screen="Events"
+                      payload={{ user, token }}
+                      child={
+                        <Flex w={"100%"} h={"100%"} style={{}}>
+                          <Flex w={"100%"} h={"100%"} justify="end" items="end" style={{ position: "absolute" }}>
+                            <Avatar.Text label={feed?.available_events?.length} size={50} />
+                          </Flex>
+                          {feed.available_events.map((event) => (
+                            <HStack key={event.name} fill spacing={20}>
                               <Flex items="center">
-                                <Avatar.Text label="12" size={50} />
-                                <Text variant="bodyMedium">mayo</Text>
+                                <Avatar.Text label={GetDay(event?.starting_date)} size={50} />
+                                <Text variant="bodyMedium">{GetCompactMonth(event?.starting_date)}</Text>
                               </Flex>
                               <VStack fill spacing={10}>
                                 <Text variant="bodyLarge" numberOfLines={2}>
-                                  Presentación de proyecto de titulación
+                                  {event.name}
                                 </Text>
                                 <Flex fill>
-                                  <Text variant="bodyMedium">De 10:00 a 15:00</Text>
                                   <Text variant="bodyMedium" numberOfLines={1}>
-                                    Centro de Enseñanza Técnica Industrial
+                                    A partir de las {Time24(event.starting_date)}
+                                  </Text>
+                                  <Text variant="bodyMedium" numberOfLines={1}>
+                                    {event.place}
                                   </Text>
                                 </Flex>
                               </VStack>
                             </HStack>
-                          </VStack>
-                        </TouchableRipple>
-                      </Card>
-                    </VStack>
-                  </Flex>
+                          ))}
+                        </Flex>
+                      }
+                    />
+                  )}
 
                   {/* Widget de progreso */}
                   {user?.role === "Prestador" ? (
                     <WidgetMedium
-                      screen="Profile"
-                      payload={{ actualUser: user, token }}
+                      screen="UserProgress"
                       child={
                         <Flex fill center>
                           <Flex fill center style={{ position: "absolute" }}>
@@ -287,6 +316,9 @@ export default Dashboard = ({ navigation, route }) => {
                       title="Tu progreso"
                     />
                   ) : null}
+
+                  {/* Widget de eventos */}
+                  {(feed?.available_events?.length == 0 || user?.role != "Prestador") && <WidgetMedium title="Eventos" screen="Events" payload={{ user, token }} child={<Avatar.Icon icon={"bulletin-board"} size={100} />} />}
 
                   {/* Widget de perfil */}
                   <WidgetSmall screen="Profile" payload={{ user, token }} child={user?.avatar ? <Avatar.Image source={{ uri: `data:image/png;base64,${user.avatar}` }} size={50} /> : <Avatar.Icon icon="account-circle-outline" size={100} />} />

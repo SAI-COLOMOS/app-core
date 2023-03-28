@@ -92,6 +92,89 @@ export const LongDate = (date) => {
   return `${weekDay()} ${day()} de ${month()}, ${year()}`
 }
 
+export const ShortDate = (date) => {
+  //const originalDate = typeof date == "object" ? date : new Date(date)
+  const originalDate = { object: date, string: new Date(date) }[typeof date]
+
+  /* Día de la semana */
+  const weekDay = () => {
+    switch (Number(originalDate.getDay())) {
+      case 0:
+        return "Dom"
+
+      case 1:
+        return "Lun"
+
+      case 2:
+        return "Mar"
+
+      case 3:
+        return "Mié"
+
+      case 4:
+        return "Jue"
+
+      case 5:
+        return "Vie"
+
+      case 6:
+        return "Sáb"
+
+      default:
+        return "DdlS"
+    }
+  }
+
+  const day = () => originalDate.getDate().toString()
+
+  const month = () => {
+    switch (originalDate.getMonth()) {
+      case 0:
+        return "ene"
+
+      case 1:
+        return "feb"
+
+      case 2:
+        return "mar"
+
+      case 3:
+        return "abr"
+
+      case 4:
+        return "may"
+
+      case 5:
+        return "jun"
+
+      case 6:
+        return "jul"
+
+      case 7:
+        return "ago"
+
+      case 8:
+        return "sep"
+
+      case 9:
+        return "oct"
+
+      case 10:
+        return "nov"
+
+      case 11:
+        return "dic"
+
+      default:
+        return "mes"
+    }
+  }
+
+  const year = () => originalDate.getFullYear()
+
+  return `${weekDay()}. ${day()} de ${month()}`
+}
+
 export const CompactDate = (date) => {
   const originalDate = { object: date, string: new Date(date) }[typeof date]
 
@@ -151,6 +234,57 @@ export const CompactDate = (date) => {
   const year = () => originalDate.getFullYear()
 
   return `${day()}/${month()}/${year()}`
+}
+
+export const GetDay = (date) => {
+  const day = { object: date, string: new Date(date) }[typeof date]
+
+  return day.getDate()
+}
+
+export const GetCompactMonth = (date) => {
+  const month = { object: date, string: new Date(date) }[typeof date]
+
+  switch (month.getMonth()) {
+    case 0:
+      return "ene"
+
+    case 1:
+      return "feb"
+
+    case 2:
+      return "mar"
+
+    case 3:
+      return "abr"
+
+    case 4:
+      return "may"
+
+    case 5:
+      return "jun"
+
+    case 6:
+      return "jul"
+
+    case 7:
+      return "ago"
+
+    case 8:
+      return "sep"
+
+    case 9:
+      return "oct"
+
+    case 10:
+      return "nov"
+
+    case 11:
+      return "dic"
+
+    default:
+      return "mes"
+  }
 }
 
 export const FormatMonth = (month) => {

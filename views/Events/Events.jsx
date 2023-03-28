@@ -1,15 +1,15 @@
-import { even, Flex, VStack } from '@react-native-material/core'
-import { useState, useEffect, useCallback } from 'react'
-import { Avatar, Button, Card, FAB, IconButton, Text, TouchableRipple, useTheme } from 'react-native-paper'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useHeaderHeight } from '@react-navigation/elements'
-import Header from '../Shared/Header'
-import Constants from 'expo-constants'
-import { FlatList } from 'react-native'
-import { useFocusEffect } from '@react-navigation/native'
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import SearchBar from '../Shared/SearchBar'
-import InformationMessage from '../Shared/InformationMessage'
+import { even, Flex, VStack } from "@react-native-material/core"
+import { useState, useEffect, useCallback } from "react"
+import { Avatar, Button, Card, FAB, IconButton, Text, TouchableRipple, useTheme } from "react-native-paper"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { useHeaderHeight } from "@react-navigation/elements"
+import Header from "../Shared/Header"
+import Constants from "expo-constants"
+import { FlatList } from "react-native"
+import { useFocusEffect } from "@react-navigation/native"
+import Icon from "react-native-vector-icons/MaterialCommunityIcons"
+import SearchBar from "../Shared/SearchBar"
+import InformationMessage from "../Shared/InformationMessage"
 
 export default Events = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
@@ -28,18 +28,18 @@ export default Events = ({ navigation, route }) => {
 
   const [loading, setLoading] = useState(false)
   const [showSearch, setShowSearch] = useState(null)
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useState("")
   const [foundEvents, setFoundEvents] = useState(undefined)
 
   async function getEvents() {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/agenda`,{
-      method: 'GET',
+    const request = await fetch(`${localhost}/agenda`, {
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        'Cache-Control': 'no-cache'
+        "Cache-Control": "no-cache"
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
@@ -58,17 +58,17 @@ export default Events = ({ navigation, route }) => {
   async function searchEvents() {
     setLoading(true)
 
-    if (search === '') {
+    if (search === "") {
       setFoundEvents(undefined)
       setLoading(false)
       return
     }
     const request = await fetch(`${localhost}/agenda?search=${search}`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        'Cache-Control': 'no-cache'
+        "Cache-Control": "no-cache"
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
@@ -83,15 +83,13 @@ export default Events = ({ navigation, route }) => {
     }
   }
 
-
   useEffect(() => {
     navigation.setOptions({
-      header: (props) => <Header {...props} children={[<IconButton key="SearchButton" icon="magnify" onPress={() => setShowSearch(!showSearch)} />]} />,
+      header: (props) => <Header {...props} children={[user?.role !== "Prestador" && <IconButton key="SearchButton" icon="magnify" onPress={() => setShowSearch(!showSearch)} />]} />,
       headerTransparent: true,
-      headerTitle: 'Eventos'
+      headerTitle: "Eventos"
     })
   }, [showSearch])
-
 
   useFocusEffect(
     useCallback(() => {
@@ -103,10 +101,10 @@ export default Events = ({ navigation, route }) => {
   const Item = ({ name, description, event_identifier }) => {
     return (
       <Flex key={`ID-${event_identifier}`} ph={20} pv={5} onPress={() => {}}>
-        <Card mode="outlined" style={{ overflow: 'hidden' }}>
+        <Card mode="outlined" style={{ overflow: "hidden" }}>
           <TouchableRipple
             onPress={() => {
-              navigation.navigate('EventDetails', { token, event_identifier })
+              navigation.navigate("EventDetails", { token, event_identifier })
             }}
           >
             <Flex p={10}>
@@ -118,19 +116,18 @@ export default Events = ({ navigation, route }) => {
     )
   }
 
-
   return (
     <Flex fill pt={headerMargin}>
       <SearchBar show={showSearch} label="Busca por nombre del evento" value={search} setter={setSearch} action={searchEvents} />
 
-      {search == '' ? (
+      {search == "" ? (
         events !== null ? (
           events?.length >= 0 || events === undefined ? (
             <Flex fill>
               <FlatList
                 data={events}
                 ListEmptyComponent={() =>
-                  events === undefined ? null : (
+                  events === undefined ? null : user?.role !== "Prestador" ? (
                     <InformationMessage
                       icon="pencil-plus-outline"
                       title="Sin eventos"
@@ -138,10 +135,22 @@ export default Events = ({ navigation, route }) => {
                       buttonIcon="plus"
                       buttonTitle="Agregar"
                       action={() => {
-                        navigation.navigate('AddEvent', {
+                        navigation.navigate("AddEvent", {
                           user,
                           token
                         })
+                      }}
+                    />
+                  ) : (
+                    <InformationMessage
+                      icon="calendar-blank-outline"
+                      title="Sin eventos"
+                      description="No hay ningún evento, regresa en otra ocasión"
+                      buttonIcon="reload"
+                      buttonTitle="Recargar"
+                      action={() => {
+                        setEvents(undefined)
+                        getEvents()
                       }}
                     />
                   )
@@ -151,16 +160,18 @@ export default Events = ({ navigation, route }) => {
                 renderItem={({ item }) => <Item key={item.event_identifier} name={item.name} description={item.description} event_identifier={item.event_identifier} />}
               />
 
-              <FAB
-                icon="plus"
-                style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
-                onPress={() => {
-                  navigation.navigate('AddEvent', {
-                    user,
-                    token
-                  })
-                }}
-              />
+              {typeof events == "object" && user?.role !== "Prestador" && (
+                <FAB
+                  icon="plus"
+                  style={{ position: "absolute", margin: 16, right: 0, bottom: 0 }}
+                  onPress={() => {
+                    navigation.navigate("AddEvent", {
+                      user,
+                      token
+                    })
+                  }}
+                />
+              )}
             </Flex>
           ) : (
             <InformationMessage
