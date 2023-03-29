@@ -197,17 +197,11 @@ export default Dashboard = ({ navigation }) => {
   )
 
   const offSet = useSharedValue(0)
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      offSet.value = event.contentOffset.y
-    }
-  })
-
   const animationStyle = useAnimatedStyle(() => {
     return {
       transform: [
         {
-          translateY: offSet.value //interpolate(offSet.value, [-500, 0, 500], [-500, 0, 500])
+          translateY: offSet.value <= 0 ? offSet.value : 0 //interpolate(offSet.value, [-500, 0, 500], [-500, 0, 500])
         }
       ]
     }
@@ -237,7 +231,7 @@ export default Dashboard = ({ navigation }) => {
     <Flex fill>
       {user !== null && feed != null && <Header />}
 
-      <ScrollView onScroll={(event) => (offSet.value = event.nativeEvent.contentOffset.y * -0.25)} scrollEventThrottle={16} refreshControl={<RefreshControl refreshing={loading} onRefresh={() => fetchData()} />}>
+      <ScrollView onScroll={(event) => (offSet.value = event.nativeEvent.contentOffset.y * -0.5)} scrollEventThrottle={16} refreshControl={<RefreshControl refreshing={loading} onRefresh={() => fetchData()} />}>
         <Flex h={insets.top} w={"100%"} />
         {user != null && feed != null ? (
           <VStack pb={50}>

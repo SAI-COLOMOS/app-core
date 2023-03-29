@@ -1,13 +1,13 @@
-import { Flex, HStack, VStack } from '@react-native-material/core'
-import { useCallback, useEffect, useState } from 'react'
-import { FlatList, RefreshControl, ScrollView } from 'react-native'
-import { ActivityIndicator, Avatar, Button, Card, FAB, ProgressBar, Text, useTheme } from 'react-native-paper'
-import { useHeaderHeight } from '@react-navigation/elements'
-import Constants from 'expo-constants'
-import Header from '../Shared/Header'
-import DisplayDetails from '../Shared/DisplayDetails'
-import { useFocusEffect } from '@react-navigation/native'
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import { Flex, HStack, VStack } from "@react-native-material/core"
+import { useCallback, useEffect, useState } from "react"
+import { FlatList, RefreshControl, ScrollView } from "react-native"
+import { ActivityIndicator, Avatar, Button, Card, FAB, ProgressBar, Text, useTheme } from "react-native-paper"
+import { useHeaderHeight } from "@react-navigation/elements"
+import Constants from "expo-constants"
+import Header from "../Shared/Header"
+import DisplayDetails from "../Shared/DisplayDetails"
+import { useFocusEffect } from "@react-navigation/native"
+import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 
 export default UserDetails = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
@@ -21,11 +21,11 @@ export default UserDetails = ({ navigation, route }) => {
   async function getUser() {
     setLoading(true)
     const request = await fetch(`${localhost}/users/${register}`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        'Cache-Control': 'no-cache'
+        "Cache-Control": "no-cache"
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
@@ -42,7 +42,7 @@ export default UserDetails = ({ navigation, route }) => {
     navigation.setOptions({
       header: (props) => <Header {...props} />,
       headerTransparent: true,
-      headerTitle: 'Datos del usuario'
+      headerTitle: "Datos del usuario"
     })
   }, [])
 
@@ -73,7 +73,7 @@ export default UserDetails = ({ navigation, route }) => {
             <Text variant="bodyMedium">RH {user?.blood_type}</Text>
           </Flex>
 
-          {user?.school != 'No aplica' ? (
+          {user?.school != "No aplica" ? (
             <Flex>
               <Text variant="labelSmall">Escuela de procedencia</Text>
               <Text variant="bodyMedium">{user?.school}</Text>
@@ -142,14 +142,14 @@ export default UserDetails = ({ navigation, route }) => {
             <Text variant="bodyMedium">{user?.role}</Text>
           </Flex>
 
-          {user?.provider_type != 'No aplica' ? (
+          {user?.provider_type != "No aplica" ? (
             <Flex>
               <Text variant="labelSmall">Tipo de prestador</Text>
               <Text variant="bodyMedium">{user?.provider_type}</Text>
             </Flex>
           ) : null}
 
-          {user?.provider_type != 'No aplica' ? (
+          {user?.provider_type != "No aplica" ? (
             <Flex>
               <Text variant="labelSmall">Horas asignadas</Text>
               <Text variant="bodyMedium">{user?.total_hours}</Text>
@@ -172,39 +172,17 @@ export default UserDetails = ({ navigation, route }) => {
 
   return (
     <Flex fill mt={headerMargin - 20}>
-      <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={() => getUser()} />}>
-        {user !== undefined ? (
-          user !== null ? (
-            isNaN(user) ? (
-              <DisplayDetails photo={user?.avatar} icon="account" title={`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name == undefined ? '' : user?.second_last_name}`} children={[PersonalData(), ContactData(), EmergencyData(), AccountData()]} />
-            ) : (
-              <VStack p={30} center spacing={20}>
-                <Icon color={theme.colors.onBackground} name="alert-circle-outline" size={50} />
-                <VStack center>
-                  <Text variant="headlineSmall">Ocurrió un problema</Text>
-                  <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
-                    No podemos recuperar los datos de la escuela, intentalo de nuevo más tarde (Error: {user})
-                  </Text>
-                </VStack>
-                <Flex>
-                  <Button
-                    mode="outlined"
-                    onPress={() => {
-                      getUser()
-                    }}
-                  >
-                    Volver a intentar
-                  </Button>
-                </Flex>
-              </VStack>
-            )
+      {user !== undefined ? (
+        user !== null ? (
+          isNaN(user) ? (
+            <DisplayDetails photo={user?.avatar} icon="account" title={`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name == undefined ? "" : user?.second_last_name}`} children={[PersonalData(), ContactData(), EmergencyData(), AccountData()]} refreshStatus={loading} refreshAction={getUser} />
           ) : (
-            <VStack center spacing={20} p={30}>
-              <Icon color={theme.colors.onBackground} name="wifi-alert" size={50} />
+            <VStack p={30} center spacing={20}>
+              <Icon color={theme.colors.onBackground} name="alert-circle-outline" size={50} />
               <VStack center>
-                <Text variant="headlineSmall">Sin internet</Text>
-                <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
-                  No podemos recuperar los datos de la escuela, revisa tu conexión a internet e intentalo de nuevo
+                <Text variant="headlineSmall">Ocurrió un problema</Text>
+                <Text variant="bodyMedium" style={{ textAlign: "center" }}>
+                  No podemos recuperar los datos de la escuela, intentalo de nuevo más tarde (Error: {user})
                 </Text>
               </VStack>
               <Flex>
@@ -219,15 +197,35 @@ export default UserDetails = ({ navigation, route }) => {
               </Flex>
             </VStack>
           )
-        ) : null}
-      </ScrollView>
+        ) : (
+          <VStack center spacing={20} p={30}>
+            <Icon color={theme.colors.onBackground} name="wifi-alert" size={50} />
+            <VStack center>
+              <Text variant="headlineSmall">Sin internet</Text>
+              <Text variant="bodyMedium" style={{ textAlign: "center" }}>
+                No podemos recuperar los datos de la escuela, revisa tu conexión a internet e intentalo de nuevo
+              </Text>
+            </VStack>
+            <Flex>
+              <Button
+                mode="outlined"
+                onPress={() => {
+                  getUser()
+                }}
+              >
+                Volver a intentar
+              </Button>
+            </Flex>
+          </VStack>
+        )
+      ) : null}
 
       {!(user === undefined || user === null) ? (
         <FAB
           icon="pencil-outline"
-          style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
+          style={{ position: "absolute", margin: 16, right: 0, bottom: 0 }}
           onPress={() => {
-            navigation.navigate('EditUser', {
+            navigation.navigate("EditUser", {
               token,
               actualUser,
               user,

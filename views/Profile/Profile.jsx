@@ -162,9 +162,7 @@ export default Profile = ({ navigation, route }) => {
 
   return (
     <Flex fill mt={headerMargin - 20}>
-      <ScrollView>
-        <DisplayDetails icon="account-circle-outline" photo={user?.avatar} title={`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name ?? ""}`} children={[PersonalData(), ContactData(), EmergencyData(), AccountData()]} actions={[UpdatePassword()]} />
-      </ScrollView>
+      <DisplayDetails icon="account-circle-outline" photo={user?.avatar} title={`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name ?? ""}`} children={[PersonalData(), ContactData(), EmergencyData(), AccountData()]} actions={[UpdatePassword()]} />
     </Flex>
   )
 }
