@@ -8,7 +8,7 @@ import Constants from "expo-constants"
 import { KeyboardAvoidingView, ScrollView } from "react-native"
 import ModalMessage from "../Shared/ModalMessage"
 import ModalLoading from "../Shared/ModalLoading"
-import UserContext from "../UserContext"
+import UserContext from "../ApplicationContext"
 
 export default FirstAccess = ({ navigation }) => {
   const userContext = useContext(UserContext)

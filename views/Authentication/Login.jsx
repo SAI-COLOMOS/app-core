@@ -8,7 +8,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 import Constants from "expo-constants"
 import * as Linking from "expo-linking"
 import ModalMessage from "../Shared/ModalMessage"
-import UserContext from "../UserContext"
+import UserContext from "../ApplicationContext"
 
 export default Login = ({ navigation }) => {
   const userContext = useContext(UserContext)
@@ -30,47 +30,54 @@ export default Login = ({ navigation }) => {
   const [responseCode, setResponseCode] = useState("")
 
   async function getSession() {
-    setModalLoading(true)
+    try {
+      setModalLoading(true)
 
-    const request = await fetch(`${localhost}/auth/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Cache-Control": `no-cache`
-      },
-      body: JSON.stringify({
-        credential: credential.trim(),
-        password: password.trim(),
-        keepAlive: rememberUser
+      const request = await fetch(`${localhost}/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": `no-cache`
+        },
+        body: JSON.stringify({
+          credential: credential.trim(),
+          password: password.trim(),
+          keepAlive: rememberUser
+        })
       })
-    })
 
-    setModalLoading(false)
+      setModalLoading(false)
 
-    if (request.ok) {
-      const response = await request.json()
-      const payload = jwtDecode(response.token)
+      if (request.ok) {
+        const response = await request.json()
+        const payload = jwtDecode(response.token)
 
-      userContext.setToken(response.token)
-      userContext.setRegister(payload.register)
+        userContext.setToken(response.token)
+        userContext.setRegister(payload.register)
 
-      if (rememberUser == true) {
-        await SecureStore.setItemAsync("token", response.token)
+        if (rememberUser == true) {
+          await SecureStore.setItemAsync("token", response.token)
+        }
+
+        if (credential === password) {
+          navigation.replace("FirstAccess")
+        } else {
+          navigation.replace("Dashboard")
+        }
+      } else if (typeof request == "number") {
+        setResponseCode(request.status)
+        setModalError(true)
+        return
       }
 
-      if (credential === password) {
-        navigation.replace("FirstAccess")
-      } else {
-        navigation.replace("Dashboard")
-      }
-    } else if (typeof request == "number") {
-      setResponseCode(request.status)
-      setModalError(true)
+      setModalFatal(true)
+      return
+    } catch (error) {
+      console.error("getSession:", error)
+      setModalLoading(false)
+      setModalFatal(true)
       return
     }
-
-    setModalFatal(true)
-    return
   }
 
   useEffect(() => {

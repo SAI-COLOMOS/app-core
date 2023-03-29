@@ -1,7 +1,5 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
-import * as SecureStore from "expo-secure-store"
-import { useEffect, useState } from "react"
-import UserContext from "./UserContext"
+import { ContextProvider } from "./ApplicationContext"
 
 // Authentication
 import Login from "./Authentication/Login"
@@ -59,12 +57,8 @@ import UserProgress from "./Cards/UserProgress"
 export default Navigation = () => {
   const Stack = createNativeStackNavigator()
 
-  const [register, setRegister] = useState(null)
-  const [user, setUser] = useState(null)
-  const [token, setToken] = useState(null)
-
   return (
-    <UserContext.Provider value={{ register, setRegister, user, setUser, token, setToken }}>
+    <ContextProvider>
       <Stack.Navigator initialRouteName="Login">
         <Stack.Group navigationKey="authentication" screenOptions={{ headerShown: false, animation: "fade_from_bottom", animationTypeForReplace: "pop" }}>
           <Stack.Screen name="Login" component={Login} options={{ animation: "fade_from_bottom" }} />
@@ -130,6 +124,6 @@ export default Navigation = () => {
           {/* <Stack.Screen name="UpdatePassword" component={UpdatePassword} options={{ headerShown: false, presentation: 'containedTransparentModal' }} /> */}
         </Stack.Group>
       </Stack.Navigator>
-    </UserContext.Provider>
+    </ContextProvider>
   )
 }

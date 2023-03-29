@@ -8,14 +8,14 @@ import { LinearGradient } from "expo-linear-gradient"
 import { useFocusEffect } from "@react-navigation/native"
 import CircularProgress from "react-native-circular-progress-indicator"
 import Constants from "expo-constants"
-import Animated from "react-native-reanimated"
+import Animated, { interpolate, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated"
 import InformationMessage from "../Shared/InformationMessage"
 import { GetCompactMonth, GetDay, ShortDate, Time24 } from "../Shared/LocaleDate"
-import UserContext from "../UserContext"
+import ApplicationContext from "../ApplicationContext"
 
-export default Dashboard = ({ navigation, route }) => {
-  const userContext = useContext(UserContext)
-  const { user, token, register } = useContext(UserContext)
+export default Dashboard = ({ navigation }) => {
+  const userContext = useContext(ApplicationContext)
+  const { user, setUser, token, setToken, register, setRegister, achieved_hours, setAchieved_hours } = useContext(ApplicationContext)
   const insets = useSafeAreaInsets()
   const theme = useTheme()
   const { width } = useWindowDimensions()
@@ -24,6 +24,7 @@ export default Dashboard = ({ navigation, route }) => {
 
   const [greeting, setGreeting] = useState("Hola")
   const [timeToSleep, setTimeToSleep] = useState(false)
+  //const [offSet, setOffSet] = useState(0)
   //const [token, setToken] = useState(undefined)
   //const [register, setRegister] = useState(undefined)
   //const [user, setUser] = useState(undefined)
@@ -31,39 +32,45 @@ export default Dashboard = ({ navigation, route }) => {
   const [loading, setLoading] = useState(false)
 
   async function fetchData() {
-    if (loading == false) {
-      setLoading(true)
+    try {
+      if (loading == false) {
+        setLoading(true)
+      }
+
+      const requests = await Promise.all([
+        await fetch(`${localhost}/profile/${register}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            "Cache-Control": "no-cache"
+          }
+        }),
+        await fetch(`${localhost}/feed`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            "Cache-Control": "no-cache"
+          }
+        })
+      ])
+
+      setLoading(false)
+
+      if (requests[0].ok && requests[1].ok) {
+        const responses = [await requests[0].json(), await requests[1].json()]
+
+        setUser(responses[0].user)
+        setFeed(responses[1])
+        setAchieved_hours(responses[1]?.achieved_hours)
+      }
+
+      return
+    } catch (error) {
+      console.error(error)
+      setLoading(false)
     }
-
-    const requests = await Promise.all([
-      await fetch(`${localhost}/profile/${register}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-          "Cache-Control": "no-cache"
-        }
-      }),
-      await fetch(`${localhost}/feed`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-          "Cache-Control": "no-cache"
-        }
-      })
-    ])
-
-    setLoading(false)
-
-    if (requests[0].ok && requests[1].ok) {
-      const responses = [await requests[0].json(), await requests[1].json()]
-
-      userContext.setUser(responses[0].user)
-      setFeed(responses[1])
-    }
-
-    return
   }
 
   useEffect(() => {
@@ -123,6 +130,8 @@ export default Dashboard = ({ navigation, route }) => {
       return () => {}
     }, [])
   )
+
+  useFocusEffect(useCallback(() => console.log(userContext.achieved_hours), []))
 
   const WidgetSmall = useCallback(
     ({ screen, payload, child }) => (
@@ -187,9 +196,26 @@ export default Dashboard = ({ navigation, route }) => {
     []
   )
 
-  return (
-    <Flex fill>
-      {user !== null && feed != null && (
+  const offSet = useSharedValue(0)
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      offSet.value = event.contentOffset.y
+    }
+  })
+
+  const animationStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          translateY: offSet.value //interpolate(offSet.value, [-500, 0, 500], [-500, 0, 500])
+        }
+      ]
+    }
+  })
+
+  const Header = () => {
+    return (
+      <Animated.View style={[{}, animationStyle]}>
         <Flex w={"100%"} h={250 + insets.top} style={{ backgroundColor: "#ff0099", position: "absolute" }}>
           {
             {
@@ -203,9 +229,15 @@ export default Dashboard = ({ navigation, route }) => {
 
           <LinearGradient colors={[theme.colors.cover, theme.colors.background]} locations={[0.75, 1]} style={{ width: "100%", height: "100%", position: "absolute" }} />
         </Flex>
-      )}
+      </Animated.View>
+    )
+  }
 
-      <ScrollView style={{}} refreshControl={<RefreshControl refreshing={loading} onRefresh={() => fetchData()} />}>
+  return (
+    <Flex fill>
+      {user !== null && feed != null && <Header />}
+
+      <ScrollView onScroll={(event) => (offSet.value = event.nativeEvent.contentOffset.y * -0.25)} scrollEventThrottle={16} refreshControl={<RefreshControl refreshing={loading} onRefresh={() => fetchData()} />}>
         <Flex h={insets.top} w={"100%"} />
         {user != null && feed != null ? (
           <VStack pb={50}>
@@ -308,7 +340,7 @@ export default Dashboard = ({ navigation, route }) => {
                           </Flex>
                           {feed?.total_hours ? (
                             <Animated.View>
-                              <CircularProgress value={feed?.achieved_hours} showProgressValue={false} progressValueColor={theme.colors.primary} activeStrokeColor={theme.colors.primary} inActiveStrokeColor={theme.colors.backdrop} rotation={180} titleColor={theme.colors.onBackground} radius={50} maxValue={feed?.total_hours} />
+                              <CircularProgress value={achieved_hours} showProgressValue={false} progressValueColor={theme.colors.primary} activeStrokeColor={theme.colors.primary} inActiveStrokeColor={theme.colors.backdrop} rotation={180} titleColor={theme.colors.onBackground} radius={50} maxValue={feed?.total_hours} />
                             </Animated.View>
                           ) : null}
                         </Flex>

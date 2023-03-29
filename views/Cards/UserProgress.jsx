@@ -9,12 +9,14 @@ import { ScrollView, RefreshControl } from "react-native"
 import { useFocusEffect } from "@react-navigation/native"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import { LongDate, Time24 } from "../Shared/LocaleDate"
-import UserContext from "../UserContext"
+import UserContext from "../ApplicationContext"
 import CircularProgress from "react-native-circular-progress-indicator"
+import InformationMessage from "../Shared/InformationMessage"
 
 export default UserProgress = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
-  const { register, token } = useContext(UserContext)
+  const { register, token, achieved_hours, setAchieved_hours } = useContext(UserContext)
+  const userContext = useContext(UserContext)
   const headerMargin = useHeaderHeight()
   // const { token, user } = route.params
   const theme = useTheme()
@@ -22,33 +24,37 @@ export default UserProgress = ({ navigation, route }) => {
   const [loading, setLoading] = useState(false)
   const [activities, setActivities] = useState(undefined)
   const [total_hours, setTotal_hours] = useState(null)
-  const [achieved_hours, setAchieved_hours] = useState(null)
 
   async function getCard() {
-    setLoading(true)
+    try {
+      setLoading(true)
 
-    const request = await fetch(`${localhost}/cards/${register}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        "Cache-Control": "no-cache"
+      const request = await fetch(`${localhost}/cards/${register}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          "Cache-Control": "no-cache"
+        }
+      })
+
+      setLoading(false)
+
+      if (request.ok) {
+        const response = await request.json()
+
+        setActivities(response.activities)
+        setAchieved_hours(Number(response.achieved_hours))
+        setTotal_hours(Number(response.total_hours))
+
+        return
       }
-    })
-      .then((response) => (response.ok ? response.json() : response.status))
-      .catch(() => null)
 
-    setLoading(false)
-
-    if (request?.activities) {
-      setActivities(request.activities)
-      setAchieved_hours(Number(request.achieved_hours))
-      setTotal_hours(Number(request.total_hours))
-      console.log(request)
+      return
+    } catch (error) {
+      console.error(error)
+      setLoading(false)
     }
-    // } else {
-    //   setActivities(request)
-    // }
   }
 
   useEffect(() => {
@@ -87,45 +93,39 @@ export default UserProgress = ({ navigation, route }) => {
   const Activity = () => {
     return (
       <VStack spacing={25} key="Activity">
-        <Text variant="headlineSmall" style={{ textAlign: "center" }}>
-          Actividades realizadas
-        </Text>
-        <VStack spacing={10}>
-          {activities.length > 0 ? (
-            activities.map((activity) => (
-              <Card mode="outlined" key={activity.activity_name}>
-                <HStack spacing={20} p={20}>
-                  <VStack items="center">
-                    <Avatar.Text label={activity?.hours} size={50} />
-                    <Text variant="bodyMedium" style={{ textAlign: "center" }}>
-                      hrs
-                    </Text>
-                  </VStack>
-                  <VStack fill spacing={5}>
-                    <Flex>
-                      <Text variant="bodyLarge" numberOfLines={2}>
-                        {activity?.activity_name}
+        {activities.length > 0 ? (
+          <>
+            <Text variant="headlineSmall" style={{ textAlign: "center" }}>
+              Actividades realizadas
+            </Text>
+            <VStack spacing={10}>
+              {activities.map((activity) => (
+                <Card mode="outlined" key={activity._id}>
+                  <HStack spacing={20} p={20}>
+                    <VStack items="center">
+                      <Avatar.Text label={activity?.hours} size={50} />
+                      <Text variant="bodyMedium" style={{ textAlign: "center" }}>
+                        hrs
                       </Text>
-                      <Text variant="bodyMedium">{LongDate(activity?.assignation_date)}</Text>
-                      <Text variant="bodyMedium">{Time24(activity?.assignation_date)}</Text>
-                      <Text variant="bodyMedium">{activity?.responsible_register}</Text>
-                    </Flex>
-                  </VStack>
-                </HStack>
-              </Card>
-            ))
-          ) : (
-            <VStack center spacing={20} p={30}>
-              <Icon name="pencil-plus-outline" color={theme.colors.onBackground} size={50} />
-              <VStack center>
-                <Text variant="headlineSmall">Sin actividades</Text>
-                <Text variant="bodyMedium" style={{ textAlign: "center" }}>
-                  No hay ningúna actividad registrada, ¿qué te parece si hacemos la primera?
-                </Text>
-              </VStack>
+                    </VStack>
+                    <VStack fill spacing={5}>
+                      <Flex>
+                        <Text variant="bodyLarge" numberOfLines={2}>
+                          {activity?.activity_name}
+                        </Text>
+                        <Text variant="bodyMedium">{LongDate(activity?.assignation_date)}</Text>
+                        <Text variant="bodyMedium">{Time24(activity?.assignation_date)}</Text>
+                        <Text variant="bodyMedium">{activity?.responsible_register}</Text>
+                      </Flex>
+                    </VStack>
+                  </HStack>
+                </Card>
+              ))}
             </VStack>
-          )}
-        </VStack>
+          </>
+        ) : (
+          <InformationMessage key="NoProgress" title="Sin actividades" description="Todavía no tines actividades realizadas, cuando completes algunas, estas aparecerán aquí" icon="alert" />
+        )}
       </VStack>
     )
   }
@@ -138,27 +138,6 @@ export default UserProgress = ({ navigation, route }) => {
             // isNaN(activities) ? (
             <DisplayDetails title="Tu progreso" children={[ProgressRing(), Activity()]} showHeader={false} />
           ) : (
-            /*) : (*/
-            // <VStack p={30} center spacing={20}>
-            //   <Icon color={theme.colors.onBackground} name="alert-circle-outline" size={50} />
-            //   <VStack center>
-            //     <Text variant="headlineSmall">Ocurrió un problema</Text>
-            //     <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
-            //       No podemos recuperar el tarjetón, inténtalo de nuevo más tarde (Error: {activities})
-            //     </Text>
-            //   </VStack>
-            //   <Flex>
-            //     <Button
-            //       mode="outlined"
-            //       onPress={(_) => {
-            //         getCard()
-            //       }}
-            //     >
-            //       Volver a intentar
-            //     </Button>
-            //   </Flex>
-            // </VStack>
-            // )
             <VStack center spacing={20} p={30}>
               <Icon color={theme.colors.onBackground} name="wifi-alert" size={50} />
               <VStack center>
