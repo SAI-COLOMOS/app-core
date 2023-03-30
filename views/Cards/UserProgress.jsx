@@ -1,7 +1,7 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useEffect, useState, useCallback, useContext } from "react"
 import { useHeaderHeight } from "@react-navigation/elements"
-import { Text, Card, Button, FAB, useTheme, Avatar, ActivityIndicator } from "react-native-paper"
+import { Text, Card, Button, FAB, useTheme, Avatar, ActivityIndicator, ProgressBar } from "react-native-paper"
 import Header from "../Shared/Header"
 import Constants from "expo-constants"
 import DisplayDetails from "../Shared/DisplayDetails"
@@ -73,31 +73,25 @@ export default UserProgress = ({ navigation, route }) => {
   )
 
   const ProgressRing = () => (
-    <Flex key="Progress" fill center>
-      {typeof achieved_hours == "number" && typeof total_hours == "number" ? (
-        <>
-          <CircularProgress value={achieved_hours} showProgressValue={false} progressValueColor={theme.colors.primary} activeStrokeColor={theme.colors.primary} inActiveStrokeColor={theme.colors.backdrop} rotation={180} titleColor={theme.colors.onBackground} radius={75} maxValue={total_hours} />
-          <Flex fill center style={{ position: "absolute" }}>
-            <Text variant="headlineLarge" style={{ fontWeight: "bold", color: theme.colors.primary }}>
-              {achieved_hours} /
-            </Text>
-            <Text variant="bodyLarge">{total_hours}</Text>
-          </Flex>
-        </>
-      ) : (
-        <ActivityIndicator size={75} />
-      )}
-    </Flex>
+    <VStack spacing={10} key="Progress">
+      <HStack justify="between" items="baseline">
+        <Text variant="headlineLarge" style={{ fontWeight: "bold", color: theme.colors.primary }}>
+          {achieved_hours} hrs
+        </Text>
+        <Text variant="bodyLarge">{total_hours} hrs</Text>
+      </HStack>
+      {total_hours > 0 && <ProgressBar progress={achieved_hours / total_hours} />}
+    </VStack>
   )
 
   const Activity = () => {
     return (
-      <VStack spacing={25} key="Activity">
-        {activities.length > 0 ? (
-          <>
-            <Text variant="headlineSmall" style={{ textAlign: "center" }}>
-              Actividades realizadas
-            </Text>
+      <Flex key="Activity">
+        <Flex pv={20}>
+          <Text variant="bodyLarge">Actividades realizadas</Text>
+        </Flex>
+        <VStack spacing={25} key="Activity">
+          {activities.length > 0 ? (
             <VStack spacing={10}>
               {activities.map((activity) => (
                 <Card mode="outlined" key={activity._id}>
@@ -108,25 +102,29 @@ export default UserProgress = ({ navigation, route }) => {
                         hrs
                       </Text>
                     </VStack>
-                    <VStack fill spacing={5}>
-                      <Flex>
-                        <Text variant="bodyLarge" numberOfLines={2}>
-                          {activity?.activity_name}
-                        </Text>
-                        <Text variant="bodyMedium">{LongDate(activity?.assignation_date)}</Text>
-                        <Text variant="bodyMedium">{Time24(activity?.assignation_date)}</Text>
-                        <Text variant="bodyMedium">{activity?.responsible_register}</Text>
-                      </Flex>
-                    </VStack>
+                    <Flex fill>
+                      <Text variant="bodyLarge" numberOfLines={2}>
+                        {activity?.activity_name}
+                      </Text>
+                      <Text variant="bodyMedium" numberOfLines={1}>
+                        {LongDate(activity?.assignation_date)}
+                      </Text>
+                      <Text variant="bodyMedium" numberOfLines={1}>
+                        {Time24(activity?.assignation_date)}
+                      </Text>
+                      <Text variant="bodyMedium" numberOfLines={1}>
+                        {activity?.responsible_name}
+                      </Text>
+                    </Flex>
                   </HStack>
                 </Card>
               ))}
             </VStack>
-          </>
-        ) : (
-          <InformationMessage key="NoProgress" title="Sin actividades" description="Todavía no tines actividades realizadas, cuando completes algunas, estas aparecerán aquí" icon="alert" />
-        )}
-      </VStack>
+          ) : (
+            <InformationMessage key="NoProgress" title="Sin actividades" description="Todavía no tines actividades realizadas, cuando completes algunas, estas aparecerán aquí" icon="alert" />
+          )}
+        </VStack>
+      </Flex>
     )
   }
 

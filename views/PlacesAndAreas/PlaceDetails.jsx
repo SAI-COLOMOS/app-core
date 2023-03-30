@@ -81,7 +81,7 @@ export default PlaceDetails = ({ navigation, route }) => {
 
   const Areas = () => (
     <Flex key="Areas">
-      <Flex p={20}>
+      <Flex pv={20}>
         <Text variant="bodyLarge">Áreas</Text>
       </Flex>
 

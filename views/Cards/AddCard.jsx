@@ -1,6 +1,6 @@
 import { Flex, VStack } from "@react-native-material/core"
 import { useHeaderHeight } from "@react-navigation/elements"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useContext, useEffect, useState } from "react"
 import Header from "../Shared/Header"
 import Constants from "expo-constants"
 import CreateForm from "../Shared/CreateForm"
@@ -9,26 +9,28 @@ import ModalMessage from "../Shared/ModalMessage"
 import { ScrollView } from "react-native"
 import { LongDate } from "../Shared/LocaleDate"
 import { DateAndTimerPicker } from "../Shared/TimeAndDatePicker"
+import ApplicationContext from "../ApplicationContext"
 
 export default AddCard = ({ navigation, route }) => {
   const headerMargin = useHeaderHeight()
-  const { user, token, register } = route.params
+  const { token } = useContext(ApplicationContext)
+  const { register } = route.params
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const theme = useTheme()
 
   const [activity_name, setActivity_name] = useState("")
   const [hours, setHours] = useState("")
 
+  const [loading, setLoading] = useState(false)
   const [modalSuccess, setModalSuccess] = useState(false)
-  const [modalLoading, setModalLoading] = useState(false)
   const [modalError, setModalError] = useState(false)
   const [modalFatal, setModalFatal] = useState(false)
-  const [reponseCode, setReponseCode] = useState("")
+  const [reponseCode, setResponseCode] = useState("")
 
   async function SaveCard() {
-    setModalLoading(true)
+    setLoading(true)
 
-    const request = await fetch(`${localhost}/cards/${user?.register}`, {
+    const request = await fetch(`${localhost}/cards/${register}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -42,12 +44,12 @@ export default AddCard = ({ navigation, route }) => {
     })
       .then((response) => response.status)
       .catch((error) => null)
-    setModalLoading(false)
+    setLoading(false)
 
     if (request == 201) {
       setModalSuccess(true)
     } else if (request != null) {
-      setReponseCode(request)
+      setResponseCode(request)
       setModalError(true)
     } else {
       setModalFatal(true)
@@ -57,7 +59,7 @@ export default AddCard = ({ navigation, route }) => {
   const Activity = () => {
     return (
       <VStack spacing={5} key="Activity">
-        <Text variant="labelLarge">Actividad</Text>
+        <Text variant="labelLarge">Actividad realizada</Text>
         <VStack spacing={10}>
           <TextInput mode="outlined" value={activity_name} onChangeText={setActivity_name} label="Nombre de actividad" maxLength={50} autoCapitalize="words" autoComplete="off" autoCorrect={false} />
           <TextInput mode="outlined" value={hours} onChangeText={setHours} label="Horas a asignar" keyboardType="numeric" maxLength={3} autoComplete="off" autoCorrect={false} />
@@ -84,7 +86,7 @@ export default AddCard = ({ navigation, route }) => {
   const Cancel = () => {
     return (
       <Button
-        mode="contained"
+        mode="outlined"
         icon="close"
         key="Cancel"
         onPress={() => {
@@ -98,7 +100,7 @@ export default AddCard = ({ navigation, route }) => {
 
   return (
     <Flex fill>
-      <CreateForm navigation={navigation} title={"Añadir actividad"} children={[Activity()]} actions={[Save(), Cancel()]} />
+      <CreateForm navigation={navigation} title={"Añadir actividad"} children={[Activity()]} actions={[Save(), Cancel()]} loading={loading} />
 
       <ModalMessage title="¡Listo!" description="La actividad ha sido creada" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[["Aceptar", () => navigation.pop()]]} dismissable={false} icon="check-circle-outline" />
       <ModalMessage title="Ocurrió un problema" description={`No pudimos crear la actividad, inténtalo más tarde.`} handler={[modalError, () => setModalError(!modalError)]} actions={[["Aceptar"]]} dismissable={true} icon="close-circle-outline" />

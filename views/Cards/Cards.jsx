@@ -1,28 +1,51 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
-import { useCallback, useEffect, useState } from "react"
-import { Card, IconButton, TouchableRipple, Text, TextInput, useTheme, Avatar, FAB, Button } from "react-native-paper"
+import { useCallback, useContext, useEffect, useState } from "react"
+import { Card, IconButton, TouchableRipple, Text, TextInput, useTheme, Avatar, FAB } from "react-native-paper"
 import { useHeaderHeight } from "@react-navigation/elements"
 import Header from "../Shared/Header"
 import Constants from "expo-constants"
-import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import { FlatList } from "react-native"
+import { useFocusEffect } from "@react-navigation/native"
+import SearchBar from "../Shared/SearchBar"
+import ModalFilters from "../Shared/ModalFilters"
+import Dropdown from "../Shared/Dropdown"
+import InformationMessage from "../Shared/InformationMessage"
+import ApplicationContext from "../ApplicationContext"
 
 export default Cards = ({ navigation, route }) => {
   const headerMargin = useHeaderHeight()
-  const { user, token } = route.params
+  const { user, token } = useContext(ApplicationContext)
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const theme = useTheme()
 
   const [loading, setLoading] = useState(false)
-  const [cards, setCards] = useState(undefined)
   const [users, setUsers] = useState(undefined)
+  const [foundUsers, setFoundUsers] = useState(undefined)
+  const [search, setSearch] = useState("")
+  const [showSearch, setShowSearch] = useState(null)
+  const [areFilters, setAreFilters] = useState(false)
+  const [showFilters, setShowFilters] = useState(false)
 
-  const getUsers = async (_) => {
-    let filters = {
-      role: "Prestador"
-    }
+  const [placesOptions, setPlacesOptions] = useState()
+  const [areasOptions, setAreasOptions] = useState()
+  const [schoolsOptions, setSchoolsOptions] = useState()
+  const roleOptions = [{ option: "Administrador" }, { option: "Encargado" }, { option: "Prestador" }]
+  const periodOptions = [{ option: "A" }, { option: "B" }]
+  const statusOptions = [{ option: "Activo" }, { option: "Suspendido" }, { option: "Inactivo" }, { option: "Finalizado" }]
+  const providerOptions = [{ option: "Servicio social" }, { option: "Prácticas profesionales" }, { option: "No aplica" }]
 
-    const request = await fetch(`${localhost}/users?filter=${JSON.stringify(filters)}`, {
+  const [placeFilter, setPlaceFilter] = useState("")
+  const [areaFilter, setAreaFilter] = useState("")
+  const [yearFilter, setYearFilter] = useState("")
+  const [periodFilter, setPeriodFilter] = useState("")
+  const [schoolFilter, setSchoolFilter] = useState("")
+  const [statusFilter, setStatusFilter] = useState("")
+  const [providerFilter, setProviderFilter] = useState("")
+
+  const getUsers = async () => {
+    setLoading(true)
+
+    const request = await fetch(`${localhost}/users?filter=${JSON.stringify({ role: "Prestador" })}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -31,7 +54,9 @@ export default Cards = ({ navigation, route }) => {
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
-      .catch((_) => null)
+      .catch(() => null)
+
+    setLoading(false)
 
     if (request?.users) {
       setUsers(request.users)
@@ -40,8 +65,48 @@ export default Cards = ({ navigation, route }) => {
     }
   }
 
-  const getCard = async (_) => {
-    const request = await fetch(`${localhost}/cards`, {
+  const searchUsers = async () => {
+    setLoading(true)
+
+    let filters = {}
+
+    if (placeFilter !== "") {
+      filters = { ...filters, place: placeFilter }
+    }
+
+    if (areaFilter !== "") {
+      filters = { ...filters, assigned_area: areaFilter }
+    }
+
+    if (yearFilter !== "") {
+      filters = { ...filters, year: yearFilter }
+    }
+
+    if (periodFilter !== "") {
+      filters = { ...filters, period: periodFilter }
+    }
+
+    if (schoolFilter !== "") {
+      filters = { ...filters, school: schoolFilter }
+    }
+
+    if (statusFilter !== "") {
+      filters = { ...filters, status: statusFilter }
+    }
+
+    if (providerFilter !== "") {
+      filters = { ...filters, provider_type: providerFilter }
+    }
+
+    setAreFilters(filters)
+
+    if (Object.keys(filters).length === 0 && search === "") {
+      setFoundUsers(undefined)
+      setLoading(false)
+      return
+    }
+
+    const request = await fetch(`${localhost}/users?search=${search.trim()}&filter=${JSON.stringify({ role: "Prestador", ...filters })}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -50,102 +115,271 @@ export default Cards = ({ navigation, route }) => {
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
-      .catch((_) => null)
+      .catch(() => null)
 
-    if (request?.cards) {
-      setCards(request.cards)
+    setLoading(false)
+
+    if (request?.users) {
+      setFoundUsers(request.users)
+    } else {
+      setFoundUsers(request)
+    }
+  }
+
+  const getPlaces = async () => {
+    const request = await fetch(`${localhost}/places`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        "Cache-Control": "no-cache"
+      }
+    })
+      .then((response) => (response.ok ? response.json() : response.status))
+      .catch(() => null)
+
+    if (request?.places) {
+      let placesData = []
+      request.places.forEach((place) => {
+        let areasData = []
+
+        place.place_areas.map((area) => {
+          areasData.push({ option: area.area_name })
+        })
+
+        placesData.push({ option: place.place_name, areas: areasData })
+      })
+      setPlacesOptions(placesData)
+    } else {
+    }
+  }
+
+  const getSchools = async () => {
+    const request = await fetch(`${localhost}/schools`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        "Cache-Control": "no-cache"
+      }
+    })
+      .then((response) => (response.ok ? response.json() : response.status))
+      .catch(() => null)
+
+    if (request?.schools) {
+      let schoolsData = []
+      request.schools.forEach((school) => {
+        schoolsData.push({ option: school.school_name })
+      })
+      setSchoolsOptions(schoolsData)
+    } else {
     }
   }
 
   useEffect(() => {
     navigation.setOptions({
-      header: (props) => <Header {...props} />,
+      header: (props) => <Header {...props} children={[<IconButton key="FilterButton" icon="filter-outline" onPress={() => setShowFilters(!showFilters)} />, <IconButton key="SearchButton" icon="magnify" onPress={() => setShowSearch(!showSearch)} />]} />,
       headerTransparent: true,
-      headerTitle: "Asignar horas"
+      headerTitle: "Prestadores"
     })
-  }, [])
+  }, [showSearch, showFilters])
 
   useEffect(() => {
-    if (users === undefined) {
+    setAreaFilter("")
+    const placeSelected = placesOptions?.find((place) => place.option == placeFilter)
+
+    let areaData = []
+    placeSelected?.areas.forEach((area) => {
+      areaData.push({ option: area.option })
+    })
+
+    setAreasOptions(areaData)
+  }, [placeFilter])
+
+  useFocusEffect(
+    useCallback(() => {
       getUsers()
-    }
-  }, [users])
+      getPlaces()
+      getSchools()
+      return () => {}
+    }, [])
+  )
 
-  const Item = useCallback(({ first_name, role, avatar, user }) => {
-    return (
-      <Flex ph={20} pv={5} onPress={() => {}}>
-        <Card mode="outlined" style={{ overflow: "hidden" }}>
-          <TouchableRipple
-            onPress={() => {
-              navigation.navigate("CardDetailsNex", { token, user })
-            }}
-          >
-            <Flex p={10}>
-              <Card.Title title={first_name} titleNumberOfLines={2} subtitle={role} subtitleNumberOfLines={2} left={(props) => (avatar ? <Avatar.Image {...props} source={{ uri: `data:image/png;base64,${avatar}` }} /> : <Avatar.Icon {...props} icon="account" />)} />
-            </Flex>
-          </TouchableRipple>
-        </Card>
-      </Flex>
-    )
-  }, [])
-
-  const EmptyList = useCallback((_) => {
-    return (
-      <VStack center spacing={20} p={30}>
-        <Icon name="pencil-plus-outline" color={theme.colors.onBackground} size={50} />
-        <VStack center>
-          <Text variant="headlineSmall">Sin usuarios</Text>
-          <Text variant="bodyMedium" style={{ textAlign: "center" }}>
-            No hay ningun usuario registrado
-          </Text>
-        </VStack>
-        {/* <Flex>
-          <Button
-            icon="plus"
-            mode="outlined"
-            onPress={(_) => {
-              navigation.navigate('AddUser', {
-                user,
-                token
-              })
-            }}
-          >
-            Agregar
-          </Button>
-        </Flex> */}
-      </VStack>
-    )
-  }, [])
-
-  const NoConection = useCallback((_) => {
-    return (
-      <VStack center spacing={20} p={30}>
-        <Icon name="wifi-alert" color={theme.colors.onBackground} size={50} />
-        <VStack center>
-          <Text variant="headlineSmall">Sin conexión</Text>
-          <Text variant="bodyMedium" style={{ textAlign: "center" }}>
-            Parece que no tienes conexión a internet, conectate e intenta de nuevo
-          </Text>
-        </VStack>
-        <Flex>
-          <Button
-            icon="reload"
-            mode="outlined"
-            onPress={(_) => {
-              setUsers(undefined)
-              getUsers()
-            }}
-          >
-            Reintentar
-          </Button>
+  const Item = useCallback(
+    ({ name, role, avatar, register, user }) => {
+      return (
+        <Flex ph={20} pv={5} onPress={() => {}}>
+          <Card mode="outlined" style={{ overflow: "hidden" }}>
+            <TouchableRipple
+              onPress={() => {
+                navigation.navigate("CardDetails", { register, user })
+              }}
+            >
+              <Flex p={10}>
+                <Card.Title title={name} titleNumberOfLines={1} subtitle={role} subtitleNumberOfLines={2} left={(props) => (avatar ? <Avatar.Image {...props} source={{ uri: `data:image/png;base64,${avatar}` }} /> : <Avatar.Icon {...props} icon="account" />)} />
+              </Flex>
+            </TouchableRipple>
+          </Card>
         </Flex>
+      )
+    },
+    [placesOptions]
+  )
+
+  const FilterOptions = () => {
+    return (
+      <VStack spacing={10}>
+        {user.role == "Administrador" ? (
+          <HStack items="end">
+            <Flex fill>
+              <Dropdown title="Bosque urbano" value={placeFilter} selected={setPlaceFilter} options={placesOptions} />
+            </Flex>
+            {placeFilter ? <IconButton icon="delete" mode="outlined" onPress={() => setPlaceFilter("")} /> : null}
+          </HStack>
+        ) : null}
+
+        {placeFilter && areasOptions.length > 0 ? (
+          <HStack items="end">
+            <Flex fill>
+              <Dropdown title="Área asignada" value={areaFilter} selected={setAreaFilter} options={areasOptions} />
+            </Flex>
+            {areaFilter ? <IconButton icon="delete" mode="outlined" onPress={() => setAreaFilter("")} /> : null}
+          </HStack>
+        ) : null}
+
+        <HStack items="end">
+          <Flex fill>
+            <TextInput value={yearFilter} onChangeText={setYearFilter} mode="outlined" label="Año de inscripción" maxLength={4} keyboardType="numeric" />
+          </Flex>
+          {yearFilter ? <IconButton icon="delete" mode="outlined" onPress={() => setYearFilter("")} /> : null}
+        </HStack>
+
+        <HStack items="end">
+          <Flex fill>
+            <Dropdown title="Periodo de inscripción" value={periodFilter} selected={setPeriodFilter} options={periodOptions} />
+          </Flex>
+          {periodFilter ? <IconButton icon="delete" mode="outlined" onPress={() => setPeriodFilter("")} /> : null}
+        </HStack>
+
+        <HStack items="end">
+          <Flex fill>
+            <Dropdown title="Escuela" value={schoolFilter} selected={setSchoolFilter} options={schoolsOptions} />
+          </Flex>
+          {schoolFilter ? <IconButton icon="delete" mode="outlined" onPress={() => setSchoolFilter("")} /> : null}
+        </HStack>
+
+        <HStack items="end">
+          <Flex fill>
+            <Dropdown title="Estado" value={statusFilter} selected={setStatusFilter} options={statusOptions} />
+          </Flex>
+          {statusFilter ? <IconButton icon="delete" mode="outlined" onPress={() => setStatusFilter("")} /> : null}
+        </HStack>
+
+        {user.role == "Administrador" ? (
+          <HStack items="end">
+            <Flex fill>
+              <Dropdown title="Tipo de prestador" value={providerFilter} selected={setProviderFilter} options={providerOptions} />
+            </Flex>
+            {providerFilter ? <IconButton icon="delete" mode="outlined" onPress={() => setProviderFilter("")} /> : null}
+          </HStack>
+        ) : null}
       </VStack>
     )
-  }, [])
+  }
 
   return (
     <Flex fill pt={headerMargin}>
-      <FlatList data={users} ListEmptyComponent={() => (users === undefined ? null : users === null ? <NoConection /> : <EmptyList />)} refreshing={loading} onRefresh={(_) => getUsers()} renderItem={({ item }) => <Item onPress={() => {}} first_name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ""}`} role={`${item.register}`} user={item} avatar={item?.avatar} />} />
+      <SearchBar show={showSearch} label="Busca por nombre, registro, correo o teléfono" value={search} setter={setSearch} action={searchUsers} />
+
+      {Object.keys(areFilters).length === 0 && search == "" ? (
+        users !== null ? (
+          users?.length >= 0 || users === undefined ? (
+            <Flex fill>
+              <FlatList
+                data={users}
+                ListEmptyComponent={() =>
+                  users === undefined ? null : (
+                    <InformationMessage
+                      icon="pencil-plus-outline"
+                      title="Sin usuarios"
+                      description="No hay ningún usuario registrado, ¿qué te parece si hacemos el primero?"
+                      buttonIcon="plus"
+                      buttonTitle="Agregar"
+                      action={() => {
+                        navigation.navigate("AddUser", {
+                          user,
+                          token,
+                          placesOptions,
+                          schoolsOptions
+                        })
+                      }}
+                    />
+                  )
+                }
+                refreshing={loading}
+                onRefresh={() => getUsers()}
+                renderItem={({ item }) => <Item key={item.register} name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ""}`} role={`${item.register}`} register={item.register} avatar={item?.avatar} user={item} />}
+              />
+            </Flex>
+          ) : (
+            <InformationMessage
+              icon="bug-outline"
+              title="¡Ups! Error nuestro"
+              description="Algo falló de nuestra parte. Inténtalo nuevamente más tarde, si el problema persiste, comunícate con tu encargado"
+              buttonTitle="Volver a cargar"
+              buttonIcon="reload"
+              action={() => {
+                setUsers(undefined)
+                getUsers()
+              }}
+            />
+          )
+        ) : (
+          <InformationMessage
+            icon="wifi-alert"
+            title="Sin conexión"
+            description="Parece que no tienes conexión a internet, conéctate e intenta de nuevo"
+            buttonTitle="Volver a cargar"
+            buttonIcon="reload"
+            action={() => {
+              setUsers(undefined)
+              getUsers()
+            }}
+          />
+        )
+      ) : foundUsers !== null ? (
+        foundUsers?.length >= 0 || foundUsers === undefined ? (
+          <Flex fill>
+            <FlatList data={foundUsers} ListEmptyComponent={() => (foundUsers === undefined ? null : <InformationMessage icon="magnify" title="Sin resultados" description="No hay ningún usuario registrado que cumpla con los parámetros de tu búsqueda" />)} refreshing={loading} onRefresh={() => getUsers()} renderItem={({ item }) => <Item key={item.register} name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ""}`} role={`${item.register}`} register={item.register} avatar={item?.avatar} user={item} />} />
+          </Flex>
+        ) : (
+          <InformationMessage
+            icon="bug-outline"
+            title="¡Ups! Error nuestro"
+            description="Algo falló de nuestra parte. Inténtalo nuevamente más tarde, si el problema persiste, comunícate con tu encargado"
+            buttonTitle="Volver a cargar"
+            buttonIcon="reload"
+            action={() => {
+              setFoundUsers(undefined)
+              searchUsers()
+            }}
+          />
+        )
+      ) : (
+        <InformationMessage
+          icon="wifi-alert"
+          title="Sin conexión"
+          description="Parece que no tienes conexión a internet, conéctate e intenta de nuevo"
+          buttonTitle="Volver a cargar"
+          buttonIcon="reload"
+          action={() => {
+            setFoundUsers(undefined)
+            searchUsers()
+          }}
+        />
+      )}
+
+      <ModalFilters handler={[showFilters, () => setShowFilters(!showFilters)]} child={FilterOptions()} action={() => searchUsers()} />
     </Flex>
   )
 }

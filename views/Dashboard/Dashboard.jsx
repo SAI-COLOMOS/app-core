@@ -346,6 +346,9 @@ export default Dashboard = ({ navigation }) => {
                   {/* Widget de eventos */}
                   {(feed?.available_events?.length == 0 || user?.role != "Prestador") && <WidgetMedium title="Eventos" screen="Events" payload={{ user, token }} child={<Avatar.Icon icon={"bulletin-board"} size={100} />} />}
 
+                  {/* Widget de horas */}
+                  {user?.role === "Administrador" ? <WidgetMedium title="Horas de servicio" screen="Cards" payload={{ user, token }} child={<Avatar.Icon icon={"clock-time-four-outline"} size={100} />} /> : null}
+
                   {/* Widget de perfil */}
                   <WidgetSmall screen="Profile" payload={{ user, token }} child={user?.avatar ? <Avatar.Image source={{ uri: `data:image/png;base64,${user.avatar}` }} size={50} /> : <Avatar.Icon icon="account-circle-outline" size={100} />} />
 
@@ -364,8 +367,6 @@ export default Dashboard = ({ navigation }) => {
                     {user?.role === "Administrador" ? <WidgetSmall screen="Schools" payload={{ user, token }} child={<Avatar.Icon icon={"town-hall"} size={50} />} /> : null}
 
                     {user?.role === "Administrador" ? <WidgetSmall screen="Events" payload={{ user, token }} child={<Avatar.Icon icon={"bulletin-board"} size={50} />} /> : null}
-
-                    {user?.role === "Encargado" ? <WidgetSmall screen="Cards" payload={{ user, token }} child={<Avatar.Icon icon={"clock-time-four-outline"} size={50} />} /> : null}
 
                     <WidgetSmall screen="Users" payload={{ actualUser: user, token }} child={<Avatar.Icon icon={"account-supervisor-outline"} size={50} />} />
 
