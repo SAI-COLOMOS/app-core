@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react'
-import { Avatar, Button } from 'react-native-paper'
-import * as ImagePicker from 'expo-image-picker'
-import { manipulateAsync } from 'expo-image-manipulator'
-import { Flex, VStack } from '@react-native-material/core'
+import React, { useState, useEffect } from "react"
+import { Avatar, Button } from "react-native-paper"
+import * as ImagePicker from "expo-image-picker"
+import { manipulateAsync } from "expo-image-manipulator"
+import { Flex, VStack } from "@react-native-material/core"
 
 export default ImageSelector = ({ value, setter }) => {
   async function selectFromLibrary() {
@@ -33,7 +33,6 @@ export default ImageSelector = ({ value, setter }) => {
 
   async function imageManipulation(image) {
     const compressPhoto = await manipulateAsync(image.assets[0].uri, [{ resize: { height: 250, width: 250 } }], { base64: true })
-    console.log(compressPhoto)
     setter(compressPhoto.base64)
   }
 

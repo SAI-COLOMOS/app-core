@@ -11,8 +11,6 @@ export default CreateForm = ({ navigation, route, loading, title, children, acti
   useEffect(
     () =>
       navigation.addListener("beforeRemove", (e) => {
-        console.log("Hola", loading)
-
         e.preventDefault()
 
         if (loading) {

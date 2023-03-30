@@ -26,7 +26,6 @@ export default Dropdown = ({ title, options, selected, value }) => {
               title={option?.option}
               onPress={() => {
                 selected(option?.value ? { option: option.option, value: option.value } : option.option)
-                console.log({ option: option.option, value: option.value })
                 setShow(!show)
               }}
             />

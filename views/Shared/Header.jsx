@@ -1,6 +1,6 @@
-import { IconButton, Text, useTheme } from 'react-native-paper'
-import { Flex, HStack } from '@react-native-material/core'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { IconButton, Text, useTheme } from "react-native-paper"
+import { Flex, HStack } from "@react-native-material/core"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 export default Header = ({ options, navigation, children }) => {
   const insets = useSafeAreaInsets()
@@ -13,7 +13,7 @@ export default Header = ({ options, navigation, children }) => {
           <HStack items="center" spacing={10}>
             <IconButton
               icon="arrow-left"
-              onPress={(_) => {
+              onPress={() => {
                 navigation.pop()
               }}
             />
