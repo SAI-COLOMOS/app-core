@@ -54,6 +54,9 @@ import AddCard from "./Cards/AddCard"
 import EditCard from "./Cards/EditCard"
 import UserProgress from "./Cards/UserProgress"
 
+// Forms
+import Forms from "./Forms/Forms"
+
 export default Navigation = () => {
   const Stack = createNativeStackNavigator()
 
@@ -122,6 +125,10 @@ export default Navigation = () => {
           <Stack.Screen name="ShowAttendanceCode" component={ShowAttendanceCode} options={{ headerShown: false, presentation: "containedTransparentModal" }} />
 
           {/* <Stack.Screen name="UpdatePassword" component={UpdatePassword} options={{ headerShown: false, presentation: 'containedTransparentModal' }} /> */}
+        </Stack.Group>
+
+        <Stack.Group>
+          <Stack.Screen name="Forms" component={Forms} />
         </Stack.Group>
       </Stack.Navigator>
     </ContextProvider>
