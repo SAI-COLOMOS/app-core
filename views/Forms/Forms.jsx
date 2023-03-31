@@ -1,6 +1,10 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
 import Header from "../Shared/Header"
 import Constants from "expo-constants"
+import { useCallback, useEffect, useState } from "react"
+import { useFocusEffect } from "@react-navigation/native"
+import { Card, IconButton, TouchableRipple, Text, TextInput, useTheme, Avatar, FAB } from "react-native-paper"
+import { useHeaderHeight } from "@react-navigation/elements"
 
 
 export default Forms = ({navigation, route}) => {
@@ -25,17 +29,32 @@ export default Forms = ({navigation, route}) => {
           .then((response) => (response.ok ? response.json() : response.status))
           .catch(() => null)
     
-        setLoading(false)
+        // setLoading(false)
     
         if (request?.forms) {
           setForms(request.forms)
         } else {
           setUsers(request)
         }
-      }
+    }
+
+    useEffect(() => {
+        navigation.setOptions({
+          header: (props) => <Header {...props} /*children={[<IconButton key="FilterButton" icon="filter-outline" onPress={() => setShowFilters(!showFilters)} />, <IconButton key="SearchButton" icon="magnify" onPress={() => setShowSearch(!showSearch)} />]}*/ />,
+          headerTransparent: true,
+          headerTitle: "Formularios"
+        })
+    }, [])
+
+    useFocusEffect(
+        useCallback(() => {
+          getForms()
+          return () => {}
+        }, [])
+    )
 
     return (
-        <Flex>
+        <Flex fill pt={headerMargin}>
 
         </Flex>
     )
