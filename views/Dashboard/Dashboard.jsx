@@ -372,7 +372,7 @@ export default Dashboard = ({ navigation }) => {
 
                     <WidgetSmall screen="Cards" payload={{ actualUser: user, token }} child={<Avatar.Icon icon={"close"} size={50} />} />
                     
-                    <WidgetSmall screen="Forms" payload={{ actualUser: user, token }} child={<Avatar.Icon icon={"list-box-outline"} size={50} />} />
+                    <WidgetSmall screen="Forms" payload={{ actualUser: user, token }} child={<Avatar.Icon icon={"form-select"} size={50} />} />
                   </Flex>
                 ) : null}
               </VStack>
