@@ -12,7 +12,7 @@ import SearchBar from '../Shared/SearchBar'
 import InformationMessage from '../Shared/InformationMessage'
 import { it } from 'react-native-paper-dates'
 
-export default Schools = ({ navigation, route }) => {
+export default Forms = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const theme = useTheme()
   const { user, token } = route.params
@@ -23,6 +23,8 @@ export default Schools = ({ navigation, route }) => {
   const [showSearch, setShowSearch] = useState(null)
   const [search, setSearch] = useState('')
   const [foundForms, setFoundForms] = useState(undefined)
+
+  const [placesOptions, setPlacesOptions] = useState()
 
   async function getForms() {
     setLoading(true)
@@ -130,7 +132,7 @@ export default Schools = ({ navigation, route }) => {
                       buttonIcon="plus"
                       buttonTitle="Agregar"
                       action={() => {
-                        navigation.navigate('AddSchool', {
+                        navigation.navigate('AddForm', {
                           user,
                           token
                         })
@@ -147,7 +149,7 @@ export default Schools = ({ navigation, route }) => {
                 icon="plus"
                 style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
                 onPress={() => {
-                  navigation.navigate('AddSchool', {
+                  navigation.navigate('AddForm', {
                     user,
                     token
                   })
@@ -162,8 +164,8 @@ export default Schools = ({ navigation, route }) => {
               buttonTitle="Volver a cargar"
               buttonIcon="reload"
               action={() => {
-                setSchools(undefined)
-                getSchools()
+                setForms(undefined)
+                getForms()
               }}
             />
           )
@@ -175,8 +177,8 @@ export default Schools = ({ navigation, route }) => {
             buttonTitle="Volver a cargar"
             buttonIcon="reload"
             action={() => {
-              setSchools(undefined)
-              getSchools()
+              setForms(undefined)
+              getForms()
             }}
           />
         )
