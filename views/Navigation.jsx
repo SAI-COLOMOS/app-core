@@ -126,10 +126,11 @@ export default Navigation = () => {
 
           {/* <Stack.Screen name="UpdatePassword" component={UpdatePassword} options={{ headerShown: false, presentation: 'containedTransparentModal' }} /> */}
         </Stack.Group>
-
-        <Stack.Group>
+ 
+        <Stack.Group navigationKey="Forms" screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}> 
           <Stack.Screen name="Forms" component={Forms} />
         </Stack.Group>
+
       </Stack.Navigator>
     </ContextProvider>
   )
