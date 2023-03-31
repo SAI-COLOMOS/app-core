@@ -24,6 +24,8 @@ export default Forms = ({ navigation, route }) => {
   const [search, setSearch] = useState('')
   const [foundForms, setFoundForms] = useState(undefined)
 
+  const [placesOptions, setPlacesOptions] = useState()
+
   async function getForms() {
     setLoading(true)
 
@@ -130,7 +132,7 @@ export default Forms = ({ navigation, route }) => {
                       buttonIcon="plus"
                       buttonTitle="Agregar"
                       action={() => {
-                        navigation.navigate('AddSchool', {
+                        navigation.navigate('AddForm', {
                           user,
                           token
                         })
@@ -147,7 +149,7 @@ export default Forms = ({ navigation, route }) => {
                 icon="plus"
                 style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
                 onPress={() => {
-                  navigation.navigate('AddSchool', {
+                  navigation.navigate('AddForm', {
                     user,
                     token
                   })

@@ -56,7 +56,11 @@ import UserProgress from "./Cards/UserProgress"
 
 // Forms
 import Forms from "./Forms/Forms"
+<<<<<<< HEAD
 import FormDetails from "./Forms/FormDetails"
+=======
+import AddForm from "./Forms/AddForm"
+>>>>>>> 2569e5e749afeab8e612674c70b43ca8fbf624a9
 
 export default Navigation = () => {
   const Stack = createNativeStackNavigator()
@@ -131,6 +135,7 @@ export default Navigation = () => {
         <Stack.Group navigationKey="Forms" screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}> 
           <Stack.Screen name="Forms" component={Forms} />
           <Stack.Screen name="FormDetails" component={FormDetails} />
+          <Stack.Screen name="AddForm" component={AddForm} options={{ headerShown: false, presentation: "containedTransparentModal" }} />
         </Stack.Group>
 
       </Stack.Navigator>
