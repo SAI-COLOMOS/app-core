@@ -10,24 +10,24 @@ import { useFocusEffect } from '@react-navigation/native'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import SearchBar from '../Shared/SearchBar'
 import InformationMessage from '../Shared/InformationMessage'
+import { it } from 'react-native-paper-dates'
 
+export default Schools = ({ navigation, route }) => {
+  const localhost = Constants.expoConfig.extra.API_LOCAL
+  const theme = useTheme()
+  const { user, token } = route.params
+  const headerMargin = useHeaderHeight()
 
-export default Forms = ({navigation, route}) => {
-    const headerMargin = useHeaderHeight()
-    const { actualUser, token } = route.params
-    const localhost = Constants.expoConfig.extra.API_LOCAL
-    const theme = useTheme()
-
-  const [schools, setSchools] = useState(undefined)
+  const [forms, setForms] = useState(undefined)
   const [loading, setLoading] = useState(false)
   const [showSearch, setShowSearch] = useState(null)
   const [search, setSearch] = useState('')
-  const [foundSchools, setFoundSchools] = useState(undefined)
+  const [foundForms, setFoundForms] = useState(undefined)
 
-  async function getSchools() {
+  async function getForms() {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/schools`, {
+    const request = await fetch(`${localhost}/forms`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -40,24 +40,70 @@ export default Forms = ({navigation, route}) => {
 
     setLoading(false)
 
-    if (request?.schools) {
-      setSchools(request.schools)
+    if (request?.forms) {
+      setForms(request.forms)
       console.log(request)
     } else {
-      setSchools(request)
+      setForms(request)
     }
   }
 
+  async function searchForms() {
+    setLoading(true)
+
+    if (search === '') {
+      setFoundForms(undefined)
+      setLoading(false)
+      return
+    }
+
+    const request = await fetch(`${localhost}/forms?search=${search}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Cache-Control': 'no-cache'
+      }
+    })
+      .then((response) => (response.ok ? response.json() : response.status))
+      .catch(() => null)
+
+    setLoading(false)
+
+    if (request?.forms) {
+      setFoundForms(request.forms)
+    } else {
+      setFoundForms(request)
+    }
+  }
+
+  useEffect(() => {
+    navigation.setOptions({
+      header: (props) => <Header {...props} children={[<IconButton key="SearchButton" icon="magnify" onPress={() => setShowSearch(!showSearch)} />]} />,
+      headerTransparent: true,
+      headerTitle: 'Formularios'
+    })
+  }, [showSearch])
+
+  useFocusEffect(
+    useCallback(() => {
+      getForms()
+
+      return () => {}
+    }, [])
+  )
+
+  const Item = ({ form_name, description, form_identifier }) => {
     return (
       <Flex ph={20} pv={5} onPress={() => {}}>
         <Card mode="outlined" style={{ overflow: 'hidden' }}>
           <TouchableRipple
             onPress={() => {
-              navigation.navigate('SchoolDetails', { token, school_identifier })
+              navigation.navigate('SchoolDetails', { token, form_identifier })
             }}
           >
             <Flex p={10}>
-              <Card.Title title={school_name} titleNumberOfLines={2} subtitle={address} subtitleNumberOfLines={1} left={(props) => <Avatar.Icon {...props} icon="town-hall" />} />
+              <Card.Title title={form_name} titleNumberOfLines={2} subtitle={description} subtitleNumberOfLines={1} left={(props) => <Avatar.Icon {...props} icon="form-select" />} />
             </Flex>
           </TouchableRipple>
         </Card>
@@ -67,24 +113,24 @@ export default Forms = ({navigation, route}) => {
 
   return (
     <Flex fill pt={headerMargin}>
-      <SearchBar show={showSearch} label="Busca por nombre de la escuela" value={search} setter={setSearch} action={searchSchools} />
+      <SearchBar show={showSearch} label="Busca por nombre del formulario" value={search} setter={setSearch} action={searchForms} />
 
       {search == '' ? (
-        schools !== null ? (
-          schools?.length >= 0 || schools === undefined ? (
+        forms !== null ? (
+          forms?.length >= 0 || forms === undefined ? (
             <Flex fill>
               <FlatList
-                data={schools}
+                data={forms}
                 ListEmptyComponent={() =>
-                  schools === undefined ? null : (
+                  forms === undefined ? null : (
                     <InformationMessage
                       icon="pencil-plus-outline"
-                      title="Sin escuelas"
-                      description="No hay ninguna escuela registrada, ¿qué te parece si hacemos la primera?"
+                      title="Sin formularios"
+                      description="No hay ningún formulario registrado, ¿qué te parece si hacemos el primero?"
                       buttonIcon="plus"
                       buttonTitle="Agregar"
                       action={() => {
-                        navigation.navigate('AddForm', {
+                        navigation.navigate('AddSchool', {
                           user,
                           token
                         })
@@ -93,15 +139,15 @@ export default Forms = ({navigation, route}) => {
                   )
                 }
                 refreshing={loading}
-                onRefresh={() => getSchools()}
-                renderItem={({ item }) => <Item key={item.school_name} school_name={item.school_name} address={`${item.street} #${item.exterior_number}, ${item.colony}, ${item.municipality}`} school_identifier={item.school_identifier} />}
+                onRefresh={() => getForms()}
+                renderItem={({ item }) => <Item key={item.name} form_name={item.name} description={item.description} form_identifier={item.form_identifier} />}
               />
 
               <FAB
                 icon="plus"
                 style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
                 onPress={() => {
-                  navigation.navigate('AddForm', {
+                  navigation.navigate('AddSchool', {
                     user,
                     token
                   })
@@ -134,10 +180,10 @@ export default Forms = ({navigation, route}) => {
             }}
           />
         )
-      ) : foundSchools !== null ? (
-        foundSchools?.length >= 0 || foundSchools === undefined ? (
+      ) : foundForms !== null ? (
+        foundForms?.length >= 0 || foundForms === undefined ? (
           <Flex fill>
-            <FlatList data={foundSchools} ListEmptyComponent={() => (foundSchools === undefined ? null : <InformationMessage icon="magnify" title="Sin resultados" description="No hay ninguna escuela registrada que cumpla con los parámetros de tu búsqueda" />)} refreshing={loading} onRefresh={() => searchSchools()} renderItem={({ item }) => <Item key={item.school_name} school_name={item.school_name} address={`${item.street} #${item.exterior_number}, ${item.colony}, ${item.municipality}`} school_identifier={item.school_identifier} />} />
+            <FlatList data={foundForms} ListEmptyComponent={() => (foundForms === undefined ? null : <InformationMessage icon="magnify" title="Sin resultados" description="No hay ningún formulario registrado que cumpla con los parámetros de tu búsqueda" />)} refreshing={loading} onRefresh={() => searchForms()} renderItem={({ item }) => <Item key={item.form_name} form_name={item.form_name} description={item.description} form_identifier={item.form_identifier} />} />
           </Flex>
         ) : (
           <InformationMessage
@@ -147,8 +193,8 @@ export default Forms = ({navigation, route}) => {
             buttonTitle="Volver a cargar"
             buttonIcon="reload"
             action={() => {
-              setFoundSchools(undefined)
-              searchSchools()
+              setFoundForms(undefined)
+              searchForms()
             }}
           />
         )
@@ -160,8 +206,8 @@ export default Forms = ({navigation, route}) => {
           buttonTitle="Volver a cargar"
           buttonIcon="reload"
           action={() => {
-            setFoundSchools(undefined)
-            searchSchools()
+            setFoundForms(undefined)
+            searchForms()
           }}
         />
       )}
