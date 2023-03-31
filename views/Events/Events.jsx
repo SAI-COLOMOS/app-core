@@ -17,7 +17,6 @@ export default Events = ({ navigation, route }) => {
   const { user, token } = route.params
   const headerMargin = useHeaderHeight()
 
-  const [place, setPlace] = useState(undefined)
   const [belonging_area, setBelonging_area] = useState(undefined)
   const [belonging_place, setBelonging_place] = useState(undefined)
   const [events, setEvents] = useState(undefined)

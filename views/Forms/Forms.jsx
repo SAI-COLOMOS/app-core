@@ -12,7 +12,7 @@ import SearchBar from '../Shared/SearchBar'
 import InformationMessage from '../Shared/InformationMessage'
 import { it } from 'react-native-paper-dates'
 
-export default Schools = ({ navigation, route }) => {
+export default Forms = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const theme = useTheme()
   const { user, token } = route.params
@@ -99,7 +99,7 @@ export default Schools = ({ navigation, route }) => {
         <Card mode="outlined" style={{ overflow: 'hidden' }}>
           <TouchableRipple
             onPress={() => {
-              navigation.navigate('SchoolDetails', { token, form_identifier })
+              navigation.navigate('FormDetails', { token, form_identifier })
             }}
           >
             <Flex p={10}>
@@ -162,8 +162,8 @@ export default Schools = ({ navigation, route }) => {
               buttonTitle="Volver a cargar"
               buttonIcon="reload"
               action={() => {
-                setSchools(undefined)
-                getSchools()
+                setForms(undefined)
+                getForms()
               }}
             />
           )
@@ -175,8 +175,8 @@ export default Schools = ({ navigation, route }) => {
             buttonTitle="Volver a cargar"
             buttonIcon="reload"
             action={() => {
-              setSchools(undefined)
-              getSchools()
+              setForms(undefined)
+              getForms()
             }}
           />
         )
