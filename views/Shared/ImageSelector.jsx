@@ -3,14 +3,16 @@ import { Avatar, Button } from "react-native-paper"
 import * as ImagePicker from "expo-image-picker"
 import { manipulateAsync } from "expo-image-manipulator"
 import { Flex, VStack } from "@react-native-material/core"
+import { Image } from "react-native"
+import ProfileImage from "./ProfileImage"
 
-export default ImageSelector = ({ value, setter }) => {
+export default ImageSelector = ({ value, setter, type }) => {
   async function selectFromLibrary() {
     let selectedPhoto = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1
+      aspect: { rectangular: [4, 3], square: [1, 1] }[type],
+      quality: 0.7
     })
 
     if (!selectedPhoto.canceled) {
@@ -22,8 +24,8 @@ export default ImageSelector = ({ value, setter }) => {
     let takenPhoto = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1
+      aspect: { rectangular: [4, 3], square: [1, 1] }[type],
+      quality: 0.7
     })
 
     if (!takenPhoto.canceled) {
@@ -32,16 +34,36 @@ export default ImageSelector = ({ value, setter }) => {
   }
 
   async function imageManipulation(image) {
-    const compressPhoto = await manipulateAsync(image.assets[0].uri, [{ resize: { height: 250, width: 250 } }], { base64: true })
+    const compressPhoto = await manipulateAsync(image.assets[0].uri, [{ resize: { height: { rectangular: 768, square: 250 }[type], width: { rectangular: 1024, square: 250 }[type] } }], { base64: true })
     setter(compressPhoto.base64)
   }
 
   return (
-    <Flex fill p={20}>
+    <Flex
+      fill
+      p={20}
+    >
       {value ? (
         <VStack spacing={20}>
           <Flex items="center">
-            <Avatar.Image source={{ uri: `data:image/png;base64,${value}` }} size={150} />
+            {
+              {
+                square: (
+                  <ProfileImage
+                    image={value}
+                    width={150}
+                    height={150}
+                  />
+                ),
+                rectangular: (
+                  <Image
+                    source={{ uri: `data:image/png;base64,${value}` }}
+                    resizeMode="contain"
+                    style={{ height: 200, width: "100%" }}
+                  />
+                )
+              }[type]
+            }
           </Flex>
 
           <Button

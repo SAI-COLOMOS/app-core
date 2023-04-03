@@ -25,7 +25,7 @@ export default AddCard = ({ navigation, route }) => {
   const [modalSuccess, setModalSuccess] = useState(false)
   const [modalError, setModalError] = useState(false)
   const [modalFatal, setModalFatal] = useState(false)
-  const [reponseCode, setResponseCode] = useState("")
+  const [responseCode, setResponseCode] = useState("")
 
   async function SaveCard() {
     setLoading(true)
@@ -58,11 +58,32 @@ export default AddCard = ({ navigation, route }) => {
 
   const Activity = () => {
     return (
-      <VStack spacing={5} key="Activity">
+      <VStack
+        spacing={5}
+        key="Activity"
+      >
         <Text variant="labelLarge">Actividad realizada</Text>
         <VStack spacing={10}>
-          <TextInput mode="outlined" value={activity_name} onChangeText={setActivity_name} label="Nombre de actividad" maxLength={50} autoCapitalize="words" autoComplete="off" autoCorrect={false} />
-          <TextInput mode="outlined" value={hours} onChangeText={setHours} label="Horas a asignar" keyboardType="numeric" maxLength={3} autoComplete="off" autoCorrect={false} />
+          <TextInput
+            mode="outlined"
+            value={activity_name}
+            onChangeText={setActivity_name}
+            label="Nombre de actividad"
+            maxLength={50}
+            autoCapitalize="words"
+            autoComplete="off"
+            autoCorrect={false}
+          />
+          <TextInput
+            mode="outlined"
+            value={hours}
+            onChangeText={setHours}
+            label="Horas a asignar"
+            keyboardType="numeric"
+            maxLength={3}
+            autoComplete="off"
+            autoCorrect={false}
+          />
         </VStack>
       </VStack>
     )
@@ -100,11 +121,38 @@ export default AddCard = ({ navigation, route }) => {
 
   return (
     <Flex fill>
-      <CreateForm navigation={navigation} title={"Añadir actividad"} children={[Activity()]} actions={[Save(), Cancel()]} loading={loading} />
+      <CreateForm
+        navigation={navigation}
+        title={"Añadir actividad"}
+        children={[Activity()]}
+        actions={[Save(), Cancel()]}
+        loading={loading}
+      />
 
-      <ModalMessage title="¡Listo!" description="La actividad ha sido creada" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[["Aceptar", () => navigation.pop()]]} dismissable={false} icon="check-circle-outline" />
-      <ModalMessage title="Ocurrió un problema" description={`No pudimos crear la actividad, inténtalo más tarde.`} handler={[modalError, () => setModalError(!modalError)]} actions={[["Aceptar"]]} dismissable={true} icon="close-circle-outline" />
-      <ModalMessage title="Sin conexión a internet" description={`Parece que no tienes conexión a internet, conéctate e intenta de nuevo`} handler={[modalFatal, () => setModalFatal(!modalFatal)]} actions={[["Aceptar"]]} dismissable={true} icon="wifi-alert" />
+      <ModalMessage
+        title="¡Listo!"
+        description="La actividad ha sido creada"
+        handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]}
+        actions={[["Aceptar", () => navigation.pop()]]}
+        dismissable={false}
+        icon="check-circle-outline"
+      />
+      <ModalMessage
+        title="Ocurrió un problema"
+        description={`No pudimos crear la actividad, inténtalo más tarde. ${responseCode}`}
+        handler={[modalError, () => setModalError(!modalError)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="close-circle-outline"
+      />
+      <ModalMessage
+        title="Sin conexión a internet"
+        description={`Parece que no tienes conexión a internet, conéctate e intenta de nuevo`}
+        handler={[modalFatal, () => setModalFatal(!modalFatal)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="wifi-alert"
+      />
     </Flex>
   )
 }

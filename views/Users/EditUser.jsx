@@ -1,35 +1,38 @@
-import { Flex, HStack, VStack } from '@react-native-material/core'
-import { useEffect, useState } from 'react'
-import { Button, Text, TextInput, useTheme } from 'react-native-paper'
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import Constants from 'expo-constants'
-import CreateForm from '../Shared/CreateForm'
-import ModalMessage from '../Shared/ModalMessage'
-import Dropdown from '../Shared/Dropdown'
+import { Flex, HStack, VStack } from "@react-native-material/core"
+import { useContext, useEffect, useState } from "react"
+import { Button, Text, TextInput, useTheme } from "react-native-paper"
+import Icon from "react-native-vector-icons/MaterialCommunityIcons"
+import Constants from "expo-constants"
+import CreateForm from "../Shared/CreateForm"
+import ModalMessage from "../Shared/ModalMessage"
+import Dropdown from "../Shared/Dropdown"
+import ApplicationContext from "../ApplicationContext"
+import ImageSelector from "../Shared/ImageSelector"
 
 export default EditUser = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
+  const { user, token } = useContext(ApplicationContext)
   const theme = useTheme()
-  const { actualUser, token, user, placesOptions, schoolsOptions } = route.params
+  const { profile, placesOptions, schoolsOptions } = route.params
 
-  const [first_name, setFirst_name] = useState(`${user.first_name ?? ''}`)
-  const [first_last_name, setFirst_last_name] = useState(`${user.first_last_name ?? ''}`)
-  const [second_last_name, setSecond_last_name] = useState(`${user.second_last_name ?? ''}`)
-  const [age, setAge] = useState(`${user.age ?? ''}`)
-  const [email, setEmail] = useState(`${user.email ?? ''}`)
-  const [phone, setPhone] = useState(`${user.phone ?? ''}`)
-  const [emergency_contact, setEmergency_contact] = useState(`${user.emergency_contact ?? ''}`)
-  const [emergency_phone, setEmergency_phone] = useState(`${user.emergency_phone ?? ''}`)
-  const [blood_type, setBlood_type] = useState(`${user.blood_type ?? ''}`)
-  const [provider_type, setProvider_type] = useState(`${user.provider_type ?? ''}`)
-  const [place, setPlace] = useState(`${user.place ?? ''}`)
-  const [assigned_area, setAssigned_area] = useState(`${user.assigned_area ?? ''}`)
-  const [school, setSchool] = useState(`${user.school ?? ''}`)
-  const [role, setRole] = useState(`${user.role ?? ''}`)
-  const [status, setStatus] = useState(`${user.status ?? ''}`)
-  const [total_hours, setTotal_hours] = useState(`${user.total_hours ?? ''}`)
-  const [avatar, setAvatar] = useState(user?.avatar ?? null)
-  const [curp, setCurp] = useState(`${user.curp ?? ''}`)
+  const [first_name, setFirst_name] = useState(`${profile.first_name ?? ""}`)
+  const [first_last_name, setFirst_last_name] = useState(`${profile.first_last_name ?? ""}`)
+  const [second_last_name, setSecond_last_name] = useState(`${profile.second_last_name ?? ""}`)
+  const [age, setAge] = useState(`${profile.age ?? ""}`)
+  const [email, setEmail] = useState(`${profile.email ?? ""}`)
+  const [phone, setPhone] = useState(`${profile.phone ?? ""}`)
+  const [emergency_contact, setEmergency_contact] = useState(`${profile.emergency_contact ?? ""}`)
+  const [emergency_phone, setEmergency_phone] = useState(`${profile.emergency_phone ?? ""}`)
+  const [blood_type, setBlood_type] = useState(`${profile.blood_type ?? ""}`)
+  const [provider_type, setProvider_type] = useState(`${profile.provider_type ?? ""}`)
+  const [place, setPlace] = useState(`${profile.place ?? ""}`)
+  const [assigned_area, setAssigned_area] = useState(`${profile.assigned_area ?? ""}`)
+  const [school, setSchool] = useState(`${profile.school ?? ""}`)
+  const [role, setRole] = useState(`${profile.role ?? ""}`)
+  const [status, setStatus] = useState(`${profile.status ?? ""}`)
+  const [total_hours, setTotal_hours] = useState(`${profile.total_hours ?? ""}`)
+  const [avatar, setAvatar] = useState(profile?.avatar ?? null)
+  const [curp, setCurp] = useState(`${profile.curp ?? ""}`)
   const [verified, setVerified] = useState(false)
 
   const [modalConfirm, setModalConfirm] = useState(false)
@@ -39,68 +42,68 @@ export default EditUser = ({ navigation, route }) => {
   const [modalError, setModalError] = useState(false)
   const [modalErrorDelete, setModalErrorDelete] = useState(false)
   const [modalFatal, setModalFatal] = useState(false)
-  const [responseCode, setResponseCode] = useState('')
+  const [responseCode, setResponseCode] = useState("")
 
   const providerTypes = [
     {
-      option: 'Servicio social'
+      option: "Servicio social"
     },
     {
-      option: 'Prácticas profesionales'
+      option: "Prácticas profesionales"
     }
   ]
   const roleTypes = [
     {
-      option: 'Administrador'
+      option: "Administrador"
     },
     {
-      option: 'Encargado'
+      option: "Encargado"
     },
     {
-      option: 'Prestador'
+      option: "Prestador"
     }
   ]
   const bloodTypes = [
     {
-      option: 'O+'
+      option: "O+"
     },
     {
-      option: 'O-'
+      option: "O-"
     },
     {
-      option: 'A+'
+      option: "A+"
     },
     {
-      option: 'A-'
+      option: "A-"
     },
     {
-      option: 'B+'
+      option: "B+"
     },
     {
-      option: 'B-'
+      option: "B-"
     },
     {
-      option: 'AB+'
+      option: "AB+"
     },
     {
-      option: 'AB-'
+      option: "AB-"
     }
   ]
   const statusTypes = [
     {
-      option: 'Activo'
+      option: "Activo"
     },
     {
-      option: 'Suspendido'
+      option: "Suspendido"
     },
     {
-      option: 'Inactivo'
+      option: "Inactivo"
     },
     {
-      option: 'Finalizado'
+      option: "Finalizado"
     }
   ]
-  const [areasOptions, setAreasOptions] = useState('')
+  const [areasOptions, setAreasOptions] = useState("")
 
   async function saveUser() {
     setModalLoading(true)
@@ -123,7 +126,7 @@ export default EditUser = ({ navigation, route }) => {
       curp: curp.trim()
     }
 
-    if (actualUser?.role == 'Administrador') {
+    if (user?.role == "Administrador") {
       bodyRequest = {
         ...bodyRequest,
         role: role.trim(),
@@ -132,12 +135,12 @@ export default EditUser = ({ navigation, route }) => {
       }
     }
 
-    const request = await fetch(`${localhost}/users/${user.register}`, {
-      method: 'PATCH',
+    const request = await fetch(`${localhost}/users/${profile.register}`, {
+      method: "PATCH",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        'Cache-Control': 'no-cache'
+        "Cache-Control": "no-cache"
       },
       body: JSON.stringify(bodyRequest)
     })
@@ -158,12 +161,12 @@ export default EditUser = ({ navigation, route }) => {
 
   async function deleteUser() {
     setModalLoading(true)
-    const request = await fetch(`${localhost}/users/${user.register}`, {
-      method: 'DELETE',
+    const request = await fetch(`${localhost}/users/${profile.register}`, {
+      method: "DELETE",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        'Cache-Control': 'no-cache'
+        "Cache-Control": "no-cache"
       }
     })
       .then((response) => response.status)
@@ -185,17 +188,17 @@ export default EditUser = ({ navigation, route }) => {
   useEffect(() => {
     let check = true
 
-    if (actualUser?.role == 'Encargado') {
+    if (user?.role == "Encargado") {
       total_hours?.length > 0 ? null : (check = false)
     }
 
-    if (actualUser?.role == 'Administrador') {
-      if (role == 'Encargado') {
+    if (user?.role == "Administrador") {
+      if (role == "Encargado") {
         place?.length > 0 ? null : (check = false)
         assigned_area?.length > 0 ? null : (check = false)
       }
 
-      if (role == 'Prestador') {
+      if (role == "Prestador") {
         provider_type?.length > 0 ? null : (check = false)
         school?.length > 0 ? null : (check = false)
         total_hours?.length > 0 ? null : (check = false)
@@ -214,7 +217,7 @@ export default EditUser = ({ navigation, route }) => {
     phone?.length == 10 ? null : (check = false)
     emergency_contact?.length > 0 ? null : (check = false)
     emergency_phone?.length == 10 ? null : (check = false)
-    curp?.length == 18 ? null : (check = false)
+    curp?.length >= 18 ? null : (check = false)
 
     if (check) {
       setVerified(true)
@@ -224,22 +227,22 @@ export default EditUser = ({ navigation, route }) => {
   }, [first_name, first_last_name, age, blood_type, email, phone, emergency_contact, emergency_phone, provider_type, place, assigned_area, school, role, status, total_hours, curp])
 
   useEffect(() => {
-    console.log(user)
-    if (role != 'Prestador') {
-      setProvider_type('')
-      setSchool('')
-      setTotal_hours('')
+    console.log(profile)
+    if (role != "Prestador") {
+      setProvider_type("")
+      setSchool("")
+      setTotal_hours("")
     } else {
-      setProvider_type(user?.provider_type)
-      setSchool(user?.school)
+      setProvider_type(profile?.provider_type)
+      setSchool(profile?.school)
     }
   }, [role])
 
   useEffect(() => {
-    if (place == user?.place) {
-      setAssigned_area(user?.assigned_area)
+    if (place == profile?.place) {
+      setAssigned_area(profile?.assigned_area)
     } else {
-      setAssigned_area('')
+      setAssigned_area("")
     }
     const placeSelected = placesOptions?.find((item) => item.option == place)
 
@@ -254,60 +257,181 @@ export default EditUser = ({ navigation, route }) => {
   }, [place])
 
   const PersonalData = () => (
-    <VStack key="Personal" spacing={5}>
+    <VStack
+      key="Personal"
+      spacing={5}
+    >
       <Text variant="labelLarge">Datos personales</Text>
       <VStack spacing={10}>
-        <TextInput mode="outlined" value={first_name} onChangeText={setFirst_name} label="Nombre" maxLength={50} autoComplete="off" autoCorrect={false} />
-        <TextInput mode="outlined" value={first_last_name} onChangeText={setFirst_last_name} label="Apellido paterno" maxLength={50} autoComplete="off" autoCorrect={false} />
-        <TextInput mode="outlined" value={second_last_name} onChangeText={setSecond_last_name} label="Apellido materno" maxLength={50} autoComplete="off" autoCorrect={false} />
-        <TextInput mode="outlined" value={age} onChangeText={setAge} label="Edad" keyboardType="numeric" maxLength={2} autoComplete="off" autoCorrect={false} />
+        <TextInput
+          mode="outlined"
+          value={first_name}
+          onChangeText={setFirst_name}
+          label="Nombre"
+          maxLength={50}
+          autoComplete="off"
+          autoCorrect={false}
+        />
+        <TextInput
+          mode="outlined"
+          value={first_last_name}
+          onChangeText={setFirst_last_name}
+          label="Apellido paterno"
+          maxLength={50}
+          autoComplete="off"
+          autoCorrect={false}
+        />
+        <TextInput
+          mode="outlined"
+          value={second_last_name}
+          onChangeText={setSecond_last_name}
+          label="Apellido materno"
+          maxLength={50}
+          autoComplete="off"
+          autoCorrect={false}
+        />
+        <TextInput
+          mode="outlined"
+          value={age}
+          onChangeText={setAge}
+          label="Edad"
+          keyboardType="numeric"
+          maxLength={2}
+          autoComplete="off"
+          autoCorrect={false}
+        />
         <Flex fill>
-          <Dropdown title="Grupo sanguíneo" options={bloodTypes} value={blood_type} selected={setBlood_type} />
+          <Dropdown
+            title="Grupo sanguíneo"
+            options={bloodTypes}
+            value={blood_type}
+            selected={setBlood_type}
+          />
         </Flex>
-        <TextInput mode="outlined" value={curp} onChangeText={setCurp} label="CURP" autoCapitalize="characters" maxLength={18} autoComplete="off" autoCorrect={false} />
+        <TextInput
+          mode="outlined"
+          value={curp}
+          onChangeText={setCurp}
+          label="CURP"
+          autoCapitalize="characters"
+          maxLength={18}
+          autoComplete="off"
+          autoCorrect={false}
+        />
       </VStack>
     </VStack>
   )
 
   const ContactData = () => (
-    <VStack key="Contact" spacing={5}>
+    <VStack
+      key="Contact"
+      spacing={5}
+    >
       <Text variant="labelLarge">Datos de contacto</Text>
       <VStack spacing={10}>
-        <TextInput mode="outlined" value={email} onChangeText={setEmail} label="Correo electrónico" keyboardType="email-address" autoCapitalize="none" maxLength={50} autoComplete="off" autoCorrect={false} />
-        <TextInput mode="outlined" value={phone} onChangeText={setPhone} label="Teléfono" keyboardType="numeric" maxLength={10} autoComplete="off" autoCorrect={false} />
-        <TextInput mode="outlined" value={emergency_contact} onChangeText={setEmergency_contact} label="Contacto de emergencia" maxLength={50} autoCapitalize="words" autoComplete="off" autoCorrect={false} />
-        <TextInput mode="outlined" value={emergency_phone} onChangeText={setEmergency_phone} label="Teléfono de emergencia" keyboardType="numeric" maxLength={10} autoComplete="off" autoCorrect={false} />
+        <TextInput
+          mode="outlined"
+          value={email}
+          onChangeText={setEmail}
+          label="Correo electrónico"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          maxLength={50}
+          autoComplete="off"
+          autoCorrect={false}
+        />
+        <TextInput
+          mode="outlined"
+          value={phone}
+          onChangeText={setPhone}
+          label="Teléfono"
+          keyboardType="numeric"
+          maxLength={10}
+          autoComplete="off"
+          autoCorrect={false}
+        />
+        <TextInput
+          mode="outlined"
+          value={emergency_contact}
+          onChangeText={setEmergency_contact}
+          label="Contacto de emergencia"
+          maxLength={50}
+          autoCapitalize="words"
+          autoComplete="off"
+          autoCorrect={false}
+        />
+        <TextInput
+          mode="outlined"
+          value={emergency_phone}
+          onChangeText={setEmergency_phone}
+          label="Teléfono de emergencia"
+          keyboardType="numeric"
+          maxLength={10}
+          autoComplete="off"
+          autoCorrect={false}
+        />
       </VStack>
     </VStack>
   )
 
   const UserData = () => (
-    <VStack key="User" spacing={5}>
+    <VStack
+      key="User"
+      spacing={5}
+    >
       <Text variant="labelLarge">Datos del usuario</Text>
       <VStack spacing={10}>
-        {actualUser?.role == 'Administrador' ? (
+        {user?.role == "Administrador" ? (
           <Flex fill>
-            <Dropdown title="Rol" options={roleTypes} value={role} selected={setRole} />
+            <Dropdown
+              title="Rol"
+              options={roleTypes}
+              value={role}
+              selected={setRole}
+            />
           </Flex>
         ) : null}
-        {actualUser?.role == 'Encargado' ? (
+        {user?.role == "Encargado" ? (
           <Flex fill>
-            <Dropdown title="Tipo de prestador" options={providerTypes} value={provider_type} selected={setProvider_type} />
+            <Dropdown
+              title="Tipo de prestador"
+              options={providerTypes}
+              value={provider_type}
+              selected={setProvider_type}
+            />
           </Flex>
         ) : null}
-        {actualUser?.role == 'Administrador' ? (
+        {user?.role == "Administrador" ? (
           <Flex>
-            <Dropdown value={place} selected={setPlace} title="Bosque urbano" options={placesOptions} />
+            <Dropdown
+              value={place}
+              selected={setPlace}
+              title="Bosque urbano"
+              options={placesOptions}
+            />
           </Flex>
         ) : null}
-        {actualUser?.role == 'Administrador' ? (
-          place != '' && areasOptions.length > 0 ? (
+        {user?.role == "Administrador" ? (
+          place != "" && areasOptions.length > 0 ? (
             <Flex>
-              <Dropdown value={assigned_area} selected={setAssigned_area} title="Área asignada" options={areasOptions} />
+              <Dropdown
+                value={assigned_area}
+                selected={setAssigned_area}
+                title="Área asignada"
+                options={areasOptions}
+              />
             </Flex>
-          ) : areasOptions.length == 0 && place != '' ? (
-            <HStack pv={10} items="center" spacing={20}>
-              <Icon name="alert" color={theme.colors.error} size={30} />
+          ) : areasOptions.length == 0 && place != "" ? (
+            <HStack
+              pv={10}
+              items="center"
+              spacing={20}
+            >
+              <Icon
+                name="alert"
+                color={theme.colors.error}
+                size={30}
+              />
               <Flex fill>
                 <Text
                   variant="bodyMedium"
@@ -321,30 +445,61 @@ export default EditUser = ({ navigation, route }) => {
             </HStack>
           ) : null
         ) : null}
-        {role == 'Prestador' ? (
+        {role == "Prestador" ? (
           <Flex>
-            <Dropdown value={school} selected={setSchool} title="Escuela" options={schoolsOptions} />
+            <Dropdown
+              value={school}
+              selected={setSchool}
+              title="Escuela"
+              options={schoolsOptions}
+            />
           </Flex>
         ) : null}
-        {role == 'Prestador' ? <TextInput mode="outlined" value={total_hours} onChangeText={setTotal_hours} label="Total de horas" keyboardType="number-pad" maxLength={3} autoComplete="off" autoCorrect={false} /> : null}
+        {role == "Prestador" ? (
+          <TextInput
+            mode="outlined"
+            value={total_hours}
+            onChangeText={setTotal_hours}
+            label="Total de horas"
+            keyboardType="number-pad"
+            maxLength={3}
+            autoComplete="off"
+            autoCorrect={false}
+          />
+        ) : null}
         <Flex fill>
-          <Dropdown title="Estado" options={statusTypes} value={status} selected={setStatus} />
+          <Dropdown
+            title="Estado"
+            options={statusTypes}
+            value={status}
+            selected={setStatus}
+          />
         </Flex>
       </VStack>
     </VStack>
   )
 
   const ImageData = () => (
-    <VStack key="Image" spacing={5}>
+    <VStack
+      key="Image"
+      spacing={5}
+    >
       <Text variant="labelLarge">Foto de perfil</Text>
       <VStack spacing={10}>
-        <ImageSelector value={avatar} setter={setAvatar} />
+        <ImageSelector
+          value={avatar}
+          setter={setAvatar}
+          type="square"
+        />
       </VStack>
     </VStack>
   )
 
   const Delete = () => (
-    <VStack key="Delete" spacing={5}>
+    <VStack
+      key="Delete"
+      spacing={5}
+    >
       <Text variant="labelLarge">Eliminar al usuario</Text>
       <VStack spacing={10}>
         <Button
@@ -391,16 +546,22 @@ export default EditUser = ({ navigation, route }) => {
 
   return (
     <Flex fill>
-      <CreateForm title="Editar usuario" children={[PersonalData(), ContactData(), UserData(), ImageData(), Delete()]} actions={[Save(), Cancel()]} navigation={navigation} loading={modalLoading} />
+      <CreateForm
+        title="Editar usuario"
+        children={[PersonalData(), ContactData(), UserData(), ImageData(), Delete()]}
+        actions={[Save(), Cancel()]}
+        navigation={navigation}
+        loading={modalLoading}
+      />
 
       <ModalMessage
         title="Eliminar usuario"
         description="¿Seguro que deseas eliminar a este usuario? La acción no se puede deshacer"
         handler={[modalConfirm, () => setModalConfirm(!modalConfirm)]}
         actions={[
-          ['Cancelar', () => setModalConfirm(!modalConfirm)],
+          ["Cancelar", () => setModalConfirm(!modalConfirm)],
           [
-            'Aceptar',
+            "Aceptar",
             () => {
               setModalConfirm(!modalConfirm), deleteUser()
             }
@@ -410,15 +571,50 @@ export default EditUser = ({ navigation, route }) => {
         icon="help-circle-outline"
       />
 
-      <ModalMessage title="¡Listo!" description="El usuario ha sido actualizado" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline" />
+      <ModalMessage
+        title="¡Listo!"
+        description="El usuario ha sido actualizado"
+        handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]}
+        actions={[["Aceptar", () => navigation.pop()]]}
+        dismissable={false}
+        icon="check-circle-outline"
+      />
 
-      <ModalMessage title="¡Listo!" description="El usuario ha sido eliminado" handler={[modalSuccessDelete, () => setModalSuccessDelete(!modalSuccessDelete)]} actions={[['Aceptar', () => navigation.pop(2)]]} dismissable={false} icon="check-circle-outline" />
+      <ModalMessage
+        title="¡Listo!"
+        description="El usuario ha sido eliminado"
+        handler={[modalSuccessDelete, () => setModalSuccessDelete(!modalSuccessDelete)]}
+        actions={[["Aceptar", () => navigation.pop(2)]]}
+        dismissable={false}
+        icon="check-circle-outline"
+      />
 
-      <ModalMessage title="Ocurrió un problema" description={`No pudimos actualizar al usuario, intentalo más tarde. (${responseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline" />
+      <ModalMessage
+        title="Ocurrió un problema"
+        description={`No pudimos actualizar al usuario, inténtalo más tarde. (${responseCode})`}
+        handler={[modalError, () => setModalError(!modalError)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="close-circle-outline"
+      />
 
-      <ModalMessage title="Ocurrió un problema" description={`No pudimos eliminar al usuario, intentalo más tarde. (${responseCode})`} handler={[modalErrorDelete, () => setModalErrorDelete(!modalErrorDelete)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline" />
+      <ModalMessage
+        title="Ocurrió un problema"
+        description={`No pudimos eliminar al usuario, inténtalo más tarde. (${responseCode})`}
+        handler={[modalErrorDelete, () => setModalErrorDelete(!modalErrorDelete)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="close-circle-outline"
+      />
 
-      <ModalMessage title="Sin conexión a internet" description={`Parece que no tienes conexión a internet, conectate e intenta de nuevo`} handler={[modalFatal, () => setModalFatal(!modalFatal)]} actions={[['Aceptar']]} dismissable={true} icon="wifi-alert" />
+      <ModalMessage
+        title="Sin conexión a internet"
+        description={`Parece que no tienes conexión a internet, conéctate e intenta de nuevo`}
+        handler={[modalFatal, () => setModalFatal(!modalFatal)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="wifi-alert"
+      />
     </Flex>
   )
 }

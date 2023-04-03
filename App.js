@@ -8,7 +8,7 @@ import * as Linking from 'expo-linking';
 import * as SplashScreen from 'expo-splash-screen';
 import Navigation from "./views/Navigation";
 
-import { darkTheme, lightTheme } from "./assets/themes/themes";
+import { darkTheme, lightTheme } from "./assets/themes/themeGreen";
 
 SplashScreen.preventAutoHideAsync();
 

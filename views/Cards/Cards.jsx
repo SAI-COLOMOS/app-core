@@ -4,7 +4,7 @@ import { Card, IconButton, TouchableRipple, Text, TextInput, useTheme, Avatar, F
 import { useHeaderHeight } from "@react-navigation/elements"
 import Header from "../Shared/Header"
 import Constants from "expo-constants"
-import { FlatList } from "react-native"
+import { FlatList, Pressable } from "react-native"
 import { useFocusEffect } from "@react-navigation/native"
 import SearchBar from "../Shared/SearchBar"
 import ModalFilters from "../Shared/ModalFilters"
@@ -178,7 +178,23 @@ export default Cards = ({ navigation, route }) => {
 
   useEffect(() => {
     navigation.setOptions({
-      header: (props) => <Header {...props} children={[<IconButton key="FilterButton" icon="filter-outline" onPress={() => setShowFilters(!showFilters)} />, <IconButton key="SearchButton" icon="magnify" onPress={() => setShowSearch(!showSearch)} />]} />,
+      header: (props) => (
+        <Header
+          {...props}
+          children={[
+            <IconButton
+              key="FilterButton"
+              icon="filter-outline"
+              onPress={() => setShowFilters(!showFilters)}
+            />,
+            <IconButton
+              key="SearchButton"
+              icon="magnify"
+              onPress={() => setShowSearch(!showSearch)}
+            />
+          ]}
+        />
+      ),
       headerTransparent: true,
       headerTitle: "Prestadores"
     })
@@ -206,20 +222,42 @@ export default Cards = ({ navigation, route }) => {
   )
 
   const Item = useCallback(
-    ({ name, role, avatar, register, user }) => {
+    ({ item, register }) => {
       return (
-        <Flex ph={20} pv={5} onPress={() => {}}>
-          <Card mode="outlined" style={{ overflow: "hidden" }}>
-            <TouchableRipple
-              onPress={() => {
-                navigation.navigate("CardDetails", { register, user })
-              }}
+        <Flex
+          ph={20}
+          pv={5}
+          onPress={() => {}}
+        >
+          <Pressable
+            onPress={() => {
+              navigation.navigate("CardDetails", { register, user: item })
+            }}
+          >
+            <Card
+              mode="outlined"
+              style={{ overflow: "hidden" }}
             >
-              <Flex p={10}>
-                <Card.Title title={name} titleNumberOfLines={1} subtitle={role} subtitleNumberOfLines={2} left={(props) => (avatar ? <Avatar.Image {...props} source={{ uri: `data:image/png;base64,${avatar}` }} /> : <Avatar.Icon {...props} icon="account" />)} />
-              </Flex>
-            </TouchableRipple>
-          </Card>
+              <HStack items="center">
+                <ProfileImage image={item.avatar} />
+                <Flex
+                  fill
+                  p={10}
+                >
+                  <Text
+                    variant="titleMedium"
+                    numberOfLines={1}
+                  >
+                    {item.first_name} {item.first_last_name} {item.second_last_name ?? null}
+                  </Text>
+                  <Text variant="bodySmall">{item.register}</Text>
+                  <Text variant="bodySmall">
+                    {item.role} {item.role == "Prestador" && item.provider_type}
+                  </Text>
+                </Flex>
+              </HStack>
+            </Card>
+          </Pressable>
         </Flex>
       )
     },
@@ -232,55 +270,134 @@ export default Cards = ({ navigation, route }) => {
         {user.role == "Administrador" ? (
           <HStack items="end">
             <Flex fill>
-              <Dropdown title="Bosque urbano" value={placeFilter} selected={setPlaceFilter} options={placesOptions} />
+              <Dropdown
+                title="Bosque urbano"
+                value={placeFilter}
+                selected={setPlaceFilter}
+                options={placesOptions}
+              />
             </Flex>
-            {placeFilter ? <IconButton icon="delete" mode="outlined" onPress={() => setPlaceFilter("")} /> : null}
+            {placeFilter ? (
+              <IconButton
+                icon="delete"
+                mode="outlined"
+                onPress={() => setPlaceFilter("")}
+              />
+            ) : null}
           </HStack>
         ) : null}
 
         {placeFilter && areasOptions.length > 0 ? (
           <HStack items="end">
             <Flex fill>
-              <Dropdown title="Área asignada" value={areaFilter} selected={setAreaFilter} options={areasOptions} />
+              <Dropdown
+                title="Área asignada"
+                value={areaFilter}
+                selected={setAreaFilter}
+                options={areasOptions}
+              />
             </Flex>
-            {areaFilter ? <IconButton icon="delete" mode="outlined" onPress={() => setAreaFilter("")} /> : null}
+            {areaFilter ? (
+              <IconButton
+                icon="delete"
+                mode="outlined"
+                onPress={() => setAreaFilter("")}
+              />
+            ) : null}
           </HStack>
         ) : null}
 
         <HStack items="end">
           <Flex fill>
-            <TextInput value={yearFilter} onChangeText={setYearFilter} mode="outlined" label="Año de inscripción" maxLength={4} keyboardType="numeric" />
+            <TextInput
+              value={yearFilter}
+              onChangeText={setYearFilter}
+              mode="outlined"
+              label="Año de inscripción"
+              maxLength={4}
+              keyboardType="numeric"
+            />
           </Flex>
-          {yearFilter ? <IconButton icon="delete" mode="outlined" onPress={() => setYearFilter("")} /> : null}
+          {yearFilter ? (
+            <IconButton
+              icon="delete"
+              mode="outlined"
+              onPress={() => setYearFilter("")}
+            />
+          ) : null}
         </HStack>
 
         <HStack items="end">
           <Flex fill>
-            <Dropdown title="Periodo de inscripción" value={periodFilter} selected={setPeriodFilter} options={periodOptions} />
+            <Dropdown
+              title="Periodo de inscripción"
+              value={periodFilter}
+              selected={setPeriodFilter}
+              options={periodOptions}
+            />
           </Flex>
-          {periodFilter ? <IconButton icon="delete" mode="outlined" onPress={() => setPeriodFilter("")} /> : null}
+          {periodFilter ? (
+            <IconButton
+              icon="delete"
+              mode="outlined"
+              onPress={() => setPeriodFilter("")}
+            />
+          ) : null}
         </HStack>
 
         <HStack items="end">
           <Flex fill>
-            <Dropdown title="Escuela" value={schoolFilter} selected={setSchoolFilter} options={schoolsOptions} />
+            <Dropdown
+              title="Escuela"
+              value={schoolFilter}
+              selected={setSchoolFilter}
+              options={schoolsOptions}
+            />
           </Flex>
-          {schoolFilter ? <IconButton icon="delete" mode="outlined" onPress={() => setSchoolFilter("")} /> : null}
+          {schoolFilter ? (
+            <IconButton
+              icon="delete"
+              mode="outlined"
+              onPress={() => setSchoolFilter("")}
+            />
+          ) : null}
         </HStack>
 
         <HStack items="end">
           <Flex fill>
-            <Dropdown title="Estado" value={statusFilter} selected={setStatusFilter} options={statusOptions} />
+            <Dropdown
+              title="Estado"
+              value={statusFilter}
+              selected={setStatusFilter}
+              options={statusOptions}
+            />
           </Flex>
-          {statusFilter ? <IconButton icon="delete" mode="outlined" onPress={() => setStatusFilter("")} /> : null}
+          {statusFilter ? (
+            <IconButton
+              icon="delete"
+              mode="outlined"
+              onPress={() => setStatusFilter("")}
+            />
+          ) : null}
         </HStack>
 
         {user.role == "Administrador" ? (
           <HStack items="end">
             <Flex fill>
-              <Dropdown title="Tipo de prestador" value={providerFilter} selected={setProviderFilter} options={providerOptions} />
+              <Dropdown
+                title="Tipo de prestador"
+                value={providerFilter}
+                selected={setProviderFilter}
+                options={providerOptions}
+              />
             </Flex>
-            {providerFilter ? <IconButton icon="delete" mode="outlined" onPress={() => setProviderFilter("")} /> : null}
+            {providerFilter ? (
+              <IconButton
+                icon="delete"
+                mode="outlined"
+                onPress={() => setProviderFilter("")}
+              />
+            ) : null}
           </HStack>
         ) : null}
       </VStack>
@@ -288,8 +405,17 @@ export default Cards = ({ navigation, route }) => {
   }
 
   return (
-    <Flex fill pt={headerMargin}>
-      <SearchBar show={showSearch} label="Busca por nombre, registro, correo o teléfono" value={search} setter={setSearch} action={searchUsers} />
+    <Flex
+      fill
+      pt={headerMargin}
+    >
+      <SearchBar
+        show={showSearch}
+        label="Busca por nombre, registro, correo o teléfono"
+        value={search}
+        setter={setSearch}
+        action={searchUsers}
+      />
 
       {Object.keys(areFilters).length === 0 && search == "" ? (
         users !== null ? (
@@ -318,7 +444,13 @@ export default Cards = ({ navigation, route }) => {
                 }
                 refreshing={loading}
                 onRefresh={() => getUsers()}
-                renderItem={({ item }) => <Item key={item.register} name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ""}`} role={`${item.register}`} register={item.register} avatar={item?.avatar} user={item} />}
+                renderItem={({ item }) => (
+                  <Item
+                    key={item.register}
+                    item={item}
+                    register={item.register}
+                  />
+                )}
               />
             </Flex>
           ) : (
@@ -350,7 +482,27 @@ export default Cards = ({ navigation, route }) => {
       ) : foundUsers !== null ? (
         foundUsers?.length >= 0 || foundUsers === undefined ? (
           <Flex fill>
-            <FlatList data={foundUsers} ListEmptyComponent={() => (foundUsers === undefined ? null : <InformationMessage icon="magnify" title="Sin resultados" description="No hay ningún usuario registrado que cumpla con los parámetros de tu búsqueda" />)} refreshing={loading} onRefresh={() => getUsers()} renderItem={({ item }) => <Item key={item.register} name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ""}`} role={`${item.register}`} register={item.register} avatar={item?.avatar} user={item} />} />
+            <FlatList
+              data={foundUsers}
+              ListEmptyComponent={() =>
+                foundUsers === undefined ? null : (
+                  <InformationMessage
+                    icon="magnify"
+                    title="Sin resultados"
+                    description="No hay ningún usuario registrado que cumpla con los parámetros de tu búsqueda"
+                  />
+                )
+              }
+              refreshing={loading}
+              onRefresh={() => getUsers()}
+              renderItem={({ item }) => (
+                <Item
+                  key={item.register}
+                  item={item}
+                  register={item.register}
+                />
+              )}
+            />
           </Flex>
         ) : (
           <InformationMessage
@@ -379,7 +531,11 @@ export default Cards = ({ navigation, route }) => {
         />
       )}
 
-      <ModalFilters handler={[showFilters, () => setShowFilters(!showFilters)]} child={FilterOptions()} action={() => searchUsers()} />
+      <ModalFilters
+        handler={[showFilters, () => setShowFilters(!showFilters)]}
+        child={FilterOptions()}
+        action={() => searchUsers()}
+      />
     </Flex>
   )
 }

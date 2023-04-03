@@ -1,19 +1,21 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useContext, useEffect, useState } from "react"
 import { Card, IconButton, TouchableRipple, Text, TextInput, useTheme, Avatar, FAB } from "react-native-paper"
 import { useHeaderHeight } from "@react-navigation/elements"
 import Header from "../Shared/Header"
 import Constants from "expo-constants"
-import { FlatList } from "react-native"
+import { FlatList, Image, Pressable } from "react-native"
 import { useFocusEffect } from "@react-navigation/native"
 import SearchBar from "../Shared/SearchBar"
 import ModalFilters from "../Shared/ModalFilters"
 import Dropdown from "../Shared/Dropdown"
 import InformationMessage from "../Shared/InformationMessage"
+import ApplicationContext from "../ApplicationContext"
+import ProfileImage from "../Shared/ProfileImage"
 
 export default Users = ({ navigation, route }) => {
   const headerMargin = useHeaderHeight()
-  const { actualUser, token } = route.params
+  const { user, token } = useContext(ApplicationContext)
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const theme = useTheme()
 
@@ -182,7 +184,23 @@ export default Users = ({ navigation, route }) => {
 
   useEffect(() => {
     navigation.setOptions({
-      header: (props) => <Header {...props} children={[<IconButton key="FilterButton" icon="filter-outline" onPress={() => setShowFilters(!showFilters)} />, <IconButton key="SearchButton" icon="magnify" onPress={() => setShowSearch(!showSearch)} />]} />,
+      header: (props) => (
+        <Header
+          {...props}
+          children={[
+            <IconButton
+              key="FilterButton"
+              icon="filter-outline"
+              onPress={() => setShowFilters(!showFilters)}
+            />,
+            <IconButton
+              key="SearchButton"
+              icon="magnify"
+              onPress={() => setShowSearch(!showSearch)}
+            />
+          ]}
+        />
+      ),
       headerTransparent: true,
       headerTitle: "Usuarios"
     })
@@ -210,20 +228,42 @@ export default Users = ({ navigation, route }) => {
   )
 
   const Item = useCallback(
-    ({ first_name, role, avatar, register }) => {
+    ({ item, register }) => {
       return (
-        <Flex ph={20} pv={5} onPress={() => {}}>
-          <Card mode="outlined" style={{ overflow: "hidden" }}>
-            <TouchableRipple
-              onPress={() => {
-                navigation.navigate("UserDetails", { actualUser, token, register, placesOptions, schoolsOptions })
-              }}
+        <Flex
+          ph={20}
+          pv={5}
+          onPress={() => {}}
+        >
+          <Pressable
+            onPress={() => {
+              navigation.navigate("UserDetails", { register, placesOptions, schoolsOptions })
+            }}
+          >
+            <Card
+              mode="outlined"
+              style={{ overflow: "hidden" }}
             >
-              <Flex p={10}>
-                <Card.Title title={first_name} titleNumberOfLines={1} subtitle={role} subtitleNumberOfLines={2} left={(props) => (avatar ? <Avatar.Image {...props} source={{ uri: `data:image/png;base64,${avatar}` }} /> : <Avatar.Icon {...props} icon="account" />)} />
-              </Flex>
-            </TouchableRipple>
-          </Card>
+              <HStack items="center">
+                <ProfileImage image={item.avatar} />
+                <Flex
+                  fill
+                  p={10}
+                >
+                  <Text
+                    variant="titleMedium"
+                    numberOfLines={1}
+                  >
+                    {item.first_name} {item.first_last_name} {item.second_last_name ?? null}
+                  </Text>
+                  <Text variant="bodySmall">{item.register}</Text>
+                  <Text variant="bodySmall">
+                    {item.role} {item.role == "Prestador" && item.provider_type}
+                  </Text>
+                </Flex>
+              </HStack>
+            </Card>
+          </Pressable>
         </Flex>
       )
     },
@@ -233,67 +273,157 @@ export default Users = ({ navigation, route }) => {
   const FilterOptions = () => {
     return (
       <VStack spacing={10}>
-        {actualUser.role == "Administrador" ? (
+        {user.role == "Administrador" ? (
           <HStack items="end">
             <Flex fill>
-              <Dropdown title="Bosque urbano" value={placeFilter} selected={setPlaceFilter} options={placesOptions} />
+              <Dropdown
+                title="Bosque urbano"
+                value={placeFilter}
+                selected={setPlaceFilter}
+                options={placesOptions}
+              />
             </Flex>
-            {placeFilter ? <IconButton icon="delete" mode="outlined" onPress={() => setPlaceFilter("")} /> : null}
+            {placeFilter ? (
+              <IconButton
+                icon="delete"
+                mode="outlined"
+                onPress={() => setPlaceFilter("")}
+              />
+            ) : null}
           </HStack>
         ) : null}
 
         {placeFilter && areasOptions.length > 0 ? (
           <HStack items="end">
             <Flex fill>
-              <Dropdown title="Área asignada" value={areaFilter} selected={setAreaFilter} options={areasOptions} />
+              <Dropdown
+                title="Área asignada"
+                value={areaFilter}
+                selected={setAreaFilter}
+                options={areasOptions}
+              />
             </Flex>
-            {areaFilter ? <IconButton icon="delete" mode="outlined" onPress={() => setAreaFilter("")} /> : null}
+            {areaFilter ? (
+              <IconButton
+                icon="delete"
+                mode="outlined"
+                onPress={() => setAreaFilter("")}
+              />
+            ) : null}
           </HStack>
         ) : null}
 
-        {actualUser.role == "Administrador" ? (
+        {user.role == "Administrador" ? (
           <HStack items="end">
             <Flex fill>
-              <Dropdown title="Rol" value={roleFilter} selected={setRoleFilter} options={roleOptions} />
+              <Dropdown
+                title="Rol"
+                value={roleFilter}
+                selected={setRoleFilter}
+                options={roleOptions}
+              />
             </Flex>
-            {roleFilter ? <IconButton icon="delete" mode="outlined" onPress={() => setRoleFilter("")} /> : null}
+            {roleFilter ? (
+              <IconButton
+                icon="delete"
+                mode="outlined"
+                onPress={() => setRoleFilter("")}
+              />
+            ) : null}
           </HStack>
         ) : null}
 
         <HStack items="end">
           <Flex fill>
-            <TextInput value={yearFilter} onChangeText={setYearFilter} mode="outlined" label="Año de inscripción" maxLength={4} keyboardType="numeric" />
+            <TextInput
+              value={yearFilter}
+              onChangeText={setYearFilter}
+              mode="outlined"
+              label="Año de inscripción"
+              maxLength={4}
+              keyboardType="numeric"
+            />
           </Flex>
-          {yearFilter ? <IconButton icon="delete" mode="outlined" onPress={() => setYearFilter("")} /> : null}
+          {yearFilter ? (
+            <IconButton
+              icon="delete"
+              mode="outlined"
+              onPress={() => setYearFilter("")}
+            />
+          ) : null}
         </HStack>
 
         <HStack items="end">
           <Flex fill>
-            <Dropdown title="Periodo de inscripción" value={periodFilter} selected={setPeriodFilter} options={periodOptions} />
+            <Dropdown
+              title="Periodo de inscripción"
+              value={periodFilter}
+              selected={setPeriodFilter}
+              options={periodOptions}
+            />
           </Flex>
-          {periodFilter ? <IconButton icon="delete" mode="outlined" onPress={() => setPeriodFilter("")} /> : null}
+          {periodFilter ? (
+            <IconButton
+              icon="delete"
+              mode="outlined"
+              onPress={() => setPeriodFilter("")}
+            />
+          ) : null}
         </HStack>
 
         <HStack items="end">
           <Flex fill>
-            <Dropdown title="Escuela" value={schoolFilter} selected={setSchoolFilter} options={schoolsOptions} />
+            <Dropdown
+              title="Escuela"
+              value={schoolFilter}
+              selected={setSchoolFilter}
+              options={schoolsOptions}
+            />
           </Flex>
-          {schoolFilter ? <IconButton icon="delete" mode="outlined" onPress={() => setSchoolFilter("")} /> : null}
+          {schoolFilter ? (
+            <IconButton
+              icon="delete"
+              mode="outlined"
+              onPress={() => setSchoolFilter("")}
+            />
+          ) : null}
         </HStack>
 
         <HStack items="end">
           <Flex fill>
-            <Dropdown title="Estado" value={statusFilter} selected={setStatusFilter} options={statusOptions} />
+            <Dropdown
+              title="Estado"
+              value={statusFilter}
+              selected={setStatusFilter}
+              options={statusOptions}
+            />
           </Flex>
-          {statusFilter ? <IconButton icon="delete" mode="outlined" onPress={() => setStatusFilter("")} /> : null}
+          {statusFilter ? (
+            <IconButton
+              icon="delete"
+              mode="outlined"
+              onPress={() => setStatusFilter("")}
+            />
+          ) : null}
         </HStack>
 
-        {actualUser.role == "Administrador" ? (
+        {user.role == "Administrador" ? (
           <HStack items="end">
             <Flex fill>
-              <Dropdown title="Tipo de prestador" value={providerFilter} selected={setProviderFilter} options={providerOptions} />
+              <Dropdown
+                title="Tipo de prestador"
+                value={providerFilter}
+                selected={setProviderFilter}
+                options={providerOptions}
+              />
             </Flex>
-            {providerFilter ? <IconButton icon="delete" mode="outlined" onPress={() => setProviderFilter("")} /> : null}
+            {providerFilter ? (
+              <IconButton
+                icon="delete"
+                mode="outlined"
+                onPress={() => setProviderFilter("")}
+              />
+            ) : null}
           </HStack>
         ) : null}
       </VStack>
@@ -301,8 +431,17 @@ export default Users = ({ navigation, route }) => {
   }
 
   return (
-    <Flex fill pt={headerMargin}>
-      <SearchBar show={showSearch} label="Busca por nombre, registro, correo o teléfono" value={search} setter={setSearch} action={searchUsers} />
+    <Flex
+      fill
+      pt={headerMargin}
+    >
+      <SearchBar
+        show={showSearch}
+        label="Busca por nombre, registro, correo o teléfono"
+        value={search}
+        setter={setSearch}
+        action={searchUsers}
+      />
 
       {Object.keys(areFilters).length === 0 && search == "" ? (
         users !== null ? (
@@ -320,7 +459,7 @@ export default Users = ({ navigation, route }) => {
                       buttonTitle="Agregar"
                       action={() => {
                         navigation.navigate("AddUser", {
-                          actualUser,
+                          user,
                           token,
                           placesOptions,
                           schoolsOptions
@@ -331,7 +470,13 @@ export default Users = ({ navigation, route }) => {
                 }
                 refreshing={loading}
                 onRefresh={() => getUsers()}
-                renderItem={({ item }) => <Item key={item.register} first_name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ""}`} role={`${item.register}`} register={item.register} avatar={item?.avatar} />}
+                renderItem={({ item }) => (
+                  <Item
+                    key={item.register}
+                    item={item}
+                    register={item.register}
+                  />
+                )}
               />
 
               <FAB
@@ -339,8 +484,6 @@ export default Users = ({ navigation, route }) => {
                 style={{ position: "absolute", margin: 16, right: 0, bottom: 0 }}
                 onPress={() => {
                   navigation.navigate("AddUser", {
-                    actualUser,
-                    token,
                     placesOptions,
                     schoolsOptions
                   })
@@ -376,7 +519,27 @@ export default Users = ({ navigation, route }) => {
       ) : foundUsers !== null ? (
         foundUsers?.length >= 0 || foundUsers === undefined ? (
           <Flex fill>
-            <FlatList data={foundUsers} ListEmptyComponent={() => (foundUsers === undefined ? null : <InformationMessage icon="magnify" title="Sin resultados" description="No hay ningún usuario registrado que cumpla con los parámetros de tu búsqueda" />)} refreshing={loading} onRefresh={() => getUsers()} renderItem={({ item }) => <Item key={item.register} first_name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ""}`} role={`${item.register}`} register={item.register} avatar={item?.avatar} />} />
+            <FlatList
+              data={foundUsers}
+              ListEmptyComponent={() =>
+                foundUsers === undefined ? null : (
+                  <InformationMessage
+                    icon="magnify"
+                    title="Sin resultados"
+                    description="No hay ningún usuario registrado que cumpla con los parámetros de tu búsqueda"
+                  />
+                )
+              }
+              refreshing={loading}
+              onRefresh={() => getUsers()}
+              renderItem={({ item }) => (
+                <Item
+                  key={item.register}
+                  item={item}
+                  register={item.register}
+                />
+              )}
+            />
           </Flex>
         ) : (
           <InformationMessage
@@ -405,7 +568,11 @@ export default Users = ({ navigation, route }) => {
         />
       )}
 
-      <ModalFilters handler={[showFilters, () => setShowFilters(!showFilters)]} child={FilterOptions()} action={() => searchUsers()} />
+      <ModalFilters
+        handler={[showFilters, () => setShowFilters(!showFilters)]}
+        child={FilterOptions()}
+        action={() => searchUsers()}
+      />
     </Flex>
   )
 }
