@@ -57,7 +57,7 @@ export default SchoolDetails = ({ icon, image, title, children, actions, avatar,
             />
             <LinearGradient
               colors={["#00000000", theme.colors.background]}
-              locations={[0.5, 0.9]}
+              locations={[0.5, 1]}
               style={{ width: "100%", height: "100%", position: "absolute" }}
             />
           </Flex>

@@ -23,7 +23,11 @@ export default CreateForm = ({ navigation, route, loading, title, children, acti
   )
 
   return (
-    <Flex fill justify="end" style={{ backgroundColor: theme.colors.backdrop }}>
+    <Flex
+      fill
+      justify="end"
+      style={{ backgroundColor: theme.colors.backdrop }}
+    >
       <Pressable
         android_ripple={false}
         style={{ width: "100%", height: "100%", position: "absolute" }}
@@ -33,7 +37,10 @@ export default CreateForm = ({ navigation, route, loading, title, children, acti
           }
         }}
       />
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : null} style={{ maxHeight: "80%", justifyContent: "flex-end" }}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : null}
+        style={{ maxHeight: "80%", justifyContent: "flex-end" }}
+      >
         <Flex
           //fill
           //maxH={"90%"}
@@ -46,20 +53,36 @@ export default CreateForm = ({ navigation, route, loading, title, children, acti
           }}
         >
           <ScrollView>
-            <Flex p={25} items="center">
-              <Text variant="headlineMedium" style={{ textAlign: "center" }}>
+            <Flex
+              p={25}
+              items="center"
+            >
+              <Text
+                variant="headlineMedium"
+                style={{ textAlign: "center" }}
+              >
                 {title}
               </Text>
             </Flex>
 
-            <VStack pr={25} pl={25} pb={50} spacing={30}>
-              {children.map((child, index) => (
+            <VStack
+              pr={25}
+              pl={25}
+              pb={50}
+              spacing={30}
+            >
+              {children?.map((child, index) => (
                 <Flex key={`Item ${index}`}>{child}</Flex>
               ))}
             </VStack>
           </ScrollView>
-          <HStack justify="between" reverse={true} pv={20} ph={20}>
-            {actions.map((action, index) => (
+          <HStack
+            justify="between"
+            reverse={true}
+            pv={20}
+            ph={20}
+          >
+            {actions?.map((action, index) => (
               <Flex key={`Action ${index}`}>{action}</Flex>
             ))}
           </HStack>
