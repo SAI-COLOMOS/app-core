@@ -5,13 +5,11 @@ import { Text, Card, Button, FAB, useTheme, Avatar, IconButton, ProgressBar } fr
 import Header from "../Shared/Header"
 import Constants from "expo-constants"
 import DisplayDetails from "../Shared/DisplayDetails"
-import { ScrollView, RefreshControl } from "react-native"
 import { useFocusEffect } from "@react-navigation/native"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import { LongDate, Time24 } from "../Shared/LocaleDate"
 import ApplicationContext from "../ApplicationContext"
 import InformationMessage from "../Shared/InformationMessage"
-import CircularProgress from "react-native-circular-progress-indicator"
 
 export default CardDetails = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
@@ -42,13 +40,11 @@ export default CardDetails = ({ navigation, route }) => {
     setLoading(false)
 
     if (request?.activities) {
+      console.log(request.activities)
       setCard(request.activities)
       setAchieved_hours(request.achieved_hours)
       setTotal_hours(request.total_hours)
     }
-    // } else {
-    //   setCard(request)
-    // }
   }
 
   useEffect(() => {
@@ -68,35 +64,21 @@ export default CardDetails = ({ navigation, route }) => {
 
   const ProgressRing = () => (
     <Flex key="Progress">
-      {/* <Flex p={20}>
-        <Text variant="bodyLarge">Progreso del prestador</Text>
-      </Flex> */}
-
       <VStack spacing={10}>
-        <HStack justify="between" items="baseline">
-          <Text variant="headlineLarge" style={{ fontWeight: "bold", color: theme.colors.primary }}>
+        <HStack
+          justify="between"
+          items="baseline"
+        >
+          <Text
+            variant="headlineLarge"
+            style={{ fontWeight: "bold", color: theme.colors.primary }}
+          >
             {achieved_hours} hrs
           </Text>
           <Text variant="bodyLarge">{total_hours} hrs</Text>
         </HStack>
         {total_hours > 0 && <ProgressBar progress={achieved_hours / total_hours} />}
       </VStack>
-
-      {/* <Flex fill center>
-        {typeof achieved_hours == "number" && typeof total_hours == "number" ? (
-          <>
-            <CircularProgress value={achieved_hours} showProgressValue={false} progressValueColor={theme.colors.primary} activeStrokeColor={theme.colors.primary} inActiveStrokeColor={theme.colors.backdrop} rotation={180} titleColor={theme.colors.onBackground} radius={75} maxValue={total_hours} />
-            <Flex fill center style={{ position: "absolute" }}>
-              <Text variant="headlineLarge" style={{ fontWeight: "bold", color: theme.colors.primary }}>
-                {achieved_hours} /
-              </Text>
-              <Text variant="bodyLarge">{total_hours}</Text>
-            </Flex>
-          </>
-        ) : (
-          <ActivityIndicator size={75} />
-        )}
-      </Flex> */}
     </Flex>
   )
 
@@ -111,31 +93,59 @@ export default CardDetails = ({ navigation, route }) => {
           {card.length > 0 ? (
             <VStack spacing={10}>
               {card.map((activity) => (
-                <Card mode="outlined" key={activity._id}>
-                  <VStack spacing={10} p={20}>
+                <Card
+                  mode="outlined"
+                  key={activity._id}
+                >
+                  <VStack
+                    spacing={10}
+                    p={20}
+                  >
                     <HStack spacing={20}>
                       <VStack items="center">
-                        <Avatar.Text label={activity?.hours} size={50} />
-                        <Text variant="bodyMedium" style={{ textAlign: "center" }}>
+                        <Avatar.Text
+                          label={activity?.hours}
+                          size={50}
+                        />
+                        <Text
+                          variant="bodyMedium"
+                          style={{ textAlign: "center" }}
+                        >
                           hrs
                         </Text>
                       </VStack>
                       <Flex fill>
-                        <Text variant="bodyLarge" numberOfLines={2}>
+                        <Text
+                          variant="bodyLarge"
+                          numberOfLines={2}
+                        >
                           {activity?.activity_name}
                         </Text>
-                        <Text variant="bodyMedium" numberOfLines={1}>
+                        <Text
+                          variant="bodyMedium"
+                          numberOfLines={1}
+                        >
                           {LongDate(activity?.assignation_date)}
                         </Text>
-                        <Text variant="bodyMedium" numberOfLines={1}>
+                        <Text
+                          variant="bodyMedium"
+                          numberOfLines={1}
+                        >
                           {Time24(activity?.assignation_date)}
                         </Text>
-                        <Text variant="bodyMedium" numberOfLines={1}>
+                        <Text
+                          variant="bodyMedium"
+                          numberOfLines={1}
+                        >
                           {activity?.responsible_name}
                         </Text>
                       </Flex>
                     </HStack>
-                    <Button mode="text" icon="pencil-outline" onPress={() => navigation.navigate("EditCard", { register, activity })}>
+                    <Button
+                      mode="text"
+                      icon="pencil-outline"
+                      onPress={() => navigation.navigate("EditCard", { register, activity })}
+                    >
                       Editar actividad
                     </Button>
                   </VStack>
@@ -143,7 +153,12 @@ export default CardDetails = ({ navigation, route }) => {
               ))}
             </VStack>
           ) : (
-            <InformationMessage key="NoProgress" title="Sin actividades" description="Todavía no tines actividades realizadas, cuando completes algunas, estas aparecerán aquí" icon="alert" />
+            <InformationMessage
+              key="NoProgress"
+              title="Sin actividades"
+              description="Todavía no tines actividades realizadas, cuando completes algunas, estas aparecerán aquí"
+              icon="alert"
+            />
           )}
         </VStack>
       </Flex>
@@ -151,17 +166,37 @@ export default CardDetails = ({ navigation, route }) => {
   }
 
   return (
-    <Flex fill pt={headerMargin - 20}>
+    <Flex
+      fill
+      pt={headerMargin - 20}
+    >
       {card !== undefined &&
         (card !== null ? (
           // isNaN(card) ? (
-          <DisplayDetails photo={user?.avatar} title={`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name == undefined ? "" : user?.second_last_name}`} children={[ProgressRing(), Activity()]} refreshStatus={loading} refreshAction={() => getCard()} />
+          <DisplayDetails
+            avatar={user?.avatar}
+            title={`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name == undefined ? "" : user?.second_last_name}`}
+            children={[ProgressRing(), Activity()]}
+            refreshStatus={loading}
+            refreshAction={() => getCard()}
+          />
         ) : (
-          <VStack center spacing={20} p={30}>
-            <Icon color={theme.colors.onBackground} name="wifi-alert" size={50} />
+          <VStack
+            center
+            spacing={20}
+            p={30}
+          >
+            <Icon
+              color={theme.colors.onBackground}
+              name="wifi-alert"
+              size={50}
+            />
             <VStack center>
               <Text variant="headlineSmall">Sin internet</Text>
-              <Text variant="bodyMedium" style={{ textAlign: "center" }}>
+              <Text
+                variant="bodyMedium"
+                style={{ textAlign: "center" }}
+              >
                 No podemos recuperar los datos del usuario, revisa tu conexión a internet e inténtalo de nuevo
               </Text>
             </VStack>
