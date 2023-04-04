@@ -170,7 +170,7 @@ export default EditEvent = ({ navigation, route }) => {
             value={description}
             onChangeText={setDescription}
             label="Descripción del evento"
-            maxLength={250}
+            maxLength={500}
             numberOfLines={3}
             multiline={true}
           />

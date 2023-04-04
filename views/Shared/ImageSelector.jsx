@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react"
-import { Avatar, Button, Card, Text, useTheme } from "react-native-paper"
+import React from "react"
+import { Button, Card, Text, TouchableRipple, useTheme } from "react-native-paper"
 import * as ImagePicker from "expo-image-picker"
 import { manipulateAsync } from "expo-image-manipulator"
 import { Flex, HStack, VStack } from "@react-native-material/core"
-import { Image, Pressable } from "react-native"
+import { Image } from "react-native"
 import ProfileImage from "./ProfileImage"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 
@@ -110,8 +110,11 @@ export default ImageSelector = ({ value, setter, type }) => {
             w={"48%"}
             h={100}
           >
-            <Card mode="outlined">
-              <Pressable onPress={() => takePhoto()}>
+            <Card
+              mode="outlined"
+              style={{ overflow: "hidden" }}
+            >
+              <TouchableRipple onPress={() => takePhoto()}>
                 <Flex
                   w={"100%"}
                   h={"100%"}
@@ -129,7 +132,7 @@ export default ImageSelector = ({ value, setter, type }) => {
                     Tomar fotografía
                   </Text>
                 </Flex>
-              </Pressable>
+              </TouchableRipple>
             </Card>
           </VStack>
 
@@ -141,7 +144,10 @@ export default ImageSelector = ({ value, setter, type }) => {
               mode="contained"
               style={{ backgroundColor: theme.colors.primary }}
             >
-              <Pressable onPress={() => selectFromLibrary()}>
+              <TouchableRipple
+                style={{ overflow: "hidden" }}
+                onPress={() => selectFromLibrary()}
+              >
                 <Flex
                   w={"100%"}
                   h={"100%"}
@@ -159,7 +165,7 @@ export default ImageSelector = ({ value, setter, type }) => {
                     Seleccionar imagen
                   </Text>
                 </Flex>
-              </Pressable>
+              </TouchableRipple>
             </Card>
           </VStack>
 

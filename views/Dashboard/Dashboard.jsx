@@ -1,7 +1,7 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useState, useEffect, useCallback, useMemo, useContext } from "react"
 import * as SecureStore from "expo-secure-store"
-import { Button, Card, Text, useTheme, Avatar } from "react-native-paper"
+import { Button, Card, Text, useTheme, Avatar, TouchableRipple } from "react-native-paper"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { Image, Pressable, RefreshControl, ScrollView, useWindowDimensions } from "react-native"
 import { LinearGradient } from "expo-linear-gradient"
@@ -144,7 +144,7 @@ export default Dashboard = ({ navigation }) => {
           mode="outlined"
           style={{ overflow: "hidden" }}
         >
-          <Pressable
+          <TouchableRipple
             onPress={() => {
               navigation.navigate(screen, { ...payload })
             }}
@@ -155,7 +155,7 @@ export default Dashboard = ({ navigation }) => {
             >
               {child}
             </Flex>
-          </Pressable>
+          </TouchableRipple>
         </Card>
       </Flex>
     ),
@@ -172,7 +172,7 @@ export default Dashboard = ({ navigation }) => {
           mode="outlined"
           style={{ overflow: "hidden" }}
         >
-          <Pressable
+          <TouchableRipple
             onPress={() => {
               navigation.navigate(screen, { ...payload })
             }}
@@ -196,7 +196,7 @@ export default Dashboard = ({ navigation }) => {
                 {child}
               </Flex>
             </VStack>
-          </Pressable>
+          </TouchableRipple>
         </Card>
       </Flex>
     ),
@@ -213,7 +213,7 @@ export default Dashboard = ({ navigation }) => {
           mode="outlined"
           style={{ overflow: "hidden" }}
         >
-          <Pressable
+          <TouchableRipple
             onPress={() => {
               navigation.navigate(screen, { ...payload })
             }}
@@ -229,7 +229,7 @@ export default Dashboard = ({ navigation }) => {
               </Flex>
               <Flex fill>{child}</Flex>
             </VStack>
-          </Pressable>
+          </TouchableRipple>
         </Card>
       </Flex>
     ),

@@ -205,7 +205,7 @@ export default Users = ({ navigation, route }) => {
         pv={5}
         onPress={() => {}}
       >
-        <Pressable
+        <TouchableRipple
           onPress={() => {
             navigation.navigate("EventDetails", { event_identifier: item.event_identifier })
           }}
@@ -271,7 +271,7 @@ export default Users = ({ navigation, route }) => {
               </HStack>
             </Flex>
           </Card>
-        </Pressable>
+        </TouchableRipple>
       </Flex>
     )
   }, [])

@@ -122,6 +122,21 @@ export default EventDetails = ({ navigation, route }) => {
     </HStack>
   )
 
+  const Description = () => (
+    <Card
+      key="Description"
+      mode="outlined"
+    >
+      <Flex
+        p={20}
+        spacing={5}
+      >
+        <Text variant="bodyLarge">Descripción</Text>
+        <Text variant="bodyMedium">{event?.description}</Text>
+      </Flex>
+    </Card>
+  )
+
   const Event = () => (
     <Card
       key="Event"
@@ -131,13 +146,8 @@ export default EventDetails = ({ navigation, route }) => {
         p={20}
         spacing={5}
       >
-        <Text variant="bodyLarge">Datos generales</Text>
+        <Text variant="bodyLarge">Lugar, fecha y hora</Text>
         <VStack spacing={10}>
-          <Flex>
-            <Text variant="labelSmall">Descripción</Text>
-            <Text variant="bodyMedium">{event?.description}</Text>
-          </Flex>
-
           <Flex>
             <Text variant="labelSmall">Lugar</Text>
             <Text variant="bodyMedium">{event?.place}</Text>
@@ -182,11 +192,11 @@ export default EventDetails = ({ navigation, route }) => {
         p={20}
         spacing={5}
       >
-        <Text variant="bodyLarge">Datos técnicos</Text>
+        <Text variant="bodyLarge">Acerca del evento</Text>
         <VStack spacing={10}>
           <Flex>
-            <Text variant="labelSmall">Autor</Text>
-            <Text variant="bodyMedium">{event?.author_register}</Text>
+            <Text variant="labelSmall">Encargado designado</Text>
+            <Text variant="bodyMedium">{event?.author_name}</Text>
           </Flex>
 
           <Flex>
@@ -254,6 +264,7 @@ export default EventDetails = ({ navigation, route }) => {
           <Button
             onPress={() => unsubscribeEvent()}
             mode="outlined"
+            style={{ backgroundColor: theme.colors.background }}
           >
             Desinscribirme al evento
           </Button>
@@ -363,7 +374,7 @@ export default EventDetails = ({ navigation, route }) => {
               icon="bulletin-board"
               image={event?.avatar}
               title={event?.name}
-              children={[Availability(), Subscribe(), Event(), Info(), user.role != "Prestador" && Enrolled()]}
+              children={[Availability(), Subscribe(), Description(), Event(), Info(), user.role != "Prestador" && Enrolled()]}
               refreshStatus={loading}
               refreshAction={() => getEvent()}
             />

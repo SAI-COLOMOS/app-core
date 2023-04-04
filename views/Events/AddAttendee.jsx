@@ -1,5 +1,5 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
-import { useCallback, useContext, useState } from "react"
+import { useCallback, useContext, useEffect, useState } from "react"
 import { FlatList, Pressable, ScrollView } from "react-native"
 import { Button, Card, Chip, Text, TextInput } from "react-native-paper"
 import CreateForm from "../Shared/CreateForm"
@@ -53,6 +53,12 @@ export default AddAttendee = ({ navigation, route }) => {
     }
   }
 
+  useEffect(() => {
+    if (search.length == 0) {
+      setFoundUsers(undefined)
+    }
+  }, [search])
+
   const SearchList = () => (
     <VStack
       fill
@@ -63,6 +69,7 @@ export default AddAttendee = ({ navigation, route }) => {
         <TextInput
           mode="outlined"
           value={search}
+          clearTextOnFocus={true}
           onChangeText={setSearch}
           label="Buscar prestadores"
           returnKeyType="search"
@@ -77,11 +84,11 @@ export default AddAttendee = ({ navigation, route }) => {
           <HStack wrap="wrap-reverse">
             {selectedUsers?.map((item) => (
               <Flex
+                key={`${item.register} added`}
                 ml={5}
                 mb={5}
               >
                 <Chip
-                  key={`${item.register} added`}
                   mode="outlined"
                   closeIcon="close"
                   onClose={() => {
