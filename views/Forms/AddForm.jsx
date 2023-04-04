@@ -18,16 +18,12 @@ export default AddForm = ({navigation, route}) => {
     const [belonging_place, setBelonging_place] = useState('')
     const [belonging_event_identifier, setBelonging_event_identifier] = useState('')
     const [version, setVersion] = useState('')
-    const [questions, setQuestions] = useState('¿Disfruto el dia?')
+    const [questions, setQuestions] = useState([])
     const [interrogation, setInterrogation] = useState('')
     const [enum_options, setEnum_options] = useState('')
     const [isTemplate, setIsTemplate] = useState(false)
-
-    // const questionsAnswer = [
-    //     {
-    //         option: '¿Disfruto el dia?'
-    //     }
-    // ]
+    const [abierta, setAbierta] = useState('')
+    const [respuesta, setRespuesta] = useState('')
 
     const QuestionType = [
         {
@@ -52,6 +48,16 @@ export default AddForm = ({navigation, route}) => {
     const [modalError, setModalError] = useState(false)
     const [modalFatal, setModalFatal] = useState(false)
     const [responseCode, setResponseCode] = useState('')
+
+    const AddQuestion = () => {
+        setQuestions([...questions, 
+            {
+            interrogation: "",
+            question_type: "Abierta",
+            enum_options: []
+            }
+        ])
+    }
 
     async function SaveForm () {
         const request = await fetch(`${localhost}/forms`,{
@@ -99,6 +105,18 @@ export default AddForm = ({navigation, route}) => {
                     <TextInput mode='outlined' value={belonging_event_identifier} onChangeText={setBelonging_event_identifier} label="Identificador de evento de origen" maxLength={150} autoCapitalize='words'/>
                     <TextInput mode='outlined' value={version} onChangeText={setVersion} label="Versión" keyboardType='number-pad'maxLength={3} autoComplete='off'/>
                     <Dropdown title="Tipo de pregunta" options={QuestionType} value={questions} selected={setQuestions} />
+                    {questions == 'Abierta' ? (
+                        <Flex>
+                            <TextInput mode='outlined' value={abierta} onChangeText={setAbierta} label="Pregunta abierta" maxLength={50} autoComplete='off' autoCorrect={false} autoCapitalize='sentences'/>
+                            {/* <TextInput mode='outlined' value={respuesta} onChangeText={setRespuesta} label="Respuesta" maxLength={250} multiline={true} numberOfLines={6} autoCapitalize='sentences'/> */}
+                        </Flex>
+                    ):null}
+                    {questions == 'Numérica' ? (
+                        <Flex>
+                            <TextInput mode='outlined' value={abierta} onChangeText={setAbierta} label="Pregunta abierta" maxLength={50} autoComplete='off' autoCorrect={false} autoCapitalize='sentences'/>
+                            {/* <TextInput mode='outlined' value={respuesta} onChangeText={setRespuesta} label="Respuesta" maxLength={250} multiline={true} numberOfLines={6} autoCapitalize='sentences'/> */}
+                        </Flex>
+                    ):null}
                 </VStack>
             </VStack>  
         )
