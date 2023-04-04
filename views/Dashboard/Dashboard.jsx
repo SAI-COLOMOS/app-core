@@ -1,9 +1,9 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useState, useEffect, useCallback, useMemo, useContext } from "react"
 import * as SecureStore from "expo-secure-store"
-import { Button, Card, Text, useTheme, Avatar, TouchableRipple } from "react-native-paper"
+import { Button, Card, Text, useTheme, Avatar } from "react-native-paper"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { Image, RefreshControl, ScrollView, useWindowDimensions } from "react-native"
+import { Image, Pressable, RefreshControl, ScrollView, useWindowDimensions } from "react-native"
 import { LinearGradient } from "expo-linear-gradient"
 import { useFocusEffect } from "@react-navigation/native"
 import CircularProgress from "react-native-circular-progress-indicator"
@@ -64,6 +64,7 @@ export default Dashboard = ({ navigation }) => {
         setUser(responses[0].user)
         setFeed(responses[1])
         setAchieved_hours(responses[1]?.achieved_hours)
+        console.log(responses[1])
       }
 
       return
@@ -143,7 +144,7 @@ export default Dashboard = ({ navigation }) => {
           mode="outlined"
           style={{ overflow: "hidden" }}
         >
-          <TouchableRipple
+          <Pressable
             onPress={() => {
               navigation.navigate(screen, { ...payload })
             }}
@@ -154,7 +155,7 @@ export default Dashboard = ({ navigation }) => {
             >
               {child}
             </Flex>
-          </TouchableRipple>
+          </Pressable>
         </Card>
       </Flex>
     ),
@@ -171,7 +172,7 @@ export default Dashboard = ({ navigation }) => {
           mode="outlined"
           style={{ overflow: "hidden" }}
         >
-          <TouchableRipple
+          <Pressable
             onPress={() => {
               navigation.navigate(screen, { ...payload })
             }}
@@ -195,7 +196,7 @@ export default Dashboard = ({ navigation }) => {
                 {child}
               </Flex>
             </VStack>
-          </TouchableRipple>
+          </Pressable>
         </Card>
       </Flex>
     ),
@@ -206,24 +207,29 @@ export default Dashboard = ({ navigation }) => {
     ({ screen, payload, child, title }) => (
       <Flex
         w={"100%"}
-        p={5}
+        p={10}
       >
-        <Card mode="outlined">
-          <TouchableRipple
+        <Card
+          mode="outlined"
+          style={{ overflow: "hidden" }}
+        >
+          <Pressable
             onPress={() => {
               navigation.navigate(screen, { ...payload })
             }}
           >
             <VStack
-              ph={20}
+              ph={15}
               pv={10}
               h={175}
               spacing={10}
             >
-              <Text variant="bodyMedium">{title}</Text>
+              <Flex ph={5}>
+                <Text variant="bodyMedium">{title}</Text>
+              </Flex>
               <Flex fill>{child}</Flex>
             </VStack>
-          </TouchableRipple>
+          </Pressable>
         </Card>
       </Flex>
     ),
@@ -362,45 +368,104 @@ export default Dashboard = ({ navigation }) => {
                   ph={10}
                 >
                   {/* Widget de evento */}
-                  <WidgetLarge
-                    title="Próximo evento"
-                    screen="ShowAttendanceCode"
-                    payload={{ register: user?.register, avatar: user?.avatar }}
-                    child={
-                      <HStack
-                        fill
-                        spacing={20}
-                      >
-                        <Flex items="center">
-                          <Avatar.Text
-                            label="12"
-                            size={50}
+                  {feed?.events?.length > 0 && (
+                    <WidgetLarge
+                      title="Próximo evento"
+                      screen="ShowAttendanceCode"
+                      payload={{ register: user?.register, avatar: user?.avatar }}
+                      child={
+                        <>
+                          {/* <Image
+                            source={avatar !== null ? { uri: `data:image/png;base64,${avatar}` } : require("../../assets/images/stocks/events.jpg")}
+                            resizeMode="cover"
+                            onLoadEnd={() => setLoadingDone(true)}
+                            style={{ height: 175, width: "100%" }}
                           />
-                          <Text variant="bodyMedium">mayo</Text>
-                        </Flex>
-                        <VStack
-                          fill
-                          spacing={10}
-                        >
-                          <Text
-                            variant="bodyLarge"
-                            numberOfLines={2}
-                          >
-                            Presentación de proyecto de titulación
-                          </Text>
-                          <Flex fill>
-                            <Text variant="bodyMedium">De 10:00 a 15:00</Text>
-                            <Text
-                              variant="bodyMedium"
-                              numberOfLines={1}
+                          {loadingDone == false && (
+                            <Flex
+                              w={"100%"}
+                              h={"100%"}
+                              center
+                              style={{ position: "absolute" }}
                             >
-                              Centro de Enseñanza Técnica Industrial
-                            </Text>
+                              <ActivityIndicator size={50} />
+                            </Flex>
+                          )} */}
+                          <Flex
+                            w={"100%"}
+                            h={"100%"}
+                            justify="end"
+                            // style={{ position: "absolute", backgroundColor: theme.colors.cover }}
+                          >
+                            <HStack
+                              spacing={15}
+                              items="end"
+                            >
+                              <Flex center>
+                                <Avatar.Text
+                                  label={GetDay(feed?.events[0].starting_date)}
+                                  size={50}
+                                />
+                                <Text variant="bodyMedium">{GetCompactMonth(feed?.events[0].starting_date)}</Text>
+                              </Flex>
+                              <VStack fill>
+                                <Text
+                                  variant="titleMedium"
+                                  numberOfLines={2}
+                                >
+                                  {feed?.events[0].name}
+                                </Text>
+                                <Text
+                                  variant="bodySmall"
+                                  numberOfLines={1}
+                                >
+                                  De {Time24(feed?.events[0].starting_date)} a {Time24(feed?.events[0].ending_date)}
+                                </Text>
+                                <Text
+                                  variant="bodySmall"
+                                  numberOfLines={1}
+                                >
+                                  En {feed?.events[0].place}
+                                </Text>
+                              </VStack>
+                            </HStack>
                           </Flex>
-                        </VStack>
-                      </HStack>
-                    }
-                  />
+                        </>
+                        //   <HStack
+                        //     fill
+                        //     spacing={20}
+                        //   >
+                        //     <Flex items="center">
+                        //       <Avatar.Text
+                        //         label="12"
+                        //         size={50}
+                        //       />
+                        //       <Text variant="bodyMedium">mayo</Text>
+                        //     </Flex>
+                        //     <VStack
+                        //       fill
+                        //       spacing={10}
+                        //     >
+                        //       <Text
+                        //         variant="bodyLarge"
+                        //         numberOfLines={2}
+                        //       >
+                        //         Presentación de proyecto de titulación
+                        //       </Text>
+                        //       <Flex fill>
+                        //         <Text variant="bodyMedium">De 10:00 a 15:00</Text>
+                        //         <Text
+                        //           variant="bodyMedium"
+                        //           numberOfLines={1}
+                        //         >
+                        //           Centro de Enseñanza Técnica Industrial
+                        //         </Text>
+                        //       </Flex>
+                        //     </VStack>
+                        //   </HStack>
+                      }
+                    />
+                  )}
 
                   {/* Widget de eventos disponibles */}
                   {feed?.available_events?.length > 0 && (

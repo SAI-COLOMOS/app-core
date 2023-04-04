@@ -1,7 +1,7 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useCallback, useContext, useState } from "react"
 import { FlatList, Pressable, ScrollView } from "react-native"
-import { Button, Card, Text, TextInput } from "react-native-paper"
+import { Button, Card, Chip, Text, TextInput } from "react-native-paper"
 import CreateForm from "../Shared/CreateForm"
 import InformationMessage from "../Shared/InformationMessage"
 import Constants from "expo-constants"
@@ -15,7 +15,7 @@ export default AddAttendee = ({ navigation, route }) => {
   const [search, setSearch] = useState("")
   const [loading, setLoading] = useState(false)
   const [foundUsers, setFoundUsers] = useState(undefined)
-  const [users, setUsers] = useState(undefined)
+  const [selectedUsers, setSelectedUsers] = useState([])
 
   const searchUsers = async () => {
     setLoading(true)
@@ -54,11 +54,12 @@ export default AddAttendee = ({ navigation, route }) => {
   }
 
   const SearchList = () => (
-    <Flex
+    <VStack
       fill
+      spacing={20}
       key="SearchList"
     >
-      <Flex pb={20}>
+      <Flex>
         <TextInput
           mode="outlined"
           value={search}
@@ -70,28 +71,77 @@ export default AddAttendee = ({ navigation, route }) => {
         />
       </Flex>
 
-      {foundUsers !== null ? (
-        foundUsers?.length >= 0 || foundUsers === undefined ? (
-          foundUsers?.length > 0 ? (
-            foundUsers.map((item) => (
-              <Item
-                key={item.register}
-                item={item}
-                register={item.register}
+      {selectedUsers.length > 0 && (
+        <Flex>
+          <Text variant="titleMedium">Usuarios seleccionados</Text>
+          <HStack wrap="wrap-reverse">
+            {selectedUsers?.map((item) => (
+              <Flex
+                ml={5}
+                mb={5}
+              >
+                <Chip
+                  key={`${item.register} added`}
+                  mode="outlined"
+                  closeIcon="close"
+                  onClose={() => {
+                    const i = selectedUsers.findIndex((a) => a.register == item.register)
+                    const temp = [...selectedUsers]
+                    temp.splice(i, 1)
+                    setSelectedUsers(temp)
+                  }}
+                >
+                  {item.name}
+                </Chip>
+              </Flex>
+            ))}
+          </HStack>
+        </Flex>
+      )}
+
+      <Flex>
+        <Text variant="titleMedium">Resultados de la búsqueda</Text>
+        {foundUsers !== null ? (
+          foundUsers?.length >= 0 || foundUsers === undefined ? (
+            foundUsers?.length > 0 ? (
+              foundUsers.map((item) => (
+                <Item
+                  key={item.register}
+                  item={item}
+                  register={item.register}
+                />
+              ))
+            ) : foundUsers == undefined ? (
+              <InformationMessage
+                icon="account-plus-outline"
+                title="Agrega a personas"
+                description="Busca a personas para agregarlas como asistentes a este evento, puedes hacerlo mediante su nombre o registro"
               />
-            ))
+            ) : (
+              <InformationMessage
+                icon="magnify"
+                title="Sin resultados"
+                description="No hay ningún usuario registrado que cumpla con los parámetros de tu búsqueda"
+              />
+            )
           ) : (
             <InformationMessage
-              icon="magnify"
-              title="Sin resultados"
-              description="No hay ningún usuario registrado que cumpla con los parámetros de tu búsqueda"
+              icon="bug-outline"
+              title="¡Ups! Error nuestro"
+              description="Algo falló de nuestra parte. Inténtalo nuevamente más tarde, si el problema persiste, comunícate con tu encargado"
+              buttonTitle="Volver a cargar"
+              buttonIcon="reload"
+              action={() => {
+                setFoundUsers(undefined)
+                searchUsers()
+              }}
             />
           )
         ) : (
           <InformationMessage
-            icon="bug-outline"
-            title="¡Ups! Error nuestro"
-            description="Algo falló de nuestra parte. Inténtalo nuevamente más tarde, si el problema persiste, comunícate con tu encargado"
+            icon="wifi-alert"
+            title="Sin conexión"
+            description="Parece que no tienes conexión a internet, conéctate e intenta de nuevo"
             buttonTitle="Volver a cargar"
             buttonIcon="reload"
             action={() => {
@@ -99,32 +149,16 @@ export default AddAttendee = ({ navigation, route }) => {
               searchUsers()
             }}
           />
-        )
-      ) : (
-        <InformationMessage
-          icon="wifi-alert"
-          title="Sin conexión"
-          description="Parece que no tienes conexión a internet, conéctate e intenta de nuevo"
-          buttonTitle="Volver a cargar"
-          buttonIcon="reload"
-          action={() => {
-            setFoundUsers(undefined)
-            searchUsers()
-          }}
-        />
-      )}
+        )}
+      </Flex>
+
       {/* <ScrollView>
         <VStack>
           {search == "" && (
-            <InformationMessage
-              icon="account-plus-outline"
-              title="Agrega a personas"
-              description="Busca a personas para agregarlas como asistentes a este evento, puedes hacerlo mediante su nombre o registro"
-            />
           )}
         </VStack>
       </ScrollView> */}
-    </Flex>
+    </VStack>
   )
 
   const Save = () => (
@@ -146,45 +180,50 @@ export default AddAttendee = ({ navigation, route }) => {
     </Button>
   )
 
-  const Item = useCallback(({ item, register }) => {
-    return (
-      <Flex
-        ph={0}
-        pv={5}
-        onPress={() => {}}
-      >
-        <Pressable
-          onPress={() => {
-            navigation.navigate("UserDetails", { register, placesOptions, schoolsOptions })
-          }}
+  const Item = useCallback(
+    ({ item, register }) => {
+      return (
+        <Flex
+          ph={0}
+          pv={5}
+          onPress={() => {}}
         >
-          <Card
-            mode="outlined"
-            style={{ overflow: "hidden" }}
+          <Pressable
+            onPress={() => {
+              if (selectedUsers.some((item) => item.register == register) == false) {
+                setSelectedUsers([...selectedUsers, { name: `${item.first_name} ${item.first_last_name}`, register: item.register }])
+              }
+            }}
           >
-            <HStack items="center">
-              <ProfileImage image={item.avatar} />
-              <Flex
-                fill
-                p={10}
-              >
-                <Text
-                  variant="titleMedium"
-                  numberOfLines={1}
+            <Card
+              mode="outlined"
+              style={{ overflow: "hidden" }}
+            >
+              <HStack items="center">
+                <ProfileImage image={item.avatar} />
+                <Flex
+                  fill
+                  p={10}
                 >
-                  {item.first_name} {item.first_last_name} {item.second_last_name ?? null}
-                </Text>
-                <Text variant="bodySmall">{item.register}</Text>
-                <Text variant="bodySmall">
-                  {item.role} {item.role == "Prestador" && item.provider_type}
-                </Text>
-              </Flex>
-            </HStack>
-          </Card>
-        </Pressable>
-      </Flex>
-    )
-  }, [])
+                  <Text
+                    variant="titleMedium"
+                    numberOfLines={1}
+                  >
+                    {item.first_name} {item.first_last_name} {item.second_last_name ?? null}
+                  </Text>
+                  <Text variant="bodySmall">{item.register}</Text>
+                  <Text variant="bodySmall">
+                    {item.role} {item.role == "Prestador" && item.provider_type}
+                  </Text>
+                </Flex>
+              </HStack>
+            </Card>
+          </Pressable>
+        </Flex>
+      )
+    },
+    [selectedUsers]
+  )
 
   return (
     <CreateForm
@@ -192,6 +231,8 @@ export default AddAttendee = ({ navigation, route }) => {
       navigation={navigation}
       children={[SearchList()]}
       actions={[Save(), Cancel()]}
+      refreshingStatus={loading}
+      refreshingAction={() => searchUsers()}
     />
   )
 }

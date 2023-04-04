@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react"
-import { Avatar, Button } from "react-native-paper"
+import { Avatar, Button, Card, Text, useTheme } from "react-native-paper"
 import * as ImagePicker from "expo-image-picker"
 import { manipulateAsync } from "expo-image-manipulator"
-import { Flex, VStack } from "@react-native-material/core"
-import { Image } from "react-native"
+import { Flex, HStack, VStack } from "@react-native-material/core"
+import { Image, Pressable } from "react-native"
 import ProfileImage from "./ProfileImage"
+import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 
 export default ImageSelector = ({ value, setter, type }) => {
+  const theme = useTheme()
+
   async function selectFromLibrary() {
     let selectedPhoto = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -41,7 +44,7 @@ export default ImageSelector = ({ value, setter, type }) => {
   return (
     <Flex
       fill
-      p={20}
+      // p={20}
     >
       {value ? (
         <VStack spacing={20}>
@@ -58,8 +61,8 @@ export default ImageSelector = ({ value, setter, type }) => {
                 rectangular: (
                   <Image
                     source={{ uri: `data:image/png;base64,${value}` }}
-                    resizeMode="contain"
-                    style={{ height: 200, width: "100%" }}
+                    resizeMode="cover"
+                    style={{ height: 200, width: "100%", borderRadius: 10 }}
                   />
                 )
               }[type]
@@ -97,8 +100,70 @@ export default ImageSelector = ({ value, setter, type }) => {
           </Button>
         </VStack>
       ) : (
-        <VStack spacing={20}>
-          <Button
+        <HStack
+          fill
+          justify="between"
+          pv={10}
+          // spacing={20}
+        >
+          <VStack
+            w={"48%"}
+            h={100}
+          >
+            <Card mode="outlined">
+              <Pressable onPress={() => takePhoto()}>
+                <Flex
+                  w={"100%"}
+                  h={"100%"}
+                  center
+                >
+                  <Icon
+                    name="camera-outline"
+                    color={theme.colors.onBackground}
+                    size={50}
+                  />
+                  <Text
+                    variant="bodyMedium"
+                    style={{ textAlign: "center" }}
+                  >
+                    Tomar fotografía
+                  </Text>
+                </Flex>
+              </Pressable>
+            </Card>
+          </VStack>
+
+          <VStack
+            w={"48%"}
+            h={100}
+          >
+            <Card
+              mode="contained"
+              style={{ backgroundColor: theme.colors.primary }}
+            >
+              <Pressable onPress={() => selectFromLibrary()}>
+                <Flex
+                  w={"100%"}
+                  h={"100%"}
+                  center
+                >
+                  <Icon
+                    name="image-outline"
+                    color={theme.colors.onPrimary}
+                    size={50}
+                  />
+                  <Text
+                    variant="bodyMedium"
+                    style={{ color: theme.colors.onPrimary, textAlign: "center" }}
+                  >
+                    Seleccionar imagen
+                  </Text>
+                </Flex>
+              </Pressable>
+            </Card>
+          </VStack>
+
+          {/* <Button
             mode="contained"
             icon="camera-outline"
             onPress={() => {
@@ -106,9 +171,9 @@ export default ImageSelector = ({ value, setter, type }) => {
             }}
           >
             Tomar fotografía
-          </Button>
+          </Button> */}
 
-          <Button
+          {/* <Button
             mode="outlined"
             icon="image-outline"
             onPress={() => {
@@ -116,8 +181,8 @@ export default ImageSelector = ({ value, setter, type }) => {
             }}
           >
             Seleccionar imagen
-          </Button>
-        </VStack>
+          </Button> */}
+        </HStack>
       )}
     </Flex>
   )

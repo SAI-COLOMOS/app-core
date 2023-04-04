@@ -238,7 +238,7 @@ export default Users = ({ navigation, route }) => {
             >
               <HStack
                 p={10}
-                spacing={10}
+                spacing={15}
                 items="end"
               >
                 <Flex center>
