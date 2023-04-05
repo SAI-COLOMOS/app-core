@@ -18,6 +18,7 @@ export default FormDetails = ({ navigation, route }) => {
 
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState(undefined)
+  const [isTemplate, setIsTemplate] = useState(false)
 
   async function getForm() {
     setLoading(true)
@@ -123,7 +124,7 @@ export default FormDetails = ({ navigation, route }) => {
         {form !== undefined ? (
           form !== null ? (
             isNaN(form) ? (
-              <DisplayDetails icon="form-select" title={form?.name} />
+              <DisplayDetails icon="form-select" title={form?.name} children={[Details(), Questions()]} />
             ) : (
               <VStack p={30} center spacing={20}>
                 <Icon color={theme.colors.onBackground} name="alert-circle-outline" size={50} />

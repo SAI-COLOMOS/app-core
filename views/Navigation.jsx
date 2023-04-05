@@ -296,6 +296,10 @@ export default Navigation = () => {
             component={Forms}
           />
           <Stack.Screen
+            name="FormDetails"
+            component={FormDetails}
+          />
+          <Stack.Screen
             name="AddForm"
             component={AddForm}
             options={{ headerShown: false, presentation: "containedTransparentModal" }}
