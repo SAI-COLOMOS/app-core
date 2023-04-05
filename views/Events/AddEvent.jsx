@@ -1,11 +1,12 @@
-import { Flex, VStack } from "@react-native-material/core"
+import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useCallback, useContext, useEffect, useState } from "react"
-import { Button, Text, TextInput } from "react-native-paper"
+import { ActivityIndicator, Button, IconButton, Text, TextInput } from "react-native-paper"
 import Constants from "expo-constants"
 import CreateForm from "../Shared/CreateForm"
 import ModalMessage from "../Shared/ModalMessage"
 import { DateAndTimerPicker } from "../Shared/TimeAndDatePicker"
 import ApplicationContext from "../ApplicationContext"
+import Dropdown from "../Shared/Dropdown"
 
 export default AddEvent = ({ navigation, route }) => {
   const { token } = useContext(ApplicationContext)
@@ -23,6 +24,8 @@ export default AddEvent = ({ navigation, route }) => {
   const [avatar, setAvatar] = useState(null)
   const [verified, setVerified] = useState(false)
 
+  const [loading, setLoading] = useState(false)
+  const [placesOptions, setPlacesOptions] = useState()
   const [modalLoading, setModalLoading] = useState(false)
   const [modalSuccess, setModalSuccess] = useState(false)
   const [modalError, setModalError] = useState(false)
@@ -72,6 +75,35 @@ export default AddEvent = ({ navigation, route }) => {
     }
   }
 
+  async function getPlaces() {
+    setLoading(true)
+
+    const request = await fetch(`${localhost}/places`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        "Cache-Control": "no-cache"
+      }
+    })
+      .then((response) => (response.ok ? response.json() : response.status))
+      .catch(() => null)
+
+    setLoading(false)
+
+    if (request?.places) {
+      let placesData = []
+      request.places.forEach((place) => {
+        placesData.push({ option: place.place_name })
+      })
+      setPlacesOptions(placesData)
+    }
+  }
+
+  useEffect(() => {
+    getPlaces()
+  }, [])
+
   useEffect(() => {
     let check = true
 
@@ -109,7 +141,7 @@ export default AddEvent = ({ navigation, route }) => {
             value={description}
             onChangeText={setDescription}
             label="Descripción del evento"
-            maxLength={250}
+            maxLength={500}
             multiline={true}
             numberOfLines={5}
           />
@@ -170,14 +202,44 @@ export default AddEvent = ({ navigation, route }) => {
 
           {/* <TextInput mode="outlined" value={} onChangeText={setAuthor_register} label="Registro" maxLength={20} keyboardType="number-pad" autoComplete="off" /> */}
           {/* <TextInput mode="outlined" value={publishing_date} onChangeText={setPublishing_date} label="Fecha de publicación" maxLength={10} keyboardType="number-pad" autoComplete="off" /> */}
-          <TextInput
-            mode="outlined"
-            value={place}
-            onChangeText={setPlace}
-            autoCapitalize="words"
-            label="Lugar"
-            maxLength={50}
-          />
+          <Flex>
+            {placesOptions != null ? (
+              <Dropdown
+                title="Bosque urbano"
+                value={place}
+                selected={setPlace}
+                options={placesOptions}
+              />
+            ) : loading == true ? (
+              <HStack
+                fill
+                items="center"
+                pv={10}
+                spacing={20}
+              >
+                <Flex fill>
+                  <Text variant="bodyMedium">Obteniendo la lista de bosques urbanos</Text>
+                </Flex>
+                <ActivityIndicator />
+              </HStack>
+            ) : (
+              <HStack
+                fill
+                items="center"
+                pv={10}
+                spacing={20}
+              >
+                <Flex fill>
+                  <Text variant="bodyMedium">Ocurrió un problema obteniendo la lista de bosques urbanos</Text>
+                </Flex>
+                <IconButton
+                  icon="reload"
+                  mode="outlined"
+                  onPress={() => getPlaces()}
+                />
+              </HStack>
+            )}
+          </Flex>
           {/* <TextInput mode="outlined" value={} onChangeText={setBelonging_area} autoCapitalize="words" label="Área de origen" maxLength={150} /> */}
           {/* <TextInput mode="outlined" value={} onChangeText={setBelonging_place} autoCapitalize="words" label="Lugar de origen" maxLength={150} /> */}
         </VStack>

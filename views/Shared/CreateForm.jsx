@@ -1,10 +1,10 @@
 import { Flex, VStack, HStack } from "@react-native-material/core"
-import { ScrollView, KeyboardAvoidingView, Pressable } from "react-native"
+import { ScrollView, KeyboardAvoidingView, Pressable, RefreshControl } from "react-native"
 import { useSafeAreaInsets, useSafeAreaFrame } from "react-native-safe-area-context"
 import { Text, TouchableRipple, useTheme } from "react-native-paper"
 import { useEffect } from "react"
 
-export default CreateForm = ({ navigation, route, loading, title, children, actions }) => {
+export default CreateForm = ({ navigation, route, loading, title, children, actions, refreshingStatus, refreshingAction }) => {
   const theme = useTheme()
   const insets = useSafeAreaInsets()
 
@@ -52,7 +52,17 @@ export default CreateForm = ({ navigation, route, loading, title, children, acti
             overflow: "hidden"
           }}
         >
-          <ScrollView>
+          <ScrollView
+            refreshControl={
+              refreshingAction &&
+              refreshingStatus && (
+                <RefreshControl
+                  refreshing={true}
+                  onRefresh={() => refreshingAction()}
+                />
+              )
+            }
+          >
             <Flex
               p={25}
               items="center"

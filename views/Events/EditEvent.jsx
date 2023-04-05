@@ -1,6 +1,6 @@
-import { even, Flex, VStack } from "@react-native-material/core"
+import { even, Flex, HStack, VStack } from "@react-native-material/core"
 import { useContext, useEffect, useState } from "react"
-import { Button, Text, TextInput, useTheme } from "react-native-paper"
+import { Button, Text, TextInput, useTheme, IconButton, ActivityIndicator } from "react-native-paper"
 import Constants from "expo-constants"
 import CreateForm from "../Shared/CreateForm"
 import ModalMessage from "../Shared/ModalMessage"
@@ -170,7 +170,7 @@ export default EditEvent = ({ navigation, route }) => {
             value={description}
             onChangeText={setDescription}
             label="Descripción del evento"
-            maxLength={250}
+            maxLength={500}
             numberOfLines={3}
             multiline={true}
           />
@@ -227,12 +227,42 @@ export default EditEvent = ({ navigation, route }) => {
           </Flex>
 
           <Flex>
-            <Dropdown
-              title="Bosque urbano"
-              value={place}
-              selected={setPlace}
-              options={placesOptions}
-            />
+            {placesOptions != null ? (
+              <Dropdown
+                title="Bosque urbano"
+                value={place}
+                selected={setPlace}
+                options={placesOptions}
+              />
+            ) : loading == true ? (
+              <HStack
+                fill
+                items="center"
+                pv={10}
+                spacing={20}
+              >
+                <Flex fill>
+                  <Text variant="bodyMedium">Obteniendo la lista de bosques urbanos</Text>
+                </Flex>
+                <ActivityIndicator />
+              </HStack>
+            ) : (
+              <HStack
+                fill
+                items="center"
+                pv={10}
+                spacing={20}
+              >
+                <Flex fill>
+                  <Text variant="bodyMedium">Ocurrió un problema obteniendo la lista de bosques urbanos</Text>
+                </Flex>
+                <IconButton
+                  icon="reload"
+                  mode="outlined"
+                  onPress={() => getPlaces()}
+                />
+              </HStack>
+            )}
           </Flex>
         </VStack>
       </VStack>
