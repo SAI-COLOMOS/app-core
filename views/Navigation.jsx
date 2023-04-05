@@ -56,11 +56,8 @@ import UserProgress from "./Cards/UserProgress"
 
 // Forms
 import Forms from "./Forms/Forms"
-<<<<<<< HEAD
 import FormDetails from "./Forms/FormDetails"
-=======
 import AddForm from "./Forms/AddForm"
->>>>>>> 2569e5e749afeab8e612674c70b43ca8fbf624a9
 
 export default Navigation = () => {
   const Stack = createNativeStackNavigator()

@@ -142,7 +142,7 @@ export default Forms = ({ navigation, route }) => {
                 }
                 refreshing={loading}
                 onRefresh={() => getForms()}
-                renderItem={({ item }) => <Item key={item.name} form_name={item.name} description={item.description} form_identifier={item.form_identifier} />}
+                renderItem={({ item }) => <Item key={item.form_identifier} form_name={item.name} description={item.description} form_identifier={item.form_identifier} />}
               />
 
               <FAB
@@ -185,7 +185,7 @@ export default Forms = ({ navigation, route }) => {
       ) : foundForms !== null ? (
         foundForms?.length >= 0 || foundForms === undefined ? (
           <Flex fill>
-            <FlatList data={foundForms} ListEmptyComponent={() => (foundForms === undefined ? null : <InformationMessage icon="magnify" title="Sin resultados" description="No hay ningún formulario registrado que cumpla con los parámetros de tu búsqueda" />)} refreshing={loading} onRefresh={() => searchForms()} renderItem={({ item }) => <Item key={item.form_name} form_name={item.form_name} description={item.description} form_identifier={item.form_identifier} />} />
+            <FlatList data={foundForms} ListEmptyComponent={() => (foundForms === undefined ? null : <InformationMessage icon="magnify" title="Sin resultados" description="No hay ningún formulario registrado que cumpla con los parámetros de tu búsqueda" />)} refreshing={loading} onRefresh={() => searchForms()} renderItem={({ item }) => <Item key={item.form_identifier} form_name={item.name} description={item.description} form_identifier={item.form_identifier} />} />
           </Flex>
         ) : (
           <InformationMessage

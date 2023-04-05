@@ -8,6 +8,7 @@ import Header from '../Shared/Header'
 import DisplayDetails from '../Shared/DisplayDetails'
 import { useFocusEffect } from '@react-navigation/native'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import { log } from 'react-native-reanimated'
 
 export default FormDetails = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
@@ -29,10 +30,11 @@ export default FormDetails = ({ navigation, route }) => {
         'Cache-Control': 'no-cache'
       }
     })
-    .then((response) => (response.ok ? response.json() : response.status))
-    .catch((_) => null)
+    //.then((response) => (response.ok ? response.json() : response.status))
+    //.catch((_) => null)
 
-    console.log(request.json)
+    const json = await request.json()
+    console.log(json)
 
     setLoading(false)
 
@@ -58,7 +60,7 @@ export default FormDetails = ({ navigation, route }) => {
       return () => {}
     }, [])
   )
-
+/*
   const Details = () => (
     <Card key="Details" mode="outlined">
       <VStack p={20} spacing={5}>
@@ -114,14 +116,14 @@ export default FormDetails = ({ navigation, route }) => {
       </VStack>
     </Flex>
   )
-
+*/
   return (
     <Flex fill pt={headerMargin - 20}>
       <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={(_) => getForm()} />}>
         {form !== undefined ? (
           form !== null ? (
             isNaN(form) ? (
-              <DisplayDetails icon="form-select" title={form?.name} children={[Details()]} />
+              <DisplayDetails icon="form-select" title={form?.name} />
             ) : (
               <VStack p={30} center spacing={20}>
                 <Icon color={theme.colors.onBackground} name="alert-circle-outline" size={50} />
