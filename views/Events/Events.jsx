@@ -138,18 +138,20 @@ export default Users = ({ navigation, route }) => {
       header: (props) => (
         <Header
           {...props}
-          children={[
-            <IconButton
-              key="FilterButton"
-              icon="filter-outline"
-              onPress={() => setShowFilters(!showFilters)}
-            />,
-            <IconButton
-              key="SearchButton"
-              icon="magnify"
-              onPress={() => setShowSearch(!showSearch)}
-            />
-          ]}
+          children={
+            user?.role != "Prestador" && [
+              <IconButton
+                key="FilterButton"
+                icon="filter-outline"
+                onPress={() => setShowFilters(!showFilters)}
+              />,
+              <IconButton
+                key="SearchButton"
+                icon="magnify"
+                onPress={() => setShowSearch(!showSearch)}
+              />
+            ]
+          }
         />
       ),
       headerTransparent: true,
@@ -493,12 +495,13 @@ export default Users = ({ navigation, route }) => {
                   />
                 )}
               />
-
-              <FAB
-                icon="plus"
-                style={{ position: "absolute", margin: 16, right: 0, bottom: 0 }}
-                onPress={() => navigation.navigate("AddEvent")}
-              />
+              {user?.role != "Prestador" && (
+                <FAB
+                  icon="plus"
+                  style={{ position: "absolute", margin: 16, right: 0, bottom: 0 }}
+                  onPress={() => navigation.navigate("AddEvent")}
+                />
+              )}
             </Flex>
           ) : (
             <InformationMessage

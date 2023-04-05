@@ -11,6 +11,7 @@ import ModalFilters from "../Shared/ModalFilters"
 import Dropdown from "../Shared/Dropdown"
 import InformationMessage from "../Shared/InformationMessage"
 import ApplicationContext from "../ApplicationContext"
+import ProfileImage from "../Shared/ProfileImage"
 
 export default Cards = ({ navigation, route }) => {
   const headerMargin = useHeaderHeight()
@@ -229,14 +230,14 @@ export default Cards = ({ navigation, route }) => {
           pv={5}
           onPress={() => {}}
         >
-          <Pressable
-            onPress={() => {
-              navigation.navigate("CardDetails", { register, user: item })
-            }}
+          <Card
+            mode="outlined"
+            style={{ overflow: "hidden" }}
           >
-            <Card
-              mode="outlined"
-              style={{ overflow: "hidden" }}
+            <TouchableRipple
+              onPress={() => {
+                navigation.navigate("CardDetails", { register, user: item })
+              }}
             >
               <HStack items="center">
                 <ProfileImage image={item.avatar} />
@@ -256,8 +257,8 @@ export default Cards = ({ navigation, route }) => {
                   </Text>
                 </Flex>
               </HStack>
-            </Card>
-          </Pressable>
+            </TouchableRipple>
+          </Card>
         </Flex>
       )
     },

@@ -253,30 +253,55 @@ export default EventDetails = ({ navigation, route }) => {
       fill
       key="Subscribe"
     >
-      {event?.attendance.attendee_list.find((item) => item.attendee_register == user.register) ? (
-        <VStack spacing={20}>
-          <Text
-            variant="bodyLarge"
-            style={{ textAlign: "center" }}
-          >
-            Ya estás inscrito al evento
-          </Text>
+      <VStack spacing={20}>
+        {event?.author_register == user.register ? (
           <Button
-            onPress={() => unsubscribeEvent()}
-            mode="outlined"
-            style={{ backgroundColor: theme.colors.background }}
+            mode="contained"
+            onPress={() => navigation.navigate("TakeAttendance", { event_identifier: event?.event_identifier })}
           >
-            Desinscribirme al evento
+            Registrar asistencia
           </Button>
-        </VStack>
-      ) : (
-        <Button
-          onPress={() => subscribeEvent()}
-          mode="contained"
-        >
-          Inscribirse al evento
-        </Button>
-      )}
+        ) : event?.attendance.attendee_list.find((item) => {
+            if (item.attendee_register == user.register) {
+              if (item.status == "Inscrito") {
+                return true
+              }
+            }
+
+            return false
+          }) ? (
+          <VStack spacing={20}>
+            <Text
+              variant="bodyLarge"
+              style={{ textAlign: "center" }}
+            >
+              Ya estás inscrito al evento
+            </Text>
+            <Button
+              onPress={() => unsubscribeEvent()}
+              mode="outlined"
+              style={{ backgroundColor: theme.colors.background }}
+            >
+              Desinscribirme al evento
+            </Button>
+            {event?.author_register != user.register && (
+              <Button
+                mode="contained"
+                onPress={() => navigation.navigate("ShowAttendanceCode")}
+              >
+                Tomar asistencia
+              </Button>
+            )}
+          </VStack>
+        ) : (
+          <Button
+            onPress={() => subscribeEvent()}
+            mode="contained"
+          >
+            Inscribirse al evento
+          </Button>
+        )}
+      </VStack>
     </Flex>
   )
 
