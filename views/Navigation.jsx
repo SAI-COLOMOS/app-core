@@ -58,6 +58,7 @@ import UserProgress from "./Cards/UserProgress"
 import Forms from "./Forms/Forms"
 import AddForm from "./Forms/AddForm"
 import AddAttendee from "./Events/AddAttendee"
+import EditAttendance from "./Attendance/EditAttendance"
 
 export default Navigation = () => {
   const Stack = createNativeStackNavigator()
@@ -65,6 +66,7 @@ export default Navigation = () => {
   return (
     <ContextProvider>
       <Stack.Navigator initialRouteName="Login">
+        {/*Authentication */}
         <Stack.Group
           navigationKey="authentication"
           screenOptions={{ headerShown: false, animation: "fade_from_bottom", animationTypeForReplace: "pop" }}
@@ -91,6 +93,7 @@ export default Navigation = () => {
           />
         </Stack.Group>
 
+        {/* Dashboard */}
         <Stack.Group
           navigationKey="dashboard"
           screenOptions={{ headerShown: false, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
@@ -101,6 +104,7 @@ export default Navigation = () => {
           />
         </Stack.Group>
 
+        {/* Schools */}
         <Stack.Group
           navigationKey="schools"
           screenOptions={{ headerShown: true, animation: "fade_from_bottom", animationTypeForReplace: "pop" }}
@@ -125,6 +129,7 @@ export default Navigation = () => {
           />
         </Stack.Group>
 
+        {/* Events */}
         <Stack.Group
           navigationKey="events"
           screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
@@ -154,6 +159,7 @@ export default Navigation = () => {
           />
         </Stack.Group>
 
+        {/* Places and areas */}
         <Stack.Group
           navigationKey="placesAndAreas"
           screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
@@ -188,6 +194,7 @@ export default Navigation = () => {
           />
         </Stack.Group>
 
+        {/* Users */}
         <Stack.Group
           navigationKey="users"
           screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
@@ -212,6 +219,7 @@ export default Navigation = () => {
           />
         </Stack.Group>
 
+        {/* Profile */}
         <Stack.Group
           navigationKey="profile"
           screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
@@ -227,6 +235,7 @@ export default Navigation = () => {
           />
         </Stack.Group>
 
+        {/* Cards */}
         <Stack.Group
           navigationKey="cards"
           screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
@@ -255,6 +264,7 @@ export default Navigation = () => {
           />
         </Stack.Group>
 
+        {/* Attendance */}
         <Stack.Group
           navigationKey="attendance"
           screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
@@ -262,6 +272,11 @@ export default Navigation = () => {
           <Stack.Screen
             name="AttendanceDetails"
             component={AttendanceDetails}
+          />
+          <Stack.Screen
+            name="EditAttendance"
+            component={EditAttendance}
+            options={{ headerShown: false, presentation: "containedTransparentModal" }}
           />
           <Stack.Screen
             name="TakeAttendance"
