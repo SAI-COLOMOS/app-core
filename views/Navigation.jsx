@@ -56,6 +56,7 @@ import UserProgress from "./Cards/UserProgress"
 
 // Forms
 import Forms from "./Forms/Forms"
+import FormDetails from "./Forms/FormDetails"
 import AddForm from "./Forms/AddForm"
 import AddAttendee from "./Events/AddAttendee"
 import EditAttendance from "./Attendance/EditAttendance"
@@ -308,6 +309,10 @@ export default Navigation = () => {
           <Stack.Screen
             name="Forms"
             component={Forms}
+          />
+          <Stack.Screen
+            name="FormDetails"
+            component={FormDetails}
           />
           <Stack.Screen
             name="AddForm"
