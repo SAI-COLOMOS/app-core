@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useMemo, useContext } from "react"
 import * as SecureStore from "expo-secure-store"
 import { Button, Card, Text, useTheme, Avatar, TouchableRipple } from "react-native-paper"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { Image, RefreshControl, ScrollView, useWindowDimensions } from "react-native"
+import { Image, Pressable, RefreshControl, ScrollView, useWindowDimensions } from "react-native"
 import { LinearGradient } from "expo-linear-gradient"
 import { useFocusEffect } from "@react-navigation/native"
 import CircularProgress from "react-native-circular-progress-indicator"
@@ -64,6 +64,7 @@ export default Dashboard = ({ navigation }) => {
         setUser(responses[0].user)
         setFeed(responses[1])
         setAchieved_hours(responses[1]?.achieved_hours)
+        console.log(responses[1])
       }
 
       return
@@ -135,14 +136,23 @@ export default Dashboard = ({ navigation }) => {
 
   const WidgetSmall = useCallback(
     ({ screen, payload, child }) => (
-      <Flex w={"25%"} p={5}>
-        <Card mode="outlined" style={{ overflow: "hidden" }}>
+      <Flex
+        w={"25%"}
+        p={5}
+      >
+        <Card
+          mode="outlined"
+          style={{ overflow: "hidden" }}
+        >
           <TouchableRipple
             onPress={() => {
               navigation.navigate(screen, { ...payload })
             }}
           >
-            <Flex h={80} center>
+            <Flex
+              h={80}
+              center
+            >
               {child}
             </Flex>
           </TouchableRipple>
@@ -154,18 +164,35 @@ export default Dashboard = ({ navigation }) => {
 
   const WidgetMedium = useCallback(
     ({ screen, payload, child, title }) => (
-      <Flex w={"50%"} p={5}>
-        <Card mode="outlined" style={{ overflow: "hidden" }}>
+      <Flex
+        w={"50%"}
+        p={5}
+      >
+        <Card
+          mode="outlined"
+          style={{ overflow: "hidden" }}
+        >
           <TouchableRipple
             onPress={() => {
               navigation.navigate(screen, { ...payload })
             }}
           >
-            <VStack ph={20} pv={10} h={175} spacing={10}>
-              <Text variant="bodyMedium" numberOfLines={1}>
+            <VStack
+              ph={20}
+              pv={10}
+              h={175}
+              spacing={10}
+            >
+              <Text
+                variant="bodyMedium"
+                numberOfLines={1}
+              >
                 {title}
               </Text>
-              <Flex fill center>
+              <Flex
+                fill
+                center
+              >
                 {child}
               </Flex>
             </VStack>
@@ -178,15 +205,28 @@ export default Dashboard = ({ navigation }) => {
 
   const WidgetLarge = useCallback(
     ({ screen, payload, child, title }) => (
-      <Flex w={"100%"} p={5}>
-        <Card mode="outlined">
+      <Flex
+        w={"100%"}
+        p={10}
+      >
+        <Card
+          mode="outlined"
+          style={{ overflow: "hidden" }}
+        >
           <TouchableRipple
             onPress={() => {
               navigation.navigate(screen, { ...payload })
             }}
           >
-            <VStack ph={20} pv={10} h={175} spacing={10}>
-              <Text variant="bodyMedium">{title}</Text>
+            <VStack
+              ph={15}
+              pv={10}
+              h={175}
+              spacing={10}
+            >
+              <Flex ph={5}>
+                <Text variant="bodyMedium">{title}</Text>
+              </Flex>
               <Flex fill>{child}</Flex>
             </VStack>
           </TouchableRipple>
@@ -210,18 +250,51 @@ export default Dashboard = ({ navigation }) => {
   const Header = () => {
     return (
       <Animated.View style={[{}, animationStyle]}>
-        <Flex w={"100%"} h={250 + insets.top} style={{ backgroundColor: "#ff0099", position: "absolute" }}>
+        <Flex
+          w={"100%"}
+          h={250 + insets.top}
+          style={{ backgroundColor: "#ff0099", position: "absolute" }}
+        >
           {
             {
-              0: <Image source={require("../../assets/images/cover/1.jpg")} style={{ width: "100%", height: "100%" }} />,
-              1: <Image source={require("../../assets/images/cover/2.jpg")} style={{ width: "100%", height: "100%" }} />,
-              2: <Image source={require("../../assets/images/cover/3.jpg")} style={{ width: "100%", height: "100%" }} />,
-              3: <Image source={require("../../assets/images/cover/4.jpg")} style={{ width: "100%", height: "100%" }} />,
-              4: <Image source={require("../../assets/images/cover/5.jpg")} style={{ width: "100%", height: "100%" }} />
+              0: (
+                <Image
+                  source={require("../../assets/images/cover/1.jpg")}
+                  style={{ width: "100%", height: "100%" }}
+                />
+              ),
+              1: (
+                <Image
+                  source={require("../../assets/images/cover/2.jpg")}
+                  style={{ width: "100%", height: "100%" }}
+                />
+              ),
+              2: (
+                <Image
+                  source={require("../../assets/images/cover/3.jpg")}
+                  style={{ width: "100%", height: "100%" }}
+                />
+              ),
+              3: (
+                <Image
+                  source={require("../../assets/images/cover/4.jpg")}
+                  style={{ width: "100%", height: "100%" }}
+                />
+              ),
+              4: (
+                <Image
+                  source={require("../../assets/images/cover/5.jpg")}
+                  style={{ width: "100%", height: "100%" }}
+                />
+              )
             }[selectedImage]
           }
 
-          <LinearGradient colors={[theme.colors.cover, theme.colors.background]} locations={[0.75, 1]} style={{ width: "100%", height: "100%", position: "absolute" }} />
+          <LinearGradient
+            colors={[theme.colors.cover, theme.colors.background]}
+            locations={[0.75, 1]}
+            style={{ width: "100%", height: "100%", position: "absolute" }}
+          />
         </Flex>
       </Animated.View>
     )
@@ -231,57 +304,168 @@ export default Dashboard = ({ navigation }) => {
     <Flex fill>
       {user !== null && feed != null && <Header />}
 
-      <ScrollView onScroll={(event) => (offSet.value = event.nativeEvent.contentOffset.y * -0.5)} scrollEventThrottle={16} refreshControl={<RefreshControl refreshing={loading} onRefresh={() => fetchData()} />}>
-        <Flex h={insets.top} w={"100%"} />
+      <ScrollView
+        onScroll={(event) => (offSet.value = event.nativeEvent.contentOffset.y * -0.5)}
+        scrollEventThrottle={16}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={() => fetchData()}
+          />
+        }
+      >
+        <Flex
+          h={insets.top}
+          w={"100%"}
+        />
         {user != null && feed != null ? (
           <VStack pb={50}>
-            <VStack h={200} center>
-              <Text variant="headlineLarge" style={{ color: theme.colors.primary }}>
+            <VStack
+              h={200}
+              center
+            >
+              <Text
+                variant="headlineLarge"
+                style={{ color: theme.colors.primary }}
+              >
                 {greeting}
               </Text>
-              <Text variant="headlineSmall" numberOfLines={1}>
+              <Text
+                variant="headlineSmall"
+                numberOfLines={1}
+              >
                 {user?.first_name}
               </Text>
               {timeToSleep ? (
-                <Text variant="bodyMedium" numberOfLines={1}>
+                <Text
+                  variant="bodyMedium"
+                  numberOfLines={1}
+                >
                   No dilates, dormir es importante ✨
                 </Text>
               ) : null}
             </VStack>
 
-            <Flex fill style={{ borderTopLeftRadius: 50, borderTopRightRadius: 50, backgroundColor: theme.colors.background }}>
-              <Flex p={25} center>
+            <Flex
+              fill
+              style={{ borderTopLeftRadius: 50, borderTopRightRadius: 50, backgroundColor: theme.colors.background }}
+            >
+              <Flex
+                p={25}
+                center
+              >
                 <Text variant="headlineSmall">Tu centro de control</Text>
               </Flex>
 
-              <VStack pb={50} spacing={20}>
+              <VStack
+                pb={50}
+                spacing={20}
+              >
                 {/* Sección común */}
-                <Flex direction="row" wrap="wrap" ph={10}>
+                <Flex
+                  direction="row"
+                  wrap="wrap"
+                  ph={10}
+                >
                   {/* Widget de evento */}
-                  <WidgetLarge
-                    title="Próximo evento"
-                    screen="ShowAttendanceCode"
-                    payload={{ register: user?.register, avatar: user?.avatar }}
-                    child={
-                      <HStack fill spacing={20}>
-                        <Flex items="center">
-                          <Avatar.Text label="12" size={50} />
-                          <Text variant="bodyMedium">mayo</Text>
-                        </Flex>
-                        <VStack fill spacing={10}>
-                          <Text variant="bodyLarge" numberOfLines={2}>
-                            Presentación de proyecto de titulación
-                          </Text>
-                          <Flex fill>
-                            <Text variant="bodyMedium">De 10:00 a 15:00</Text>
-                            <Text variant="bodyMedium" numberOfLines={1}>
-                              Centro de Enseñanza Técnica Industrial
-                            </Text>
+                  {feed?.events?.length > 0 && (
+                    <WidgetLarge
+                      title="Próximo evento"
+                      screen="ShowAttendanceCode"
+                      payload={{ register: user?.register, avatar: user?.avatar }}
+                      child={
+                        <>
+                          {/* <Image
+                            source={avatar !== null ? { uri: `data:image/png;base64,${avatar}` } : require("../../assets/images/stocks/events.jpg")}
+                            resizeMode="cover"
+                            onLoadEnd={() => setLoadingDone(true)}
+                            style={{ height: 175, width: "100%" }}
+                          />
+                          {loadingDone == false && (
+                            <Flex
+                              w={"100%"}
+                              h={"100%"}
+                              center
+                              style={{ position: "absolute" }}
+                            >
+                              <ActivityIndicator size={50} />
+                            </Flex>
+                          )} */}
+                          <Flex
+                            w={"100%"}
+                            h={"100%"}
+                            justify="end"
+                            // style={{ position: "absolute", backgroundColor: theme.colors.cover }}
+                          >
+                            <HStack
+                              spacing={15}
+                              items="end"
+                            >
+                              <Flex center>
+                                <Avatar.Text
+                                  label={GetDay(feed?.events[0].starting_date)}
+                                  size={50}
+                                />
+                                <Text variant="bodyMedium">{GetCompactMonth(feed?.events[0].starting_date)}</Text>
+                              </Flex>
+                              <VStack fill>
+                                <Text
+                                  variant="titleMedium"
+                                  numberOfLines={2}
+                                >
+                                  {feed?.events[0].name}
+                                </Text>
+                                <Text
+                                  variant="bodySmall"
+                                  numberOfLines={1}
+                                >
+                                  De {Time24(feed?.events[0].starting_date)} a {Time24(feed?.events[0].ending_date)}
+                                </Text>
+                                <Text
+                                  variant="bodySmall"
+                                  numberOfLines={1}
+                                >
+                                  En {feed?.events[0].place}
+                                </Text>
+                              </VStack>
+                            </HStack>
                           </Flex>
-                        </VStack>
-                      </HStack>
-                    }
-                  />
+                        </>
+                        //   <HStack
+                        //     fill
+                        //     spacing={20}
+                        //   >
+                        //     <Flex items="center">
+                        //       <Avatar.Text
+                        //         label="12"
+                        //         size={50}
+                        //       />
+                        //       <Text variant="bodyMedium">mayo</Text>
+                        //     </Flex>
+                        //     <VStack
+                        //       fill
+                        //       spacing={10}
+                        //     >
+                        //       <Text
+                        //         variant="bodyLarge"
+                        //         numberOfLines={2}
+                        //       >
+                        //         Presentación de proyecto de titulación
+                        //       </Text>
+                        //       <Flex fill>
+                        //         <Text variant="bodyMedium">De 10:00 a 15:00</Text>
+                        //         <Text
+                        //           variant="bodyMedium"
+                        //           numberOfLines={1}
+                        //         >
+                        //           Centro de Enseñanza Técnica Industrial
+                        //         </Text>
+                        //       </Flex>
+                        //     </VStack>
+                        //   </HStack>
+                      }
+                    />
+                  )}
 
                   {/* Widget de eventos disponibles */}
                   {feed?.available_events?.length > 0 && (
@@ -290,25 +474,57 @@ export default Dashboard = ({ navigation }) => {
                       screen="Events"
                       payload={{ user, token }}
                       child={
-                        <Flex w={"100%"} h={"100%"} style={{}}>
-                          <Flex w={"100%"} h={"100%"} justify="end" items="end" style={{ position: "absolute" }}>
-                            <Avatar.Text label={feed?.available_events?.length} size={50} />
+                        <Flex
+                          w={"100%"}
+                          h={"100%"}
+                          style={{}}
+                        >
+                          <Flex
+                            w={"100%"}
+                            h={"100%"}
+                            justify="end"
+                            items="end"
+                            style={{ position: "absolute" }}
+                          >
+                            <Avatar.Text
+                              label={feed?.available_events?.length}
+                              size={50}
+                            />
                           </Flex>
                           {feed.available_events.map((event) => (
-                            <HStack key={event.name} fill spacing={20}>
+                            <HStack
+                              key={event.name}
+                              fill
+                              spacing={20}
+                            >
                               <Flex items="center">
-                                <Avatar.Text label={GetDay(event?.starting_date)} size={50} />
+                                <Avatar.Text
+                                  label={GetDay(event?.starting_date)}
+                                  size={50}
+                                />
                                 <Text variant="bodyMedium">{GetCompactMonth(event?.starting_date)}</Text>
                               </Flex>
-                              <VStack fill spacing={10}>
-                                <Text variant="bodyLarge" numberOfLines={2}>
+                              <VStack
+                                fill
+                                spacing={10}
+                              >
+                                <Text
+                                  variant="bodyLarge"
+                                  numberOfLines={2}
+                                >
                                   {event.name}
                                 </Text>
                                 <Flex fill>
-                                  <Text variant="bodyMedium" numberOfLines={1}>
+                                  <Text
+                                    variant="bodyMedium"
+                                    numberOfLines={1}
+                                  >
                                     A partir de las {Time24(event.starting_date)}
                                   </Text>
-                                  <Text variant="bodyMedium" numberOfLines={1}>
+                                  <Text
+                                    variant="bodyMedium"
+                                    numberOfLines={1}
+                                  >
                                     {event.place}
                                   </Text>
                                 </Flex>
@@ -325,16 +541,36 @@ export default Dashboard = ({ navigation }) => {
                     <WidgetMedium
                       screen="UserProgress"
                       child={
-                        <Flex fill center>
-                          <Flex fill center style={{ position: "absolute" }}>
-                            <Text variant="headlineSmall" style={{ fontWeight: "bold", color: theme.colors.primary }}>
+                        <Flex
+                          fill
+                          center
+                        >
+                          <Flex
+                            fill
+                            center
+                            style={{ position: "absolute" }}
+                          >
+                            <Text
+                              variant="headlineSmall"
+                              style={{ fontWeight: "bold", color: theme.colors.primary }}
+                            >
                               {feed?.achieved_hours} /
                             </Text>
                             <Text variant="bodyMedium">{feed?.total_hours}</Text>
                           </Flex>
                           {feed?.total_hours ? (
                             <Animated.View>
-                              <CircularProgress value={achieved_hours} showProgressValue={false} progressValueColor={theme.colors.primary} activeStrokeColor={theme.colors.primary} inActiveStrokeColor={theme.colors.backdrop} rotation={180} titleColor={theme.colors.onBackground} radius={50} maxValue={feed?.total_hours} />
+                              <CircularProgress
+                                value={achieved_hours}
+                                showProgressValue={false}
+                                progressValueColor={theme.colors.primary}
+                                activeStrokeColor={theme.colors.primary}
+                                inActiveStrokeColor={theme.colors.backdrop}
+                                rotation={180}
+                                titleColor={theme.colors.onBackground}
+                                radius={50}
+                                maxValue={feed?.total_hours}
+                              />
                             </Animated.View>
                           ) : null}
                         </Flex>
@@ -344,43 +580,161 @@ export default Dashboard = ({ navigation }) => {
                   ) : null}
 
                   {/* Widget de eventos */}
-                  {(feed?.available_events?.length == 0 || user?.role != "Prestador") && <WidgetMedium title="Eventos" screen="Events" payload={{ user, token }} child={<Avatar.Icon icon={"bulletin-board"} size={100} />} />}
+                  {(feed?.available_events?.length == 0 || user?.role != "Prestador") && (
+                    <WidgetMedium
+                      title="Eventos"
+                      screen="Events"
+                      payload={{ user, token }}
+                      child={
+                        <Avatar.Icon
+                          icon={"bulletin-board"}
+                          size={100}
+                        />
+                      }
+                    />
+                  )}
 
                   {/* Widget de horas */}
-                  {user?.role === "Administrador" ? <WidgetMedium title="Horas de servicio" screen="Cards" payload={{ user, token }} child={<Avatar.Icon icon={"clock-time-four-outline"} size={100} />} /> : null}
+                  {user?.role === "Administrador" ? (
+                    <WidgetMedium
+                      title="Horas de servicio"
+                      screen="Cards"
+                      payload={{ user, token }}
+                      child={
+                        <Avatar.Icon
+                          icon={"clock-time-four-outline"}
+                          size={100}
+                        />
+                      }
+                    />
+                  ) : null}
 
                   {/* Widget de perfil */}
-                  <WidgetSmall screen="Profile" payload={{ user, token }} child={user?.avatar ? <Avatar.Image source={{ uri: `data:image/png;base64,${user.avatar}` }} size={50} /> : <Avatar.Icon icon="account-circle-outline" size={100} />} />
+                  <WidgetSmall
+                    screen="Profile"
+                    payload={{ user, token }}
+                    child={
+                      user?.avatar ? (
+                        <Avatar.Image
+                          source={{ uri: `data:image/png;base64,${user.avatar}` }}
+                          size={50}
+                        />
+                      ) : (
+                        <Avatar.Icon
+                          icon="account-circle-outline"
+                          size={100}
+                        />
+                      )
+                    }
+                  />
 
-                  <WidgetSmall screen="TakeAttendance" payload={{ actualUser: user, token }} child={<Avatar.Icon icon={"alert"} size={50} />} />
+                  <WidgetSmall
+                    screen="TakeAttendance"
+                    payload={{ actualUser: user, token }}
+                    child={
+                      <Avatar.Icon
+                        icon={"alert"}
+                        size={50}
+                      />
+                    }
+                  />
                 </Flex>
 
                 {/* Sección de herramientas del administrador */}
                 {user?.role === "Administrador" || user?.role === "Encargado" ? (
-                  <Flex direction="row" wrap="wrap" ph={10}>
-                    <Flex w={"100%"} ph={10}>
+                  <Flex
+                    direction="row"
+                    wrap="wrap"
+                    ph={10}
+                  >
+                    <Flex
+                      w={"100%"}
+                      ph={10}
+                    >
                       <Text variant="bodyLarge">Herramientas del {user?.role}</Text>
                     </Flex>
 
-                    {user?.role === "Administrador" ? <WidgetSmall screen="PlacesAndAreas" payload={{ user, token }} child={<Avatar.Icon icon={"map-marker-radius-outline"} size={50} />} /> : null}
+                    <WidgetSmall
+                      screen="PlacesAndAreas"
+                      child={
+                        <Avatar.Icon
+                          icon={"map-marker-radius-outline"}
+                          size={50}
+                        />
+                      }
+                    />
 
-                    {user?.role === "Administrador" ? <WidgetSmall screen="Schools" payload={{ user, token }} child={<Avatar.Icon icon={"town-hall"} size={50} />} /> : null}
+                    <WidgetSmall
+                      screen="Schools"
+                      payload={{ user, token }}
+                      child={
+                        <Avatar.Icon
+                          icon={"town-hall"}
+                          size={50}
+                        />
+                      }
+                    />
 
-                    {user?.role === "Administrador" ? <WidgetSmall screen="Events" payload={{ user, token }} child={<Avatar.Icon icon={"bulletin-board"} size={50} />} /> : null}
+                    <WidgetSmall
+                      screen="Events"
+                      payload={{ user, token }}
+                      child={
+                        <Avatar.Icon
+                          icon={"bulletin-board"}
+                          size={50}
+                        />
+                      }
+                    />
 
-                    <WidgetSmall screen="Users" payload={{ actualUser: user, token }} child={<Avatar.Icon icon={"account-supervisor-outline"} size={50} />} />
+                    <WidgetSmall
+                      screen="Users"
+                      child={
+                        <Avatar.Icon
+                          icon={"account-supervisor-outline"}
+                          size={50}
+                        />
+                      }
+                    />
 
-                    <WidgetSmall screen="Cards" payload={{ actualUser: user, token }} child={<Avatar.Icon icon={"close"} size={50} />} />
-                    
-                    <WidgetSmall screen="Forms" payload={{ actualUser: user, token }} child={<Avatar.Icon icon={"form-select"} size={50} />} />
+                    <WidgetSmall
+                      screen="Cards"
+                      payload={{ actualUser: user, token }}
+                      child={
+                        <Avatar.Icon
+                          icon={"close"}
+                          size={50}
+                        />
+                      }
+                    />
+
+                    <WidgetSmall
+                      screen="Forms"
+                      payload={{ actualUser: user, token }}
+                      child={
+                        <Avatar.Icon
+                          icon={"form-select"}
+                          size={50}
+                        />
+                      }
+                    />
                   </Flex>
                 ) : null}
               </VStack>
             </Flex>
           </VStack>
         ) : loading == false ? (
-          <Flex pt={insets.top} fill>
-            <InformationMessage icon="alert" title="Uy, ocurrió un error" description="No podemos recuperar la información de tu cuenta, revisa tu conexión a internet e inténtalo nuevamente, si el problema persiste, contacta con tu encargado de servicio" buttonIcon="reload" buttonTitle="Volver a cargar" action={() => fetchData()} />
+          <Flex
+            pt={insets.top}
+            fill
+          >
+            <InformationMessage
+              icon="alert"
+              title="Uy, ocurrió un error"
+              description="No podemos recuperar la información de tu cuenta, revisa tu conexión a internet e inténtalo nuevamente, si el problema persiste, contacta con tu encargado de servicio"
+              buttonIcon="reload"
+              buttonTitle="Volver a cargar"
+              action={() => fetchData()}
+            />
           </Flex>
         ) : null}
       </ScrollView>

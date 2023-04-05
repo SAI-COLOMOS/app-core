@@ -1,16 +1,21 @@
-import React, { useState, useEffect } from "react"
-import { Avatar, Button } from "react-native-paper"
+import React from "react"
+import { Button, Card, Text, TouchableRipple, useTheme } from "react-native-paper"
 import * as ImagePicker from "expo-image-picker"
 import { manipulateAsync } from "expo-image-manipulator"
-import { Flex, VStack } from "@react-native-material/core"
+import { Flex, HStack, VStack } from "@react-native-material/core"
+import { Image } from "react-native"
+import ProfileImage from "./ProfileImage"
+import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 
-export default ImageSelector = ({ value, setter }) => {
+export default ImageSelector = ({ value, setter, type }) => {
+  const theme = useTheme()
+
   async function selectFromLibrary() {
     let selectedPhoto = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1
+      aspect: { rectangular: [4, 3], square: [1, 1] }[type],
+      quality: 0.7
     })
 
     if (!selectedPhoto.canceled) {
@@ -22,8 +27,8 @@ export default ImageSelector = ({ value, setter }) => {
     let takenPhoto = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1
+      aspect: { rectangular: [4, 3], square: [1, 1] }[type],
+      quality: 0.7
     })
 
     if (!takenPhoto.canceled) {
@@ -32,16 +37,36 @@ export default ImageSelector = ({ value, setter }) => {
   }
 
   async function imageManipulation(image) {
-    const compressPhoto = await manipulateAsync(image.assets[0].uri, [{ resize: { height: 250, width: 250 } }], { base64: true })
+    const compressPhoto = await manipulateAsync(image.assets[0].uri, [{ resize: { height: { rectangular: 768, square: 250 }[type], width: { rectangular: 1024, square: 250 }[type] } }], { base64: true })
     setter(compressPhoto.base64)
   }
 
   return (
-    <Flex fill p={20}>
+    <Flex
+      fill
+      // p={20}
+    >
       {value ? (
         <VStack spacing={20}>
           <Flex items="center">
-            <Avatar.Image source={{ uri: `data:image/png;base64,${value}` }} size={150} />
+            {
+              {
+                square: (
+                  <ProfileImage
+                    image={value}
+                    width={150}
+                    height={150}
+                  />
+                ),
+                rectangular: (
+                  <Image
+                    source={{ uri: `data:image/png;base64,${value}` }}
+                    resizeMode="cover"
+                    style={{ height: 200, width: "100%", borderRadius: 10 }}
+                  />
+                )
+              }[type]
+            }
           </Flex>
 
           <Button
@@ -75,8 +100,76 @@ export default ImageSelector = ({ value, setter }) => {
           </Button>
         </VStack>
       ) : (
-        <VStack spacing={20}>
-          <Button
+        <HStack
+          fill
+          justify="between"
+          pv={10}
+          // spacing={20}
+        >
+          <VStack
+            w={"48%"}
+            h={100}
+          >
+            <Card
+              mode="outlined"
+              style={{ overflow: "hidden" }}
+            >
+              <TouchableRipple onPress={() => takePhoto()}>
+                <Flex
+                  w={"100%"}
+                  h={"100%"}
+                  center
+                >
+                  <Icon
+                    name="camera-outline"
+                    color={theme.colors.onBackground}
+                    size={50}
+                  />
+                  <Text
+                    variant="bodyMedium"
+                    style={{ textAlign: "center" }}
+                  >
+                    Tomar fotografía
+                  </Text>
+                </Flex>
+              </TouchableRipple>
+            </Card>
+          </VStack>
+
+          <VStack
+            w={"48%"}
+            h={100}
+          >
+            <Card
+              mode="contained"
+              style={{ backgroundColor: theme.colors.primary }}
+            >
+              <TouchableRipple
+                style={{ overflow: "hidden" }}
+                onPress={() => selectFromLibrary()}
+              >
+                <Flex
+                  w={"100%"}
+                  h={"100%"}
+                  center
+                >
+                  <Icon
+                    name="image-outline"
+                    color={theme.colors.onPrimary}
+                    size={50}
+                  />
+                  <Text
+                    variant="bodyMedium"
+                    style={{ color: theme.colors.onPrimary, textAlign: "center" }}
+                  >
+                    Seleccionar imagen
+                  </Text>
+                </Flex>
+              </TouchableRipple>
+            </Card>
+          </VStack>
+
+          {/* <Button
             mode="contained"
             icon="camera-outline"
             onPress={() => {
@@ -84,9 +177,9 @@ export default ImageSelector = ({ value, setter }) => {
             }}
           >
             Tomar fotografía
-          </Button>
+          </Button> */}
 
-          <Button
+          {/* <Button
             mode="outlined"
             icon="image-outline"
             onPress={() => {
@@ -94,8 +187,8 @@ export default ImageSelector = ({ value, setter }) => {
             }}
           >
             Seleccionar imagen
-          </Button>
-        </VStack>
+          </Button> */}
+        </HStack>
       )}
     </Flex>
   )

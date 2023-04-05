@@ -1,30 +1,34 @@
-import { even, Flex, VStack } from '@react-native-material/core'
-import { useEffect, useState } from 'react'
-import { Button, Text, TextInput, useTheme } from 'react-native-paper'
-import Constants from 'expo-constants'
-import CreateForm from '../Shared/CreateForm'
-import ModalMessage from '../Shared/ModalMessage'
+import { even, Flex, HStack, VStack } from "@react-native-material/core"
+import { useContext, useEffect, useState } from "react"
+import { Button, Text, TextInput, useTheme, IconButton, ActivityIndicator } from "react-native-paper"
+import Constants from "expo-constants"
+import CreateForm from "../Shared/CreateForm"
+import ModalMessage from "../Shared/ModalMessage"
+import ApplicationContext from "../ApplicationContext"
+import { DateAndTimerPicker } from "../Shared/TimeAndDatePicker"
+import Dropdown from "../Shared/Dropdown"
 
 export default EditEvent = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
+  const { token } = useContext(ApplicationContext)
   const theme = useTheme()
-  const { token, event, event_identifier } = route.params
+  const { event, event_identifier } = route.params
 
+  const [places, setPlaces] = useState(undefined)
   const [name, setName] = useState(`${event.name}`)
   const [description, setDescription] = useState(`${event.description}`)
-  const [offered_hours, setOfered_hours] = useState(`${event.offered_hours}`)
+  const [offered_hours, setOffered_hours] = useState(`${event.offered_hours}`)
   const [tolerance, setTolerance] = useState(`${event.tolerance}`)
   const [vacancy, setVacancy] = useState(`${event.vacancy}`)
-  const [starting_date, setStarting_date] = useState(`${event.starting_date}`)
-  const [ending_date, setEnding_date] = useState(`${event.ending_date}`)
-  const [author_register, setAuthor_register] = useState(`${event.author_register}`)
-  const [modifier_register, setmodifier_register] = useState(`${event.modifier_register}`)
-  const [publishing_date, setPublishing_date] = useState(`${event.publishing_date}`)
+  const [starting_date, setStarting_date] = useState(new Date(event.starting_date)) //`${event.starting_date}`)
+  const [ending_date, setEnding_date] = useState(new Date(event.ending_date)) //`${event.ending_date}`)
+  const [publishing_date, setPublishing_date] = useState(new Date(event.publishing_date)) //`${event.publishing_date}`)
+  const [avatar, setAvatar] = useState(event.avatar ?? null)
   const [place, setPlace] = useState(`${event.place}`)
-  const [belonging_area, setBelonging_area] = useState(`${event.belonging_area}`)
-  const [belonging_place, setBelonging_place] = useState(`${event.belonging_place}`)
   const [verified, setVerified] = useState(false)
 
+  const [loading, setLoading] = useState(false)
+  const [placesOptions, setPlacesOptions] = useState()
   const [modalConfirm, setModalConfirm] = useState(false)
   const [modalLoading, setModalLoading] = useState(false)
   const [modalSuccess, setModalSuccess] = useState(false)
@@ -32,17 +36,17 @@ export default EditEvent = ({ navigation, route }) => {
   const [modalError, setModalError] = useState(false)
   const [modalErrorDelete, setModalErrorDelete] = useState(false)
   const [modalFatal, setModalFatal] = useState(false)
-  const [responseCode, setResponseCode] = useState('')
+  const [responseCode, setResponseCode] = useState("")
 
   async function savePlace() {
     setModalLoading(true)
 
-    const request = await fetch(`${localhost}/agenda/${event_identifier}`,{
-      method: 'PATCH',
+    const request = await fetch(`${localhost}/agenda/${event_identifier}`, {
+      method: "PATCH",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        'Cache-Control': 'no-cache'
+        "Cache-Control": "no-cache"
       },
       body: JSON.stringify({
         name: name.trim(),
@@ -50,19 +54,16 @@ export default EditEvent = ({ navigation, route }) => {
         offered_hours: Number(offered_hours.trim()),
         tolerance: Number(tolerance.trim()),
         vacancy: Number(vacancy.trim()),
-        starting_date: starting_date.trim(),
-        ending_date: ending_date.trim(),
-        publishing_date: publishing_date.trim(),
+        starting_date: starting_date.toISOString(),
+        ending_date: ending_date.toISOString(),
+        publishing_date: publishing_date.toISOString(),
         place: place.trim(),
-        modifier_register: modifier_register.trim()
+        avatar: avatar
       })
     })
       .then((response) => response.status)
       .catch(() => null)
 
-      //const json = await request.json()
-      //console.log(json)
-      
     setModalLoading(false)
 
     if (request == 200) {
@@ -78,12 +79,12 @@ export default EditEvent = ({ navigation, route }) => {
   async function deleteEvent() {
     setModalLoading(true)
 
-    const request = await fetch(`${localhost}/agenda/${event_identifier}`,{
-      method: 'DELETE',
+    const request = await fetch(`${localhost}/agenda/${event_identifier}`, {
+      method: "DELETE",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        'Cache-Control': 'no-cache'
+        "Cache-Control": "no-cache"
       }
     })
       .then((response) => response.status)
@@ -103,6 +104,35 @@ export default EditEvent = ({ navigation, route }) => {
     }
   }
 
+  async function getPlaces() {
+    setLoading(true)
+
+    const request = await fetch(`${localhost}/places`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        "Cache-Control": "no-cache"
+      }
+    })
+      .then((response) => (response.ok ? response.json() : response.status))
+      .catch(() => null)
+
+    setLoading(false)
+
+    if (request?.places) {
+      let placesData = []
+      request.places.forEach((place) => {
+        placesData.push({ option: place.place_name })
+      })
+      setPlacesOptions(placesData)
+    }
+  }
+
+  useEffect(() => {
+    getPlaces()
+  }, [])
+
   useEffect(() => {
     let check = true
 
@@ -111,46 +141,155 @@ export default EditEvent = ({ navigation, route }) => {
     offered_hours.length > 0 ? null : (check = false)
     tolerance.length > 0 ? null : (check = false)
     vacancy.length > 0 ? null : (check = false)
-    starting_date.length > 0 ? null : (check = false)
-    ending_date.length > 0 ? null : (check = false)
-    author_register.length > 0 ? null : (check = false)
-    publishing_date.length > 0 ? null : (check = false)
     place.length > 0 ? null : (check = false)
-    belonging_area.length > 0 ? null : (check = false)
-    belonging_place.length > 0 ? null : (check = false)
 
     if (check) {
       setVerified(true)
     } else {
       setVerified(false)
     }
-}, [name, description, offered_hours, tolerance, vacancy, starting_date, ending_date, author_register, publishing_date, place, belonging_area, belonging_place])
-  
-const Data = () => {
+  }, [name, description, offered_hours, tolerance, vacancy, starting_date, ending_date, publishing_date, place])
+
+  const Data = () => {
     return (
-      <VStack key="Data" spacing={5}>
+      <VStack
+        key="Data"
+        spacing={5}
+      >
         <Text variant="labelLarge">Datos del evento</Text>
         <VStack spacing={10}>
-          <TextInput mode="outlined" value={name} onChangeText={setName} autoCapitalize="words" label="Nombre del evento" maxLength={50} />
-          <TextInput mode="outlined" value={description} onChangeText={setDescription} label="Descripción del evento" maxLength={250} />
-          <TextInput mode="outlined" value={offered_hours} onChangeText={setOfered_hours} label="Número de horas ofertadas" maxLength={3} keyboardType="number-pad" autoComplete="off" />
-          <TextInput mode="outlined" value={tolerance} onChangeText={setTolerance} label="Minutos de tolerancia" maxLength={3} keyboardType="number-pad" autoComplete="off" />
-          <TextInput mode="outlined" value={vacancy} onChangeText={setVacancy} label="Número de vacantes" maxLength={3} keyboardType="number-pad" autoComplete="off" />
-          <TextInput mode="outlined" value={starting_date} onChangeText={setStarting_date} label="Fecha de inicio" maxLength={10} keyboardType="number-pad" autoComplete="off"/>
-          <TextInput mode="outlined" value={ending_date} onChangeText={setEnding_date} label="Fecha de termino" maxLength={10} keyboardType="number-pad" autoComplete="off"/>
-          <TextInput mode="outlined" value={author_register} onChangeText={setAuthor_register} label="Registro" maxLength={20} keyboardType="number-pad" autoComplete="off"/>
-          <TextInput mode="outlined" value={publishing_date} onChangeText={setPublishing_date} label="Fecha de publicación" maxLength={10} keyboardType="number-pad" autoComplete="off"/>
-          <TextInput mode="outlined" value={place} onChangeText={setPlace} autoCapitalize="words" label="Lugar" maxLength={50} />
-          <TextInput mode="outlined" value={belonging_area} onChangeText={setBelonging_area} autoCapitalize="words" label="Área de origen" maxLength={150} />
-          <TextInput mode="outlined" value={belonging_place} onChangeText={setBelonging_place} autoCapitalize="words" label="Lugar de origen" maxLength={150} />
-          <TextInput mode="outlined" value={modifier_register} onChangeText={setmodifier_register} autoCapitalize="words" label="modificacion del registro" maxLength={150} />
+          <TextInput
+            mode="outlined"
+            value={name}
+            onChangeText={setName}
+            label="Nombre del evento"
+            maxLength={50}
+          />
+          <TextInput
+            mode="outlined"
+            value={description}
+            onChangeText={setDescription}
+            label="Descripción del evento"
+            maxLength={500}
+            numberOfLines={3}
+            multiline={true}
+          />
+          <TextInput
+            mode="outlined"
+            value={offered_hours}
+            onChangeText={setOffered_hours}
+            label="Número de horas ofertadas"
+            maxLength={3}
+            keyboardType="number-pad"
+            autoComplete="off"
+          />
+          <TextInput
+            mode="outlined"
+            value={tolerance}
+            onChangeText={setTolerance}
+            label="Minutos de tolerancia"
+            maxLength={3}
+            keyboardType="number-pad"
+            autoComplete="off"
+          />
+          <TextInput
+            mode="outlined"
+            value={vacancy}
+            onChangeText={setVacancy}
+            label="Número de vacantes"
+            maxLength={3}
+            keyboardType="number-pad"
+            autoComplete="off"
+          />
+
+          <Flex>
+            <Text variant="labelMedium">Fecha y hora de inicio</Text>
+            <DateAndTimerPicker
+              actualDate={starting_date}
+              selectedDate={setStarting_date}
+            />
+          </Flex>
+
+          <Flex>
+            <Text variant="labelMedium">Fecha y hora de termino</Text>
+            <DateAndTimerPicker
+              actualDate={ending_date}
+              selectedDate={setEnding_date}
+            />
+          </Flex>
+
+          <Flex>
+            <Text variant="labelMedium">Fecha y hora de publicación</Text>
+            <DateAndTimerPicker
+              actualDate={publishing_date}
+              selectedDate={setPublishing_date}
+            />
+          </Flex>
+
+          <Flex>
+            {placesOptions != null ? (
+              <Dropdown
+                title="Bosque urbano"
+                value={place}
+                selected={setPlace}
+                options={placesOptions}
+              />
+            ) : loading == true ? (
+              <HStack
+                fill
+                items="center"
+                pv={10}
+                spacing={20}
+              >
+                <Flex fill>
+                  <Text variant="bodyMedium">Obteniendo la lista de bosques urbanos</Text>
+                </Flex>
+                <ActivityIndicator />
+              </HStack>
+            ) : (
+              <HStack
+                fill
+                items="center"
+                pv={10}
+                spacing={20}
+              >
+                <Flex fill>
+                  <Text variant="bodyMedium">Ocurrió un problema obteniendo la lista de bosques urbanos</Text>
+                </Flex>
+                <IconButton
+                  icon="reload"
+                  mode="outlined"
+                  onPress={() => getPlaces()}
+                />
+              </HStack>
+            )}
+          </Flex>
         </VStack>
       </VStack>
     )
   }
 
+  const ImageData = () => (
+    <VStack
+      key="Image"
+      spacing={5}
+    >
+      <Text variant="labelLarge">Foto para el evento</Text>
+      <VStack spacing={10}>
+        <ImageSelector
+          value={avatar}
+          setter={setAvatar}
+          type="rectangular"
+        />
+      </VStack>
+    </VStack>
+  )
+
   const Delete = () => (
-    <VStack key="Delete" spacing={5}>
+    <VStack
+      key="Delete"
+      spacing={5}
+    >
       <Text variant="labelLarge">Eliminar evento</Text>
       <VStack spacing={10}>
         <Button
@@ -169,12 +308,12 @@ const Data = () => {
 
   const Save = () => (
     <Button
-        key="SaveButton"
-        icon="content-save-outline"
-        disabled={modalLoading || !verified}
-        loading={modalLoading}
-        mode="contained"
-        onPress={() => {
+      key="SaveButton"
+      icon="content-save-outline"
+      disabled={modalLoading || !verified}
+      loading={modalLoading}
+      mode="contained"
+      onPress={() => {
         savePlace()
       }}
     >
@@ -184,11 +323,11 @@ const Data = () => {
 
   const Cancel = () => (
     <Button
-        key="CancelButton"
-        icon="close"
-        disabled={modalLoading}
-        mode="outlined"
-        onPress={() => {
+      key="CancelButton"
+      icon="close"
+      disabled={modalLoading}
+      mode="outlined"
+      onPress={() => {
         navigation.pop()
       }}
     >
@@ -198,16 +337,22 @@ const Data = () => {
 
   return (
     <Flex fill>
-      <CreateForm title="Editar evento" children={[Data(), Delete()]} actions={[Save(), Cancel()]} navigation={navigation} loading={modalLoading} />
+      <CreateForm
+        title="Editar evento"
+        children={[Data(), ImageData(), Delete()]}
+        actions={[Save(), Cancel()]}
+        navigation={navigation}
+        loading={modalLoading}
+      />
 
       <ModalMessage
         title="Eliminar evento"
         description="¿Seguro que deseas eliminar este evento? La acción no se podrá deshacer"
         handler={[modalConfirm, () => setModalConfirm(!modalConfirm)]}
         actions={[
-          ['Cancelar', () => setModalConfirm(!modalConfirm)],
+          ["Cancelar", () => setModalConfirm(!modalConfirm)],
           [
-            'Aceptar',
+            "Aceptar",
             () => {
               setModalConfirm(!modalConfirm), deleteEvent()
             }
@@ -217,15 +362,50 @@ const Data = () => {
         icon="help-circle-outline"
       />
 
-      <ModalMessage title="¡Listo!" description="El evento ha sido actualizado" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline" />
+      <ModalMessage
+        title="¡Listo!"
+        description="El evento ha sido actualizado"
+        handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]}
+        actions={[["Aceptar", () => navigation.pop()]]}
+        dismissable={false}
+        icon="check-circle-outline"
+      />
 
-      <ModalMessage title="¡Listo!" description="El evento ha sido eliminado" handler={[modalSuccessDelete, () => setModalSuccessDelete(!modalSuccessDelete)]} actions={[['Aceptar', () => navigation.pop(2)]]} dismissable={false} icon="check-circle-outline" />
+      <ModalMessage
+        title="¡Listo!"
+        description="El evento ha sido eliminado"
+        handler={[modalSuccessDelete, () => setModalSuccessDelete(!modalSuccessDelete)]}
+        actions={[["Aceptar", () => navigation.pop(2)]]}
+        dismissable={false}
+        icon="check-circle-outline"
+      />
 
-      <ModalMessage title="Ocurrió un problema" description={`No pudimos actualizar el evento, inténtalo más tarde (${responseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline" />
+      <ModalMessage
+        title="Ocurrió un problema"
+        description={`No pudimos actualizar el evento, inténtalo más tarde (${responseCode})`}
+        handler={[modalError, () => setModalError(!modalError)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="close-circle-outline"
+      />
 
-      <ModalMessage title="Ocurrió un problema" description={`No pudimos eliminar el evento, inténtalo más tarde (${responseCode})`} handler={[modalErrorDelete, () => setModalErrorDelete(!modalErrorDelete)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline" />
+      <ModalMessage
+        title="Ocurrió un problema"
+        description={`No pudimos eliminar el evento, inténtalo más tarde (${responseCode})`}
+        handler={[modalErrorDelete, () => setModalErrorDelete(!modalErrorDelete)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="close-circle-outline"
+      />
 
-      <ModalMessage title="Sin conexión a internet" description={`Parece que no tienes conexión a internet, conéctate e intenta de nuevo`} handler={[modalFatal, () => setModalFatal(!modalFatal)]} actions={[['Aceptar']]} dismissable={true} icon="wifi-alert" />
+      <ModalMessage
+        title="Sin conexión a internet"
+        description={`Parece que no tienes conexión a internet, conéctate e intenta de nuevo`}
+        handler={[modalFatal, () => setModalFatal(!modalFatal)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="wifi-alert"
+      />
     </Flex>
   )
 }

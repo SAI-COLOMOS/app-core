@@ -1,18 +1,19 @@
 import { Flex, VStack } from "@react-native-material/core"
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, useContext } from "react"
 import { useHeaderHeight } from "@react-navigation/elements"
 import { Text, Card, Button, FAB, useTheme } from "react-native-paper"
 import Header from "../Shared/Header"
 import Constants from "expo-constants"
 import DisplayDetails from "../Shared/DisplayDetails"
-import { ScrollView, RefreshControl } from "react-native"
 import { useFocusEffect } from "@react-navigation/native"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
+import ApplicationContext from "../ApplicationContext"
 
 export default PlaceDetails = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
+  const { token } = useContext(ApplicationContext)
   const headerMargin = useHeaderHeight()
-  const { token, place_identifier } = route.params
+  const { place_identifier } = route.params
   const theme = useTheme()
 
   const [loading, setLoading] = useState(false)
@@ -36,7 +37,6 @@ export default PlaceDetails = ({ navigation, route }) => {
 
     if (request?.place) {
       setPlace(request.place)
-      console.log(request.place.place_areas)
     } else {
       setPlace(request)
     }
@@ -58,8 +58,14 @@ export default PlaceDetails = ({ navigation, route }) => {
   )
 
   const Places = () => (
-    <Card mode="outlined" key="Place">
-      <VStack p={20} spacing={5}>
+    <Card
+      mode="outlined"
+      key="Place"
+    >
+      <VStack
+        p={20}
+        spacing={5}
+      >
         <Text variant="bodyLarge">Bosque urbano</Text>
         <VStack spacing={10}>
           <Text variant="labelSmall">Domicilio</Text>
@@ -88,9 +94,18 @@ export default PlaceDetails = ({ navigation, route }) => {
       <VStack spacing={10}>
         {place.place_areas.length > 0 ? (
           place.place_areas.map((area) => (
-            <Card mode="outlined" key={area.area_name}>
-              <VStack spacing={10} p={20}>
-                <VStack fill spacing={10}>
+            <Card
+              mode="outlined"
+              key={area.area_name}
+            >
+              <VStack
+                spacing={10}
+                p={20}
+              >
+                <VStack
+                  fill
+                  spacing={10}
+                >
                   <Flex>
                     <Text variant="labelSmall">Nombre del área</Text>
                     <Text variant="bodyMedium">{area?.area_name}</Text>
@@ -102,13 +117,12 @@ export default PlaceDetails = ({ navigation, route }) => {
                 </VStack>
                 <Button
                   icon="pencil-outline"
-                  onPress={() => {
+                  onPress={() =>
                     navigation.navigate("EditArea", {
-                      token,
                       area,
                       place_identifier
                     })
-                  }}
+                  }
                 >
                   Editar área
                 </Button>
@@ -116,11 +130,22 @@ export default PlaceDetails = ({ navigation, route }) => {
             </Card>
           ))
         ) : (
-          <VStack center spacing={20} p={30}>
-            <Icon name="pencil-plus-outline" color={theme.colors.onBackground} size={50} />
+          <VStack
+            center
+            spacing={20}
+            p={30}
+          >
+            <Icon
+              name="pencil-plus-outline"
+              color={theme.colors.onBackground}
+              size={50}
+            />
             <VStack center>
               <Text variant="headlineSmall">Sin áreas</Text>
-              <Text variant="bodyMedium" style={{ textAlign: "center" }}>
+              <Text
+                variant="bodyMedium"
+                style={{ textAlign: "center" }}
+              >
                 No hay ningún área registrada, ¿qué te parece si hacemos el primero?
               </Text>
             </VStack>
@@ -128,13 +153,11 @@ export default PlaceDetails = ({ navigation, route }) => {
         )}
         <Button
           icon="plus"
-          onPress={() => {
+          onPress={() =>
             navigation.navigate("AddArea", {
-              token,
-              place,
               place_identifier
             })
-          }}
+          }
         >
           Agregar área
         </Button>
@@ -143,46 +166,45 @@ export default PlaceDetails = ({ navigation, route }) => {
   )
 
   return (
-    <Flex fill pt={headerMargin - 20}>
-      <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={(_) => getPlace()} />}>
-        {place !== undefined ? (
-          place !== null ? (
-            isNaN(place) ? (
-              <DisplayDetails icon="pine-tree" title={place?.place_name} children={[Places(), Areas()]} />
-            ) : (
-              <VStack p={30} center spacing={20}>
-                <Icon color={theme.colors.onBackground} name="alert-circle-outline" size={50} />
-                <VStack center>
-                  <Text variant="headlineSmall">Ocurrió un problema</Text>
-                  <Text variant="bodyMedium" style={{ textAlign: "center" }}>
-                    No podemos recuperar del bosque urbano, inténtalo de nuevo más tarde (Error: {place})
-                  </Text>
-                </VStack>
-                <Flex>
-                  <Button
-                    mode="outlined"
-                    onPress={(_) => {
-                      getPlace()
-                    }}
-                  >
-                    Volver a intentar
-                  </Button>
-                </Flex>
-              </VStack>
-            )
+    <Flex
+      fill
+      pt={headerMargin - 20}
+    >
+      {place !== undefined ? (
+        place !== null ? (
+          isNaN(place) ? (
+            <DisplayDetails
+              icon="bee-flower"
+              image={place?.avatar ?? null}
+              title={place?.place_name}
+              children={[Places(), Areas()]}
+              refreshStatus={loading}
+              refreshAction={() => getPlace()}
+            />
           ) : (
-            <VStack center spacing={20} p={30}>
-              <Icon color={theme.colors.onBackground} name="wifi-alert" size={50} />
+            <VStack
+              p={30}
+              center
+              spacing={20}
+            >
+              <Icon
+                color={theme.colors.onBackground}
+                name="alert-circle-outline"
+                size={50}
+              />
               <VStack center>
-                <Text variant="headlineSmall">Sin internet</Text>
-                <Text variant="bodyMedium" style={{ textAlign: "center" }}>
-                  No podemos recuperar los datos del bosque urbano, revisa tu conexión a internet e inténtalo de nuevo
+                <Text variant="headlineSmall">Ocurrió un problema</Text>
+                <Text
+                  variant="bodyMedium"
+                  style={{ textAlign: "center" }}
+                >
+                  No podemos recuperar del bosque urbano, inténtalo de nuevo más tarde (Error: {place})
                 </Text>
               </VStack>
               <Flex>
                 <Button
                   mode="outlined"
-                  onPress={() => {
+                  onPress={(_) => {
                     getPlace()
                   }}
                 >
@@ -191,21 +213,51 @@ export default PlaceDetails = ({ navigation, route }) => {
               </Flex>
             </VStack>
           )
-        ) : null}
-      </ScrollView>
+        ) : (
+          <VStack
+            center
+            spacing={20}
+            p={30}
+          >
+            <Icon
+              color={theme.colors.onBackground}
+              name="wifi-alert"
+              size={50}
+            />
+            <VStack center>
+              <Text variant="headlineSmall">Sin internet</Text>
+              <Text
+                variant="bodyMedium"
+                style={{ textAlign: "center" }}
+              >
+                No podemos recuperar los datos del bosque urbano, revisa tu conexión a internet e inténtalo de nuevo
+              </Text>
+            </VStack>
+            <Flex>
+              <Button
+                mode="outlined"
+                onPress={() => {
+                  getPlace()
+                }}
+              >
+                Volver a intentar
+              </Button>
+            </Flex>
+          </VStack>
+        )
+      ) : null}
 
-      {!(place === undefined || place === null) ? (
+      {!(place === undefined || place === null) && (
         <FAB
           icon="pencil-outline"
           style={{ position: "absolute", margin: 16, right: 0, bottom: 0 }}
-          onPress={() => {
+          onPress={() =>
             navigation.navigate("EditPlace", {
-              token,
               place
             })
-          }}
+          }
         />
-      ) : null}
+      )}
     </Flex>
   )
 }

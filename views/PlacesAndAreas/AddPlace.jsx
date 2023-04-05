@@ -1,39 +1,42 @@
-import { Flex, VStack } from '@react-native-material/core'
-import { useEffect, useState } from 'react'
-import { Button, Text, TextInput } from 'react-native-paper'
-import Constants from 'expo-constants'
-import CreateForm from '../Shared/CreateForm'
-import ModalMessage from '../Shared/ModalMessage'
+import { Flex, VStack } from "@react-native-material/core"
+import { useContext, useEffect, useState } from "react"
+import { Button, Text, TextInput } from "react-native-paper"
+import Constants from "expo-constants"
+import CreateForm from "../Shared/CreateForm"
+import ModalMessage from "../Shared/ModalMessage"
+import ImageSelector from "../Shared/ImageSelector"
+import ApplicationContext from "../ApplicationContext"
 
 export default AddPlace = ({ navigation, route }) => {
-  const { token } = route.params
+  const { token } = useContext(ApplicationContext)
   const localhost = Constants.expoConfig.extra.API_LOCAL
 
-  const [place_name, setPlace_name] = useState('')
-  const [street, setStreet] = useState('')
-  const [exterior_number, setExterior_number] = useState('')
-  const [colony, setColony] = useState('')
-  const [municipality, setMunicipality] = useState('')
-  const [postal_code, setPostal_code] = useState('')
-  const [phone, setPhone] = useState('')
-  const [reference, setReference] = useState('')
+  const [place_name, setPlace_name] = useState("")
+  const [street, setStreet] = useState("")
+  const [exterior_number, setExterior_number] = useState("")
+  const [colony, setColony] = useState("")
+  const [municipality, setMunicipality] = useState("")
+  const [postal_code, setPostal_code] = useState("")
+  const [phone, setPhone] = useState("")
+  const [reference, setReference] = useState("")
+  const [avatar, setAvatar] = useState(null)
   const [verified, setVerified] = useState(false)
 
   const [modalLoading, setModalLoading] = useState(false)
   const [modalSuccess, setModalSuccess] = useState(false)
   const [modalError, setModalError] = useState(false)
   const [modalFatal, setModalFatal] = useState(false)
-  const [responseCode, setResponseCode] = useState('')
+  const [responseCode, setResponseCode] = useState("")
 
   async function savePlace() {
     setModalLoading(true)
 
     const request = await fetch(`${localhost}/places`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        'Cache-Control': 'no-cache'
+        "Cache-Control": "no-cache"
       },
       body: JSON.stringify({
         place_name: place_name.trim(),
@@ -43,7 +46,8 @@ export default AddPlace = ({ navigation, route }) => {
         municipality: municipality.trim(),
         postal_code: postal_code.trim(),
         phone: phone.trim(),
-        reference: reference.trim()
+        reference: reference.trim(),
+        avatar: avatar
       })
     })
       .then((response) => response.status)
@@ -80,17 +84,95 @@ export default AddPlace = ({ navigation, route }) => {
   }, [place_name, street, exterior_number, colony, municipality, postal_code, phone])
 
   const Data = () => (
-    <VStack key="Data" spacing={5}>
+    <VStack
+      key="Data"
+      spacing={5}
+    >
       <Text variant="labelLarge">Datos del bosque urbano</Text>
       <VStack spacing={10}>
-        <TextInput mode="outlined" value={place_name} onChangeText={setPlace_name} autoCapitalize="words" label="Nombre del bosque urbano" maxLength={50} />
-        <TextInput mode="outlined" value={street} onChangeText={setStreet} label="Nombre de la calle" maxLength={50} />
-        <TextInput mode="outlined" value={exterior_number} onChangeText={setExterior_number} label="Número del domicilio" maxLength={50} keyboardType="number-pad" autoComplete="off" />
-        <TextInput mode="outlined" value={colony} onChangeText={setColony} autoCapitalize="words" label="Nombre de la colonia" maxLength={50} />
-        <TextInput mode="outlined" value={municipality} onChangeText={setMunicipality} autoCapitalize="words" label="Nombre del municipio" maxLength={50} />
-        <TextInput mode="outlined" value={postal_code} onChangeText={setPostal_code} label="Código postal" maxLength={5} keyboardType="number-pad" autoComplete="off" />
-        <TextInput mode="outlined" value={phone} onChangeText={setPhone} label="Número telefónico" maxLength={10} keyboardType="phone-pad" autoComplete="off" />
-        <TextInput mode="outlined" value={reference} onChangeText={setReference} label="Referencia del lugar" maxLength={250} />
+        <TextInput
+          mode="outlined"
+          value={place_name}
+          onChangeText={setPlace_name}
+          autoCapitalize="words"
+          label="Nombre del bosque urbano"
+          maxLength={50}
+        />
+        <TextInput
+          mode="outlined"
+          value={street}
+          onChangeText={setStreet}
+          label="Nombre de la calle"
+          maxLength={50}
+        />
+        <TextInput
+          mode="outlined"
+          value={exterior_number}
+          onChangeText={setExterior_number}
+          label="Número del domicilio"
+          maxLength={50}
+          keyboardType="number-pad"
+          autoComplete="off"
+        />
+        <TextInput
+          mode="outlined"
+          value={colony}
+          onChangeText={setColony}
+          autoCapitalize="words"
+          label="Nombre de la colonia"
+          maxLength={50}
+        />
+        <TextInput
+          mode="outlined"
+          value={municipality}
+          onChangeText={setMunicipality}
+          autoCapitalize="words"
+          label="Nombre del municipio"
+          maxLength={50}
+        />
+        <TextInput
+          mode="outlined"
+          value={postal_code}
+          onChangeText={setPostal_code}
+          label="Código postal"
+          maxLength={5}
+          keyboardType="number-pad"
+          autoComplete="off"
+        />
+        <TextInput
+          mode="outlined"
+          value={phone}
+          onChangeText={setPhone}
+          label="Número telefónico"
+          maxLength={10}
+          keyboardType="phone-pad"
+          autoComplete="off"
+        />
+        <TextInput
+          mode="outlined"
+          value={reference}
+          onChangeText={setReference}
+          label="Referencia del lugar"
+          maxLength={250}
+          multiline={true}
+          numberOfLines={3}
+        />
+      </VStack>
+    </VStack>
+  )
+
+  const ImageData = () => (
+    <VStack
+      key="Image"
+      spacing={5}
+    >
+      <Text variant="labelLarge">Foto del parque</Text>
+      <VStack spacing={10}>
+        <ImageSelector
+          value={avatar}
+          setter={setAvatar}
+          type="rectangular"
+        />
       </VStack>
     </VStack>
   )
@@ -126,13 +208,40 @@ export default AddPlace = ({ navigation, route }) => {
 
   return (
     <Flex fill>
-      <CreateForm title="Añadir nuevo bosque urbano" children={[Data()]} actions={[Save(), Cancel()]} navigation={navigation} loading={modalLoading} />
+      <CreateForm
+        title="Añadir nuevo bosque urbano"
+        children={[Data(), ImageData()]}
+        actions={[Save(), Cancel()]}
+        navigation={navigation}
+        loading={modalLoading}
+      />
 
-      <ModalMessage title="¡Listo!" description="El bosque urbano ha sido añadido exitosamente" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline" />
+      <ModalMessage
+        title="¡Listo!"
+        description="El bosque urbano ha sido añadido exitosamente"
+        handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]}
+        actions={[["Aceptar", () => navigation.pop()]]}
+        dismissable={false}
+        icon="check-circle-outline"
+      />
 
-      <ModalMessage title="Ocurrió un problema" description={`No pudimos añadir el bosque urbano, inténtalo más tarde. (${responseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline" />
+      <ModalMessage
+        title="Ocurrió un problema"
+        description={`No pudimos añadir el bosque urbano, inténtalo más tarde. (${responseCode})`}
+        handler={[modalError, () => setModalError(!modalError)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="close-circle-outline"
+      />
 
-      <ModalMessage title="Sin conexión a internet" description={`Parece que no tienes conexión a internet, conéctate e intenta de nuevo`} handler={[modalFatal, () => setModalFatal(!modalFatal)]} actions={[['Aceptar']]} dismissable={true} icon="wifi-alert" />
+      <ModalMessage
+        title="Sin conexión a internet"
+        description={`Parece que no tienes conexión a internet, conéctate e intenta de nuevo`}
+        handler={[modalFatal, () => setModalFatal(!modalFatal)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="wifi-alert"
+      />
     </Flex>
   )
 }

@@ -1,14 +1,16 @@
-import { Flex, VStack } from '@react-native-material/core'
-import { useEffect, useState } from 'react'
-import { Button, Text, TextInput, useTheme } from 'react-native-paper'
-import Constants from 'expo-constants'
-import CreateForm from '../Shared/CreateForm'
-import ModalMessage from '../Shared/ModalMessage'
+import { Flex, VStack } from "@react-native-material/core"
+import { useContext, useEffect, useState } from "react"
+import { Button, Text, TextInput, useTheme } from "react-native-paper"
+import Constants from "expo-constants"
+import CreateForm from "../Shared/CreateForm"
+import ModalMessage from "../Shared/ModalMessage"
+import ApplicationContext from "../ApplicationContext"
 
 export default EditPlace = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
+  const { token } = useContext(ApplicationContext)
   const theme = useTheme()
-  const { token, place } = route.params
+  const { place } = route.params
 
   const [place_name, setPlace_name] = useState(`${place.place_name}`)
   const [street, setStreet] = useState(`${place.street}`)
@@ -18,6 +20,7 @@ export default EditPlace = ({ navigation, route }) => {
   const [postal_code, setPostal_code] = useState(`${place.postal_code}`)
   const [phone, setPhone] = useState(`${place.phone}`)
   const [reference, setReference] = useState(`${place.reference}`)
+  const [avatar, setAvatar] = useState(place.avatar ?? null)
   const [verified, setVerified] = useState(false)
 
   const [modalConfirm, setModalConfirm] = useState(false)
@@ -27,17 +30,17 @@ export default EditPlace = ({ navigation, route }) => {
   const [modalError, setModalError] = useState(false)
   const [modalErrorDelete, setModalErrorDelete] = useState(false)
   const [modalFatal, setModalFatal] = useState(false)
-  const [responseCode, setResponseCode] = useState('')
+  const [responseCode, setResponseCode] = useState("")
 
   async function savePlace() {
     setModalLoading(true)
 
-    const request = await fetch(`${localhost}/places/${places.place_identifier}`, {
-      method: 'PATCH',
+    const request = await fetch(`${localhost}/places/${place.place_identifier}`, {
+      method: "PATCH",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        'Cache-Control': 'no-cache'
+        "Cache-Control": "no-cache"
       },
       body: JSON.stringify({
         place_name: place_name.trim(),
@@ -47,7 +50,8 @@ export default EditPlace = ({ navigation, route }) => {
         colony: colony.trim(),
         postal_code: postal_code.trim(),
         phone: phone.trim(),
-        reference: reference.trim()
+        reference: reference.trim(),
+        avatar: avatar
       })
     })
       .then((response) => response.status)
@@ -69,17 +73,15 @@ export default EditPlace = ({ navigation, route }) => {
     setModalLoading(true)
 
     const request = await fetch(`${localhost}/places/${places.place_identifier}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        'Cache-Control': 'no-cache'
+        "Cache-Control": "no-cache"
       }
     })
       .then((response) => response.status)
       .catch(() => null)
-
-    console.log(request)
 
     setModalLoading(false)
 
@@ -112,23 +114,102 @@ export default EditPlace = ({ navigation, route }) => {
   }, [place_name, street, exterior_number, colony, municipality, postal_code, phone])
 
   const Data = () => (
-    <VStack key="Data" spacing={5}>
+    <VStack
+      key="Data"
+      spacing={5}
+    >
       <Text variant="labelLarge">Datos del bosque urbano</Text>
       <VStack spacing={10}>
-        <TextInput mode="outlined" value={place_name} onChangeText={setPlace_name} autoCapitalize="words" label="Nombre del bosque urbano" maxLength={50} />
-        <TextInput mode="outlined" value={street} onChangeText={setStreet} label="Nombre de la calle" maxLength={50} />
-        <TextInput mode="outlined" value={exterior_number} onChangeText={setExterior_number} label="Número del domicilio" maxLength={50} keyboardType="number-pad" autoComplete="off" />
-        <TextInput mode="outlined" value={colony} onChangeText={setColony} autoCapitalize="words" label="Nombre de la colonia" maxLength={50} />
-        <TextInput mode="outlined" value={municipality} onChangeText={setMunicipality} autoCapitalize="words" label="Nombre del municipio" maxLength={50} />
-        <TextInput mode="outlined" value={postal_code} onChangeText={setPostal_code} label="Código postal" maxLength={5} keyboardType="number-pad" autoComplete="off" />
-        <TextInput mode="outlined" value={phone} onChangeText={setPhone} label="Número telefónico" maxLength={10} keyboardType="phone-pad" autoComplete="off" />
-        <TextInput mode="outlined" value={reference} onChangeText={setReference} label="Referencia del lugar" maxLength={250} />
+        <TextInput
+          mode="outlined"
+          value={place_name}
+          onChangeText={setPlace_name}
+          autoCapitalize="words"
+          label="Nombre del bosque urbano"
+          maxLength={50}
+        />
+        <TextInput
+          mode="outlined"
+          value={street}
+          onChangeText={setStreet}
+          label="Nombre de la calle"
+          maxLength={50}
+        />
+        <TextInput
+          mode="outlined"
+          value={exterior_number}
+          onChangeText={setExterior_number}
+          label="Número del domicilio"
+          maxLength={50}
+          keyboardType="number-pad"
+          autoComplete="off"
+        />
+        <TextInput
+          mode="outlined"
+          value={colony}
+          onChangeText={setColony}
+          autoCapitalize="words"
+          label="Nombre de la colonia"
+          maxLength={50}
+        />
+        <TextInput
+          mode="outlined"
+          value={municipality}
+          onChangeText={setMunicipality}
+          autoCapitalize="words"
+          label="Nombre del municipio"
+          maxLength={50}
+        />
+        <TextInput
+          mode="outlined"
+          value={postal_code}
+          onChangeText={setPostal_code}
+          label="Código postal"
+          maxLength={5}
+          keyboardType="number-pad"
+          autoComplete="off"
+        />
+        <TextInput
+          mode="outlined"
+          value={phone}
+          onChangeText={setPhone}
+          label="Número telefónico"
+          maxLength={10}
+          keyboardType="phone-pad"
+          autoComplete="off"
+        />
+        <TextInput
+          mode="outlined"
+          value={reference}
+          onChangeText={setReference}
+          label="Referencia del lugar"
+          maxLength={250}
+        />
+      </VStack>
+    </VStack>
+  )
+
+  const ImageData = () => (
+    <VStack
+      key="Image"
+      spacing={5}
+    >
+      <Text variant="labelLarge">Foto del parque</Text>
+      <VStack spacing={10}>
+        <ImageSelector
+          value={avatar}
+          setter={setAvatar}
+          type="rectangular"
+        />
       </VStack>
     </VStack>
   )
 
   const Delete = () => (
-    <VStack key="Delete" spacing={5}>
+    <VStack
+      key="Delete"
+      spacing={5}
+    >
       <Text variant="labelLarge">Eliminar bosque urbano</Text>
       <VStack spacing={10}>
         <Button
@@ -147,7 +228,7 @@ export default EditPlace = ({ navigation, route }) => {
 
   const Save = () => (
     <Button
-    key="SaveButton"
+      key="SaveButton"
       icon="content-save-outline"
       disabled={modalLoading || !verified}
       loading={modalLoading}
@@ -162,7 +243,7 @@ export default EditPlace = ({ navigation, route }) => {
 
   const Cancel = () => (
     <Button
-    key="CancelButton"
+      key="CancelButton"
       icon="close"
       disabled={modalLoading}
       mode="outlined"
@@ -176,16 +257,22 @@ export default EditPlace = ({ navigation, route }) => {
 
   return (
     <Flex fill>
-      <CreateForm title="Editar bosque urbano" children={[Data(), Delete()]} actions={[Save(), Cancel()]} navigation={navigation} loading={modalLoading} />
+      <CreateForm
+        title="Editar bosque urbano"
+        children={[Data(), ImageData(), Delete()]}
+        actions={[Save(), Cancel()]}
+        navigation={navigation}
+        loading={modalLoading}
+      />
 
       <ModalMessage
         title="Eliminar bosque urbano"
         description="¿Seguro que deseas eliminar este lugar? La acción no se podrá deshacer"
         handler={[modalConfirm, () => setModalConfirm(!modalConfirm)]}
         actions={[
-          ['Cancelar', () => setModalConfirm(!modalConfirm)],
+          ["Cancelar", () => setModalConfirm(!modalConfirm)],
           [
-            'Aceptar',
+            "Aceptar",
             () => {
               setModalConfirm(!modalConfirm), deletePlace()
             }
@@ -195,15 +282,50 @@ export default EditPlace = ({ navigation, route }) => {
         icon="help-circle-outline"
       />
 
-      <ModalMessage title="¡Listo!" description="El lugar ha sido actualizado" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[['Aceptar', () => navigation.pop()]]} dismissable={false} icon="check-circle-outline" />
+      <ModalMessage
+        title="¡Listo!"
+        description="El lugar ha sido actualizado"
+        handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]}
+        actions={[["Aceptar", () => navigation.pop()]]}
+        dismissable={false}
+        icon="check-circle-outline"
+      />
 
-      <ModalMessage title="¡Listo!" description="El lugar ha sido eliminado" handler={[modalSuccessDelete, () => setModalSuccessDelete(!modalSuccessDelete)]} actions={[['Aceptar', () => navigation.pop(2)]]} dismissable={false} icon="check-circle-outline" />
+      <ModalMessage
+        title="¡Listo!"
+        description="El lugar ha sido eliminado"
+        handler={[modalSuccessDelete, () => setModalSuccessDelete(!modalSuccessDelete)]}
+        actions={[["Aceptar", () => navigation.pop(2)]]}
+        dismissable={false}
+        icon="check-circle-outline"
+      />
 
-      <ModalMessage title="Ocurrió un problema" description={`No pudimos actualizar el lugar, inténtalo más tarde (${responseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline" />
+      <ModalMessage
+        title="Ocurrió un problema"
+        description={`No pudimos actualizar el lugar, inténtalo más tarde (${responseCode})`}
+        handler={[modalError, () => setModalError(!modalError)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="close-circle-outline"
+      />
 
-      <ModalMessage title="Ocurrió un problema" description={`No pudimos eliminar el lugar, inténtalo más tarde (${responseCode})`} handler={[modalErrorDelete, () => setModalErrorDelete(!modalErrorDelete)]} actions={[['Aceptar']]} dismissable={true} icon="close-circle-outline" />
+      <ModalMessage
+        title="Ocurrió un problema"
+        description={`No pudimos eliminar el lugar, inténtalo más tarde (${responseCode})`}
+        handler={[modalErrorDelete, () => setModalErrorDelete(!modalErrorDelete)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="close-circle-outline"
+      />
 
-      <ModalMessage title="Sin conexión a internet" description={`Parece que no tienes conexión a internet, conéctate e intenta de nuevo`} handler={[modalFatal, () => setModalFatal(!modalFatal)]} actions={[['Aceptar']]} dismissable={true} icon="wifi-alert" />
+      <ModalMessage
+        title="Sin conexión a internet"
+        description={`Parece que no tienes conexión a internet, conéctate e intenta de nuevo`}
+        handler={[modalFatal, () => setModalFatal(!modalFatal)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="wifi-alert"
+      />
     </Flex>
   )
 }
