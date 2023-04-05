@@ -233,7 +233,6 @@ export default Users = ({ navigation, route }) => {
         <Flex
           ph={20}
           pv={5}
-          onPress={() => {}}
         >
           <Pressable
             onPress={() => {
