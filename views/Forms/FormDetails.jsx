@@ -23,7 +23,7 @@ export default FormDetails = ({ navigation, route }) => {
   async function getForm() {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/forms/${form_identifier}`, {
+    const request = await fetch(`${localhost}/forms/0101JEfyHr?isTemplate=${isTemplate}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -31,11 +31,11 @@ export default FormDetails = ({ navigation, route }) => {
         'Cache-Control': 'no-cache'
       }
     })
-    //.then((response) => (response.ok ? response.json() : response.status))
-    //.catch((_) => null)
+    .then((response) => (response.ok ? response.json() : response.status))
+    .catch((_) => null)
 
-    const json = await request.json()
-    console.log(json)
+    //const json = await request.json()
+    //console.log("String: " + json)
 
     setLoading(false)
 
@@ -61,7 +61,7 @@ export default FormDetails = ({ navigation, route }) => {
       return () => {}
     }, [])
   )
-/*
+
   const Details = () => (
     <Card key="Details" mode="outlined">
       <VStack p={20} spacing={5}>
@@ -101,7 +101,7 @@ export default FormDetails = ({ navigation, route }) => {
     </Card>
   )
 
-  const Questions = () => (
+  /*const Questions = () => (
     <Flex key="Preguntas">
       <VStack p={10} spacing={10}>
         {form.questions.length > 0 ? (
@@ -124,7 +124,7 @@ export default FormDetails = ({ navigation, route }) => {
         {form !== undefined ? (
           form !== null ? (
             isNaN(form) ? (
-              <DisplayDetails icon="form-select" title={form?.name} children={[Details(), Questions()]} />
+              <DisplayDetails icon="form-select" title={form?.name} children={[Details()]} />
             ) : (
               <VStack p={30} center spacing={20}>
                 <Icon color={theme.colors.onBackground} name="alert-circle-outline" size={50} />

@@ -23,13 +23,14 @@ export default Forms = ({ navigation, route }) => {
   const [showSearch, setShowSearch] = useState(null)
   const [search, setSearch] = useState('')
   const [foundForms, setFoundForms] = useState(undefined)
+  const [isTemplate, setIsTemplate] = useState(false)
 
   const [placesOptions, setPlacesOptions] = useState()
 
   async function getForms() {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/forms`, {
+    const request = await fetch(`${localhost}/forms?isTemplate=${isTemplate}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
