@@ -391,7 +391,7 @@ export default EditUser = ({ navigation, route }) => {
             />
           </Flex>
         ) : null}
-        {user?.role == "Encargado" ? (
+        {user?.role == "Encargado" || user.role == "Encargado" ? (
           <Flex fill>
             <Dropdown
               title="Tipo de prestador"
@@ -445,7 +445,7 @@ export default EditUser = ({ navigation, route }) => {
             </HStack>
           ) : null
         ) : null}
-        {role == "Prestador" ? (
+        {role == "Prestador" || user.role == "Encargado" ? (
           <Flex>
             <Dropdown
               value={school}
@@ -455,7 +455,7 @@ export default EditUser = ({ navigation, route }) => {
             />
           </Flex>
         ) : null}
-        {role == "Prestador" ? (
+        {role == "Prestador" || user.role == "Encargado" ? (
           <TextInput
             mode="outlined"
             value={total_hours}

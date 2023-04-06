@@ -73,7 +73,7 @@ export default TakeAttendance = ({ navigation, route }) => {
     })
   }, [])
 
-  const Attendee = useCallback(({ register }) => {
+  const Attendee = useCallback(({ attendance, register }) => {
     const [attendee, setAttendee] = useState(undefined)
 
     const requestAttendee = async () => {
@@ -120,6 +120,14 @@ export default TakeAttendance = ({ navigation, route }) => {
                 <Text variant="bodySmall">
                   {attendee?.role} {attendee?.role == "Prestador" && attendee?.provider_type}
                 </Text>
+                {/* <Button mode="text">Editar asistencia</Button> */}
+              </Flex>
+              <Flex pr={10}>
+                <IconButton
+                  mode="outlined"
+                  icon="pencil-outline"
+                  onPress={() => navigation.navigate("EditAttendance", { attendance, event_identifier })}
+                />
               </Flex>
             </HStack>
           ) : (
@@ -169,6 +177,7 @@ export default TakeAttendance = ({ navigation, route }) => {
                 <Attendee
                   key={item.attendee_register}
                   register={item.attendee_register}
+                  attendance={item}
                 />
               )}
             />
