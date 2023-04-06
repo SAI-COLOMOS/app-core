@@ -1,7 +1,7 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useEffect, useState, useCallback, useContext } from "react"
 import { useHeaderHeight } from "@react-navigation/elements"
-import { Text, Card, Button, FAB, useTheme, Avatar, IconButton } from "react-native-paper"
+import { Text, Card, Button, FAB, useTheme, Avatar, IconButton, TouchableRipple } from "react-native-paper"
 import Header from "../Shared/Header"
 import Constants from "expo-constants"
 import DisplayDetails from "../Shared/DisplayDetails"
@@ -216,7 +216,7 @@ export default EventDetails = ({ navigation, route }) => {
       mode="outlined"
     >
       <Flex p={20}>
-        <Text variant="bodyLarge">Personas inscritas</Text>
+        <Text variant="bodyLarge">Lista de participantes</Text>
       </Flex>
       <VStack
         spacing={10}
@@ -225,7 +225,10 @@ export default EventDetails = ({ navigation, route }) => {
         {event?.attendance.attendee_list.length > 0 ? (
           event.attendance.attendee_list.map((item) => (
             <Flex key={item.attendee_register}>
-              <Attendee register={item.attendee_register} />
+              <Attendee
+                register={item.attendee_register}
+                attendance={item}
+              />
             </Flex>
           ))
         ) : (
@@ -257,7 +260,7 @@ export default EventDetails = ({ navigation, route }) => {
         {event?.author_register == user.register ? (
           <Button
             mode="contained"
-            onPress={() => navigation.navigate("TakeAttendance", { event_identifier: event?.event_identifier })}
+            onPress={() => navigation.navigate("ScanAttendance", { attendeeList: event?.attendance.attendee_list })}
           >
             Registrar asistencia
           </Button>
@@ -307,7 +310,7 @@ export default EventDetails = ({ navigation, route }) => {
 
   /* Componentes de componentes */
 
-  const Attendee = useCallback(({ register }) => {
+  const Attendee = useCallback(({ attendance, register }) => {
     const [attendee, setAttendee] = useState(undefined)
 
     const requestAttendee = async () => {
@@ -330,44 +333,51 @@ export default EventDetails = ({ navigation, route }) => {
 
     if (attendee !== null) {
       return (
-        <HStack
-          spacing={10}
-          ph={20}
-          items="center"
+        <Flex
+          mh={20}
+          style={{ borderRadius: 10, overflow: "hidden" }}
         >
-          <Flex>
-            <ProfileImage
-              image={attendee?.avatar}
-              width={50}
-              height={50}
-            />
-          </Flex>
-          <VStack fill>
-            <Text
-              variant="bodyMedium"
-              numberOfLines={1}
+          <TouchableRipple onPress={() => navigation.navigate("EditAttendance", { attendance, event_identifier })}>
+            <HStack
+              spacing={10}
+              // mh={20}
+              //items="center"
             >
-              {attendee?.first_name} {attendee?.first_last_name} {attendee?.second_last_name ?? null}
-            </Text>
-            <Text
-              variant="bodySmall"
-              numberOfLines={1}
-            >
-              {attendee?.register}
-            </Text>
-            <Text
-              variant="bodySmall"
-              numberOfLines={1}
-            >
-              {attendee?.role}
-            </Text>
-          </VStack>
-          <IconButton
-            icon="delete"
+              <Flex>
+                <ProfileImage
+                  image={attendee?.avatar}
+                  width={50}
+                  height={50}
+                />
+              </Flex>
+              <VStack fill>
+                <Text
+                  variant="bodyMedium"
+                  numberOfLines={1}
+                >
+                  {attendee?.first_name} {attendee?.first_last_name} {attendee?.second_last_name ?? null}
+                </Text>
+                <Text
+                  variant="bodySmall"
+                  numberOfLines={1}
+                >
+                  {attendee?.register}
+                </Text>
+                <Text
+                  variant="bodyMedium"
+                  numberOfLines={1}
+                >
+                  {attendance?.status}
+                </Text>
+              </VStack>
+              {/* <IconButton
+            icon="pencil-outline"
             mode="outlined"
-            iconColor={theme.colors.error}
-          />
-        </HStack>
+            onPress={() => navigation.navigate("EditAttendance", { attendance, event_identifier })}
+          /> */}
+            </HStack>
+          </TouchableRipple>
+        </Flex>
       )
     } else {
       return (

@@ -210,7 +210,7 @@ export default EditSchool = ({ navigation, route }) => {
   return (
     <Flex fill>
       <CreateForm
-        title="Editar escuela"
+        title="Editar asistencia"
         children={[Data(), Delete()]}
         actions={[Save(), Cancel()]}
         navigation={navigation}

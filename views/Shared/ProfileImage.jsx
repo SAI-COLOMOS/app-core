@@ -3,7 +3,7 @@ import { Image } from "react-native"
 import { useTheme } from "react-native-paper"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 
-export default ProfileImage = ({ image, height, width }) => {
+export default ProfileImage = ({ image, icon, height, width }) => {
   const theme = useTheme()
 
   return (
@@ -21,7 +21,7 @@ export default ProfileImage = ({ image, height, width }) => {
         />
       ) : (
         <Icon
-          name="account"
+          name={icon ?? "alert"}
           color={theme.colors.onPrimary}
           size={50}
         />

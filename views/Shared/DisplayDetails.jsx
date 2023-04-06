@@ -93,6 +93,7 @@ export default SchoolDetails = ({ icon, image, title, children, actions, avatar,
               {image == undefined && (
                 <ProfileImage
                   image={avatar}
+                  icon={icon}
                   width={150}
                   height={150}
                 />
