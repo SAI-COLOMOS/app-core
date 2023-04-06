@@ -391,7 +391,7 @@ export default EditUser = ({ navigation, route }) => {
             />
           </Flex>
         ) : null}
-        {user?.role == "Encargado" ? (
+        {user?.role == "Encargado" || user.role == "Encargado" ? (
           <Flex fill>
             <Dropdown
               title="Tipo de prestador"
