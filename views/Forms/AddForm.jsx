@@ -1,15 +1,16 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useContext } from "react"
 import { Button, Text, TextInput, useTheme } from "react-native-paper"
 import CreateForm from "../Shared/CreateForm"
 import Constants from "expo-constants"
 import ModalMessage from "../Shared/ModalMessage"
 import Dropdown from "../Shared/Dropdown"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
+import ApplicationContext from "../ApplicationContext"
 
 export default AddForm = ({ navigation, route }) => {
   const theme = useTheme()
-  const { token } = route.params
+  const { user, token } = useContext(ApplicationContext)
   const localhost = Constants.expoConfig.extra.API_LOCAL
 
   const [name, setName] = useState("")
@@ -18,15 +19,27 @@ export default AddForm = ({ navigation, route }) => {
   const [belonging_place, setBelonging_place] = useState("")
   const [belonging_event_identifier, setBelonging_event_identifier] = useState("")
   const [version, setVersion] = useState("")
-  const [question, setQuestion] = useState("")
-  const [type, setType] = useState("")
-  const [question_options, setQuestion_options] = useState([])
-  const [questions, setQuestions] = useState([])
-  const [interrogation, setInterrogation] = useState("")
-  const [enum_options, setEnum_options] = useState("")
+  // const [newQuestion, setNewQuestion] = useState("")
+  // const [type, setType] = useState("")
+  // const [question_options, setQuestion_options] = useState([])
+  const [questions, setQuestions] = useState([
+    {
+      interrogation: "¿Que te pareció el evento",
+      question_type: "Abierta",
+      enum_options: []
+    },
+    {
+      interrogation: "¿En serio?",
+      question_type: "Numérica",
+      enum_options: []
+    }
+  ])
+  const [inter, setInter] = useState("")
+  const [enumOp, setEnumOp] = useState([""])
+  // const [quesType, setQuesType] = useState("")
   const [isTemplate, setIsTemplate] = useState(false)
-  const [abierta, setAbierta] = useState("")
-  const [respuesta, setRespuesta] = useState("")
+  // const [abierta, setAbierta] = useState("")
+  // const [respuesta, setRespuesta] = useState("")
 
   const QuestionType = [
     {
@@ -46,7 +59,9 @@ export default AddForm = ({ navigation, route }) => {
     }
   ]
 
-  // console.log(questions[0])
+  // console.log(questions)
+
+  // questions.push("¿Pregunta añadida?")
 
   const [modalSuccess, setModalSuccess] = useState(false)
   const [modalLoading, setModalLoading] = useState(false)
@@ -69,11 +84,11 @@ export default AddForm = ({ navigation, route }) => {
         belonging_place: belonging_place.trim(),
         belonging_event_identifier: belonging_event_identifier.trim(),
         version: Number(version),
-        // questions: Array(questions),
-        isTemplate: isTemplate
+        questions: Array(questions),
+        isTemplate
       })
     })
-      .then((response) => /*response.json()*/ response.status)
+      .then((response) => response.json() /*response.status*/)
       .catch((error) => console.error("Error: ", error))
 
     console.log(request)
@@ -95,7 +110,10 @@ export default AddForm = ({ navigation, route }) => {
         spacing={5}
       >
         <Text variant="labelLarge">Datos del formulario</Text>
-        <VStack spacing={10}>
+        <VStack
+          key="FormData"
+          spacing={10}
+        >
           <TextInput
             mode="outlined"
             value={name}
@@ -128,8 +146,8 @@ export default AddForm = ({ navigation, route }) => {
             mode="outlined"
             value={belonging_area}
             onChangeText={setBeging_area}
-            label="Área de origen"
             maxLength={150}
+            label="Área de origen"
           />
           <TextInput
             mode="outlined"
@@ -137,40 +155,32 @@ export default AddForm = ({ navigation, route }) => {
             onChangeText={setBelonging_event_identifier}
             label="Identificador de evento de origen"
             maxLength={150}
-            autoCapitalize="words"
+            autoCapitalize="characters"
           />
           <TextInput
             mode="outlined"
             value={version}
             onChangeText={setVersion}
             label="Versión"
-            keyboardType="number-pad"
+            // keyboardType="number-pad"
             maxLength={3}
             autoComplete="off"
           />
-          {/* <Dropdown
-            title="Tipo de pregunta"
-            options={QuestionType}
-            value={questions}
-            selected={setQuestions}
-            // {...(questions.length > 0 && questions.map((question) => <Item question={question}></Item>))}
-          /> */}
-          {/* <Button
-            mode="outlined"
-            icon="plus"
-            onPress={() => {
-              AddQuestion()
-              // questions.length > 0 &&
-              // questions.map((question, index) => (
-              //   <Item
-              //     question={question}
-              //     index={index}
-              //   ></Item>
-              // ))
-            }}
-          >
-            Agregar pregunta
-          </Button> */}
+          <Text variant="labelLarge">Preguntas</Text>
+
+          {questions != 0
+            ? questions.map((question, questionIndex, questions, setQuestions) => (
+                // console.log("question: ", question),
+                // console.log("questions: ", questions),
+                <Item
+                  // key="ItemMap"
+                  indexQuestion={questionIndex}
+                  question={question}
+                  questions={questions}
+                  setQuestions={setQuestions}
+                />
+              ))
+            : null}
         </VStack>
       </VStack>
     )
@@ -204,93 +214,118 @@ export default AddForm = ({ navigation, route }) => {
     </Button>
   )
 
-  const AddQuestion = () => {
+  const AddQuestion = (questions, question, setQuestions, newQuestion, quesType) => {
+    const defaultQuestion = {
+      interrogation: newQuestion,
+      question_type: quesType,
+      enum_options: ["Sí", "No"]
+    }
+    // console.log(questions.length)
+    const mutatedQuestions = [question]
+    mutatedQuestions.push(defaultQuestion)
+    setQuestions([...mutatedQuestions])
+    console.log(question)
+  }
+
+  const ChangeQuestion = (questions, setNewQuestion, indexQuestion, newQuestion) => {
+    const mutatedChangeQuestion = questions
+    mutatedChangeQuestion[indexQuestion].interrogation = newQuestion
+    setQuestions([...mutatedChangeQuestion])
+  }
+
+  const Item = ({ indexQuestion, question, questions, setQuestions }) => {
+    const [newQuestion, setNewQuestion] = useState()
+    const [quesType, setQuesType] = useState()
+
     return (
       <VStack
+        key="Question"
         spacing={5}
-        key="addQuestion"
       >
-        <Text variant="labelLarge">Preguntas</Text>
+        {/* <Text>Pregunta: {question.interrogation}</Text>
+        <Text>Tipo de pregunta: {question.question_type}</Text> */}
         <TextInput
           mode="outlined"
-          value={question}
-          onChangeText={setQuestion}
-          label="Pregunta"
+          value={newQuestion}
+          onChangeText={setNewQuestion}
+          label="Nueva Pregunta"
+          autoComplete="off"
+        />
+        {/* <TextInput
+          mode="outlined"
+          value={quesType}
+          onChangeText={setQuesType}
+          label="Tipo de Pregunta"
           autoComplete="off"
           autoCapitalize="sentences"
-        />
+        /> */}
         <Dropdown
           title="Tipo de pregunta"
           options={QuestionType}
-          value={type}
-          selected={setType}
+          value={quesType}
+          selected={setQuesType}
         />
-        {type == "Opción múltiple" || type == "Selección múltiple" || type == "Escala" ? CountOptions() : null}
+        {quesType == "Opción múltiple" || quesType == "Selección múltiple" || quesType == "Escala" ? (
+          <TextInput
+            mode="outlined"
+            value={question.enum_options}
+            onChangeText={setQuestions}
+            label="Respuestas"
+            autoComplete="off"
+          />
+        ) : null}
         <VStack
+          key="Button"
           pt={10}
+          pb={10}
           spacing={5}
         >
           <Button
-            mode="outlined"
+            key="SaveButton"
+            mode="contained"
             icon="plus"
             onPress={() => {
-              AddQuestion()
-              // questions.length > 0 &&
-              // questions.map((question, index) => (
-              //   <Item
-              //     question={question}
-              //     index={index}
-              //   ></Item>
-              // ))
+              AddQuestion(questions, setQuestions, quesType, newQuestion)
             }}
           >
-            Agregar pregunta
+            Agregar al formulario
           </Button>
+          {/* <Button
+            key="ChangeButton"
+            mode="contained"
+            icon="plus"
+            onPress={() => {
+              ChangeQuestion(questions, setQuestions, newQuestion, indexQuestion)
+            }}
+          >
+            Cambiar pregunta
+          </Button> */}
         </VStack>
+        {/* {NewQuestion()} */}
       </VStack>
     )
-    setQuestions([
-      ...questions,
-      {
-        interrogation: question,
-        question_type: type,
-        enum_options: question_options
-      }
-    ])
   }
 
-  const CountOptions = () => {
-    return (
-      <VStack
-        pt={5}
-        spacing={5}
-        key="opt"
-      >
-        <TextInput
-          mode="outlined"
-          value={question_options}
-          onChangeText={setQuestion_options}
-          label="Respuestas"
-          autoComplete="off"
-        />
-        ,
-        <Button
-          onPress={() => {
-            CountOptions()
-          }}
-        >
-          Agregar otra respuesta
-        </Button>
-      </VStack>
-    )
-  }
-  const Item = ({ index, question }) => console.log("Entra")
+  const NewQuestion = (question, setQuestion) => (
+    <Button
+      key="SaveButton"
+      mode="contained"
+      icon="plus"
+      onPress={() => {
+        AddQuestion(question, setQuestion)
+      }}
+    >
+      Agregar pregunta
+    </Button>
+  )
+
+  // const EraseQuestion = () => <Button>Eliminar pregunta</Button>
 
   return (
     <Flex fill>
       <CreateForm
         title="Añadir nuevo formulario"
-        children={[FormData(), AddQuestion()]}
+        children={[FormData()]}
         actions={[Save(), Cancel()]}
         navigation={navigation}
       />
