@@ -12,9 +12,11 @@ import Animated, { interpolate, useAnimatedScrollHandler, useAnimatedStyle, useS
 import InformationMessage from "../Shared/InformationMessage"
 import { GetCompactMonth, GetDay, ShortDate, Time24 } from "../Shared/LocaleDate"
 import ApplicationContext from "../ApplicationContext"
+import CacheContext from "../Contexts/CacheContext"
 
 export default Dashboard = ({ navigation }) => {
   const userContext = useContext(ApplicationContext)
+  const cache = useContext(CacheContext)
   const { user, setUser, token, setToken, register, setRegister, achieved_hours, setAchieved_hours } = useContext(ApplicationContext)
   const insets = useSafeAreaInsets()
   const theme = useTheme()
@@ -76,35 +78,8 @@ export default Dashboard = ({ navigation }) => {
 
   useEffect(() => {
     fetchData()
+    console.log(cache)
   }, [])
-
-  // useEffect(() => {
-  //   const getToken = async (_) => {
-  //     const token = await SecureStore.getItemAsync("token")
-  //     token ? setToken(token) : setToken(undefined)
-  //   }
-
-  //   if (token == undefined) {
-  //     getToken()
-  //   }
-  // }, [token])
-
-  // useEffect(() => {
-  //   const getRegister = async (_) => {
-  //     const register = await SecureStore.getItemAsync("register")
-  //     register ? setRegister(register) : setRegister(undefined)
-  //   }
-
-  //   if (register == undefined) {
-  //     getRegister()
-  //   }
-  // }, [register])
-
-  // useEffect(() => {
-  //   if (token !== undefined && register !== undefined) {
-  //     fetchData()
-  //   }
-  // }, [token, register])
 
   useFocusEffect(
     useCallback(() => {

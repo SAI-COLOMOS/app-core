@@ -7,6 +7,7 @@ import { useFonts } from "expo-font";
 import * as Linking from 'expo-linking';
 import * as SplashScreen from 'expo-splash-screen';
 import Navigation from "./views/Navigation";
+import { LogBox } from "react-native";
 
 import { darkTheme, lightTheme } from "./assets/themes/themeGreen";
 
@@ -18,6 +19,7 @@ export default function App() {
     const recovery = useRef()
     let dth = darkTheme
     let lth = lightTheme
+    LogBox.ignoreLogs([ 'Non-serializable values were found in the navigation state', ]);
     
     const [fontsLoaded] = useFonts({
         'Lexend-Deca': require('./assets/fonts/LexendDeca.ttf')

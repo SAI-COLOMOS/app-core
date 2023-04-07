@@ -2,7 +2,7 @@ import { createContext, useState } from "react"
 
 const ApplicationContext = createContext()
 
-const ContextProvider = ({ children }) => {
+const ApplicationProvider = ({ children }) => {
   const [register, setRegister] = useState(null)
   const [user, setUser] = useState(null)
   const [token, setToken] = useState(null)
@@ -11,5 +11,5 @@ const ContextProvider = ({ children }) => {
   return <ApplicationContext.Provider value={{ register, setRegister, user, setUser, token, setToken, achieved_hours, setAchieved_hours }}>{children}</ApplicationContext.Provider>
 }
 
-export { ContextProvider }
+export { ApplicationProvider }
 export default ApplicationContext

@@ -19,7 +19,12 @@ export default Profile = ({ navigation, route }) => {
 
   useEffect(() => {
     navigation.setOptions({
-      header: (props) => <Header {...props} children={[<Logout key="Logout" />]} />,
+      header: (props) => (
+        <Header
+          {...props}
+          children={[<Logout key="Logout" />]}
+        />
+      ),
       headerTransparent: true,
       headerTitle: "Tu perfil"
     })
@@ -39,8 +44,14 @@ export default Profile = ({ navigation, route }) => {
   )
 
   const PersonalData = () => (
-    <Card key="Personal" mode="outlined">
-      <VStack p={20} spacing={5}>
+    <Card
+      key="Personal"
+      mode="outlined"
+    >
+      <VStack
+        p={20}
+        spacing={5}
+      >
         <Text variant="bodyLarge">Datos personales</Text>
         <VStack spacing={10}>
           <Flex>
@@ -70,8 +81,14 @@ export default Profile = ({ navigation, route }) => {
   )
 
   const ContactData = () => (
-    <Card key="Contact" mode="outlined">
-      <VStack p={20} spacing={5}>
+    <Card
+      key="Contact"
+      mode="outlined"
+    >
+      <VStack
+        p={20}
+        spacing={5}
+      >
         <Text variant="bodyLarge">Datos de contacto</Text>
         <VStack spacing={10}>
           <Flex>
@@ -89,8 +106,14 @@ export default Profile = ({ navigation, route }) => {
   )
 
   const EmergencyData = () => (
-    <Card key="Emergency" mode="outlined">
-      <VStack p={20} spacing={5}>
+    <Card
+      key="Emergency"
+      mode="outlined"
+    >
+      <VStack
+        p={20}
+        spacing={5}
+      >
         <Text variant="bodyLarge">Datos de emergencia</Text>
         <VStack spacing={10}>
           <Flex>
@@ -108,8 +131,14 @@ export default Profile = ({ navigation, route }) => {
   )
 
   const AccountData = () => (
-    <Card key="Account" mode="outlined">
-      <VStack p={20} spacing={5}>
+    <Card
+      key="Account"
+      mode="outlined"
+    >
+      <VStack
+        p={20}
+        spacing={5}
+      >
         <Text variant="bodyLarge">Datos de la cuenta</Text>
         <VStack spacing={10}>
           <Flex>
@@ -161,8 +190,17 @@ export default Profile = ({ navigation, route }) => {
   )
 
   return (
-    <Flex fill mt={headerMargin - 20}>
-      <DisplayDetails icon="account-circle-outline" photo={user?.avatar} title={`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name ?? ""}`} children={[PersonalData(), ContactData(), EmergencyData(), AccountData()]} actions={[UpdatePassword()]} />
+    <Flex
+      fill
+      mt={headerMargin - 20}
+    >
+      <DisplayDetails
+        icon="account-circle-outline"
+        avatar={user?.avatar}
+        title={`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name ?? ""}`}
+        children={[PersonalData(), ContactData(), EmergencyData(), AccountData()]}
+        actions={[UpdatePassword()]}
+      />
     </Flex>
   )
 }

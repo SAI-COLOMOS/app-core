@@ -23,13 +23,14 @@ export default Forms = ({ navigation, route }) => {
   const [showSearch, setShowSearch] = useState(null)
   const [search, setSearch] = useState('')
   const [foundForms, setFoundForms] = useState(undefined)
+  const [isTemplate, setIsTemplate] = useState(false)
 
   const [placesOptions, setPlacesOptions] = useState()
 
   async function getForms() {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/forms`, {
+    const request = await fetch(`${localhost}/forms?isTemplate=${isTemplate}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -101,7 +102,7 @@ export default Forms = ({ navigation, route }) => {
         <Card mode="outlined" style={{ overflow: 'hidden' }}>
           <TouchableRipple
             onPress={() => {
-              navigation.navigate('SchoolDetails', { token, form_identifier })
+              navigation.navigate('FormDetails', { token, form_identifier })
             }}
           >
             <Flex p={10}>
@@ -142,7 +143,7 @@ export default Forms = ({ navigation, route }) => {
                 }
                 refreshing={loading}
                 onRefresh={() => getForms()}
-                renderItem={({ item }) => <Item key={item.name} form_name={item.name} description={item.description} form_identifier={item.form_identifier} />}
+                renderItem={({ item }) => <Item key={item.form_identifier} form_name={item.name} description={item.description} form_identifier={item.form_identifier} />}
               />
 
               <FAB
@@ -185,7 +186,7 @@ export default Forms = ({ navigation, route }) => {
       ) : foundForms !== null ? (
         foundForms?.length >= 0 || foundForms === undefined ? (
           <Flex fill>
-            <FlatList data={foundForms} ListEmptyComponent={() => (foundForms === undefined ? null : <InformationMessage icon="magnify" title="Sin resultados" description="No hay ningún formulario registrado que cumpla con los parámetros de tu búsqueda" />)} refreshing={loading} onRefresh={() => searchForms()} renderItem={({ item }) => <Item key={item.form_name} form_name={item.form_name} description={item.description} form_identifier={item.form_identifier} />} />
+            <FlatList data={foundForms} ListEmptyComponent={() => (foundForms === undefined ? null : <InformationMessage icon="magnify" title="Sin resultados" description="No hay ningún formulario registrado que cumpla con los parámetros de tu búsqueda" />)} refreshing={loading} onRefresh={() => searchForms()} renderItem={({ item }) => <Item key={item.form_identifier} form_name={item.name} description={item.description} form_identifier={item.form_identifier} />} />
           </Flex>
         ) : (
           <InformationMessage

@@ -12,15 +12,17 @@ import Dropdown from "../Shared/Dropdown"
 import InformationMessage from "../Shared/InformationMessage"
 import ApplicationContext from "../ApplicationContext"
 import ProfileImage from "../Shared/ProfileImage"
+import CacheContext from "../Contexts/CacheContext"
 
 export default Users = ({ navigation, route }) => {
   const headerMargin = useHeaderHeight()
   const { user, token } = useContext(ApplicationContext)
+  const { users, setUsers } = useContext(CacheContext)
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const theme = useTheme()
 
   const [loading, setLoading] = useState(false)
-  const [users, setUsers] = useState(undefined)
+  //const [users, setUsers] = useState(undefined)
   const [foundUsers, setFoundUsers] = useState(undefined)
   const [search, setSearch] = useState("")
   const [showSearch, setShowSearch] = useState(null)
@@ -51,8 +53,7 @@ export default Users = ({ navigation, route }) => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        "Cache-Control": "no-cache"
+        Authorization: `Bearer ${token}`
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
@@ -116,8 +117,7 @@ export default Users = ({ navigation, route }) => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        "Cache-Control": "no-cache"
+        Authorization: `Bearer ${token}`
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
@@ -137,8 +137,7 @@ export default Users = ({ navigation, route }) => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        "Cache-Control": "no-cache"
+        Authorization: `Bearer ${token}`
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
@@ -165,8 +164,7 @@ export default Users = ({ navigation, route }) => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        "Cache-Control": "no-cache"
+        Authorization: `Bearer ${token}`
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
@@ -218,26 +216,44 @@ export default Users = ({ navigation, route }) => {
     setAreasOptions(areaData)
   }, [placeFilter])
 
-  useFocusEffect(
-    useCallback(() => {
+  useEffect(() => {
+    if (users == undefined) {
       getUsers()
       getPlaces()
       getSchools()
-      return () => {}
-    }, [])
-  )
+    }
+  }, [])
 
   const Item = useCallback(
     ({ item, register }) => {
+      const [avatar, setAvatar] = useState(undefined)
+
+      useEffect(() => {
+        const requestAvatar = async () => {
+          const request = await fetch(`${localhost}/users/${register}?avatar=true`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`
+            }
+          })
+            .then((response) => response.json())
+            .catch(() => null)
+
+          request?.avatar ? setAvatar(request.avatar) : setAvatar(null)
+        }
+
+        requestAvatar()
+      }, [users])
+
       return (
         <Flex
           ph={20}
           pv={5}
-          onPress={() => {}}
         >
           <Pressable
             onPress={() => {
-              navigation.navigate("UserDetails", { register, placesOptions, schoolsOptions })
+              navigation.navigate("UserDetails", { register, getUsers })
             }}
           >
             <Card
@@ -245,7 +261,11 @@ export default Users = ({ navigation, route }) => {
               style={{ overflow: "hidden" }}
             >
               <HStack items="center">
-                <ProfileImage image={item.avatar} />
+                <ProfileImage
+                  image={avatar}
+                  icon="account-outline"
+                  loading={avatar === undefined}
+                />
                 <Flex
                   fill
                   p={10}
@@ -459,17 +479,20 @@ export default Users = ({ navigation, route }) => {
                       buttonTitle="Agregar"
                       action={() => {
                         navigation.navigate("AddUser", {
-                          user,
-                          token,
                           placesOptions,
-                          schoolsOptions
+                          schoolsOptions,
+                          getUsers
                         })
                       }}
                     />
                   )
                 }
                 refreshing={loading}
-                onRefresh={() => getUsers()}
+                onRefresh={() => {
+                  getUsers()
+                  getPlaces()
+                  getSchools()
+                }}
                 renderItem={({ item }) => (
                   <Item
                     key={item.register}
@@ -484,8 +507,7 @@ export default Users = ({ navigation, route }) => {
                 style={{ position: "absolute", margin: 16, right: 0, bottom: 0 }}
                 onPress={() => {
                   navigation.navigate("AddUser", {
-                    placesOptions,
-                    schoolsOptions
+                    getUsers
                   })
                 }}
               />

@@ -56,7 +56,7 @@ export default SchoolDetails = ({ icon, image, title, children, actions, avatar,
               style={{ width: "100%", height: "100%" }}
             />
             <LinearGradient
-              colors={["#00000000", theme.colors.background]}
+              colors={["transparent", theme.colors.background]}
               locations={[0.5, 1]}
               style={{ width: "100%", height: "100%", position: "absolute" }}
             />
@@ -88,13 +88,15 @@ export default SchoolDetails = ({ icon, image, title, children, actions, avatar,
               fill
               center
             >
-              {image && <Flex h={150} />}
+              {image && <Flex h={200} />}
 
               {image == undefined && (
                 <ProfileImage
                   image={avatar}
+                  icon={icon}
                   width={150}
                   height={150}
+                  loading={avatar === undefined}
                 />
               )}
             </Flex>
