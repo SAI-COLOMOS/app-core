@@ -12,10 +12,12 @@ import { LongDate, Time24 } from "../Shared/LocaleDate"
 import ApplicationContext from "../ApplicationContext"
 import ProfileImage from "../Shared/ProfileImage"
 import InformationMessage from "../Shared/InformationMessage"
+// import EventContext from "../Contexts/CacheContext"
 
 export default EventDetails = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const { user, token } = useContext(ApplicationContext)
+  //const { event, setEvent, attendees, setAttendees, profiles, setProfiles } = useContext(EventContext)
   const headerMargin = useHeaderHeight()
   const { event_identifier } = route.params
   const theme = useTheme()

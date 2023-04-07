@@ -1,6 +1,6 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useContext, useEffect, useState } from "react"
-import { Button, Text, TextInput, useTheme } from "react-native-paper"
+import { ActivityIndicator, Button, IconButton, Text, TextInput, useTheme } from "react-native-paper"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import Constants from "expo-constants"
 import CreateForm from "../Shared/CreateForm"
@@ -13,7 +13,7 @@ export default EditUser = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const { user, token } = useContext(ApplicationContext)
   const theme = useTheme()
-  const { profile, placesOptions, schoolsOptions } = route.params
+  const { profile, image, getUsers, getUser } = route.params
 
   const [first_name, setFirst_name] = useState(`${profile.first_name ?? ""}`)
   const [first_last_name, setFirst_last_name] = useState(`${profile.first_last_name ?? ""}`)
@@ -31,10 +31,11 @@ export default EditUser = ({ navigation, route }) => {
   const [role, setRole] = useState(`${profile.role ?? ""}`)
   const [status, setStatus] = useState(`${profile.status ?? ""}`)
   const [total_hours, setTotal_hours] = useState(`${profile.total_hours ?? ""}`)
-  const [avatar, setAvatar] = useState(profile?.avatar ?? null)
+  const [avatar, setAvatar] = useState(image ?? null)
   const [curp, setCurp] = useState(`${profile.curp ?? ""}`)
   const [verified, setVerified] = useState(false)
 
+  const [loading, setLoading] = useState(false)
   const [modalConfirm, setModalConfirm] = useState(false)
   const [modalLoading, setModalLoading] = useState(false)
   const [modalSuccess, setModalSuccess] = useState(false)
@@ -103,7 +104,9 @@ export default EditUser = ({ navigation, route }) => {
       option: "Finalizado"
     }
   ]
-  const [areasOptions, setAreasOptions] = useState("")
+  const [schoolsOptions, setSchoolsOptions] = useState(undefined)
+  const [placesOptions, setPlacesOptions] = useState(undefined)
+  const [areasOptions, setAreasOptions] = useState(undefined)
 
   async function saveUser() {
     setModalLoading(true)
@@ -185,6 +188,62 @@ export default EditUser = ({ navigation, route }) => {
     }
   }
 
+  async function getData() {
+    setLoading(true)
+
+    const requests = await Promise.all([
+      await fetch(`${localhost}/places`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      }).catch((error) => console.error("Get places:", error)),
+      await fetch(`${localhost}/schools`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      }).catch((error) => console.error("Get schools", error))
+    ]).catch((error) => console.error("Get data:", error))
+
+    setLoading(false)
+
+    if (requests[0]?.ok) {
+      const response = await requests[0].json()
+
+      let placesData = []
+      response.places.forEach((place) => {
+        let areasData = []
+
+        place.place_areas.map((area) => {
+          areasData.push({ option: area.area_name })
+        })
+
+        placesData.push({ option: place.place_name, areas: areasData })
+      })
+      setPlacesOptions(placesData)
+    } else {
+      setPlacesOptions(null)
+    }
+
+    if (requests[1]?.ok) {
+      const response = await requests[1].json()
+      let schoolsData = []
+      response.schools.forEach((school) => {
+        schoolsData.push({ option: school.school_name })
+      })
+      setSchoolsOptions(schoolsData)
+    } else {
+      setSchoolsOptions(null)
+    }
+  }
+
+  useEffect(() => {
+    getData()
+  }, [])
+
   useEffect(() => {
     let check = true
 
@@ -254,7 +313,7 @@ export default EditUser = ({ navigation, route }) => {
     })
 
     setAreasOptions(areaData)
-  }, [place])
+  }, [place, placesOptions])
 
   const PersonalData = () => (
     <VStack
@@ -401,18 +460,50 @@ export default EditUser = ({ navigation, route }) => {
             />
           </Flex>
         ) : null}
-        {user?.role == "Administrador" ? (
+
+        {user?.role == "Administrador" && (
           <Flex>
-            <Dropdown
-              value={place}
-              selected={setPlace}
-              title="Bosque urbano"
-              options={placesOptions}
-            />
+            {placesOptions != null ? (
+              <Dropdown
+                title="Bosque urbano"
+                value={place}
+                selected={setPlace}
+                options={placesOptions}
+              />
+            ) : loading == true ? (
+              <HStack
+                fill
+                items="center"
+                pv={10}
+                spacing={20}
+              >
+                <Flex fill>
+                  <Text variant="bodyMedium">Obteniendo la lista de bosques urbanos</Text>
+                </Flex>
+                <ActivityIndicator />
+              </HStack>
+            ) : (
+              <HStack
+                fill
+                items="center"
+                pv={10}
+                spacing={20}
+              >
+                <Flex fill>
+                  <Text variant="bodyMedium">Ocurrió un problema obteniendo la lista de bosques urbanos</Text>
+                </Flex>
+                <IconButton
+                  icon="reload"
+                  mode="outlined"
+                  onPress={() => getData()}
+                />
+              </HStack>
+            )}
           </Flex>
-        ) : null}
-        {user?.role == "Administrador" ? (
-          place != "" && areasOptions.length > 0 ? (
+        )}
+
+        {user?.role == "Administrador" &&
+          (place != "" && areasOptions?.length > 0 ? (
             <Flex>
               <Dropdown
                 value={assigned_area}
@@ -421,52 +512,88 @@ export default EditUser = ({ navigation, route }) => {
                 options={areasOptions}
               />
             </Flex>
-          ) : areasOptions.length == 0 && place != "" ? (
-            <HStack
-              pv={10}
-              items="center"
-              spacing={20}
-            >
-              <Icon
-                name="alert"
-                color={theme.colors.error}
-                size={30}
-              />
-              <Flex fill>
-                <Text
-                  variant="bodyMedium"
-                  style={{
-                    color: theme.colors.error
-                  }}
-                >
-                  El bosque urbano seleccionado no cuenta con áreas registradas, primero cree un área para poder continuar.
-                </Text>
-              </Flex>
-            </HStack>
-          ) : null
-        ) : null}
-        {role == "Prestador" || user.role == "Encargado" ? (
+          ) : (
+            areasOptions?.length == 0 &&
+            place != "" && (
+              <HStack
+                pv={10}
+                items="center"
+                spacing={20}
+              >
+                <Icon
+                  name="alert"
+                  color={theme.colors.error}
+                  size={30}
+                />
+                <Flex fill>
+                  <Text
+                    variant="bodyMedium"
+                    style={{
+                      color: theme.colors.error
+                    }}
+                  >
+                    El bosque urbano seleccionado no cuenta con áreas registradas, primero cree un área para poder continuar.
+                  </Text>
+                </Flex>
+              </HStack>
+            )
+          ))}
+
+        {role == "Prestador" && (
           <Flex>
-            <Dropdown
-              value={school}
-              selected={setSchool}
-              title="Escuela"
-              options={schoolsOptions}
-            />
+            {placesOptions != null ? (
+              <Dropdown
+                value={school}
+                selected={setSchool}
+                title="Escuela"
+                options={schoolsOptions}
+              />
+            ) : loading == true ? (
+              <HStack
+                fill
+                items="center"
+                pv={10}
+                spacing={20}
+              >
+                <Flex fill>
+                  <Text variant="bodyMedium">Obteniendo la lista de escuelas</Text>
+                </Flex>
+                <ActivityIndicator />
+              </HStack>
+            ) : (
+              <HStack
+                fill
+                items="center"
+                pv={10}
+                spacing={20}
+              >
+                <Flex fill>
+                  <Text variant="bodyMedium">Ocurrió un problema obteniendo la lista de escuelas</Text>
+                </Flex>
+                <IconButton
+                  icon="reload"
+                  mode="outlined"
+                  onPress={() => getData()}
+                />
+              </HStack>
+            )}
           </Flex>
-        ) : null}
-        {role == "Prestador" || user.role == "Encargado" ? (
-          <TextInput
-            mode="outlined"
-            value={total_hours}
-            onChangeText={setTotal_hours}
-            label="Total de horas"
-            keyboardType="number-pad"
-            maxLength={3}
-            autoComplete="off"
-            autoCorrect={false}
-          />
-        ) : null}
+        )}
+
+        {role == "Prestador" ||
+          (user.role == "Encargado" && (
+            <TextInput
+              mode="outlined"
+              value={total_hours}
+              onChangeText={setTotal_hours}
+              label="Total de horas"
+              keyboardType="number-pad"
+              maxLength={3}
+              autoComplete="off"
+              autoCorrect={false}
+            />
+          ))}
+
         <Flex fill>
           <Dropdown
             title="Estado"
@@ -575,7 +702,16 @@ export default EditUser = ({ navigation, route }) => {
         title="¡Listo!"
         description="El usuario ha sido actualizado"
         handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]}
-        actions={[["Aceptar", () => navigation.pop()]]}
+        actions={[
+          [
+            "Aceptar",
+            () => {
+              getUser()
+              getUsers()
+              navigation.pop()
+            }
+          ]
+        ]}
         dismissable={false}
         icon="check-circle-outline"
       />
@@ -584,7 +720,15 @@ export default EditUser = ({ navigation, route }) => {
         title="¡Listo!"
         description="El usuario ha sido eliminado"
         handler={[modalSuccessDelete, () => setModalSuccessDelete(!modalSuccessDelete)]}
-        actions={[["Aceptar", () => navigation.pop(2)]]}
+        actions={[
+          [
+            "Aceptar",
+            () => {
+              navigation.pop(2)
+              getUsers()
+            }
+          ]
+        ]}
         dismissable={false}
         icon="check-circle-outline"
       />

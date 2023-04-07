@@ -173,9 +173,6 @@ export default AddEvent = ({ navigation, route }) => {
             autoComplete="off"
           />
 
-          {/* <TextInput mode="outlined" value={starting_date.toString()} onChangeText={setStarting_date} label="Fecha de inicio" keyboardType="number-pad" autoComplete="off" />
-          <TextInput mode="outlined" value={ending_date.toISOString()} onChangeText={setEnding_date} label="Fecha de termino" keyboardType="number-pad" autoComplete="off" /> */}
-
           <Flex>
             <Text variant="labelMedium">Fecha y hora de inicio</Text>
             <DateAndTimerPicker
@@ -200,8 +197,6 @@ export default AddEvent = ({ navigation, route }) => {
             />
           </Flex>
 
-          {/* <TextInput mode="outlined" value={} onChangeText={setAuthor_register} label="Registro" maxLength={20} keyboardType="number-pad" autoComplete="off" /> */}
-          {/* <TextInput mode="outlined" value={publishing_date} onChangeText={setPublishing_date} label="Fecha de publicación" maxLength={10} keyboardType="number-pad" autoComplete="off" /> */}
           <Flex>
             {placesOptions != null ? (
               <Dropdown
@@ -240,8 +235,6 @@ export default AddEvent = ({ navigation, route }) => {
               </HStack>
             )}
           </Flex>
-          {/* <TextInput mode="outlined" value={} onChangeText={setBelonging_area} autoCapitalize="words" label="Área de origen" maxLength={150} /> */}
-          {/* <TextInput mode="outlined" value={} onChangeText={setBelonging_place} autoCapitalize="words" label="Lugar de origen" maxLength={150} /> */}
         </VStack>
       </VStack>
     )

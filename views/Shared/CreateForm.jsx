@@ -86,16 +86,18 @@ export default CreateForm = ({ navigation, route, loading, title, children, acti
               ))}
             </VStack>
           </ScrollView>
-          <HStack
-            justify="between"
-            reverse={true}
-            pv={20}
-            ph={20}
-          >
-            {actions?.map((action, index) => (
-              <Flex key={`Action ${index}`}>{action}</Flex>
-            ))}
-          </HStack>
+          {actions && (
+            <HStack
+              justify="between"
+              reverse={true}
+              pv={20}
+              ph={20}
+            >
+              {actions?.map((action, index) => (
+                <Flex key={`Action ${index}`}>{action}</Flex>
+              ))}
+            </HStack>
+          )}
         </Flex>
       </KeyboardAvoidingView>
     </Flex>

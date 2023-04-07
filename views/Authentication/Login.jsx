@@ -64,16 +64,13 @@ export default Login = ({ navigation }) => {
         } else {
           navigation.replace("Dashboard")
         }
-      } else if (typeof request == "number") {
-        setResponseCode(request.status)
-        setModalError(true)
-        return
       }
 
-      setModalFatal(true)
+      setResponseCode(request.status)
+      setModalError(true)
       return
     } catch (error) {
-      console.error("getSession:", error)
+      console.error("Get session:", error)
       setModalLoading(false)
       setModalFatal(true)
       return
@@ -115,20 +112,43 @@ export default Login = ({ navigation }) => {
   }, [activeSession])
 
   return (
-    <Flex fill pt={insets.top}>
+    <Flex
+      fill
+      pt={insets.top}
+    >
       {activeSession === undefined ? (
-        <Flex fill center>
-          <ActivityIndicator animating={true} color={theme.colors.primary} size={75} />
+        <Flex
+          fill
+          center
+        >
+          <ActivityIndicator
+            animating={true}
+            color={theme.colors.primary}
+            size={75}
+          />
         </Flex>
       ) : (
         <ScrollView>
-          <VStack p={20} pb={50} spacing={50}>
+          <VStack
+            p={20}
+            pb={50}
+            spacing={50}
+          >
             <Flex center>
-              <Image source={require("../../assets/logo.png")} style={{ width: 150, height: 150 }} />
+              <Image
+                source={require("../../assets/logo.png")}
+                style={{ width: 150, height: 150 }}
+              />
             </Flex>
 
             <VStack spacing={10}>
-              <TextInput mode="outlined" label="Registro, email o teléfono" autoComplete="username" autoCapitalize="none" onChangeText={setCredential} />
+              <TextInput
+                mode="outlined"
+                label="Registro, email o teléfono"
+                autoComplete="username"
+                autoCapitalize="none"
+                onChangeText={setCredential}
+              />
               <TextInput
                 mode="outlined"
                 label="Contraseña"
@@ -145,7 +165,10 @@ export default Login = ({ navigation }) => {
                   />
                 }
               />
-              <HStack items="center" spacing={10}>
+              <HStack
+                items="center"
+                spacing={10}
+              >
                 <Switch
                   value={rememberUser}
                   onValueChange={(_) => {
@@ -184,11 +207,32 @@ export default Login = ({ navigation }) => {
 
       {/* <ModalLoaading handler={[modalLoading, () => setModalLoading(!modalLoading)]} dismissable={false}/> */}
 
-      <ModalMessage title="¡Listo!" description="La contraseña ha sido actualizada, ahora puedes acceder a la aplicación" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[["Aceptar", () => navigation.replace("Dashboard")]]} dismissable={false} icon="check-circle-outline" />
+      <ModalMessage
+        title="¡Listo!"
+        description="La contraseña ha sido actualizada, ahora puedes acceder a la aplicación"
+        handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]}
+        actions={[["Aceptar", () => navigation.replace("Dashboard")]]}
+        dismissable={false}
+        icon="check-circle-outline"
+      />
 
-      <ModalMessage title="Ocurrió un problema" description={`No pudimos iniciar sesión, verifica tu usuario y contraseña e intentalo nuevamente. (${responseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[["Aceptar"]]} dismissable={true} icon="close-circle-outline" />
+      <ModalMessage
+        title="Ocurrió un problema"
+        description={`No pudimos iniciar sesión, verifica tu usuario y contraseña e inténtalo nuevamente. (${responseCode})`}
+        handler={[modalError, () => setModalError(!modalError)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="close-circle-outline"
+      />
 
-      <ModalMessage title="Sin conexión a internet" description={`Parece que no tienes conexión a internet, conectate e intenta de nuevo`} handler={[modalFatal, () => setModalFatal(!modalFatal)]} actions={[["Aceptar"]]} dismissable={true} icon="wifi-alert" />
+      <ModalMessage
+        title="Sin conexión a internet"
+        description={`Parece que no tienes conexión a internet, conéctate e intenta de nuevo`}
+        handler={[modalFatal, () => setModalFatal(!modalFatal)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="wifi-alert"
+      />
     </Flex>
   )
 }

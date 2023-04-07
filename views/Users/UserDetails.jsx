@@ -13,9 +13,10 @@ import ApplicationContext from "../ApplicationContext"
 export default UserDetails = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const { token } = useContext(ApplicationContext)
-  const { register, placesOptions, schoolsOptions } = route.params
+  const { register, getUsers } = route.params
   const headerMargin = useHeaderHeight()
   const theme = useTheme()
+  const [avatar, setAvatar] = useState(undefined)
 
   const [loading, setLoading] = useState(false)
   const [profile, setProfile] = useState(undefined)
@@ -26,8 +27,7 @@ export default UserDetails = ({ navigation, route }) => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        "Cache-Control": "no-cache"
+        Authorization: `Bearer ${token}`
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
@@ -42,6 +42,24 @@ export default UserDetails = ({ navigation, route }) => {
   }
 
   useEffect(() => {
+    const requestAvatar = async () => {
+      const request = await fetch(`${localhost}/users/${register}?avatar=true`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        }
+      })
+        .then((response) => response.json())
+        .catch(() => null)
+
+      request?.avatar ? setAvatar(request.avatar) : setAvatar(null)
+    }
+
+    requestAvatar()
+  }, [profile])
+
+  useEffect(() => {
     navigation.setOptions({
       header: (props) => <Header {...props} />,
       headerTransparent: true,
@@ -49,12 +67,9 @@ export default UserDetails = ({ navigation, route }) => {
     })
   }, [])
 
-  useFocusEffect(
-    useCallback(() => {
-      getUser()
-      return () => {}
-    }, [])
-  )
+  useEffect(() => {
+    getUser()
+  }, [])
 
   const PersonalData = () => (
     <Card
@@ -206,8 +221,8 @@ export default UserDetails = ({ navigation, route }) => {
         profile !== null ? (
           isNaN(profile) ? (
             <DisplayDetails
-              avatar={profile?.avatar}
-              icon="account"
+              avatar={avatar}
+              icon="account-outline"
               title={`${profile?.first_name} ${profile?.first_last_name} ${profile?.second_last_name == undefined ? "" : profile?.second_last_name}`}
               children={[PersonalData(), ContactData(), EmergencyData(), AccountData()]}
               refreshStatus={loading}
@@ -286,8 +301,9 @@ export default UserDetails = ({ navigation, route }) => {
           onPress={() => {
             navigation.navigate("EditUser", {
               profile,
-              placesOptions,
-              schoolsOptions
+              image: avatar,
+              getUsers,
+              getUser
             })
           }}
         />

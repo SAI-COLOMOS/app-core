@@ -11,6 +11,7 @@ import ApplicationContext from "../ApplicationContext"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import Constants from "expo-constants"
 import ProfileImage from "../Shared/ProfileImage"
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
 
 export default ScanAttendance = ({ navigation, route }) => {
   const theme = useTheme()
@@ -21,10 +22,23 @@ export default ScanAttendance = ({ navigation, route }) => {
 
   const [register, setRegister] = useState("")
   const [attendee, setAttendee] = useState(undefined)
-  const [processStatus, setProcessStatus] = useState("notFound")
+  const [loading, setLoading] = useState(false)
+  const [processStatus, setProcessStatus] = useState("ready")
   const [cameraPermissions, requestCameraPermission] = Camera.useCameraPermissions()
 
+  const animationConfiguration = { duration: 250, easing: Easing.bezier(0.5, 0.01, 0.75, 1) }
+  const heightCameraView = useSharedValue(300)
+  const opacityCameraView = useSharedValue(1)
+
+  const animatedHeightCameraViewStyle = useAnimatedStyle(() => {
+    return {
+      height: withTiming(heightCameraView.value, animationConfiguration),
+      opacity: withTiming(opacityCameraView.value, animationConfiguration)
+    }
+  })
+
   if (!cameraPermissions) {
+    console.log("first", cameraPermissions)
   }
 
   if (!cameraPermissions?.granted) {
@@ -66,25 +80,79 @@ export default ScanAttendance = ({ navigation, route }) => {
     }
   }
 
+  async function checkAttendance() {
+    // TO-DO
+    try {
+    } catch (error) {}
+  }
+
   useEffect(() => {
-    console.log(cameraPermissions)
-  }, [cameraPermissions])
+    if (processStatus == "ready") {
+      heightCameraView.value = 250
+      opacityCameraView.value = 1
+    } else {
+      heightCameraView.value = 0
+      opacityCameraView.value = 0
+    }
+  }, [processStatus])
 
   const ScanCamera = () => (
-    <Flex
-      key="ScanCamera"
-      center
-      style={{ borderRadius: 50, width: 300, height: 300, overflow: "hidden", alignSelf: "center" }}
-    >
-      <Camera
-        ratio="4:3"
-        style={{ width: 300, height: (300 * 4) / 3, position: "absolute" }}
-        type={CameraType.back}
-        barCodeScannerSettings={{ barCodeTypes: [BarCodeScanner.Constants.BarCodeType.qr] }}
-        onBarCodeScanned={processStatus != "ready" ? undefined : onCodeScanned}
-      />
-    </Flex>
+    <>
+      <Animated.View style={[{ overflow: "hidden" }, animatedHeightCameraViewStyle]}>
+        <Flex
+          key="ScanCamera"
+          center
+          style={{ borderRadius: 50, width: 250, height: "100%", overflow: "hidden", alignSelf: "center" }}
+        >
+          <Camera
+            ratio="4:3"
+            style={{ width: 300, height: (300 * 4) / 3, position: "absolute" }}
+            type={CameraType.back}
+            barCodeScannerSettings={{ barCodeTypes: [BarCodeScanner.Constants.BarCodeType.qr] }}
+            onBarCodeScanned={processStatus != "ready" ? undefined : onCodeScanned}
+          />
+        </Flex>
+      </Animated.View>
+      <>
+        {
+          {
+            ready: <Ready />,
+            scanned: <Scanned />,
+            notFound: <NotFound />,
+            found: <Found />
+          }[processStatus]
+        }
+      </>
+    </>
   )
+
+  const AskForPermissions = () => {
+    if (cameraPermissions?.canAskAgain == true) {
+      return (
+        <InformationMessage
+          key="AskForPermissions"
+          title="Sin permisos"
+          icon="camera-outline"
+          description="La aplicación no tiene permiso para usar la cámara, otorga los permisos necesarios para continuar"
+          buttonTitle="Otorgar permisos"
+          buttonIcon="shape-outline"
+          action={async () => await requestCameraPermission()}
+        />
+      )
+    } else {
+      return (
+        <InformationMessage
+          key="AskForPermissions"
+          title="Sin acceso"
+          icon="camera-off-outline"
+          description="El acceso a la cámara está bloqueado, para poder continuar, es necesario otorgues los permisos necesarios desde la aplicación de configuraciones del dispositivo"
+          buttonTitle="Volver a intentar"
+          buttonIcon="reload"
+          action={async () => await requestCameraPermission()}
+        />
+      )
+    }
+  }
 
   const StatusBar = () => (
     <>
@@ -112,59 +180,64 @@ export default ScanAttendance = ({ navigation, route }) => {
 
   /* Componentes para los estados */
   const Ready = () => (
+    <InformationMessage
+      key="Ready"
+      icon="qrcode-scan"
+      title="Listo para escanear"
+      description="Coloca el código QR dentro del recuadro y espera a que sea detectado"
+      action={() => navigation.pop()}
+      buttonTitle="Finalizar escaneo"
+      buttonIcon="close"
+    />
+  )
+
+  const Scanned = () => (
     <VStack
-      key="NotFound"
+      center
       spacing={20}
+      p={30}
     >
-      <Flex center>
-        <Icon
-          name="qrcode-scan"
-          color={theme.colors.onBackground}
-          size={50}
-        />
-      </Flex>
-      <Flex>
+      <ActivityIndicator size={50} />
+      <VStack center>
         <Text
-          variant="titleLarge"
+          variant="headlineSmall"
           style={{ textAlign: "center" }}
         >
-          Todo listo para escanear
+          Buscando usuario
         </Text>
         <Text
           variant="bodyMedium"
           style={{ textAlign: "center" }}
         >
-          Coloca el código QR dentro del recuadro y espera a que sea detectado
+          Estamos verificando con la base de datos que el usuario sí esté en la lista
         </Text>
-      </Flex>
-    </VStack>
-  )
-
-  const Scanned = () => (
-    <VStack key="Scanned">
-      <Flex center>
-        <ActivityIndicator size={50} />
-      </Flex>
-      <Text
-        variant="titleLarge"
-        style={{ textAlign: "center" }}
-      >
-        Comprobando usuario...
-      </Text>
+      </VStack>
+      <HStack spacing={20}>
+        <Button
+          icon="close"
+          mode="outlined"
+          textColor={theme.colors.error}
+          style={{ opacity: 0 }}
+        >
+          Cancelar
+        </Button>
+      </HStack>
     </VStack>
   )
 
   const Found = () => (
     <VStack
-      key="Found"
+      center
       spacing={20}
+      p={30}
     >
-      <Flex center>
-        <ProfileImage image={attendee?.avatar} />
-      </Flex>
-      <Flex>
+      <ProfileImage
+        image={attendee?.avatar}
+        icon="account"
+      />
+      <VStack center>
         <Text
-          variant="titleLarge"
+          variant="headlineSmall"
           style={{ textAlign: "center" }}
         >
           {attendee?.first_name} {attendee?.first_last_name} {attendee?.second_last_name ?? null}
@@ -175,64 +248,48 @@ export default ScanAttendance = ({ navigation, route }) => {
         >
           Usuario encontrado
         </Text>
-      </Flex>
-      <HStack justify="evenly">
+      </VStack>
+      <HStack spacing={20}>
         <Button
-          mode="outlined"
           icon="close"
+          mode="outlined"
           onPress={() => setProcessStatus("ready")}
+          textColor={theme.colors.error}
         >
           Cancelar
+        </Button>
+
+        <Button
+          icon="check"
+          mode="contained"
+          onPress={() => null}
+        >
+          Registrar asistencia
         </Button>
       </HStack>
     </VStack>
   )
 
   const NotFound = () => (
-    <VStack
+    <InformationMessage
       key="NotFound"
-      spacing={20}
-    >
-      <Flex center>
-        <Icon
-          name="account-question-outline"
-          color={theme.colors.onBackground}
-          size={50}
-        />
-      </Flex>
-      <Flex>
-        <Text
-          variant="titleLarge"
-          style={{ textAlign: "center" }}
-        >
-          ¡Ups!, no estás en la lista
-        </Text>
-        <Text
-          variant="bodyMedium"
-          style={{ textAlign: "center" }}
-        >
-          El registro {register} no fue encontrado, ¿Si está registrado en la lista de participantes?
-        </Text>
-      </Flex>
-      <HStack justify="evenly">
-        <Button
-          mode="contained"
-          onPress={() => setProcessStatus("ready")}
-        >
-          Continuar escaneando
-        </Button>
-      </HStack>
-    </VStack>
+      icon="account-question-outline"
+      title="¡Ups!, no estás en la lista"
+      description={`El registro ${register} no fue encontrado, ¿Si está registrado en la lista de participantes?`}
+      action={() => setProcessStatus("ready")}
+      buttonTitle="Continuar"
+      buttonIcon="arrow-right"
+    />
   )
 
   return (
     <Flex fill>
       <CreateForm
-        actions={[Close()]}
+        // actions={[Close()]}
         title="Escaneo de asistencia"
         navigation={navigation}
-        loading={false}
-        children={[ScanCamera(), StatusBar()]}
+        loading={processStatus == "ready" ? false : true}
+        children={cameraPermissions?.granted == true ? [ScanCamera()] : [AskForPermissions()]}
       />
     </Flex>
   )
