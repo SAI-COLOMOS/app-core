@@ -96,7 +96,7 @@ export default SchoolDetails = ({ icon, image, title, children, actions, avatar,
                   icon={icon}
                   width={150}
                   height={150}
-                  loading={avatar === undefined}
+                  // loading={avatar === undefined && image === undefined}
                 />
               )}
             </Flex>

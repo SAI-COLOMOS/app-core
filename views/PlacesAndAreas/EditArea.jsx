@@ -10,7 +10,7 @@ export default EditArea = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const { token } = useContext(ApplicationContext)
   const theme = useTheme()
-  const { area, place_identifier } = route.params
+  const { area, place_identifier, getPlace } = route.params
 
   const [area_name, setArea_name] = useState(`${area.area_name}`)
   const [phone, setPhone] = useState(`${area.phone}`)
@@ -206,7 +206,15 @@ export default EditArea = ({ navigation, route }) => {
         title="¡Listo!"
         description="El área ha sido actualizada"
         handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]}
-        actions={[["Aceptar", () => navigation.pop()]]}
+        actions={[
+          [
+            "Aceptar",
+            () => {
+              getPlace()
+              navigation.pop()
+            }
+          ]
+        ]}
         dismissable={false}
         icon="check-circle-outline"
       />
@@ -215,7 +223,15 @@ export default EditArea = ({ navigation, route }) => {
         title="¡Listo!"
         description="El área ha sido eliminada"
         handler={[modalSuccessDelete, () => setModalSuccessDelete(!modalSuccessDelete)]}
-        actions={[["Aceptar", () => navigation.pop(1)]]}
+        actions={[
+          [
+            "Aceptar",
+            () => {
+              getPlace()
+              navigation.pop()
+            }
+          ]
+        ]}
         dismissable={false}
         icon="check-circle-outline"
       />

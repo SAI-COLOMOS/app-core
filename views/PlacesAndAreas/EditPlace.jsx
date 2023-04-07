@@ -10,7 +10,7 @@ export default EditPlace = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const { token } = useContext(ApplicationContext)
   const theme = useTheme()
-  const { place } = route.params
+  const { place, image, getPlace, getPlaces } = route.params
 
   const [place_name, setPlace_name] = useState(`${place.place_name}`)
   const [street, setStreet] = useState(`${place.street}`)
@@ -20,7 +20,7 @@ export default EditPlace = ({ navigation, route }) => {
   const [postal_code, setPostal_code] = useState(`${place.postal_code}`)
   const [phone, setPhone] = useState(`${place.phone}`)
   const [reference, setReference] = useState(`${place.reference}`)
-  const [avatar, setAvatar] = useState(place.avatar ?? null)
+  const [avatar, setAvatar] = useState(image ?? null)
   const [verified, setVerified] = useState(false)
 
   const [modalConfirm, setModalConfirm] = useState(false)
@@ -286,7 +286,16 @@ export default EditPlace = ({ navigation, route }) => {
         title="¡Listo!"
         description="El lugar ha sido actualizado"
         handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]}
-        actions={[["Aceptar", () => navigation.pop()]]}
+        actions={[
+          [
+            "Aceptar",
+            () => {
+              getPlace()
+              getPlaces()
+              navigation.pop()
+            }
+          ]
+        ]}
         dismissable={false}
         icon="check-circle-outline"
       />
@@ -295,7 +304,15 @@ export default EditPlace = ({ navigation, route }) => {
         title="¡Listo!"
         description="El lugar ha sido eliminado"
         handler={[modalSuccessDelete, () => setModalSuccessDelete(!modalSuccessDelete)]}
-        actions={[["Aceptar", () => navigation.pop(2)]]}
+        actions={[
+          [
+            "Aceptar",
+            () => {
+              getPlaces()
+              navigation.pop(2)
+            }
+          ]
+        ]}
         dismissable={false}
         icon="check-circle-outline"
       />

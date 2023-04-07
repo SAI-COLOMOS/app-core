@@ -1,21 +1,24 @@
-import { Flex, VStack } from "@react-native-material/core"
+import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useEffect, useState, useCallback, useContext } from "react"
 import { useHeaderHeight } from "@react-navigation/elements"
-import { Text, Card, Button, FAB, useTheme } from "react-native-paper"
+import { Text, Card, Button, FAB, useTheme, TouchableRipple } from "react-native-paper"
 import Header from "../Shared/Header"
 import Constants from "expo-constants"
 import DisplayDetails from "../Shared/DisplayDetails"
 import { useFocusEffect } from "@react-navigation/native"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import ApplicationContext from "../ApplicationContext"
+import InformationMessage from "../Shared/InformationMessage"
+import ProfileImage from "../Shared/ProfileImage"
 
 export default PlaceDetails = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const { token } = useContext(ApplicationContext)
   const headerMargin = useHeaderHeight()
-  const { place_identifier } = route.params
+  const { place_identifier, getPlaces } = route.params
   const theme = useTheme()
 
+  const [avatar, setAvatar] = useState(undefined)
   const [loading, setLoading] = useState(false)
   const [place, setPlace] = useState(undefined)
 
@@ -26,8 +29,7 @@ export default PlaceDetails = ({ navigation, route }) => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        "Cache-Control": "no-cache"
+        Authorization: `Bearer ${token}`
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
@@ -50,12 +52,27 @@ export default PlaceDetails = ({ navigation, route }) => {
     })
   }, [])
 
-  useFocusEffect(
-    useCallback(() => {
-      getPlace()
-      return () => {}
-    }, [])
-  )
+  useEffect(() => {
+    const requestAvatar = async () => {
+      const request = await fetch(`${localhost}/places/${place_identifier}?avatar=true`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        }
+      })
+        .then((response) => response.json())
+        .catch(() => null)
+
+      request?.avatar ? setAvatar(request.avatar) : setAvatar(null)
+    }
+
+    requestAvatar()
+  }, [place])
+
+  useEffect(() => {
+    getPlace()
+  }, [])
 
   const Places = () => (
     <Card
@@ -86,84 +103,93 @@ export default PlaceDetails = ({ navigation, route }) => {
   )
 
   const Areas = () => (
-    <Flex key="Areas">
-      <Flex pv={20}>
-        <Text variant="bodyLarge">Áreas</Text>
+    <Card
+      key="Areas"
+      mode="outlined"
+    >
+      <Flex p={20}>
+        <Text variant="bodyLarge">Áreas del bosque urbano</Text>
       </Flex>
-
-      <VStack spacing={10}>
-        {place.place_areas.length > 0 ? (
-          place.place_areas.map((area) => (
-            <Card
-              mode="outlined"
-              key={area.area_name}
-            >
-              <VStack
-                spacing={10}
-                p={20}
-              >
-                <VStack
-                  fill
-                  spacing={10}
-                >
-                  <Flex>
-                    <Text variant="labelSmall">Nombre del área</Text>
-                    <Text variant="bodyMedium">{area?.area_name}</Text>
-                  </Flex>
-                  <Flex>
-                    <Text variant="labelSmall">Teléfono de contacto</Text>
-                    <Text variant="bodyMedium">{area?.phone}</Text>
-                  </Flex>
-                </VStack>
-                <Button
-                  icon="pencil-outline"
-                  onPress={() =>
-                    navigation.navigate("EditArea", {
-                      area,
-                      place_identifier
-                    })
-                  }
-                >
-                  Editar área
-                </Button>
-              </VStack>
-            </Card>
+      <VStack
+        spacing={10}
+        pb={20}
+      >
+        {place?.place_areas.length > 0 ? (
+          place.place_areas.map((item) => (
+            <Flex key={item.area_identifier}>
+              <Area
+                area={item}
+                place_identifier={place.place_identifier}
+              />
+            </Flex>
           ))
         ) : (
-          <VStack
-            center
-            spacing={20}
-            p={30}
-          >
-            <Icon
-              name="pencil-plus-outline"
-              color={theme.colors.onBackground}
-              size={50}
-            />
-            <VStack center>
-              <Text variant="headlineSmall">Sin áreas</Text>
-              <Text
-                variant="bodyMedium"
-                style={{ textAlign: "center" }}
-              >
-                No hay ningún área registrada, ¿qué te parece si hacemos el primero?
-              </Text>
-            </VStack>
-          </VStack>
+          <InformationMessage
+            icon="account"
+            title="Sin inscripciones"
+            description="Todavía no hay nadie inscrito, ¿quieres agregar a alguien?"
+          />
         )}
-        <Button
-          icon="plus"
+        <Flex ph={20}>
+          <Button
+            icon="plus"
+            mode="text"
+            onPress={() =>
+              navigation.navigate("AddArea", {
+                place_identifier,
+                getPlace
+              })
+            }
+          >
+            Agregar
+          </Button>
+        </Flex>
+      </VStack>
+    </Card>
+  )
+
+  const Area = useCallback(({ area, place_identifier }) => {
+    return (
+      <Flex
+        mh={20}
+        style={{ borderRadius: 10, overflow: "hidden" }}
+      >
+        <TouchableRipple
           onPress={() =>
-            navigation.navigate("AddArea", {
-              place_identifier
+            navigation.navigate("EditArea", {
+              area,
+              place_identifier,
+              getPlace
             })
           }
         >
-          Agregar área
-        </Button>
-      </VStack>
-    </Flex>
-  )
+          <HStack spacing={10}>
+            <Flex>
+              <ProfileImage
+                icon="tree-outline"
+                width={50}
+                height={50}
+              />
+            </Flex>
+            <VStack fill>
+              <Text
+                variant="bodyMedium"
+                numberOfLines={1}
+              >
+                {area?.area_name}
+              </Text>
+              <Text
+                variant="bodySmall"
+                numberOfLines={1}
+              >
+                {area?.phone}
+              </Text>
+            </VStack>
+          </HStack>
+        </TouchableRipple>
+      </Flex>
+    )
+  }, [])
 
   return (
     <Flex
@@ -175,7 +201,7 @@ export default PlaceDetails = ({ navigation, route }) => {
           isNaN(place) ? (
             <DisplayDetails
               icon="bee-flower"
-              image={place?.avatar ?? null}
+              image={avatar ?? null}
               title={place?.place_name}
               children={[Places(), Areas()]}
               refreshStatus={loading}
@@ -253,7 +279,10 @@ export default PlaceDetails = ({ navigation, route }) => {
           style={{ position: "absolute", margin: 16, right: 0, bottom: 0 }}
           onPress={() =>
             navigation.navigate("EditPlace", {
-              place
+              place,
+              image: avatar,
+              getPlace,
+              getPlaces
             })
           }
         />

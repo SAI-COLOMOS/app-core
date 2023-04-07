@@ -1,6 +1,6 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useState, useEffect, useCallback, useContext } from "react"
-import { Avatar, Button, Card, FAB, IconButton, Text, TouchableRipple, useTheme } from "react-native-paper"
+import { ActivityIndicator, Avatar, Button, Card, FAB, IconButton, Text, TouchableRipple, useTheme } from "react-native-paper"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useHeaderHeight } from "@react-navigation/elements"
 import Header from "../Shared/Header"
@@ -12,14 +12,16 @@ import SearchBar from "../Shared/SearchBar"
 import InformationMessage from "../Shared/InformationMessage"
 import { Image } from "react-native"
 import ApplicationContext from "../ApplicationContext"
+import CacheContext from "../Contexts/CacheContext"
 
 export default PlaceAndAreas = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const { token } = useContext(ApplicationContext)
+  const { places, setPlaces } = useContext(CacheContext)
   const theme = useTheme()
   const headerMargin = useHeaderHeight()
 
-  const [places, setPlaces] = useState(undefined)
+  // const [places, setPlaces] = useState(undefined)
   const [loading, setLoading] = useState(false)
   const [showSearch, setShowSearch] = useState(null)
   const [search, setSearch] = useState("")
@@ -95,70 +97,104 @@ export default PlaceAndAreas = ({ navigation, route }) => {
     })
   }, [showSearch])
 
-  useFocusEffect(
-    useCallback(() => {
+  useEffect(() => {
+    if (places === undefined) {
       getPlaces()
-      return () => {}
-    }, [])
-  )
+    }
+  }, [])
 
-  const Item = ({ place_name, place_address, place_identifier, place_avatar }) => {
-    return (
-      <Flex
-        ph={20}
-        pv={5}
-        onPress={() => {}}
-      >
-        <Pressable
-          onPress={() => {
-            navigation.navigate("PlaceDetails", { place_identifier })
-          }}
+  const Item = useCallback(
+    ({ place_name, place_address, place_identifier }) => {
+      const [avatar, setAvatar] = useState(undefined)
+      const [loadingDone, setLoadingDone] = useState(false)
+
+      useEffect(() => {
+        const requestAvatar = async () => {
+          const request = await fetch(`${localhost}/places/${place_identifier}?avatar=true`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`
+            }
+          })
+            .then((response) => response.json())
+            .catch(() => null)
+
+          request?.avatar ? setAvatar(request.avatar) : setAvatar(null)
+        }
+
+        requestAvatar()
+      }, [])
+
+      return (
+        <Flex
+          ph={20}
+          pv={5}
+          onPress={() => {}}
         >
-          <Card
-            mode="outlined"
-            style={{ overflow: "hidden" }}
+          <Pressable
+            onPress={() => {
+              navigation.navigate("PlaceDetails", { place_identifier, getPlaces })
+            }}
           >
-            <Image
-              source={place_avatar ? { uri: `data:image/png;base64,${place_avatar}` } : require("../../assets/images/stocks/place.jpg")}
-              resizeMode="cover"
-              style={{ height: 175, width: "100%" }}
-            />
-            <Flex
-              w={"100%"}
-              h={"100%"}
-              justify="end"
-              style={{ position: "absolute", backgroundColor: theme.colors.cover }}
+            <Card
+              mode="outlined"
+              style={{ overflow: "hidden" }}
             >
-              <HStack
-                p={10}
-                spacing={10}
-                items="center"
+              <Image
+                source={avatar !== null ? { uri: `data:image/png;base64,${avatar}` } : require("../../assets/images/stocks/place.jpg")}
+                resizeMode="cover"
+                onLoadEnd={() => setLoadingDone(true)}
+                style={{ height: 175, width: "100%" }}
+              />
+              {loadingDone == false && (
+                <Flex
+                  w={"100%"}
+                  h={"100%"}
+                  center
+                  style={{ position: "absolute" }}
+                >
+                  <ActivityIndicator size={50} />
+                </Flex>
+              )}
+              <Flex
+                w={"100%"}
+                h={"100%"}
+                justify="end"
+                style={{ position: "absolute", backgroundColor: theme.colors.cover }}
               >
-                <Avatar.Icon
-                  icon="bee-flower"
-                  size={50}
-                />
-                <VStack fill>
-                  <Text
-                    variant="titleMedium"
-                    numberOfLines={1}
-                  >
-                    {place_name}
-                  </Text>
-                  <Text
-                    variant="bodySmall"
-                    numberOfLines={1}
-                  >
-                    {place_address}
-                  </Text>
-                </VStack>
-              </HStack>
-            </Flex>
-          </Card>
-        </Pressable>
-      </Flex>
-    )
-  }
+                <HStack
+                  p={10}
+                  spacing={10}
+                  items="center"
+                >
+                  <Avatar.Icon
+                    icon="bee-flower"
+                    size={50}
+                  />
+                  <VStack fill>
+                    <Text
+                      variant="titleMedium"
+                      numberOfLines={1}
+                    >
+                      {place_name}
+                    </Text>
+                    <Text
+                      variant="bodySmall"
+                      numberOfLines={1}
+                    >
+                      {place_address}
+                    </Text>
+                  </VStack>
+                </HStack>
+              </Flex>
+            </Card>
+          </Pressable>
+        </Flex>
+      )
+    },
+    [places]
+  )
 
   return (
     <Flex
@@ -196,7 +232,6 @@ export default PlaceAndAreas = ({ navigation, route }) => {
                 renderItem={({ item }) => (
                   <Item
                     key={item.place_name}
-                    place_avatar={item.avatar}
                     place_name={item.place_name}
                     place_address={`${item.street} #${item.exterior_number}, ${item.colony}, ${item.municipality}, ${item.postal_code}`}
                     place_identifier={item.place_identifier}

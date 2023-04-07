@@ -244,7 +244,7 @@ export default Users = ({ navigation, route }) => {
         }
 
         requestAvatar()
-      }, [users])
+      }, [])
 
       return (
         <Flex
@@ -287,7 +287,7 @@ export default Users = ({ navigation, route }) => {
         </Flex>
       )
     },
-    [placesOptions]
+    [users]
   )
 
   const FilterOptions = () => {

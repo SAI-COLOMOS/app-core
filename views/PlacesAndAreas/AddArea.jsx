@@ -7,7 +7,7 @@ import ModalMessage from "../Shared/ModalMessage"
 import ApplicationContext from "../ApplicationContext"
 
 export default AddArea = ({ navigation, route }) => {
-  const { place_identifier } = route.params
+  const { place_identifier, getPlace } = route.params
   const { token } = useContext(ApplicationContext)
 
   const localhost = Constants.expoConfig.extra.API_LOCAL
@@ -137,7 +137,15 @@ export default AddArea = ({ navigation, route }) => {
         title="¡Listo!"
         description="El área ha sido añadida exitosamente"
         handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]}
-        actions={[["Aceptar", () => navigation.pop()]]}
+        actions={[
+          [
+            "Aceptar",
+            () => {
+              navigation.pop()
+              getPlace()
+            }
+          ]
+        ]}
         dismissable={false}
         icon="check-circle-outline"
       />

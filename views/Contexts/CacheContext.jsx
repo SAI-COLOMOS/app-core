@@ -5,10 +5,12 @@ const CacheContext = createContext()
 const images = []
 
 const CacheProvider = ({ children }) => {
+  const [users, setUsers] = useState(undefined)
+  const [places, setPlaces] = useState(undefined)
+
   const [event, setEvent] = useState(undefined)
   const [attendees, setAttendees] = useState(undefined)
   const [profiles, setProfiles] = useState(undefined)
-  const [users, setUsers] = useState(undefined)
 
   const getImage = useCallback((id, url, reload) => {
     async function get() {
@@ -50,6 +52,8 @@ const CacheProvider = ({ children }) => {
   const props = {
     users,
     setUsers,
+    places,
+    setPlaces,
     event,
     setEvent,
     attendees,
