@@ -1,12 +1,18 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useEffect, useState, useContext } from "react"
-import { Button, Text, TextInput, useTheme } from "react-native-paper"
+import { Button, Text, TextInput, useTheme, IconButton } from "react-native-paper"
 import CreateForm from "../Shared/CreateForm"
 import Constants from "expo-constants"
 import ModalMessage from "../Shared/ModalMessage"
 import Dropdown from "../Shared/Dropdown"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import ApplicationContext from "../ApplicationContext"
+
+const defaultQuestion = {
+  interrogation: '',
+  question_type: 'Abierta',
+  enum_options: []
+}
 
 export default AddForm = ({ navigation, route }) => {
   const theme = useTheme()
@@ -19,27 +25,12 @@ export default AddForm = ({ navigation, route }) => {
   const [belonging_place, setBelonging_place] = useState("")
   const [belonging_event_identifier, setBelonging_event_identifier] = useState("")
   const [version, setVersion] = useState("")
-  // const [newQuestion, setNewQuestion] = useState("")
-  // const [type, setType] = useState("")
-  // const [question_options, setQuestion_options] = useState([])
-  const [questions, setQuestions] = useState([
-    {
-      interrogation: "¿Que te pareció el evento",
-      question_type: "Abierta",
-      enum_options: []
-    },
-    {
-      interrogation: "¿En serio?",
-      question_type: "Numérica",
-      enum_options: []
-    }
-  ])
-  const [inter, setInter] = useState("")
-  const [enumOp, setEnumOp] = useState([""])
-  // const [quesType, setQuesType] = useState("")
+  const [questions, setQuestions] = useState([{
+    interrogation: '',
+    question_type: 'Abierta',
+    enum_options: []
+  }])
   const [isTemplate, setIsTemplate] = useState(false)
-  // const [abierta, setAbierta] = useState("")
-  // const [respuesta, setRespuesta] = useState("")
 
   const QuestionType = [
     {
@@ -58,18 +49,13 @@ export default AddForm = ({ navigation, route }) => {
       option: "Escala"
     }
   ]
-
-  // console.log(questions)
-
-  // questions.push("¿Pregunta añadida?")
-
   const [modalSuccess, setModalSuccess] = useState(false)
   const [modalLoading, setModalLoading] = useState(false)
   const [modalError, setModalError] = useState(false)
   const [modalFatal, setModalFatal] = useState(false)
   const [responseCode, setResponseCode] = useState("")
 
-  async function SaveForm() {
+  async function SaveForm () {
     const request = await fetch(`${localhost}/forms`, {
       method: "POST",
       headers: {
@@ -168,18 +154,14 @@ export default AddForm = ({ navigation, route }) => {
           />
           <Text variant="labelLarge">Preguntas</Text>
 
-          {questions != 0
-            ? questions.map((question, questionIndex, questions, setQuestions) => (
-                // console.log("question: ", question),
-                // console.log("questions: ", questions),
-                <Item
-                  // key="ItemMap"
-                  indexQuestion={questionIndex}
-                  question={question}
-                  questions={questions}
-                  setQuestions={setQuestions}
-                />
-              ))
+          {questions.length > 0
+            ? questions.map((question, questionIndex) => (
+              <Item
+                key={questionIndex}
+                questionIndex={questionIndex}
+                question={question}
+              />
+            ))
             : null}
         </VStack>
       </VStack>
@@ -214,58 +196,42 @@ export default AddForm = ({ navigation, route }) => {
     </Button>
   )
 
-  const AddQuestion = (questions, question, setQuestions, newQuestion, quesType) => {
-    const defaultQuestion = {
-      interrogation: newQuestion,
-      question_type: quesType,
-      enum_options: ["Sí", "No"]
-    }
-    // console.log(questions.length)
-    const mutatedQuestions = [question]
-    mutatedQuestions.push(defaultQuestion)
-    setQuestions([...mutatedQuestions])
-    console.log(question)
+  const addQuestion = (questionIndex) => {
+    questions.splice(questionIndex + 1, 0, { ...defaultQuestion, interrogation: '' })
+    setQuestions([...questions])
   }
 
-  const ChangeQuestion = (questions, setNewQuestion, indexQuestion, newQuestion) => {
-    const mutatedChangeQuestion = questions
-    mutatedChangeQuestion[indexQuestion].interrogation = newQuestion
-    setQuestions([...mutatedChangeQuestion])
+  const deleteQuestion = (questionIndex) => {
+    questions.splice(questionIndex, 1)
+    setQuestions([...questions])
   }
 
-  const Item = ({ indexQuestion, question, questions, setQuestions }) => {
-    const [newQuestion, setNewQuestion] = useState()
-    const [quesType, setQuesType] = useState()
+  const changeQuestion = (questionIndex, text) => {
+    if (text !== undefined) questions[questionIndex].interrogation = text
+    setQuestions([...questions])
+  }
 
+  const Item = ({ questionIndex, question }) => {
     return (
       <VStack
         key="Question"
         spacing={5}
       >
-        {/* <Text>Pregunta: {question.interrogation}</Text>
-        <Text>Tipo de pregunta: {question.question_type}</Text> */}
         <TextInput
           mode="outlined"
-          value={newQuestion}
-          onChangeText={setNewQuestion}
-          label="Nueva Pregunta"
+          value={question.interrogation}
+          onChangeText={text => changeQuestion(questionIndex, text)}
+          label="Interrogante"
           autoComplete="off"
         />
-        {/* <TextInput
-          mode="outlined"
-          value={quesType}
-          onChangeText={setQuesType}
-          label="Tipo de Pregunta"
-          autoComplete="off"
-          autoCapitalize="sentences"
-        /> */}
         <Dropdown
           title="Tipo de pregunta"
           options={QuestionType}
-          value={quesType}
-          selected={setQuesType}
+          value={question.question_type}
+          selected={_ => changeQuestion(questionIndex)}
+          isArray={true}
         />
-        {quesType == "Opción múltiple" || quesType == "Selección múltiple" || quesType == "Escala" ? (
+        {/* {quesType == "Opción múltiple" || quesType == "Selección múltiple" || quesType == "Escala" ? (
           <TextInput
             mode="outlined"
             value={question.enum_options}
@@ -273,35 +239,12 @@ export default AddForm = ({ navigation, route }) => {
             label="Respuestas"
             autoComplete="off"
           />
-        ) : null}
-        <VStack
-          key="Button"
-          pt={10}
-          pb={10}
-          spacing={5}
-        >
-          <Button
-            key="SaveButton"
-            mode="contained"
-            icon="plus"
-            onPress={() => {
-              AddQuestion(questions, setQuestions, quesType, newQuestion)
-            }}
-          >
-            Agregar al formulario
-          </Button>
-          {/* <Button
-            key="ChangeButton"
-            mode="contained"
-            icon="plus"
-            onPress={() => {
-              ChangeQuestion(questions, setQuestions, newQuestion, indexQuestion)
-            }}
-          >
-            Cambiar pregunta
-          </Button> */}
-        </VStack>
-        {/* {NewQuestion()} */}
+        ) : null} */}
+
+        <Flex direction='row' items='center' justify='end'>
+          <IconButton icon='plus' mode='contained' onPress={_ => addQuestion(questionIndex)} />
+          <IconButton icon='minus' mode='contained' onPress={_ => deleteQuestion(questionIndex)} />
+        </Flex>
       </VStack>
     )
   }
