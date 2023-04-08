@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react"
 import { Pressable } from "react-native"
 import { Text, TextInput, TouchableRipple, Menu, Card } from "react-native-paper"
 
-export default Dropdown = ({ title, options, selected, value }) => {
+export default Dropdown = ({ title, options, selected, value, isAnObjectsArray, objectInfo }) => {
   const [show, setShow] = useState(false)
   return (
     <Menu
@@ -21,15 +21,21 @@ export default Dropdown = ({ title, options, selected, value }) => {
     >
       {options?.length > 0
         ? options.map((option) => (
-            <Menu.Item
-              key={`Menu item ${option?.value ?? option?.option}`}
-              title={option?.option}
-              onPress={() => {
+          <Menu.Item
+            key={`Menu item ${option?.value ?? option?.option}`}
+            title={option?.option}
+            onPress={() => {
+              if (!isAnObjectsArray)
                 selected(option?.value ? { option: option.option, value: option.value } : option.option)
-                setShow(!show)
-              }}
-            />
-          ))
+              else {
+                const selectedValue = option?.value ? { option: option.option, value: option.value } : option.option
+                objectInfo.arr[objectInfo.index][objectInfo.key] = selectedValue
+                objectInfo.setArr([...objectInfo.arr])
+              }
+              setShow(!show)
+            }}
+          />
+        ))
         : null}
     </Menu>
   )

@@ -1,5 +1,5 @@
 import { Flex, HStack, VStack } from '@react-native-material/core'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useContext } from 'react'
 import { Avatar, Button, Card, FAB, IconButton, Text, TouchableRipple, useTheme } from 'react-native-paper'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useHeaderHeight } from '@react-navigation/elements'
@@ -11,11 +11,12 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import SearchBar from '../Shared/SearchBar'
 import InformationMessage from '../Shared/InformationMessage'
 import { it } from 'react-native-paper-dates'
+import ApplicationContext from '../ApplicationContext'
 
 export default Forms = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const theme = useTheme()
-  const { user, token } = route.params
+  const { user, token } = useContext(ApplicationContext)
   const headerMargin = useHeaderHeight()
 
   const [forms, setForms] = useState(undefined)
@@ -27,7 +28,7 @@ export default Forms = ({ navigation, route }) => {
 
   const [placesOptions, setPlacesOptions] = useState()
 
-  async function getForms() {
+  async function getForms () {
     setLoading(true)
 
     const request = await fetch(`${localhost}/forms?isTemplate=${isTemplate}`, {
@@ -51,7 +52,7 @@ export default Forms = ({ navigation, route }) => {
     }
   }
 
-  async function searchForms() {
+  async function searchForms () {
     setLoading(true)
 
     if (search === '') {
@@ -92,13 +93,13 @@ export default Forms = ({ navigation, route }) => {
     useCallback(() => {
       getForms()
 
-      return () => {}
+      return () => { }
     }, [])
   )
 
   const Item = ({ form_name, description, form_identifier }) => {
     return (
-      <Flex ph={20} pv={5} onPress={() => {}}>
+      <Flex ph={20} pv={5} onPress={() => { }}>
         <Card mode="outlined" style={{ overflow: 'hidden' }}>
           <TouchableRipple
             onPress={() => {
