@@ -1,5 +1,5 @@
 import { Flex, VStack } from "@react-native-material/core"
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useContext } from "react"
 import { Button, Card, IconButton, Text, TextInput, useTheme } from "react-native-paper"
 import { useHeaderHeight } from "@react-navigation/elements"
 import Header from "../Shared/Header"
@@ -11,11 +11,12 @@ import DisplayDetails from "../Shared/DisplayDetails"
 import { useFocusEffect } from "@react-navigation/native"
 import * as ImagePicker from "expo-image-picker"
 import { manipulateAsync, FlipType, SaveFormat } from "expo-image-manipulator"
+import ApplicationContext from "../ApplicationContext"
 
 export default Profile = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const headerMargin = useHeaderHeight()
-  const { user, token } = route.params
+  const { user, token } = useContext(ApplicationContext)
 
   useEffect(() => {
     navigation.setOptions({

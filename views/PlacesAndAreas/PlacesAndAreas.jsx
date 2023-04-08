@@ -223,7 +223,7 @@ export default PlaceAndAreas = ({ navigation, route }) => {
                       description="No hay ningún bosque urbano registrado, ¿qué te parece si hacemos el primero?"
                       buttonIcon="plus"
                       buttonTitle="Agregar"
-                      action={() => navigation.navigate("AddPlace")}
+                      action={() => navigation.navigate("AddPlace", { getPlaces })}
                     />
                   )
                 }
@@ -242,7 +242,7 @@ export default PlaceAndAreas = ({ navigation, route }) => {
               <FAB
                 icon="plus"
                 style={{ position: "absolute", margin: 16, right: 0, bottom: 0 }}
-                onPress={() => navigation.navigate("AddPlace")}
+                onPress={() => navigation.navigate("AddPlace", { getPlaces })}
               />
             </Flex>
           ) : (

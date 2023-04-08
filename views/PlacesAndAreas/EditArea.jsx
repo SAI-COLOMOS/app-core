@@ -194,7 +194,8 @@ export default EditArea = ({ navigation, route }) => {
           [
             "Aceptar",
             () => {
-              setModalConfirm(!modalConfirm), deleteArea()
+              setModalConfirm(!modalConfirm)
+              deleteArea()
             }
           ]
         ]}

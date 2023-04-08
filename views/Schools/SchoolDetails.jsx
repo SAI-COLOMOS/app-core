@@ -1,17 +1,19 @@
-import { Flex, VStack } from '@react-native-material/core'
-import { useCallback, useEffect, useState } from 'react'
-import { FlatList, RefreshControl, ScrollView } from 'react-native'
-import { ActivityIndicator, Avatar, Button, Card, FAB, ProgressBar, Text, useTheme } from 'react-native-paper'
-import { useHeaderHeight } from '@react-navigation/elements'
-import Constants from 'expo-constants'
-import Header from '../Shared/Header'
-import DisplayDetails from '../Shared/DisplayDetails'
-import { useFocusEffect } from '@react-navigation/native'
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import { Flex, VStack } from "@react-native-material/core"
+import { useCallback, useContext, useEffect, useState } from "react"
+import { FlatList, RefreshControl, ScrollView } from "react-native"
+import { ActivityIndicator, Avatar, Button, Card, FAB, ProgressBar, Text, useTheme } from "react-native-paper"
+import { useHeaderHeight } from "@react-navigation/elements"
+import Constants from "expo-constants"
+import Header from "../Shared/Header"
+import DisplayDetails from "../Shared/DisplayDetails"
+import { useFocusEffect } from "@react-navigation/native"
+import Icon from "react-native-vector-icons/MaterialCommunityIcons"
+import ApplicationContext from "../ApplicationContext"
 
 export default SchoolDetails = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
-  const { token, school_identifier } = route.params
+  const { token } = useContext(ApplicationContext)
+  const { school_identifier, getSchools } = route.params
   const headerMargin = useHeaderHeight()
   const theme = useTheme()
 
@@ -22,11 +24,11 @@ export default SchoolDetails = ({ navigation, route }) => {
     setLoading(true)
 
     const request = await fetch(`${localhost}/schools/${school_identifier}`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        'Cache-Control': 'no-cache'
+        "Cache-Control": "no-cache"
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
@@ -46,46 +48,23 @@ export default SchoolDetails = ({ navigation, route }) => {
     navigation.setOptions({
       header: (props) => <Header {...props} />,
       headerTransparent: true,
-      headerTitle: 'Datos de la escuela'
+      headerTitle: "Datos de la escuela"
     })
   }, [])
 
-  useFocusEffect(
-    useCallback(() => {
-      getSchool()
-      return () => {}
-    }, [])
-  )
-
-  // TO-DO: Por revisar que onda con esto
-  const NoConection = (_) => {
-    return (
-      <VStack center spacing={20} p={30}>
-        <Icon name="wifi-alert" color={theme.colors.onBackground} size={50} />
-        <VStack center>
-          <Text variant="headlineSmall">Sin conexión</Text>
-          <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
-            Parece que no tienes conexión a internet, conectate e intenta de nuevo
-          </Text>
-        </VStack>
-        <Flex>
-          <Button
-            icon="reload"
-            mode="outlined"
-            onPress={(_) => {
-              getSchool()
-            }}
-          >
-            Volver a intentar
-          </Button>
-        </Flex>
-      </VStack>
-    )
-  }
+  useEffect(() => {
+    getSchool()
+  }, [])
 
   const Contact = () => (
-    <Card key="Contact" mode="outlined">
-      <VStack p={20} spacing={5}>
+    <Card
+      key="Contact"
+      mode="outlined"
+    >
+      <VStack
+        p={20}
+        spacing={5}
+      >
         <Text variant="bodyLarge">Contacto de la escuela</Text>
         <VStack spacing={10}>
           <Flex>
@@ -98,8 +77,14 @@ export default SchoolDetails = ({ navigation, route }) => {
   )
 
   const Address = () => (
-    <Card key="Address" mode="outlined">
-      <VStack p={20} spacing={5}>
+    <Card
+      key="Address"
+      mode="outlined"
+    >
+      <VStack
+        p={20}
+        spacing={5}
+      >
         <Text variant="bodyLarge">Dirección de la escuela</Text>
         <VStack spacing={10}>
           <Flex>
@@ -109,7 +94,7 @@ export default SchoolDetails = ({ navigation, route }) => {
 
           <Flex>
             <Text variant="labelSmall">Referencia</Text>
-            <Text variant="bodyMedium">{school?.reference ? school?.reference : 'Sin referencia'}</Text>
+            <Text variant="bodyMedium">{school?.reference ? school?.reference : "Sin referencia"}</Text>
           </Flex>
         </VStack>
       </VStack>
@@ -117,18 +102,43 @@ export default SchoolDetails = ({ navigation, route }) => {
   )
 
   return (
-    <Flex fill pt={headerMargin - 20}>
-      <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={(_) => getSchool()} />}>
+    <Flex
+      fill
+      pt={headerMargin - 20}
+    >
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={(_) => getSchool()}
+          />
+        }
+      >
         {school !== undefined ? (
           school !== null ? (
             isNaN(school) ? (
-              <DisplayDetails icon="town-hall" title={school?.school_name} children={[Contact(), Address()]} />
+              <DisplayDetails
+                icon="town-hall"
+                title={school?.school_name}
+                children={[Contact(), Address()]}
+              />
             ) : (
-              <VStack p={30} center spacing={20}>
-                <Icon color={theme.colors.onBackground} name="alert-circle-outline" size={50} />
+              <VStack
+                p={30}
+                center
+                spacing={20}
+              >
+                <Icon
+                  color={theme.colors.onBackground}
+                  name="alert-circle-outline"
+                  size={50}
+                />
                 <VStack center>
                   <Text variant="headlineSmall">Ocurrió un problema</Text>
-                  <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
+                  <Text
+                    variant="bodyMedium"
+                    style={{ textAlign: "center" }}
+                  >
                     No podemos recuperar los datos de la escuela, intentalo de nuevo más tarde (Error: {school})
                   </Text>
                 </VStack>
@@ -145,11 +155,22 @@ export default SchoolDetails = ({ navigation, route }) => {
               </VStack>
             )
           ) : (
-            <VStack center spacing={20} p={30}>
-              <Icon color={theme.colors.onBackground} name="wifi-alert" size={50} />
+            <VStack
+              center
+              spacing={20}
+              p={30}
+            >
+              <Icon
+                color={theme.colors.onBackground}
+                name="wifi-alert"
+                size={50}
+              />
               <VStack center>
                 <Text variant="headlineSmall">Sin internet</Text>
-                <Text variant="bodyMedium" style={{ textAlign: 'center' }}>
+                <Text
+                  variant="bodyMedium"
+                  style={{ textAlign: "center" }}
+                >
                   No podemos recuperar los datos de la escuela, revisa tu conexión a internet e intentalo de nuevo
                 </Text>
               </VStack>
@@ -171,11 +192,12 @@ export default SchoolDetails = ({ navigation, route }) => {
       {!(school === undefined || school === null) ? (
         <FAB
           icon="pencil-outline"
-          style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
+          style={{ position: "absolute", margin: 16, right: 0, bottom: 0 }}
           onPress={() => {
-            navigation.navigate('EditSchool', {
-              token,
-              school
+            navigation.navigate("EditSchool", {
+              school,
+              getSchool,
+              getSchools
             })
           }}
         />

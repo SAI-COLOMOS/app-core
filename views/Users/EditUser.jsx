@@ -690,7 +690,8 @@ export default EditUser = ({ navigation, route }) => {
           [
             "Aceptar",
             () => {
-              setModalConfirm(!modalConfirm), deleteUser()
+              setModalConfirm(!modalConfirm)
+              deleteUser()
             }
           ]
         ]}

@@ -1,4 +1,4 @@
-import { Flex, HStack, VStack } from "@react-native-material/core"
+import { Flex, HStack, VStack, Wrap } from "@react-native-material/core"
 import { useState, useEffect, useCallback, useMemo, useContext } from "react"
 import * as SecureStore from "expo-secure-store"
 import { Button, Card, Text, useTheme, Avatar, TouchableRipple } from "react-native-paper"
@@ -109,8 +109,9 @@ export default Dashboard = ({ navigation }) => {
   const WidgetSmall = useCallback(
     ({ screen, payload, child }) => (
       <Flex
-        w={"25%"}
         p={5}
+        h={90}
+        w={90}
       >
         <Card
           mode="outlined"
@@ -122,7 +123,8 @@ export default Dashboard = ({ navigation }) => {
             }}
           >
             <Flex
-              h={80}
+              h={"100%"}
+              w={"100%"}
               center
             >
               {child}
@@ -137,8 +139,9 @@ export default Dashboard = ({ navigation }) => {
   const WidgetMedium = useCallback(
     ({ screen, payload, child, title }) => (
       <Flex
-        w={"50%"}
         p={5}
+        h={180}
+        w={180}
       >
         <Card
           mode="outlined"
@@ -152,7 +155,8 @@ export default Dashboard = ({ navigation }) => {
             <VStack
               ph={20}
               pv={10}
-              h={175}
+              h={"100%"}
+              w={"100%"}
               spacing={10}
             >
               <Text
@@ -275,11 +279,7 @@ export default Dashboard = ({ navigation }) => {
   /* Areas de Screens */
 
   const VistaAdministrador = () => (
-    <Flex
-      direction="row"
-      wrap="wrap"
-      ph={10}
-    >
+    <Wrap justify="center">
       {/* Lugares y áreas */}
       <WidgetMedium
         title="Usuarios"
@@ -319,26 +319,29 @@ export default Dashboard = ({ navigation }) => {
         }
       />
 
-      {/* Widget de perfil */}
-      <WidgetSmall
-        screen="Profile"
-        // payload={{ user, token }}
-        child={
-          <ProfileImage
-            icon="account-outline"
-            image={user?.avatar}
-          />
-        }
-      />
-    </Flex>
+      <Wrap
+        h={180}
+        w={180}
+      >
+        {/* Widget de perfil */}
+        <WidgetSmall
+          screen="Profile"
+          // payload={{ user, token }}
+          child={
+            <ProfileImage
+              icon="account-outline"
+              image={user?.avatar}
+              width={85}
+              height={85}
+            />
+          }
+        />
+      </Wrap>
+    </Wrap>
   )
 
   const VistaEncargado = () => (
-    <Flex
-      direction="row"
-      wrap="wrap"
-      ph={10}
-    >
+    <Wrap justify="center">
       {/* Eventos */}
       <WidgetMedium
         title="Eventos"
@@ -365,41 +368,47 @@ export default Dashboard = ({ navigation }) => {
         }
       />
 
-      {/* Usuarios */}
-      <WidgetSmall
-        screen="Users"
-        child={
-          <Avatar.Icon
-            icon={"account-supervisor-outline"}
-            size={50}
-          />
-        }
-      />
+      <Wrap
+        h={90}
+        w={360}
+      >
+        {/* Usuarios */}
+        <WidgetSmall
+          screen="Users"
+          child={
+            <Avatar.Icon
+              icon={"account-supervisor-outline"}
+              size={50}
+            />
+          }
+        />
 
-      {/* Formularios */}
-      <WidgetSmall
-        screen="Forms"
-        // payload={{ actualUser: user, token }}
-        child={
-          <Avatar.Icon
-            icon={"form-select"}
-            size={50}
-          />
-        }
-      />
-
-      {/* Widget de perfil */}
-      <WidgetSmall
-        screen="Profile"
-        // payload={{ user, token }}
-        child={
-          <ProfileImage
-            icon="account-outline"
-            image={user?.avatar}
-          />
-        }
-      />
-    </Flex>
+        {/* Formularios */}
+        <WidgetSmall
+          screen="Forms"
+          // payload={{ actualUser: user, token }}
+          child={
+            <Avatar.Icon
+              icon={"form-select"}
+              size={50}
+            />
+          }
+        />
+        {/* Widget de perfil */}
+        <WidgetSmall
+          screen="Profile"
+          // payload={{ user, token }}
+          child={
+            <ProfileImage
+              icon="account-outline"
+              image={user?.avatar}
+              width={85}
+              height={85}
+            />
+          }
+        />
+      </Wrap>
+    </Wrap>
   )
 
   return (
