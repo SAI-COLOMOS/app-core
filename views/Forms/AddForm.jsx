@@ -1,5 +1,5 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
-import { useEffect, useState, useContext } from "react"
+import { useEffect, useState, useContext, Component } from "react"
 import { Button, Text, TextInput, useTheme, IconButton } from "react-native-paper"
 import CreateForm from "../Shared/CreateForm"
 import Constants from "expo-constants"
@@ -154,15 +154,13 @@ export default AddForm = ({ navigation, route }) => {
           />
           <Text variant="labelLarge">Preguntas</Text>
 
-          {questions.length > 0
-            ? questions.map((question, questionIndex) => (
-              <Item
-                key={questionIndex}
-                questionIndex={questionIndex}
-                question={question}
-              />
-            ))
-            : null}
+          {questions.length > 0 && questions.map((question, questionIndex) => (
+            <Item
+              key={questionIndex}
+              questionIndex={questionIndex}
+              question={question}
+            />
+          ))}
         </VStack>
       </VStack>
     )
@@ -206,12 +204,15 @@ export default AddForm = ({ navigation, route }) => {
     setQuestions([...questions])
   }
 
-  const changeQuestion = (questionIndex, text) => {
-    if (text !== undefined) questions[questionIndex].interrogation = text
+  const changeQuestion = (questionIndex, text, key) => {
+    questions[questionIndex][key] = text
     setQuestions([...questions])
   }
 
   const Item = ({ questionIndex, question }) => {
+    const { question_type } = question
+    const [interrogation, setInterrogation] = useState(question.interrogation);
+
     return (
       <VStack
         key="Question"
@@ -219,50 +220,38 @@ export default AddForm = ({ navigation, route }) => {
       >
         <TextInput
           mode="outlined"
-          value={question.interrogation}
-          onChangeText={text => changeQuestion(questionIndex, text)}
+          value={interrogation}
+          onChangeText={setInterrogation}
+          onEndEditing={event => changeQuestion(questionIndex, event.nativeEvent.text, 'interrogation')}
           label="Interrogante"
           autoComplete="off"
         />
         <Dropdown
           title="Tipo de pregunta"
           options={QuestionType}
-          value={question.question_type}
-          selected={_ => changeQuestion(questionIndex)}
-          isArray={true}
+          value={question_type}
+          isAnObjectsArray={true}
+          objectInfo={{ "index": questionIndex, "key": "question_type", "arr": questions, "setArr": setQuestions }}
         />
-        {/* {quesType == "Opción múltiple" || quesType == "Selección múltiple" || quesType == "Escala" ? (
+        {question_type == "Opción múltiple" || question_type == "Selección múltiple" || question_type == "Escala" ? (
           <TextInput
             mode="outlined"
-            value={question.enum_options}
-            onChangeText={setQuestions}
+            // value={question.enum_options}
+            // onChangeText={setQuestions}
             label="Respuestas"
             autoComplete="off"
           />
-        ) : null} */}
+        ) : null}
 
         <Flex direction='row' items='center' justify='end'>
           <IconButton icon='plus' mode='contained' onPress={_ => addQuestion(questionIndex)} />
-          <IconButton icon='minus' mode='contained' onPress={_ => deleteQuestion(questionIndex)} />
+          {
+            questionIndex > 0 && <IconButton icon='minus' mode='contained' onPress={_ => deleteQuestion(questionIndex)} />
+          }
         </Flex>
       </VStack>
     )
   }
-
-  const NewQuestion = (question, setQuestion) => (
-    <Button
-      key="SaveButton"
-      mode="contained"
-      icon="plus"
-      onPress={() => {
-        AddQuestion(question, setQuestion)
-      }}
-    >
-      Agregar pregunta
-    </Button>
-  )
-
-  // const EraseQuestion = () => <Button>Eliminar pregunta</Button>
 
   return (
     <Flex fill>
