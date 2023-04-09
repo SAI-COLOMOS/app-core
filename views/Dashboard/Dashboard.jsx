@@ -358,7 +358,7 @@ export default Dashboard = ({ navigation }) => {
   const VistaEncargado = () => (
     <Wrap justify="center">
       {/* Widget A continuación */}
-      {typeof feed?.enrolled_event == "object" && Object.keys(feed?.enrolled_event).length > 0 && (
+      {feed?.enrolled_event != null && (
         <WidgetLarge
           title={GetMoment(feed?.enrolled_event?.starting_date)}
           screen="EventDetails"
