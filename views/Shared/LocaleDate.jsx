@@ -1,5 +1,6 @@
 import { Flex } from "@react-native-material/core"
 import { Text } from "react-native-paper"
+import { log } from "react-native-reanimated"
 
 export const LongDate = (date) => {
   //const originalDate = typeof date == "object" ? date : new Date(date)
@@ -337,4 +338,29 @@ export const Time24 = (time) => {
   const minutes = () => (originalTime.getMinutes() <= 9 ? `0${originalTime.getMinutes()}` : originalTime.getMinutes().toString())
 
   return `${hours()}:${minutes()}`
+}
+
+export const GetMoment = (date) => {
+  const originalDate = { object: date, string: new Date(date) }[typeof date]
+
+  const actualDate = new Date()
+  const subtraction = originalDate - actualDate
+  const hours = Math.floor(subtraction / (1000 * 60 * 60))
+  const days = Math.floor(hours / 24)
+
+  if (days > 2) {
+    return "Evento próximo"
+  } else if (days === 2) {
+    return "Evento para pasado mañana"
+  } else if (days === 1) {
+    return "Evento para mañana"
+  } else if (hours > 2) {
+    return `Evento para hoy`
+  } else if (hours <= 2) {
+    return "Evento por comenzar"
+  } else if (subtraction >= 0) {
+    return "Evento iniciado"
+  } else {
+    return "Evento en curso"
+  }
 }

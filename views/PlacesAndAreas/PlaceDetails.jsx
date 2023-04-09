@@ -83,7 +83,7 @@ export default PlaceDetails = ({ navigation, route }) => {
         p={20}
         spacing={5}
       >
-        <Text variant="bodyLarge">Bosque urbano</Text>
+        <Text variant="titleMedium">Bosque urbano</Text>
         <VStack spacing={10}>
           <Text variant="labelSmall">Domicilio</Text>
           <Text variant="bodyMedium">{`${place?.street} #${place?.exterior_number}\n${place?.colony}, ${place?.municipality}, ${place?.postal_code}`}</Text>
@@ -108,7 +108,7 @@ export default PlaceDetails = ({ navigation, route }) => {
       mode="outlined"
     >
       <Flex p={20}>
-        <Text variant="bodyLarge">Áreas del bosque urbano</Text>
+        <Text variant="titleMedium">Áreas del bosque urbano</Text>
       </Flex>
       <VStack
         spacing={10}

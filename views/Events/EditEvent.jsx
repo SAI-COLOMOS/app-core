@@ -5,25 +5,24 @@ import Constants from "expo-constants"
 import CreateForm from "../Shared/CreateForm"
 import ModalMessage from "../Shared/ModalMessage"
 import ApplicationContext from "../ApplicationContext"
-import { DateAndTimerPicker } from "../Shared/TimeAndDatePicker"
+import DateAndTimePicker from "../Shared/DateAndTimePicker"
 import Dropdown from "../Shared/Dropdown"
 
 export default EditEvent = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const { token } = useContext(ApplicationContext)
   const theme = useTheme()
-  const { event, event_identifier } = route.params
+  const { event, event_identifier, image, getEvent, getEvents } = route.params
 
-  const [places, setPlaces] = useState(undefined)
   const [name, setName] = useState(`${event.name}`)
   const [description, setDescription] = useState(`${event.description}`)
   const [offered_hours, setOffered_hours] = useState(`${event.offered_hours}`)
   const [tolerance, setTolerance] = useState(`${event.tolerance}`)
   const [vacancy, setVacancy] = useState(`${event.vacancy}`)
-  const [starting_date, setStarting_date] = useState(new Date(event.starting_date)) //`${event.starting_date}`)
-  const [ending_date, setEnding_date] = useState(new Date(event.ending_date)) //`${event.ending_date}`)
-  const [publishing_date, setPublishing_date] = useState(new Date(event.publishing_date)) //`${event.publishing_date}`)
-  const [avatar, setAvatar] = useState(event.avatar ?? null)
+  const [starting_date, setStarting_date] = useState(new Date(event.starting_date))
+  const [ending_date, setEnding_date] = useState(new Date(event.ending_date))
+  const [publishing_date, setPublishing_date] = useState(new Date(event.publishing_date))
+  const [avatar, setAvatar] = useState(image ?? null)
   const [place, setPlace] = useState(`${event.place}`)
   const [verified, setVerified] = useState(false)
 
@@ -203,26 +202,26 @@ export default EditEvent = ({ navigation, route }) => {
           />
 
           <Flex>
-            <Text variant="labelMedium">Fecha y hora de inicio</Text>
-            <DateAndTimerPicker
-              actualDate={starting_date}
-              selectedDate={setStarting_date}
+            <DateAndTimePicker
+              title="Fecha y hora de inicio"
+              date={starting_date}
+              setDate={setStarting_date}
             />
           </Flex>
 
           <Flex>
-            <Text variant="labelMedium">Fecha y hora de termino</Text>
-            <DateAndTimerPicker
-              actualDate={ending_date}
-              selectedDate={setEnding_date}
+            <DateAndTimePicker
+              title="Fecha y hora de termino"
+              date={ending_date}
+              setDate={setEnding_date}
             />
           </Flex>
 
           <Flex>
-            <Text variant="labelMedium">Fecha y hora de publicación</Text>
-            <DateAndTimerPicker
-              actualDate={publishing_date}
-              selectedDate={setPublishing_date}
+            <DateAndTimePicker
+              title="Fecha y hora de publicación"
+              date={publishing_date}
+              setDate={setPublishing_date}
             />
           </Flex>
 
@@ -366,7 +365,16 @@ export default EditEvent = ({ navigation, route }) => {
         title="¡Listo!"
         description="El evento ha sido actualizado"
         handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]}
-        actions={[["Aceptar", () => navigation.pop()]]}
+        actions={[
+          [
+            "Aceptar",
+            () => {
+              getEvent()
+              getEvents()
+              navigation.pop()
+            }
+          ]
+        ]}
         dismissable={false}
         icon="check-circle-outline"
       />
@@ -375,7 +383,15 @@ export default EditEvent = ({ navigation, route }) => {
         title="¡Listo!"
         description="El evento ha sido eliminado"
         handler={[modalSuccessDelete, () => setModalSuccessDelete(!modalSuccessDelete)]}
-        actions={[["Aceptar", () => navigation.pop(2)]]}
+        actions={[
+          [
+            "Aceptar",
+            () => {
+              getEvents()
+              navigation.pop(2)
+            }
+          ]
+        ]}
         dismissable={false}
         icon="check-circle-outline"
       />

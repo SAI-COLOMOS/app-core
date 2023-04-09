@@ -95,7 +95,7 @@ const CalendarPicker = ({ handler, date, setDate }) => {
     setSelectedDate(date)
   }
 
-  function saveDate(params) {
+  function saveDate() {
     handler[1]()
     setDate(selectedDate)
   }
@@ -178,7 +178,7 @@ const CalendarPicker = ({ handler, date, setDate }) => {
 }
 
 export { CalendarPicker, ClockPicker }
-export default DateAndTimePicker = ({ title, date, setDate }) => {
+export default DateAndTimePicker = ({ title, date, setDate, hideTime }) => {
   const [showCalendarPicker, setShowCalendarPicker] = useState(false)
   const [showClockPicker, setShowClockPicker] = useState(false)
 
@@ -191,7 +191,7 @@ export default DateAndTimePicker = ({ title, date, setDate }) => {
             <TextInput
               mode="outlined"
               editable={false}
-              value={ShortDate(date)}
+              value={typeof date == "object" ? ShortDate(date) : "Selecciona una fecha"}
               right={
                 <TextInput.Icon
                   disabled={true}
@@ -202,30 +202,32 @@ export default DateAndTimePicker = ({ title, date, setDate }) => {
           </Pressable>
         </Flex>
 
-        <Flex w={125}>
-          <Pressable onPress={() => setShowClockPicker(true)}>
-            <TextInput
-              mode="outlined"
-              editable={false}
-              value={Time24(date)}
-              right={
-                <TextInput.Icon
-                  disabled={true}
-                  icon="menu-down"
-                />
-              }
-            />
-          </Pressable>
-        </Flex>
+        {hideTime != true && (
+          <Flex w={125}>
+            <Pressable onPress={() => setShowClockPicker(true)}>
+              <TextInput
+                mode="outlined"
+                editable={false}
+                value={typeof date == "object" ? Time24(date) : "Selecciona una hora"}
+                right={
+                  <TextInput.Icon
+                    disabled={true}
+                    icon="menu-down"
+                  />
+                }
+              />
+            </Pressable>
+          </Flex>
+        )}
       </HStack>
 
       <CalendarPicker
-        date={date}
+        date={typeof date == "object" ? date : new Date()}
         setDate={(data) => setDate(data)}
         handler={[showCalendarPicker, () => setShowCalendarPicker(!showCalendarPicker)]}
       />
       <ClockPicker
-        date={date}
+        date={typeof date == "object" ? date : new Date()}
         setDate={(data) => setDate(data)}
         handler={[showClockPicker, () => setShowClockPicker(!showClockPicker)]}
       />

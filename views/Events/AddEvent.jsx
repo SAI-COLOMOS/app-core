@@ -8,7 +8,7 @@ import ModalMessage from "../Shared/ModalMessage"
 import ApplicationContext from "../ApplicationContext"
 import Dropdown from "../Shared/Dropdown"
 import { Pressable } from "react-native"
-import DateAndTimePicker, { CalendarPicker, ClockPicker } from "../Shared/DatePicker"
+import DateAndTimePicker, { CalendarPicker, ClockPicker } from "../Shared/DateAndTimePicker"
 import { LongDate } from "../Shared/LocaleDate"
 
 export default AddEvent = ({ navigation, route }) => {
@@ -92,8 +92,7 @@ export default AddEvent = ({ navigation, route }) => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        "Cache-Control": "no-cache"
+        Authorization: `Bearer ${token}`
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))

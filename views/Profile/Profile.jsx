@@ -53,7 +53,7 @@ export default Profile = ({ navigation, route }) => {
         p={20}
         spacing={5}
       >
-        <Text variant="bodyLarge">Datos personales</Text>
+        <Text variant="titleMedium">Datos personales</Text>
         <VStack spacing={10}>
           <Flex>
             <Text variant="labelSmall">Edad</Text>
@@ -90,7 +90,7 @@ export default Profile = ({ navigation, route }) => {
         p={20}
         spacing={5}
       >
-        <Text variant="bodyLarge">Datos de contacto</Text>
+        <Text variant="titleMedium">Datos de contacto</Text>
         <VStack spacing={10}>
           <Flex>
             <Text variant="labelSmall">Teléfono</Text>
@@ -115,7 +115,7 @@ export default Profile = ({ navigation, route }) => {
         p={20}
         spacing={5}
       >
-        <Text variant="bodyLarge">Datos de emergencia</Text>
+        <Text variant="titleMedium">Datos de emergencia</Text>
         <VStack spacing={10}>
           <Flex>
             <Text variant="labelSmall">Contacto de emergencia</Text>
@@ -140,7 +140,7 @@ export default Profile = ({ navigation, route }) => {
         p={20}
         spacing={5}
       >
-        <Text variant="bodyLarge">Datos de la cuenta</Text>
+        <Text variant="titleMedium">Datos de la cuenta</Text>
         <VStack spacing={10}>
           <Flex>
             <Text variant="labelSmall">Registro</Text>

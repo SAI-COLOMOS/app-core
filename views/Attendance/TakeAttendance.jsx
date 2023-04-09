@@ -7,7 +7,7 @@ import Constants from "expo-constants"
 // import DateTimePicker from "@react-native-community/datetimepicker"
 // import { DatePickerModal, DatePickerModalContent } from "react-native-paper-dates"
 import ApplicationContext from "../ApplicationContext"
-import DatePicker from "../Shared/DatePicker"
+// import DatePicker from "../Shared/DatePicker"
 
 import { LongDate } from "../Shared/LocaleDate"
 import { FlatList } from "react-native"

@@ -75,7 +75,7 @@ export default CardDetails = ({ navigation, route }) => {
           >
             {achieved_hours} hrs
           </Text>
-          <Text variant="bodyLarge">{total_hours} hrs</Text>
+          <Text variant="titleMedium">{total_hours} hrs</Text>
         </HStack>
         {total_hours > 0 && <ProgressBar progress={achieved_hours / total_hours} />}
       </VStack>
@@ -86,7 +86,7 @@ export default CardDetails = ({ navigation, route }) => {
     return (
       <Flex key="Activity">
         <Flex pv={20}>
-          <Text variant="bodyLarge">Actividades realizadas</Text>
+          <Text variant="titleMedium">Actividades realizadas</Text>
         </Flex>
 
         <VStack spacing={25}>
@@ -116,7 +116,7 @@ export default CardDetails = ({ navigation, route }) => {
                       </VStack>
                       <Flex fill>
                         <Text
-                          variant="bodyLarge"
+                          variant="titleMedium"
                           numberOfLines={2}
                         >
                           {activity?.activity_name}

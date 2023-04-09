@@ -19,9 +19,10 @@ export default EventDetails = ({ navigation, route }) => {
   const { user, token } = useContext(ApplicationContext)
   //const { event, setEvent, attendees, setAttendees, profiles, setProfiles } = useContext(EventContext)
   const headerMargin = useHeaderHeight()
-  const { event_identifier } = route.params
+  const { event_identifier, getEvents } = route.params
   const theme = useTheme()
 
+  const [avatar, setAvatar] = useState(undefined)
   const [loading, setLoading] = useState(false)
   const [event, setEvent] = useState(undefined)
   const [starting_date, setStarting_date] = useState(new Date())
@@ -85,6 +86,24 @@ export default EventDetails = ({ navigation, route }) => {
   }
 
   useEffect(() => {
+    const requestAvatar = async () => {
+      const request = await fetch(`${localhost}/agenda/${event_identifier}?avatar=true`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        }
+      })
+        .then((response) => response.json())
+        .catch(() => null)
+
+      request?.avatar ? setAvatar(request.avatar) : setAvatar(null)
+    }
+
+    requestAvatar()
+  }, [event])
+
+  useEffect(() => {
     navigation.setOptions({
       header: (props) => <Header {...props} />,
       headerTransparent: true,
@@ -108,7 +127,7 @@ export default EventDetails = ({ navigation, route }) => {
         <Text variant="bodyMedium">Horas ofertadas</Text>
         <HStack items="baseline">
           <Text variant="displaySmall">{event?.offered_hours}</Text>
-          <Text variant="bodyLarge"> hrs.</Text>
+          <Text variant="titleMedium"> hrs.</Text>
         </HStack>
       </VStack>
       <VStack>
@@ -118,7 +137,7 @@ export default EventDetails = ({ navigation, route }) => {
           justify="end"
         >
           <Text variant="displaySmall">{event?.attendance.attendee_list.length}</Text>
-          <Text variant="bodyLarge"> / {event?.vacancy}</Text>
+          <Text variant="titleMedium"> / {event?.vacancy}</Text>
         </HStack>
       </VStack>
     </HStack>
@@ -133,7 +152,7 @@ export default EventDetails = ({ navigation, route }) => {
         p={20}
         spacing={5}
       >
-        <Text variant="bodyLarge">Descripción</Text>
+        <Text variant="titleMedium">Descripción</Text>
         <Text variant="bodyMedium">{event?.description}</Text>
       </Flex>
     </Card>
@@ -148,7 +167,7 @@ export default EventDetails = ({ navigation, route }) => {
         p={20}
         spacing={5}
       >
-        <Text variant="bodyLarge">Lugar, fecha y hora</Text>
+        <Text variant="titleMedium">Lugar, fecha y hora</Text>
         <VStack spacing={10}>
           <Flex>
             <Text variant="labelSmall">Lugar</Text>
@@ -194,7 +213,7 @@ export default EventDetails = ({ navigation, route }) => {
         p={20}
         spacing={5}
       >
-        <Text variant="bodyLarge">Acerca del evento</Text>
+        <Text variant="titleMedium">Acerca del evento</Text>
         <VStack spacing={10}>
           <Flex>
             <Text variant="labelSmall">Encargado designado</Text>
@@ -218,7 +237,7 @@ export default EventDetails = ({ navigation, route }) => {
       mode="outlined"
     >
       <Flex p={20}>
-        <Text variant="bodyLarge">Lista de participantes</Text>
+        <Text variant="titleMedium">Lista de participantes</Text>
       </Flex>
       <VStack
         spacing={10}
@@ -259,6 +278,35 @@ export default EventDetails = ({ navigation, route }) => {
       key="Subscribe"
     >
       <VStack spacing={20}>
+        {event?.author_register == user.register && event?.attendance?.status == "Por publicar" && (
+          <Card mode="outlined">
+            <InformationMessage
+              icon="clock-outline"
+              title="Evento por publicar"
+              description={`Actualmente solo tú puedes ver este evento, el cual será publicado el día ${LongDate(event?.publishing_date)} a las ${Time24(event?.publishing_date)}`}
+              action={() => null}
+              buttonTitle="Publicar ahora"
+              buttonIcon="calendar-check-outline"
+            />
+          </Card>
+          // <HStack
+          //   spacing={10}
+          //   fill
+          // >
+          //   <Icon
+          //     name="clock-outline"
+          //     color={theme.colors.primary}
+          //     size={50}
+          //   />
+          //   <Flex fill>
+          //     <Text variant="titleMedium">Evento por publicar</Text>
+          //     <Text variant="bodyMedium">
+          //       Actualmente solo tú puedes ver este evento, el cual será publicado el día {LongDate(event?.publishing_date)} a las {Time24(event?.publishing_date)}
+          //     </Text>
+          //   </Flex>
+          // </HStack>
+        )}
+
         {event?.author_register == user.register ? (
           <Button
             mode="contained"
@@ -277,7 +325,7 @@ export default EventDetails = ({ navigation, route }) => {
           }) ? (
           <VStack spacing={20}>
             <Text
-              variant="bodyLarge"
+              variant="titleMedium"
               style={{ textAlign: "center" }}
             >
               Ya estás inscrito al evento
@@ -409,7 +457,7 @@ export default EventDetails = ({ navigation, route }) => {
           isNaN(event) ? (
             <DisplayDetails
               icon="bulletin-board"
-              image={event?.avatar}
+              image={avatar}
               title={event?.name}
               children={[Availability(), Subscribe(), Description(), Event(), Info(), user.role != "Prestador" && Enrolled()]}
               refreshStatus={loading}
@@ -488,7 +536,10 @@ export default EventDetails = ({ navigation, route }) => {
           onPress={() =>
             navigation.navigate("EditEvent", {
               event,
-              event_identifier
+              event_identifier,
+              image: avatar,
+              getEvent,
+              getEvents
             })
           }
         />
