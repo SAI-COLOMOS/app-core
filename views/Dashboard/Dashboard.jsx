@@ -193,18 +193,16 @@ export default Dashboard = ({ navigation }) => {
           <>
             {image && (
               <Flex
-                // fill
                 h={"100%"}
                 w={"100%"}
-                style={{ position: "absolute", backgroundColor: "#00aaff" }}
+                style={{ position: "absolute" }}
               >
                 <Image
-                  source={require("../../assets/images/stocks/events.jpg") /*{ uri: `data:image/png;base64,${image}` }*/}
+                  source={require("../../assets/images/stocks/events.jpg")}
                   resizeMode="cover"
                   style={{ height: "100%", width: "100%" }}
                 />
                 <Flex
-                  // fill
                   h={"100%"}
                   w={"100%"}
                   style={{ position: "absolute", backgroundColor: theme.colors.cover }}
@@ -440,74 +438,16 @@ export default Dashboard = ({ navigation }) => {
       )}
 
       {/* Widget de eventos */}
-      {feed?.created_events?.length > 0 ? (
-        <WidgetLarge
-          title="Eventos disponibles"
-          screen="Events"
-          child={
-            <Flex
-              w={"100%"}
-              //h={"100%"}
-              style={{ position: "absolute" }}
-            >
-              <Flex
-                w={"100%"}
-                h={"100%"}
-                justify="end"
-                items="end"
-                style={{ position: "absolute" }}
-              >
-                <Avatar.Text
-                  label={feed?.created_events?.length}
-                  size={25}
-                />
-              </Flex>
-              {feed?.created_events?.map((event) => (
-                <HStack
-                  key={event.name}
-                  fill
-                  spacing={20}
-                >
-                  <Flex items="center">
-                    <Avatar.Text
-                      label={GetDay(event?.starting_date)}
-                      size={30}
-                    />
-                    <Text variant="bodyMedium">{GetCompactMonth(event?.starting_date)}</Text>
-                  </Flex>
-                  <VStack fill>
-                    <Text
-                      variant="titleMedium"
-                      numberOfLines={1}
-                    >
-                      {event.name}
-                    </Text>
-                    <Flex fill>
-                      <Text
-                        variant="bodyMedium"
-                        numberOfLines={1}
-                      >
-                        {Time24(event.starting_date)} - {Time24(event.ending_date)}, {event.place}
-                      </Text>
-                    </Flex>
-                  </VStack>
-                </HStack>
-              ))}
-            </Flex>
-          }
-        />
-      ) : (
-        <WidgetMedium
-          title="Eventos"
-          screen="Events"
-          child={
-            <Avatar.Icon
-              icon={"calendar-outline"}
-              size={100}
-            />
-          }
-        />
-      )}
+      <WidgetMedium
+        title="Eventos"
+        screen="Events"
+        child={
+          <Avatar.Icon
+            icon={"calendar-outline"}
+            size={100}
+          />
+        }
+      />
 
       {/* Horas de servicio */}
       <WidgetMedium
@@ -567,60 +507,55 @@ export default Dashboard = ({ navigation }) => {
 
   const VistaPrestador = () => (
     <Wrap justify="center">
-      <WidgetLarge
-        title="A continuación"
-        screen="Events"
-        child={
-          <Flex
-            w={"100%"}
-            h={"100%"}
-          >
+      {/* Widget de a continuación */}
+      {feed?.enrolled_event != null && (
+        <WidgetLarge
+          title={GetMoment(feed?.enrolled_event?.starting_date)}
+          screen="EventDetails"
+          payload={{ event_identifier: feed?.enrolled_event?.event_identifier }}
+          image={true}
+          child={
             <Flex
               w={"100%"}
               h={"100%"}
-              justify="end"
-              items="end"
-              style={{ position: "absolute" }}
             >
-              <Avatar.Text
-                label={feed?.enrolled_events?.length}
-                size={25}
-              />
-            </Flex>
-            {feed?.enrolled_events?.map((event) => (
               <HStack
-                key={event.name}
-                fill
-                spacing={20}
+                spacing={15}
+                items="end"
+                h={"100%"}
               >
-                <Flex items="center">
+                <Flex center>
                   <Avatar.Text
-                    label={GetDay(event?.starting_date)}
-                    size={30}
+                    label={GetDay(feed?.enrolled_event?.starting_date)}
+                    size={50}
                   />
-                  <Text variant="bodyMedium">{GetCompactMonth(event?.starting_date)}</Text>
+                  <Text variant="bodyMedium">{GetCompactMonth(feed?.enrolled_event?.starting_date)}</Text>
                 </Flex>
                 <VStack fill>
                   <Text
                     variant="titleMedium"
+                    numberOfLines={2}
+                  >
+                    {feed?.enrolled_event?.name}
+                  </Text>
+                  <Text
+                    variant="bodySmall"
                     numberOfLines={1}
                   >
-                    {event.name}
+                    De {Time24(feed?.enrolled_event?.starting_date)} a {Time24(feed?.enrolled_event?.ending_date)}
                   </Text>
-                  <Flex fill>
-                    <Text
-                      variant="bodyMedium"
-                      numberOfLines={1}
-                    >
-                      {Time24(event.starting_date)} - {Time24(event.ending_date)}, {event.place}
-                    </Text>
-                  </Flex>
+                  <Text
+                    variant="bodySmall"
+                    numberOfLines={1}
+                  >
+                    En {feed?.enrolled_event?.place}
+                  </Text>
                 </VStack>
               </HStack>
-            ))}
-          </Flex>
-        }
-      />
+            </Flex>
+          }
+        />
+      )}
 
       {/* Widget de eventos */}
       {feed?.available_events?.length > 0 ? (
@@ -734,7 +669,7 @@ export default Dashboard = ({ navigation }) => {
 
       <Wrap
         h={180}
-        w={180}
+        w={feed?.available_events?.length > 0 ? 180 : 360}
       >
         {/* Widget de perfil */}
         <WidgetSmall

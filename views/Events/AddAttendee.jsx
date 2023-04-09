@@ -17,7 +17,7 @@ export default AddAttendee = ({ navigation, route }) => {
   const [foundUsers, setFoundUsers] = useState(undefined)
   const [selectedUsers, setSelectedUsers] = useState([])
 
-  const searchUsers = async () => {
+  async function searchUsers() {
     setLoading(true)
 
     // let filters = {}
@@ -50,6 +50,12 @@ export default AddAttendee = ({ navigation, route }) => {
       console.log(request.users)
     } else {
       setFoundUsers(request)
+    }
+  }
+
+  function addAttendee(user, register) {
+    if (selectedUsers.some((item) => item.register == register) == false) {
+      setSelectedUsers([...selectedUsers, { name: `${user.first_name} ${user.first_last_name}`, register: user.register }])
     }
   }
 
@@ -187,50 +193,57 @@ export default AddAttendee = ({ navigation, route }) => {
     </Button>
   )
 
-  const Item = useCallback(
-    ({ item, register }) => {
-      return (
-        <Flex
-          ph={0}
-          pv={5}
-          onPress={() => {}}
-        >
-          <Pressable
-            onPress={() => {
-              if (selectedUsers.some((item) => item.register == register) == false) {
-                setSelectedUsers([...selectedUsers, { name: `${item.first_name} ${item.first_last_name}`, register: item.register }])
-              }
-            }}
+  const Item = useCallback(({ item, register }) => {
+    const [avatar, setAvatar] = useState(undefined)
+
+    const requestAvatar = async () => {
+      const request = await fetch(`${localhost}/users/${register}?avatar=true`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        }
+      })
+        .then((response) => response.json())
+        .catch(() => null)
+
+      request?.avatar ? setAvatar(request.avatar) : setAvatar(null)
+    }
+
+    useEffect(() => {
+      requestAvatar()
+    }, [])
+    return (
+      <Flex
+        ph={0}
+        pv={5}
+        onPress={() => {}}
+      >
+        <Pressable onPress={() => addAttendee(item, register)}>
+          <Card
+            mode="outlined"
+            style={{ overflow: "hidden" }}
           >
-            <Card
-              mode="outlined"
-              style={{ overflow: "hidden" }}
-            >
-              <HStack items="center">
-                <ProfileImage image={item.avatar} />
-                <Flex
-                  fill
-                  p={10}
+            <HStack>
+              <ProfileImage image={avatar} />
+              <Flex
+                fill
+                p={10}
+              >
+                <Text
+                  variant="titleMedium"
+                  numberOfLines={1}
                 >
-                  <Text
-                    variant="titleMedium"
-                    numberOfLines={1}
-                  >
-                    {item.first_name} {item.first_last_name} {item.second_last_name ?? null}
-                  </Text>
-                  <Text variant="bodySmall">{item.register}</Text>
-                  <Text variant="bodySmall">
-                    {item.role} {item.role == "Prestador" && item.provider_type}
-                  </Text>
-                </Flex>
-              </HStack>
-            </Card>
-          </Pressable>
-        </Flex>
-      )
-    },
-    [selectedUsers]
-  )
+                  {item.first_name} {item.first_last_name} {item.second_last_name ?? null}
+                </Text>
+                <Text variant="bodyMedium">{item.register}</Text>
+              </Flex>
+            </HStack>
+          </Card>
+        </Pressable>
+      </Flex>
+    )
+  }, [])
 
   return (
     <CreateForm

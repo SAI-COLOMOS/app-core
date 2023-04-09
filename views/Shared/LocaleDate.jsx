@@ -356,7 +356,7 @@ export const GetMoment = (date) => {
     return "Evento para mañana"
   } else if (hours > 2) {
     return `Evento para hoy`
-  } else if (hours <= 2) {
+  } else if (hours <= 2 && hours > 0) {
     return "Evento por comenzar"
   } else if (subtraction >= 0) {
     return "Evento iniciado"
