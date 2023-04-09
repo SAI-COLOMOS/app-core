@@ -7,37 +7,31 @@ import InformationMessage from "../Shared/InformationMessage"
 import Constants from "expo-constants"
 import ApplicationContext from "../ApplicationContext"
 import ProfileImage from "../Shared/ProfileImage"
+import ModalMessage from "../Shared/ModalMessage"
 
 export default AddAttendee = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const { token } = useContext(ApplicationContext)
+  const { event_identifier } = route.params
 
   const [search, setSearch] = useState("")
   const [loading, setLoading] = useState(false)
   const [foundUsers, setFoundUsers] = useState(undefined)
-  const [selectedUsers, setSelectedUsers] = useState([])
+
+  const [modalLoading, setModalLoading] = useState(false)
+  const [modalSuccess, setModalSuccess] = useState(false)
+  const [modalError, setModalError] = useState(false)
+  const [modalFatal, setModalFatal] = useState(false)
+  const [responseCode, setResponseCode] = useState("")
 
   async function searchUsers() {
     setLoading(true)
-
-    // let filters = {}
-
-    // if (placeFilter !== "") {
-    //   filters = { ...filters, place: placeFilter }
-    // }
-
-    // if (Object.keys(filters).length === 0 && search === "") {
-    //   setFoundUsers(undefined)
-    //   setLoading(false)
-    //   return
-    // }
 
     const request = await fetch(`${localhost}/users?search=${search.trim()}&filter=${JSON.stringify({ status: "Activo" })}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        "Cache-Control": "no-cache"
+        Authorization: `Bearer ${token}`
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
@@ -53,10 +47,61 @@ export default AddAttendee = ({ navigation, route }) => {
     }
   }
 
-  function addAttendee(user, register) {
-    if (selectedUsers.some((item) => item.register == register) == false) {
-      setSelectedUsers([...selectedUsers, { name: `${user.first_name} ${user.first_last_name}`, register: user.register }])
+  async function addAttendee(register) {
+    setModalLoading(true)
+
+    const request = await fetch(`${localhost}/agenda/${event_identifier}/attendance/several`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        "Cache-Control": "no-cache"
+      },
+      body: JSON.stringify([
+        {
+          register
+        }
+      ])
+    })
+      .then(async (response) => {
+        console.error(await response.json())
+        return response.status
+      })
+      .catch(() => null)
+
+    setModalLoading(false)
+
+    if (request == 201) {
+      setModalSuccess(true)
+    } else if (request != null) {
+      setResponseCode(request)
+      setModalError(true)
+    } else {
+      setModalFatal(true)
     }
+    // setLoading(true)
+
+    // const request = await fetch(`${localhost}/agenda/${event_identifier}/attendance/several`, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     Authorization: `Bearer ${token}`,
+    //   },
+    //   body: JSON.stringify({
+    //     register
+    //   })
+    // })
+    //   .then((response) => (response.ok ? response.json() : response.status))
+    //   .catch(() => null)
+
+    // setLoading(false)
+
+    // if (request?.users) {
+    //   setFoundUsers(request.users)
+    //   console.log(request.users)
+    // } else {
+    //   setFoundUsers(request)
+    // }
   }
 
   useEffect(() => {
@@ -83,34 +128,6 @@ export default AddAttendee = ({ navigation, route }) => {
           onSubmitEditing={() => searchUsers()}
         />
       </Flex>
-
-      {selectedUsers.length > 0 && (
-        <Flex>
-          <Text variant="titleMedium">Usuarios seleccionados</Text>
-          <HStack wrap="wrap-reverse">
-            {selectedUsers?.map((item) => (
-              <Flex
-                key={`${item.register} added`}
-                ml={5}
-                mb={5}
-              >
-                <Chip
-                  mode="outlined"
-                  closeIcon="close"
-                  onClose={() => {
-                    const i = selectedUsers.findIndex((a) => a.register == item.register)
-                    const temp = [...selectedUsers]
-                    temp.splice(i, 1)
-                    setSelectedUsers(temp)
-                  }}
-                >
-                  {item.name}
-                </Chip>
-              </Flex>
-            ))}
-          </HStack>
-        </Flex>
-      )}
 
       <Flex>
         <Text variant="titleMedium">Resultados de la búsqueda</Text>
@@ -196,7 +213,7 @@ export default AddAttendee = ({ navigation, route }) => {
   const Item = useCallback(({ item, register }) => {
     const [avatar, setAvatar] = useState(undefined)
 
-    const requestAvatar = async () => {
+    const requestAvatar = useCallback(async () => {
       const request = await fetch(`${localhost}/users/${register}?avatar=true`, {
         method: "GET",
         headers: {
@@ -208,7 +225,7 @@ export default AddAttendee = ({ navigation, route }) => {
         .catch(() => null)
 
       request?.avatar ? setAvatar(request.avatar) : setAvatar(null)
-    }
+    }, [])
 
     useEffect(() => {
       requestAvatar()
@@ -219,7 +236,7 @@ export default AddAttendee = ({ navigation, route }) => {
         pv={5}
         onPress={() => {}}
       >
-        <Pressable onPress={() => addAttendee(item, register)}>
+        <Pressable onPress={() => addAttendee(register)}>
           <Card
             mode="outlined"
             style={{ overflow: "hidden" }}
@@ -246,13 +263,50 @@ export default AddAttendee = ({ navigation, route }) => {
   }, [])
 
   return (
-    <CreateForm
-      title="Agregar asistentes"
-      navigation={navigation}
-      children={[SearchList()]}
-      actions={[Save(), Cancel()]}
-      refreshingStatus={loading}
-      refreshingAction={() => searchUsers()}
-    />
+    <Flex fill>
+      <CreateForm
+        title="Agregar asistente"
+        navigation={navigation}
+        children={[SearchList()]}
+        actions={[Save(), Cancel()]}
+        refreshingStatus={loading}
+        refreshingAction={() => searchUsers()}
+      />
+
+      <ModalMessage
+        title="¡Listo!"
+        description="El participante ha sido añadido exitosamente"
+        handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]}
+        actions={[
+          [
+            "Aceptar",
+            () => {
+              // getEvents()
+              navigation.pop()
+            }
+          ]
+        ]}
+        dismissable={false}
+        icon="check-circle-outline"
+      />
+
+      <ModalMessage
+        title="Ocurrió un problema"
+        description={`No pudimos añadir al participante, inténtalo más tarde. (${responseCode})`}
+        handler={[modalError, () => setModalError(!modalError)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="close-circle-outline"
+      />
+
+      <ModalMessage
+        title="Sin conexión a internet"
+        description={`Parece que no tienes conexión a internet, conéctate e intenta de nuevo`}
+        handler={[modalFatal, () => setModalFatal(!modalFatal)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="wifi-alert"
+      />
+    </Flex>
   )
 }

@@ -251,7 +251,7 @@ export default EventDetails = ({ navigation, route }) => {
               <Button
                 icon="plus"
                 mode="outlined"
-                onPress={() => navigation.navigate("AddAttendee")}
+                onPress={() => navigation.navigate("AddAttendee", { event_identifier })}
               >
                 Inscribir
               </Button>
@@ -263,7 +263,7 @@ export default EventDetails = ({ navigation, route }) => {
           icon="account"
           title="Sin inscripciones"
           description="Todavía no hay nadie inscrito, ¿quieres agregar a alguien?"
-          action={() => navigation.navigate("AddAttendee")}
+          action={() => navigation.navigate("AddAttendee", { event_identifier })}
           buttonTitle="Inscribir"
           buttonIcon="plus"
         />

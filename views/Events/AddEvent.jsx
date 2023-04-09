@@ -63,10 +63,7 @@ export default AddEvent = ({ navigation, route }) => {
           avatar: avatar
         })
       })
-        .then(async (response) => {
-          console.log(await response.json())
-          return response.status
-        })
+        .then((response) => response.status)
         .catch(() => null)
 
       setModalLoading(false)
