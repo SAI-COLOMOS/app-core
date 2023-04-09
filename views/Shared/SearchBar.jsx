@@ -1,10 +1,11 @@
-import { Flex, HStack } from '@react-native-material/core'
-import React, { useState, useEffect } from 'react'
-import { IconButton, TextInput } from 'react-native-paper'
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated'
+import { Flex, HStack } from "@react-native-material/core"
+import React, { useState, useEffect } from "react"
+import { IconButton, TextInput } from "react-native-paper"
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated"
 
 export default SearchBar = ({ label, value, setter, show, action }) => {
   const [clear, setClear] = useState(false)
+  const [timer, setTimer] = useState(undefined)
 
   const animationConfiguration = { duration: 250, easing: Easing.bezier(0.5, 0.01, 0.75, 1) }
 
@@ -26,6 +27,13 @@ export default SearchBar = ({ label, value, setter, show, action }) => {
       opacity: withTiming(displayEraseOpacity.value, animationConfiguration)
     }
   })
+
+  function handler(input) {
+    console.log(input, timer, action)
+    setter(input)
+    clearTimeout(timer)
+    setTimer(setTimeout(() => action(input), 2000))
+  }
 
   useEffect(() => {
     if (show == true) {
@@ -49,7 +57,7 @@ export default SearchBar = ({ label, value, setter, show, action }) => {
   }, [value])
 
   useEffect(() => {
-    if (clear === true && value == '') {
+    if (clear === true && value == "") {
       action()
       setClear(false)
     }
@@ -57,23 +65,36 @@ export default SearchBar = ({ label, value, setter, show, action }) => {
 
   useEffect(() => {
     if (show === false) {
-      setter('')
+      setter("")
       setClear(true)
     }
   }, [show])
 
   return (
     <Animated.View style={[{}, animatedSearchBarStyle]}>
-      <HStack ph={20} spacing={10} items="end">
+      <HStack
+        ph={20}
+        spacing={10}
+        items="end"
+      >
         <Flex fill>
-          <TextInput mode="outlined" label={label ?? 'Búsqueda'} clearTextOnFocus={true} value={value} returnKeyType="search" returnKeyLabel="Buscar" onChangeText={setter} onSubmitEditing={() => action(value)} />
+          <TextInput
+            mode="outlined"
+            label={label ?? "Búsqueda"}
+            clearTextOnFocus={true}
+            value={value}
+            returnKeyType="search"
+            returnKeyLabel="Buscar"
+            onChangeText={setter}
+            onSubmitEditing={() => action(value)}
+          />
         </Flex>
         <Animated.View style={[{}, animatedEraseStyle]}>
           <IconButton
             mode="outlined"
             icon="close"
             onPress={() => {
-              setter('')
+              setter("")
               setClear(true)
             }}
           />

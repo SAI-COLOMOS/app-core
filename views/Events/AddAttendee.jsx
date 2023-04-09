@@ -57,14 +57,12 @@ export default AddAttendee = ({ navigation, route }) => {
         Authorization: `Bearer ${token}`,
         "Cache-Control": "no-cache"
       },
-      body: JSON.stringify([
-        {
-          register
-        }
-      ])
+      body: JSON.stringify({
+        attendees: [{ register }]
+      })
     })
       .then(async (response) => {
-        console.error(await response.json())
+        console.log(await response.json())
         return response.status
       })
       .catch(() => null)
