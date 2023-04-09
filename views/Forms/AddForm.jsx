@@ -9,8 +9,8 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import ApplicationContext from "../ApplicationContext"
 
 const defaultQuestion = {
-  interrogation: '',
-  question_type: 'Abierta',
+  interrogation: "",
+  question_type: "Abierta",
   enum_options: []
 }
 
@@ -25,11 +25,13 @@ export default AddForm = ({ navigation, route }) => {
   const [belonging_place, setBelonging_place] = useState("")
   const [belonging_event_identifier, setBelonging_event_identifier] = useState("")
   const [version, setVersion] = useState("")
-  const [questions, setQuestions] = useState([{
-    interrogation: '',
-    question_type: 'Abierta',
-    enum_options: []
-  }])
+  const [questions, setQuestions] = useState([
+    {
+      interrogation: "",
+      question_type: "Abierta",
+      enum_options: []
+    }
+  ])
   const [isTemplate, setIsTemplate] = useState(false)
 
   const QuestionType = [
@@ -55,7 +57,7 @@ export default AddForm = ({ navigation, route }) => {
   const [modalFatal, setModalFatal] = useState(false)
   const [responseCode, setResponseCode] = useState("")
 
-  async function SaveForm () {
+  async function SaveForm() {
     const request = await fetch(`${localhost}/forms`, {
       method: "POST",
       headers: {
@@ -156,12 +158,12 @@ export default AddForm = ({ navigation, route }) => {
 
           {questions.length > 0
             ? questions.map((question, questionIndex) => (
-              <Item
-                key={questionIndex}
-                questionIndex={questionIndex}
-                question={question}
-              />
-            ))
+                <Item
+                  key={questionIndex}
+                  questionIndex={questionIndex}
+                  question={question}
+                />
+              ))
             : null}
         </VStack>
       </VStack>
@@ -197,7 +199,12 @@ export default AddForm = ({ navigation, route }) => {
   )
 
   const addQuestion = (questionIndex) => {
-    questions.splice(questionIndex + 1, 0, { ...defaultQuestion, interrogation: '' })
+    questions.splice(questionIndex + 1, 0, { ...defaultQuestion, interrogation: "" })
+    setQuestions([...questions])
+  }
+
+  const addAnswer = (questionIndex) => {
+    questions.splice(questionIndex + 1, 0, { ...defaultQuestion, enum_options: [""] })
     setQuestions([...questions])
   }
 
@@ -206,12 +213,13 @@ export default AddForm = ({ navigation, route }) => {
     setQuestions([...questions])
   }
 
-  const changeQuestion = (questionIndex, text) => {
+  const changeQuestion = (questionIndex, text, debounce) => {
     if (text !== undefined) questions[questionIndex].interrogation = text
     setQuestions([...questions])
   }
 
   const Item = ({ questionIndex, question }) => {
+    const [debounce, setDebounce] = useState()
     return (
       <VStack
         key="Question"
@@ -220,7 +228,7 @@ export default AddForm = ({ navigation, route }) => {
         <TextInput
           mode="outlined"
           value={question.interrogation}
-          onChangeText={text => changeQuestion(questionIndex, text)}
+          onChangeText={(text) => changeQuestion(questionIndex, text)}
           label="Interrogante"
           autoComplete="off"
         />
@@ -228,7 +236,7 @@ export default AddForm = ({ navigation, route }) => {
           title="Tipo de pregunta"
           options={QuestionType}
           value={question.question_type}
-          selected={_ => changeQuestion(questionIndex)}
+          selected={(_) => changeQuestion(questionIndex)}
           isArray={true}
         />
         {/* {quesType == "Opción múltiple" || quesType == "Selección múltiple" || quesType == "Escala" ? (
@@ -241,9 +249,36 @@ export default AddForm = ({ navigation, route }) => {
           />
         ) : null} */}
 
-        <Flex direction='row' items='center' justify='end'>
-          <IconButton icon='plus' mode='contained' onPress={_ => addQuestion(questionIndex)} />
-          <IconButton icon='minus' mode='contained' onPress={_ => deleteQuestion(questionIndex)} />
+        <TextInput
+          mode="outlined"
+          value={question.enum_options}
+          onChangeText={(text) => changeAnswer(questionIndex, text)}
+          label="Respuesta"
+          autoComplete="off"
+        />
+
+        <Flex
+          direction="row"
+          items="center"
+          justify="end"
+        >
+          <IconButton
+            icon="database-plus-outline"
+            mode="contained"
+            onPress={(_) => addAnswer(questionIndex)}
+          />
+          <IconButton
+            icon="plus"
+            mode="contained"
+            onPress={(_) => addQuestion(questionIndex)}
+          />
+          {questionIndex > 0 && (
+            <IconButton
+              icon="minus"
+              mode="contained"
+              onPress={(_) => deleteQuestion(questionIndex)}
+            />
+          )}
         </Flex>
       </VStack>
     )

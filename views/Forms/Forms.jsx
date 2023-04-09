@@ -1,27 +1,28 @@
-import { Flex, HStack, VStack } from '@react-native-material/core'
-import { useState, useEffect, useCallback } from 'react'
-import { Avatar, Button, Card, FAB, IconButton, Text, TouchableRipple, useTheme } from 'react-native-paper'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useHeaderHeight } from '@react-navigation/elements'
-import Header from '../Shared/Header'
-import Constants from 'expo-constants'
-import { FlatList } from 'react-native'
-import { useFocusEffect } from '@react-navigation/native'
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import SearchBar from '../Shared/SearchBar'
-import InformationMessage from '../Shared/InformationMessage'
-import { it } from 'react-native-paper-dates'
+import { Flex, HStack, VStack } from "@react-native-material/core"
+import { useState, useEffect, useCallback, useContext } from "react"
+import { Avatar, Button, Card, FAB, IconButton, Text, TouchableRipple, useTheme } from "react-native-paper"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { useHeaderHeight } from "@react-navigation/elements"
+import Header from "../Shared/Header"
+import Constants from "expo-constants"
+import { FlatList } from "react-native"
+import { useFocusEffect } from "@react-navigation/native"
+import Icon from "react-native-vector-icons/MaterialCommunityIcons"
+import SearchBar from "../Shared/SearchBar"
+import InformationMessage from "../Shared/InformationMessage"
+import { it } from "react-native-paper-dates"
+import ApplicationContext from "../ApplicationContext"
 
 export default Forms = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const theme = useTheme()
-  const { user, token } = route.params
+  const { user, token } = useContext(ApplicationContext)
   const headerMargin = useHeaderHeight()
 
   const [forms, setForms] = useState(undefined)
   const [loading, setLoading] = useState(false)
   const [showSearch, setShowSearch] = useState(null)
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useState("")
   const [foundForms, setFoundForms] = useState(undefined)
   const [isTemplate, setIsTemplate] = useState(false)
 
@@ -31,11 +32,11 @@ export default Forms = ({ navigation, route }) => {
     setLoading(true)
 
     const request = await fetch(`${localhost}/forms?isTemplate=${isTemplate}`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        'Cache-Control': 'no-cache'
+        "Cache-Control": "no-cache"
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
@@ -54,18 +55,18 @@ export default Forms = ({ navigation, route }) => {
   async function searchForms() {
     setLoading(true)
 
-    if (search === '') {
+    if (search === "") {
       setFoundForms(undefined)
       setLoading(false)
       return
     }
 
     const request = await fetch(`${localhost}/forms?search=${search}`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        'Cache-Control': 'no-cache'
+        "Cache-Control": "no-cache"
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
@@ -82,9 +83,20 @@ export default Forms = ({ navigation, route }) => {
 
   useEffect(() => {
     navigation.setOptions({
-      header: (props) => <Header {...props} children={[<IconButton key="SearchButton" icon="magnify" onPress={() => setShowSearch(!showSearch)} />]} />,
+      header: (props) => (
+        <Header
+          {...props}
+          children={[
+            <IconButton
+              key="SearchButton"
+              icon="magnify"
+              onPress={() => setShowSearch(!showSearch)}
+            />
+          ]}
+        />
+      ),
       headerTransparent: true,
-      headerTitle: 'Formularios'
+      headerTitle: "Formularios"
     })
   }, [showSearch])
 
@@ -98,15 +110,33 @@ export default Forms = ({ navigation, route }) => {
 
   const Item = ({ form_name, description, form_identifier }) => {
     return (
-      <Flex ph={20} pv={5} onPress={() => {}}>
-        <Card mode="outlined" style={{ overflow: 'hidden' }}>
+      <Flex
+        ph={20}
+        pv={5}
+        onPress={() => {}}
+      >
+        <Card
+          mode="outlined"
+          style={{ overflow: "hidden" }}
+        >
           <TouchableRipple
             onPress={() => {
-              navigation.navigate('FormDetails', { token, form_identifier })
+              navigation.navigate("FormDetails", { token, form_identifier })
             }}
           >
             <Flex p={10}>
-              <Card.Title title={form_name} titleNumberOfLines={2} subtitle={description} subtitleNumberOfLines={1} left={(props) => <Avatar.Icon {...props} icon="form-select" />} />
+              <Card.Title
+                title={form_name}
+                titleNumberOfLines={2}
+                subtitle={description}
+                subtitleNumberOfLines={1}
+                left={(props) => (
+                  <Avatar.Icon
+                    {...props}
+                    icon="form-select"
+                  />
+                )}
+              />
             </Flex>
           </TouchableRipple>
         </Card>
@@ -115,10 +145,19 @@ export default Forms = ({ navigation, route }) => {
   }
 
   return (
-    <Flex fill pt={headerMargin}>
-      <SearchBar show={showSearch} label="Busca por nombre del formulario" value={search} setter={setSearch} action={searchForms} />
+    <Flex
+      fill
+      pt={headerMargin}
+    >
+      <SearchBar
+        show={showSearch}
+        label="Busca por nombre del formulario"
+        value={search}
+        setter={setSearch}
+        action={searchForms}
+      />
 
-      {search == '' ? (
+      {search == "" ? (
         forms !== null ? (
           forms?.length >= 0 || forms === undefined ? (
             <Flex fill>
@@ -133,7 +172,7 @@ export default Forms = ({ navigation, route }) => {
                       buttonIcon="plus"
                       buttonTitle="Agregar"
                       action={() => {
-                        navigation.navigate('AddForm', {
+                        navigation.navigate("AddForm", {
                           user,
                           token
                         })
@@ -143,14 +182,21 @@ export default Forms = ({ navigation, route }) => {
                 }
                 refreshing={loading}
                 onRefresh={() => getForms()}
-                renderItem={({ item }) => <Item key={item.form_identifier} form_name={item.name} description={item.description} form_identifier={item.form_identifier} />}
+                renderItem={({ item }) => (
+                  <Item
+                    key={item.form_identifier}
+                    form_name={item.name}
+                    description={item.description}
+                    form_identifier={item.form_identifier}
+                  />
+                )}
               />
 
               <FAB
                 icon="plus"
-                style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
+                style={{ position: "absolute", margin: 16, right: 0, bottom: 0 }}
                 onPress={() => {
-                  navigation.navigate('AddForm', {
+                  navigation.navigate("AddForm", {
                     user,
                     token
                   })
@@ -186,7 +232,28 @@ export default Forms = ({ navigation, route }) => {
       ) : foundForms !== null ? (
         foundForms?.length >= 0 || foundForms === undefined ? (
           <Flex fill>
-            <FlatList data={foundForms} ListEmptyComponent={() => (foundForms === undefined ? null : <InformationMessage icon="magnify" title="Sin resultados" description="No hay ningún formulario registrado que cumpla con los parámetros de tu búsqueda" />)} refreshing={loading} onRefresh={() => searchForms()} renderItem={({ item }) => <Item key={item.form_identifier} form_name={item.name} description={item.description} form_identifier={item.form_identifier} />} />
+            <FlatList
+              data={foundForms}
+              ListEmptyComponent={() =>
+                foundForms === undefined ? null : (
+                  <InformationMessage
+                    icon="magnify"
+                    title="Sin resultados"
+                    description="No hay ningún formulario registrado que cumpla con los parámetros de tu búsqueda"
+                  />
+                )
+              }
+              refreshing={loading}
+              onRefresh={() => searchForms()}
+              renderItem={({ item }) => (
+                <Item
+                  key={item.form_identifier}
+                  form_name={item.name}
+                  description={item.description}
+                  form_identifier={item.form_identifier}
+                />
+              )}
+            />
           </Flex>
         ) : (
           <InformationMessage
