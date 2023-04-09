@@ -87,7 +87,6 @@ export default Login = ({ navigation }) => {
   }, [url])
 
   useEffect(() => {
-    console.log(userContext)
     const getActualSession = async () => {
       const token = await SecureStore.getItemAsync("token")
 
