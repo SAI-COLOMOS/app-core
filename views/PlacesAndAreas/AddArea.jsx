@@ -7,7 +7,7 @@ import ModalMessage from "../Shared/ModalMessage"
 import ApplicationContext from "../ApplicationContext"
 
 export default AddArea = ({ navigation, route }) => {
-  const { place_identifier, getPlace } = route.params
+  const { place_identifier, getPlaces } = route.params
   const { token } = useContext(ApplicationContext)
 
   const localhost = Constants.expoConfig.extra.API_LOCAL
@@ -142,7 +142,7 @@ export default AddArea = ({ navigation, route }) => {
             "Aceptar",
             () => {
               navigation.pop()
-              getPlace()
+              getPlaces()
             }
           ]
         ]}

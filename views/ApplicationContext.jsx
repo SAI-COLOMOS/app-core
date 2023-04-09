@@ -8,7 +8,18 @@ const ApplicationProvider = ({ children }) => {
   const [token, setToken] = useState(null)
   const [achieved_hours, setAchieved_hours] = useState(0)
 
-  return <ApplicationContext.Provider value={{ register, setRegister, user, setUser, token, setToken, achieved_hours, setAchieved_hours }}>{children}</ApplicationContext.Provider>
+  const params = {
+    register,
+    setRegister,
+    user,
+    setUser,
+    token,
+    setToken,
+    achieved_hours,
+    setAchieved_hours
+  }
+
+  return <ApplicationContext.Provider value={params}>{children}</ApplicationContext.Provider>
 }
 
 export { ApplicationProvider }

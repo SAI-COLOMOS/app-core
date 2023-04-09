@@ -274,7 +274,8 @@ export default EditPlace = ({ navigation, route }) => {
           [
             "Aceptar",
             () => {
-              setModalConfirm(!modalConfirm), deletePlace()
+              setModalConfirm(!modalConfirm)
+              deletePlace()
             }
           ]
         ]}

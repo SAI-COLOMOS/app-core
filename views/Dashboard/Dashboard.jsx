@@ -1,4 +1,4 @@
-import { Flex, HStack, VStack } from "@react-native-material/core"
+import { Flex, HStack, VStack, Wrap } from "@react-native-material/core"
 import { useState, useEffect, useCallback, useMemo, useContext } from "react"
 import * as SecureStore from "expo-secure-store"
 import { Button, Card, Text, useTheme, Avatar, TouchableRipple } from "react-native-paper"
@@ -8,7 +8,7 @@ import { LinearGradient } from "expo-linear-gradient"
 import { useFocusEffect } from "@react-navigation/native"
 import CircularProgress from "react-native-circular-progress-indicator"
 import Constants from "expo-constants"
-import Animated, { interpolate, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated"
+import Animated, { interpolate, log, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated"
 import InformationMessage from "../Shared/InformationMessage"
 import { GetCompactMonth, GetDay, ShortDate, Time24 } from "../Shared/LocaleDate"
 import ApplicationContext from "../ApplicationContext"
@@ -109,8 +109,9 @@ export default Dashboard = ({ navigation }) => {
   const WidgetSmall = useCallback(
     ({ screen, payload, child }) => (
       <Flex
-        w={"25%"}
         p={5}
+        h={90}
+        w={90}
       >
         <Card
           mode="outlined"
@@ -122,7 +123,8 @@ export default Dashboard = ({ navigation }) => {
             }}
           >
             <Flex
-              h={80}
+              h={"100%"}
+              w={"100%"}
               center
             >
               {child}
@@ -137,8 +139,9 @@ export default Dashboard = ({ navigation }) => {
   const WidgetMedium = useCallback(
     ({ screen, payload, child, title }) => (
       <Flex
-        w={"50%"}
         p={5}
+        h={180}
+        w={180}
       >
         <Card
           mode="outlined"
@@ -152,7 +155,8 @@ export default Dashboard = ({ navigation }) => {
             <VStack
               ph={20}
               pv={10}
-              h={175}
+              h={"100%"}
+              w={"100%"}
               spacing={10}
             >
               <Text
@@ -178,8 +182,9 @@ export default Dashboard = ({ navigation }) => {
   const WidgetLarge = useCallback(
     ({ screen, payload, child, title }) => (
       <Flex
-        w={"100%"}
-        p={10}
+        w={360}
+        h={180}
+        p={5}
       >
         <Card
           mode="outlined"
@@ -191,9 +196,10 @@ export default Dashboard = ({ navigation }) => {
             }}
           >
             <VStack
-              ph={15}
+              ph={20}
               pv={10}
-              h={175}
+              h={"100%"}
+              w={"100%"}
               spacing={10}
             >
               <Flex ph={5}>
@@ -275,11 +281,7 @@ export default Dashboard = ({ navigation }) => {
   /* Areas de Screens */
 
   const VistaAdministrador = () => (
-    <Flex
-      direction="row"
-      wrap="wrap"
-      ph={10}
-    >
+    <Wrap justify="center">
       {/* Lugares y áreas */}
       <WidgetMedium
         title="Usuarios"
@@ -319,34 +321,91 @@ export default Dashboard = ({ navigation }) => {
         }
       />
 
-      {/* Widget de perfil */}
-      <WidgetSmall
-        screen="Profile"
-        // payload={{ user, token }}
-        child={
-          <ProfileImage
-            icon="account-outline"
-            image={user?.avatar}
-          />
-        }
-      />
-    </Flex>
+      <Wrap
+        h={180}
+        w={180}
+      >
+        {/* Widget de perfil */}
+        <WidgetSmall
+          screen="Profile"
+          // payload={{ user, token }}
+          child={
+            <ProfileImage
+              icon="account-outline"
+              image={user?.avatar}
+              width={85}
+              height={85}
+            />
+          }
+        />
+      </Wrap>
+    </Wrap>
   )
 
   const VistaEncargado = () => (
-    <Flex
-      direction="row"
-      wrap="wrap"
-      ph={10}
-    >
-      {/* Eventos */}
+    <Wrap justify="center">
+      <WidgetLarge
+        title="A continuación"
+        screen="Events"
+        child={
+          <Flex
+            w={"100%"}
+            h={"100%"}
+          >
+            <Flex
+              w={"100%"}
+              h={"100%"}
+              justify="end"
+              items="end"
+              style={{ position: "absolute" }}
+            >
+              <Avatar.Text
+                label={feed?.enrolled_events?.length}
+                size={25}
+              />
+            </Flex>
+            {feed?.enrolled_events?.map((event) => (
+              <HStack
+                key={event.name}
+                fill
+                spacing={20}
+              >
+                <Flex items="center">
+                  <Avatar.Text
+                    label={GetDay(event?.starting_date)}
+                    size={30}
+                  />
+                  <Text variant="bodyMedium">{GetCompactMonth(event?.starting_date)}</Text>
+                </Flex>
+                <VStack fill>
+                  <Text
+                    variant="bodyLarge"
+                    numberOfLines={1}
+                  >
+                    {event.name}
+                  </Text>
+                  <Flex fill>
+                    <Text
+                      variant="bodyMedium"
+                      numberOfLines={1}
+                    >
+                      {Time24(event.starting_date)} - {Time24(event.ending_date)}, {event.place}
+                    </Text>
+                  </Flex>
+                </VStack>
+              </HStack>
+            ))}
+          </Flex>
+        }
+      />
+
+      {/* Widget de eventos */}
       <WidgetMedium
         title="Eventos"
         screen="Events"
-        // payload={{ user, token }}
         child={
           <Avatar.Icon
-            icon={"bulletin-board"}
+            icon={"calendar-outline"}
             size={100}
           />
         }
@@ -365,41 +424,234 @@ export default Dashboard = ({ navigation }) => {
         }
       />
 
-      {/* Usuarios */}
-      <WidgetSmall
-        screen="Users"
+      <Wrap
+        h={90}
+        w={360}
+      >
+        {/* Usuarios */}
+        <WidgetSmall
+          screen="Users"
+          child={
+            <Avatar.Icon
+              icon={"account-supervisor-outline"}
+              size={50}
+            />
+          }
+        />
+
+        {/* Formularios */}
+        <WidgetSmall
+          screen="Forms"
+          // payload={{ actualUser: user, token }}
+          child={
+            <Avatar.Icon
+              icon={"form-select"}
+              size={50}
+            />
+          }
+        />
+        {/* Widget de perfil */}
+        <WidgetSmall
+          screen="Profile"
+          // payload={{ user, token }}
+          child={
+            <ProfileImage
+              icon="account-outline"
+              image={user?.avatar}
+              width={85}
+              height={85}
+            />
+          }
+        />
+      </Wrap>
+    </Wrap>
+  )
+
+  const VistaPrestador = () => (
+    <Wrap justify="center">
+      <WidgetLarge
+        title="A continuación"
+        screen="Events"
         child={
-          <Avatar.Icon
-            icon={"account-supervisor-outline"}
-            size={50}
-          />
+          <Flex
+            w={"100%"}
+            h={"100%"}
+          >
+            <Flex
+              w={"100%"}
+              h={"100%"}
+              justify="end"
+              items="end"
+              style={{ position: "absolute" }}
+            >
+              <Avatar.Text
+                label={feed?.enrolled_events?.length}
+                size={25}
+              />
+            </Flex>
+            {feed?.enrolled_events?.map((event) => (
+              <HStack
+                key={event.name}
+                fill
+                spacing={20}
+              >
+                <Flex items="center">
+                  <Avatar.Text
+                    label={GetDay(event?.starting_date)}
+                    size={30}
+                  />
+                  <Text variant="bodyMedium">{GetCompactMonth(event?.starting_date)}</Text>
+                </Flex>
+                <VStack fill>
+                  <Text
+                    variant="bodyLarge"
+                    numberOfLines={1}
+                  >
+                    {event.name}
+                  </Text>
+                  <Flex fill>
+                    <Text
+                      variant="bodyMedium"
+                      numberOfLines={1}
+                    >
+                      {Time24(event.starting_date)} - {Time24(event.ending_date)}, {event.place}
+                    </Text>
+                  </Flex>
+                </VStack>
+              </HStack>
+            ))}
+          </Flex>
         }
       />
 
-      {/* Formularios */}
-      <WidgetSmall
-        screen="Forms"
-        // payload={{ actualUser: user, token }}
+      {/* Widget de eventos */}
+      {feed?.available_events?.length > 0 ? (
+        <WidgetLarge
+          title="Eventos disponibles"
+          screen="Events"
+          child={
+            <Flex
+              w={"100%"}
+              h={"100%"}
+            >
+              <Flex
+                w={"100%"}
+                h={"100%"}
+                justify="end"
+                items="end"
+                style={{ position: "absolute" }}
+              >
+                <Avatar.Text
+                  label={feed?.available_events?.length}
+                  size={25}
+                />
+              </Flex>
+              {feed?.available_events?.map((event) => (
+                <HStack
+                  key={event.name}
+                  fill
+                  spacing={20}
+                >
+                  <Flex items="center">
+                    <Avatar.Text
+                      label={GetDay(event?.starting_date)}
+                      size={30}
+                    />
+                    <Text variant="bodyMedium">{GetCompactMonth(event?.starting_date)}</Text>
+                  </Flex>
+                  <VStack fill>
+                    <Text
+                      variant="bodyLarge"
+                      numberOfLines={1}
+                    >
+                      {event.name}
+                    </Text>
+                    <Flex fill>
+                      <Text
+                        variant="bodyMedium"
+                        numberOfLines={1}
+                      >
+                        {Time24(event.starting_date)} - {Time24(event.ending_date)}, {event.place}
+                      </Text>
+                    </Flex>
+                  </VStack>
+                </HStack>
+              ))}
+            </Flex>
+          }
+        />
+      ) : (
+        <WidgetMedium
+          title="Eventos"
+          screen="Events"
+          child={
+            <Avatar.Icon
+              icon={"calendar-outline"}
+              size={100}
+            />
+          }
+        />
+      )}
+
+      {/* Widget de progreso */}
+      <WidgetMedium
+        screen="UserProgress"
         child={
-          <Avatar.Icon
-            icon={"form-select"}
-            size={50}
-          />
+          <Flex
+            fill
+            center
+          >
+            <Flex
+              fill
+              center
+              style={{ position: "absolute" }}
+            >
+              <Text
+                variant="headlineSmall"
+                style={{ fontWeight: "bold", color: theme.colors.primary }}
+              >
+                {feed?.achieved_hours} /
+              </Text>
+              <Text variant="bodyMedium">{feed?.total_hours}</Text>
+            </Flex>
+            {feed?.total_hours ? (
+              <Animated.View>
+                <CircularProgress
+                  value={achieved_hours}
+                  showProgressValue={false}
+                  progressValueColor={theme.colors.primary}
+                  activeStrokeColor={theme.colors.primary}
+                  inActiveStrokeColor={theme.colors.backdrop}
+                  rotation={180}
+                  titleColor={theme.colors.onBackground}
+                  radius={50}
+                  maxValue={feed?.total_hours}
+                />
+              </Animated.View>
+            ) : null}
+          </Flex>
         }
+        title="Tu progreso"
       />
 
-      {/* Widget de perfil */}
-      <WidgetSmall
-        screen="Profile"
-        // payload={{ user, token }}
-        child={
-          <ProfileImage
-            icon="account-outline"
-            image={user?.avatar}
-          />
-        }
-      />
-    </Flex>
+      <Wrap
+        h={180}
+        w={180}
+      >
+        {/* Widget de perfil */}
+        <WidgetSmall
+          screen="Profile"
+          child={
+            <ProfileImage
+              icon="account-outline"
+              image={user?.avatar}
+              width={85}
+              height={85}
+            />
+          }
+        />
+      </Wrap>
+    </Wrap>
   )
 
   return (
@@ -462,228 +714,10 @@ export default Dashboard = ({ navigation }) => {
               {
                 {
                   Administrador: <VistaEncargado />,
-                  Encargado: <VistaEncargado />
+                  Encargado: <VistaEncargado />,
+                  Prestador: <VistaPrestador />
                 }[user?.role]
               }
-
-              {/* Sección común */}
-              <Flex
-                direction="row"
-                wrap="wrap"
-                ph={10}
-              >
-                {/* Widget de evento */}
-                {feed?.events?.length > 0 && (
-                  <WidgetLarge
-                    title="Próximo evento"
-                    screen="ShowAttendanceCode"
-                    payload={{ register: user?.register, avatar: user?.avatar }}
-                    child={
-                      <>
-                        {/* <Image
-                            source={avatar !== null ? { uri: `data:image/png;base64,${avatar}` } : require("../../assets/images/stocks/events.jpg")}
-                            resizeMode="cover"
-                            onLoadEnd={() => setLoadingDone(true)}
-                            style={{ height: 175, width: "100%" }}
-                          />
-                          {loadingDone == false && (
-                            <Flex
-                              w={"100%"}
-                              h={"100%"}
-                              center
-                              style={{ position: "absolute" }}
-                            >
-                              <ActivityIndicator size={50} />
-                            </Flex>
-                          )} */}
-                        <Flex
-                          w={"100%"}
-                          h={"100%"}
-                          justify="end"
-                          // style={{ position: "absolute", backgroundColor: theme.colors.cover }}
-                        >
-                          <HStack
-                            spacing={15}
-                            items="end"
-                          >
-                            <Flex center>
-                              <Avatar.Text
-                                label={GetDay(feed?.events[0].starting_date)}
-                                size={50}
-                              />
-                              <Text variant="bodyMedium">{GetCompactMonth(feed?.events[0].starting_date)}</Text>
-                            </Flex>
-                            <VStack fill>
-                              <Text
-                                variant="titleMedium"
-                                numberOfLines={2}
-                              >
-                                {feed?.events[0].name}
-                              </Text>
-                              <Text
-                                variant="bodySmall"
-                                numberOfLines={1}
-                              >
-                                De {Time24(feed?.events[0].starting_date)} a {Time24(feed?.events[0].ending_date)}
-                              </Text>
-                              <Text
-                                variant="bodySmall"
-                                numberOfLines={1}
-                              >
-                                En {feed?.events[0].place}
-                              </Text>
-                            </VStack>
-                          </HStack>
-                        </Flex>
-                      </>
-                      //   <HStack
-                      //     fill
-                      //     spacing={20}
-                      //   >
-                      //     <Flex items="center">
-                      //       <Avatar.Text
-                      //         label="12"
-                      //         size={50}
-                      //       />
-                      //       <Text variant="bodyMedium">mayo</Text>
-                      //     </Flex>
-                      //     <VStack
-                      //       fill
-                      //       spacing={10}
-                      //     >
-                      //       <Text
-                      //         variant="bodyLarge"
-                      //         numberOfLines={2}
-                      //       >
-                      //         Presentación de proyecto de titulación
-                      //       </Text>
-                      //       <Flex fill>
-                      //         <Text variant="bodyMedium">De 10:00 a 15:00</Text>
-                      //         <Text
-                      //           variant="bodyMedium"
-                      //           numberOfLines={1}
-                      //         >
-                      //           Centro de Enseñanza Técnica Industrial
-                      //         </Text>
-                      //       </Flex>
-                      //     </VStack>
-                      //   </HStack>
-                    }
-                  />
-                )}
-
-                {/* Widget de eventos disponibles */}
-                {feed?.available_events?.length > 0 && (
-                  <WidgetLarge
-                    title="Eventos disponibles"
-                    screen="Events"
-                    payload={{ user, token }}
-                    child={
-                      <Flex
-                        w={"100%"}
-                        h={"100%"}
-                        style={{}}
-                      >
-                        <Flex
-                          w={"100%"}
-                          h={"100%"}
-                          justify="end"
-                          items="end"
-                          style={{ position: "absolute" }}
-                        >
-                          <Avatar.Text
-                            label={feed?.available_events?.length}
-                            size={50}
-                          />
-                        </Flex>
-                        {feed.available_events.map((event) => (
-                          <HStack
-                            key={event.name}
-                            fill
-                            spacing={20}
-                          >
-                            <Flex items="center">
-                              <Avatar.Text
-                                label={GetDay(event?.starting_date)}
-                                size={50}
-                              />
-                              <Text variant="bodyMedium">{GetCompactMonth(event?.starting_date)}</Text>
-                            </Flex>
-                            <VStack
-                              fill
-                              spacing={10}
-                            >
-                              <Text
-                                variant="bodyLarge"
-                                numberOfLines={2}
-                              >
-                                {event.name}
-                              </Text>
-                              <Flex fill>
-                                <Text
-                                  variant="bodyMedium"
-                                  numberOfLines={1}
-                                >
-                                  A partir de las {Time24(event.starting_date)}
-                                </Text>
-                                <Text
-                                  variant="bodyMedium"
-                                  numberOfLines={1}
-                                >
-                                  {event.place}
-                                </Text>
-                              </Flex>
-                            </VStack>
-                          </HStack>
-                        ))}
-                      </Flex>
-                    }
-                  />
-                )}
-
-                {/* Widget de progreso */}
-                {user?.role === "Prestador" ? (
-                  <WidgetMedium
-                    screen="UserProgress"
-                    child={
-                      <Flex
-                        fill
-                        center
-                      >
-                        <Flex
-                          fill
-                          center
-                          style={{ position: "absolute" }}
-                        >
-                          <Text
-                            variant="headlineSmall"
-                            style={{ fontWeight: "bold", color: theme.colors.primary }}
-                          >
-                            {feed?.achieved_hours} /
-                          </Text>
-                          <Text variant="bodyMedium">{feed?.total_hours}</Text>
-                        </Flex>
-                        {feed?.total_hours ? (
-                          <Animated.View>
-                            <CircularProgress
-                              value={achieved_hours}
-                              showProgressValue={false}
-                              progressValueColor={theme.colors.primary}
-                              activeStrokeColor={theme.colors.primary}
-                              inActiveStrokeColor={theme.colors.backdrop}
-                              rotation={180}
-                              titleColor={theme.colors.onBackground}
-                              radius={50}
-                              maxValue={feed?.total_hours}
-                            />
-                          </Animated.View>
-                        ) : null}
-                      </Flex>
-                    }
-                    title="Tu progreso"
-                  />
-                ) : null}
-              </Flex>
             </Flex>
           </VStack>
         ) : loading == false ? (

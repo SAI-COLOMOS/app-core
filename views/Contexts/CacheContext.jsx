@@ -7,8 +7,9 @@ const images = []
 const CacheProvider = ({ children }) => {
   const [users, setUsers] = useState(undefined)
   const [places, setPlaces] = useState(undefined)
+  const [schools, setSchools] = useState(undefined)
+  const [events, setEvents] = useState(undefined)
 
-  const [event, setEvent] = useState(undefined)
   const [attendees, setAttendees] = useState(undefined)
   const [profiles, setProfiles] = useState(undefined)
 
@@ -54,13 +55,14 @@ const CacheProvider = ({ children }) => {
     setUsers,
     places,
     setPlaces,
-    event,
-    setEvent,
+    schools,
+    setSchools,
+    events,
+    setEvents,
     attendees,
     setAttendees,
     profiles,
-    setProfiles,
-    getImage
+    setProfiles
   }
 
   return (

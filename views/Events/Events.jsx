@@ -13,15 +13,17 @@ import InformationMessage from "../Shared/InformationMessage"
 import ApplicationContext from "../ApplicationContext"
 import ProfileImage from "../Shared/ProfileImage"
 import { GetDay, GetCompactMonth, Time24 } from "../Shared/LocaleDate"
+import CacheContext from "../Contexts/CacheContext"
 
 export default Users = ({ navigation, route }) => {
   const headerMargin = useHeaderHeight()
   const { user, token } = useContext(ApplicationContext)
+  const { events, setEvents } = useContext(CacheContext)
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const theme = useTheme()
 
   const [loading, setLoading] = useState(false)
-  const [events, setEvents] = useState(undefined)
+  //const [events, setEvents] = useState(undefined)
   const [foundEvents, setFoundEvents] = useState(undefined)
   const [search, setSearch] = useState("")
   const [showSearch, setShowSearch] = useState(null)
@@ -52,8 +54,7 @@ export default Users = ({ navigation, route }) => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        "Cache-Control": "no-cache"
+        Authorization: `Bearer ${token}`
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
@@ -171,112 +172,113 @@ export default Users = ({ navigation, route }) => {
     setAreasOptions(areaData)
   }, [placeFilter])
 
-  useFocusEffect(
-    useCallback(() => {
+  useEffect(() => {
+    if (events === undefined) {
       getEvents()
-      return () => {}
-    }, [])
-  )
+    }
+  }, [])
 
-  const Item = useCallback(({ item }) => {
-    const [avatar, setAvatar] = useState(undefined)
-    const [loadingDone, setLoadingDone] = useState(false)
+  const Item = useCallback(
+    ({ item }) => {
+      const [avatar, setAvatar] = useState(undefined)
+      const [loadingDone, setLoadingDone] = useState(false)
 
-    useEffect(() => {
-      const getAvatar = async () => {
-        const request = await fetch(`${localhost}/agenda/${item.event_identifier}?avatar=true`, {
-          method: "GET",
-          headers: {
-            "Content-type": "application/json",
-            Authorization: `Bearer ${token}`,
-            "Cache-Control": "no-cache"
-          }
-        })
-          .then((response) => response.json())
-          .catch(() => null)
+      useEffect(() => {
+        const getAvatar = async () => {
+          const request = await fetch(`${localhost}/agenda/${item.event_identifier}?avatar=true`, {
+            method: "GET",
+            headers: {
+              "Content-type": "application/json",
+              Authorization: `Bearer ${token}`
+            }
+          })
+            .then((response) => response.json())
+            .catch(() => null)
 
-        request?.avatar ? setAvatar(request.avatar) : setAvatar(null)
-      }
+          request?.avatar ? setAvatar(request.avatar) : setAvatar(null)
+        }
 
-      getAvatar()
-    }, [])
+        getAvatar()
+      }, [])
 
-    return (
-      <Flex
-        ph={20}
-        pv={5}
-        onPress={() => {}}
-      >
-        <TouchableRipple
-          onPress={() => {
-            navigation.navigate("EventDetails", { event_identifier: item.event_identifier })
-          }}
+      return (
+        <Flex
+          ph={20}
+          pv={5}
+          onPress={() => {}}
         >
-          <Card
-            mode="outlined"
-            style={{ overflow: "hidden" }}
+          <TouchableRipple
+            onPress={() => {
+              navigation.navigate("EventDetails", { event_identifier: item.event_identifier })
+            }}
           >
-            <Image
-              source={avatar !== null ? { uri: `data:image/png;base64,${avatar}` } : require("../../assets/images/stocks/events.jpg")}
-              resizeMode="cover"
-              onLoadEnd={() => setLoadingDone(true)}
-              style={{ height: 175, width: "100%" }}
-            />
-            {loadingDone == false && (
+            <Card
+              mode="outlined"
+              style={{ overflow: "hidden" }}
+            >
+              <Image
+                source={avatar !== null ? { uri: `data:image/png;base64,${avatar}` } : require("../../assets/images/stocks/events.jpg")}
+                resizeMode="cover"
+                onLoadEnd={() => setLoadingDone(true)}
+                style={{ height: 175, width: "100%" }}
+              />
+              {loadingDone == false && (
+                <Flex
+                  w={"100%"}
+                  h={"100%"}
+                  center
+                  style={{ position: "absolute" }}
+                >
+                  <ActivityIndicator size={50} />
+                </Flex>
+              )}
               <Flex
                 w={"100%"}
                 h={"100%"}
-                center
-                style={{ position: "absolute" }}
+                justify="end"
+                style={{ position: "absolute", backgroundColor: theme.colors.cover }}
               >
-                <ActivityIndicator size={50} />
+                <HStack
+                  p={10}
+                  spacing={15}
+                  items="end"
+                >
+                  <Flex center>
+                    <Avatar.Text
+                      label={GetDay(item.starting_date)}
+                      size={50}
+                    />
+                    <Text variant="bodyMedium">{GetCompactMonth(item.starting_date)}</Text>
+                  </Flex>
+                  <VStack fill>
+                    <Text
+                      variant="titleMedium"
+                      numberOfLines={2}
+                    >
+                      {item.name}
+                    </Text>
+                    <Text
+                      variant="bodySmall"
+                      numberOfLines={1}
+                    >
+                      De {Time24(item.starting_date)} a {Time24(item.ending_date)}
+                    </Text>
+                    <Text
+                      variant="bodySmall"
+                      numberOfLines={1}
+                    >
+                      En {item.place}
+                    </Text>
+                  </VStack>
+                </HStack>
               </Flex>
-            )}
-            <Flex
-              w={"100%"}
-              h={"100%"}
-              justify="end"
-              style={{ position: "absolute", backgroundColor: theme.colors.cover }}
-            >
-              <HStack
-                p={10}
-                spacing={15}
-                items="end"
-              >
-                <Flex center>
-                  <Avatar.Text
-                    label={GetDay(item.starting_date)}
-                    size={50}
-                  />
-                  <Text variant="bodyMedium">{GetCompactMonth(item.starting_date)}</Text>
-                </Flex>
-                <VStack fill>
-                  <Text
-                    variant="titleMedium"
-                    numberOfLines={2}
-                  >
-                    {item.name}
-                  </Text>
-                  <Text
-                    variant="bodySmall"
-                    numberOfLines={1}
-                  >
-                    De {Time24(item.starting_date)} a {Time24(item.ending_date)}
-                  </Text>
-                  <Text
-                    variant="bodySmall"
-                    numberOfLines={1}
-                  >
-                    En {item.place}
-                  </Text>
-                </VStack>
-              </HStack>
-            </Flex>
-          </Card>
-        </TouchableRipple>
-      </Flex>
-    )
-  }, [])
+            </Card>
+          </TouchableRipple>
+        </Flex>
+      )
+    },
+    [events]
+  )
 
   const FilterOptions = () => {
     return (
@@ -465,12 +467,11 @@ export default Users = ({ navigation, route }) => {
                       description="No hay ningún evento registrado, ¿qué te parece si hacemos el primero?"
                       buttonIcon="plus"
                       buttonTitle="Agregar"
-                      action={() => {
+                      action={() =>
                         navigation.navigate("AddEvent", {
-                          user,
-                          token
+                          getEvents
                         })
-                      }}
+                      }
                     />
                   ) : (
                     <InformationMessage
@@ -499,7 +500,7 @@ export default Users = ({ navigation, route }) => {
                 <FAB
                   icon="plus"
                   style={{ position: "absolute", margin: 16, right: 0, bottom: 0 }}
-                  onPress={() => navigation.navigate("AddEvent")}
+                  onPress={() => navigation.navigate("AddEvent", { getEvents })}
                 />
               )}
             </Flex>

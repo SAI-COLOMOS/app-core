@@ -251,7 +251,7 @@ export default Users = ({ navigation, route }) => {
           ph={20}
           pv={5}
         >
-          <Pressable
+          <TouchableRipple
             onPress={() => {
               navigation.navigate("UserDetails", { register, getUsers })
             }}
@@ -283,7 +283,7 @@ export default Users = ({ navigation, route }) => {
                 </Flex>
               </HStack>
             </Card>
-          </Pressable>
+          </TouchableRipple>
         </Flex>
       )
     },

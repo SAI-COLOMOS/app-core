@@ -4,13 +4,17 @@ import { ActivityIndicator, Button, IconButton, Text, TextInput } from "react-na
 import Constants from "expo-constants"
 import CreateForm from "../Shared/CreateForm"
 import ModalMessage from "../Shared/ModalMessage"
-import { DateAndTimerPicker } from "../Shared/TimeAndDatePicker"
+//import { DateAndTimerPicker } from "../Shared/TimeAndDatePicker"
 import ApplicationContext from "../ApplicationContext"
 import Dropdown from "../Shared/Dropdown"
+import { Pressable } from "react-native"
+import DateAndTimePicker, { CalendarPicker, ClockPicker } from "../Shared/DatePicker"
+import { LongDate } from "../Shared/LocaleDate"
 
 export default AddEvent = ({ navigation, route }) => {
   const { token } = useContext(ApplicationContext)
   const localhost = Constants.expoConfig.extra.API_LOCAL
+  const { getEvents } = route.params
 
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
@@ -23,6 +27,9 @@ export default AddEvent = ({ navigation, route }) => {
   const [place, setPlace] = useState("")
   const [avatar, setAvatar] = useState(null)
   const [verified, setVerified] = useState(false)
+
+  const [showStarting_date, setShowStarting_date] = useState(false)
+  const [showStarting_dateTime, setShowStarting_dateTime] = useState(false)
 
   const [loading, setLoading] = useState(false)
   const [placesOptions, setPlacesOptions] = useState()
@@ -56,7 +63,10 @@ export default AddEvent = ({ navigation, route }) => {
           avatar: avatar
         })
       })
-        .then((response) => response.status)
+        .then(async (response) => {
+          console.log(await response.json())
+          return response.status
+        })
         .catch(() => null)
 
       setModalLoading(false)
@@ -174,26 +184,26 @@ export default AddEvent = ({ navigation, route }) => {
           />
 
           <Flex>
-            <Text variant="labelMedium">Fecha y hora de inicio</Text>
-            <DateAndTimerPicker
-              actualDate={starting_date}
-              selectedDate={setStarting_date}
+            <DateAndTimePicker
+              title="Fecha y hora de inicio"
+              date={starting_date}
+              setDate={setStarting_date}
             />
           </Flex>
 
           <Flex>
-            <Text variant="labelMedium">Fecha y hora de termino</Text>
-            <DateAndTimerPicker
-              actualDate={ending_date}
-              selectedDate={setEnding_date}
+            <DateAndTimePicker
+              title="Fecha y hora de termino"
+              date={ending_date}
+              setDate={setEnding_date}
             />
           </Flex>
 
           <Flex>
-            <Text variant="labelMedium">Fecha y hora de publicación</Text>
-            <DateAndTimerPicker
-              actualDate={publishing_date}
-              selectedDate={setPublishing_date}
+            <DateAndTimePicker
+              title="Fecha y hora de publicación"
+              date={publishing_date}
+              setDate={setPublishing_date}
             />
           </Flex>
 
@@ -303,7 +313,15 @@ export default AddEvent = ({ navigation, route }) => {
         title="¡Listo!"
         description="El evento ha sido añadido exitosamente"
         handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]}
-        actions={[["Aceptar", () => navigation.pop()]]}
+        actions={[
+          [
+            "Aceptar",
+            () => {
+              getEvents()
+              navigation.pop()
+            }
+          ]
+        ]}
         dismissable={false}
         icon="check-circle-outline"
       />
