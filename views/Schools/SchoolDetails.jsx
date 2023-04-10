@@ -65,7 +65,7 @@ export default SchoolDetails = ({ navigation, route }) => {
         p={20}
         spacing={5}
       >
-        <Text variant="bodyLarge">Contacto de la escuela</Text>
+        <Text variant="titleMedium">Contacto de la escuela</Text>
         <VStack spacing={10}>
           <Flex>
             <Text variant="labelSmall">Teléfono de la escuela</Text>
@@ -85,11 +85,11 @@ export default SchoolDetails = ({ navigation, route }) => {
         p={20}
         spacing={5}
       >
-        <Text variant="bodyLarge">Dirección de la escuela</Text>
+        <Text variant="titleMedium">Dirección de la escuela</Text>
         <VStack spacing={10}>
           <Flex>
             <Text variant="labelSmall">Domicilio</Text>
-            <Text variant="bodyLarge">{`${school?.street} #${school?.exterior_number}\n${school?.colony}, ${school?.municipality}. ${school?.postal_code}`}</Text>
+            <Text variant="titleMedium">{`${school?.street} #${school?.exterior_number}\n${school?.colony}, ${school?.municipality}. ${school?.postal_code}`}</Text>
           </Flex>
 
           <Flex>

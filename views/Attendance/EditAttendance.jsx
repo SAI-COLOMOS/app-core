@@ -11,10 +11,9 @@ export default EditSchool = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const theme = useTheme()
   const { token } = useContext(ApplicationContext)
-  const { attendance, event_identifier } = route.params
+  const { attendee, event_identifier, event_status, getEvent } = route.params
 
-  const [status, setStatus] = useState(attendance?.status)
-  const [verified, setVerified] = useState(true)
+  const [status, setStatus] = useState(attendee?.status)
 
   const [modalConfirm, setModalConfirm] = useState(false)
   const [modalLoading, setModalLoading] = useState(false)
@@ -25,7 +24,7 @@ export default EditSchool = ({ navigation, route }) => {
   const [modalFatal, setModalFatal] = useState(false)
   const [responseCode, setResponseCode] = useState("")
 
-  const options = [{ option: "Asistió" }, { option: "Retardo" }, { option: "Desinscrito" }, { option: "No asistió" }]
+  const options = [{ option: "Asistió" }, { option: "Retardo" }, { option: "No asistió" }]
 
   async function updateAttendance() {
     setModalLoading(true)
@@ -34,11 +33,10 @@ export default EditSchool = ({ navigation, route }) => {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        "Cache-Control": "no-cache"
+        Authorization: `Bearer ${token}`
       },
       body: JSON.stringify({
-        attendee_register: attendance.attendee_register,
+        attendee_register: attendee.attendee_register,
         status: status
       })
     })
@@ -60,28 +58,24 @@ export default EditSchool = ({ navigation, route }) => {
     }
   }
 
-  async function saveSchool() {
+  async function deleteAttendance() {
     setModalLoading(true)
 
-    const request = await fetch(`${localhost}/schools/${school.school_identifier}`, {
+    const request = await fetch(`${localhost}/agenda/${event_identifier}/attendance`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        "Cache-Control": "no-cache"
+        Authorization: `Bearer ${token}`
       },
       body: JSON.stringify({
-        school_name: school_name.trim(),
-        municipality: municipality.trim(),
-        street: street.trim(),
-        exterior_number: exterior_number.trim(),
-        colony: colony.trim(),
-        postal_code: postal_code.trim(),
-        phone: phone.trim(),
-        reference: reference.trim()
+        attendee_register: attendee.attendee_register,
+        status: "Desinscrito"
       })
     })
-      .then((response) => response.status)
+      .then(async (response) => {
+        console.log(await response.json())
+        return response.status
+      })
       .catch((_) => null)
 
     setModalLoading(false)
@@ -96,58 +90,15 @@ export default EditSchool = ({ navigation, route }) => {
     }
   }
 
-  async function deleteSchool() {
-    setModalLoading(true)
-
-    const request = await fetch(`${localhost}/schools/${school.school_identifier}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        "Cache-Control": "no-cache"
-      }
-    })
-      .then((response) => response.status)
-      .catch((_) => null)
-
-    console.log(request)
-
-    setModalLoading(false)
-
-    if (request == 200) {
-      setModalSuccessDelete(true)
-    } else if (request != null) {
-      setResponseCode(request)
-      setModalErrorDelete(true)
-    } else {
-      setModalFatal(true)
-    }
-  }
-
-  // useEffect(() => {
-  //   let check = true
-
-  //   school_name.length > 0 ? null : (check = false)
-  //   municipality.length > 0 ? null : (check = false)
-  //   street.length > 0 ? null : (check = false)
-  //   exterior_number.length > 0 ? null : (check = false)
-  //   colony.length > 0 ? null : (check = false)
-  //   postal_code.length == 5 ? null : (check = false)
-  //   phone.length == 10 ? null : (check = false)
-
-  //   if (check) {
-  //     setVerified(true)
-  //   } else {
-  //     setVerified(false)
-  //   }
-  // }, [school_name, municipality, street, postal_code, exterior_number, colony, phone])
-
   const Data = () => (
     <VStack
       key="Data"
       spacing={5}
     >
-      <Text variant="labelLarge">Estado de la asistencia{JSON.stringify(attendance)}</Text>
+      <Text variant="titleMedium">
+        {attendee?.first_name} {attendee?.first_last_name} {attendee?.second_last_name ?? null} {event_status}
+      </Text>
+      <Text variant="labelLarge">Estado de la asistencia</Text>
       <VStack spacing={10}>
         <Dropdown
           title="Estado de la asistencia"
@@ -164,7 +115,7 @@ export default EditSchool = ({ navigation, route }) => {
       key="Delete"
       spacing={5}
     >
-      <Text variant="labelLarge">Eliminar la escuela</Text>
+      <Text variant="labelLarge">Eliminar participante</Text>
       <VStack spacing={10}>
         <Button
           textColor={theme.colors.error}
@@ -184,7 +135,7 @@ export default EditSchool = ({ navigation, route }) => {
     <Button
       key="SaveButton"
       icon="content-save-outline"
-      disabled={modalLoading || !verified}
+      disabled={modalLoading}
       loading={modalLoading}
       mode="contained"
       onPress={() => updateAttendance()}
@@ -211,22 +162,23 @@ export default EditSchool = ({ navigation, route }) => {
     <Flex fill>
       <CreateForm
         title="Editar asistencia"
-        children={[Data(), Delete()]}
+        children={!(event_status == "En proceso" || event_status == "Concluido" || event_status == "Concluido por sistema" || event_status == "Por comenzar") ? [Data(), Delete()] : [Data()]}
         actions={[Save(), Cancel()]}
         navigation={navigation}
         loading={modalLoading}
       />
 
       <ModalMessage
-        title="Eliminar escuela"
-        description="¿Seguro que deseas eliminar esta escuela? La acción no se podrá deshacer"
+        title="Eliminar participante"
+        description="¿Seguro que deseas eliminar a este participante?"
         handler={[modalConfirm, () => setModalConfirm(!modalConfirm)]}
         actions={[
           ["Cancelar", () => setModalConfirm(!modalConfirm)],
           [
             "Aceptar",
             () => {
-              setModalConfirm(!modalConfirm), deleteSchool()
+              setModalConfirm(!modalConfirm)
+              deleteAttendance()
             }
           ]
         ]}
@@ -236,23 +188,39 @@ export default EditSchool = ({ navigation, route }) => {
 
       <ModalMessage
         title="¡Listo!"
-        description="La escuela ha sido actualizada"
+        description="La asistencia del participante ha sido actualizada"
         handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]}
-        actions={[["Aceptar", () => navigation.pop()]]}
+        actions={[
+          [
+            "Aceptar",
+            () => {
+              getEvent()
+              navigation.pop()
+            }
+          ]
+        ]}
         dismissable={false}
         icon="check-circle-outline"
       />
       <ModalMessage
         title="¡Listo!"
-        description="La escuela ha sido eliminada"
+        description="El participante ha sido eliminado"
         handler={[modalSuccessDelete, () => setModalSuccessDelete(!modalSuccessDelete)]}
-        actions={[["Aceptar", () => navigation.pop(2)]]}
+        actions={[
+          [
+            "Aceptar",
+            () => {
+              getEvent()
+              navigation.pop()
+            }
+          ]
+        ]}
         dismissable={false}
         icon="check-circle-outline"
       />
       <ModalMessage
         title="Ocurrió un problema"
-        description={`No pudimos actualizar la escuela, inténtalo más tarde (${responseCode})`}
+        description={`No pudimos actualizar la asistencia del participante, inténtalo más tarde (${responseCode})`}
         handler={[modalError, () => setModalError(!modalError)]}
         actions={[["Aceptar"]]}
         dismissable={true}

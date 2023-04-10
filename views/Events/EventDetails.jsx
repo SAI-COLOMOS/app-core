@@ -1,4 +1,4 @@
-import { Flex, HStack, VStack } from "@react-native-material/core"
+import { Flex, HStack, VStack, even } from "@react-native-material/core"
 import { useEffect, useState, useCallback, useContext } from "react"
 import { useHeaderHeight } from "@react-navigation/elements"
 import { Text, Card, Button, FAB, useTheme, Avatar, IconButton, TouchableRipple } from "react-native-paper"
@@ -19,9 +19,10 @@ export default EventDetails = ({ navigation, route }) => {
   const { user, token } = useContext(ApplicationContext)
   //const { event, setEvent, attendees, setAttendees, profiles, setProfiles } = useContext(EventContext)
   const headerMargin = useHeaderHeight()
-  const { event_identifier } = route.params
+  const { event_identifier, getEvents } = route.params
   const theme = useTheme()
 
+  const [avatar, setAvatar] = useState(undefined)
   const [loading, setLoading] = useState(false)
   const [event, setEvent] = useState(undefined)
   const [starting_date, setStarting_date] = useState(new Date())
@@ -55,34 +56,52 @@ export default EventDetails = ({ navigation, route }) => {
   }
 
   async function subscribeEvent() {
-    const request = await fetch(`${localhost}/agenda/${event_identifier}`, {
+    const request = await fetch(`${localhost}/agenda/${event_identifier}/attendance`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        "Cache-Control": "no-cache"
+        Authorization: `Bearer ${token}`
       }
-    })
+    }).catch(() => null)
 
-    if (request.ok) {
+    if (request?.ok) {
       getEvent()
     }
   }
 
   async function unsubscribeEvent() {
-    const request = await fetch(`${localhost}/agenda/${event_identifier}/unsubscribe`, {
-      method: "PATCH",
+    const request = await fetch(`${localhost}/agenda/${event_identifier}/attendance`, {
+      method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        "Cache-Control": "no-cache"
+        Authorization: `Bearer ${token}`
       }
-    })
+    }).catch(() => null)
 
-    if (request.ok) {
+    if (request?.ok) {
       getEvent()
     }
+
+    console.error(await request.json())
   }
+
+  useEffect(() => {
+    const requestAvatar = async () => {
+      const request = await fetch(`${localhost}/agenda/${event_identifier}?avatar=true`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        }
+      })
+        .then((response) => response.json())
+        .catch(() => null)
+
+      request?.avatar ? setAvatar(request.avatar) : setAvatar(null)
+    }
+
+    requestAvatar()
+  }, [event])
 
   useEffect(() => {
     navigation.setOptions({
@@ -92,12 +111,9 @@ export default EventDetails = ({ navigation, route }) => {
     })
   }, [])
 
-  useFocusEffect(
-    useCallback(() => {
-      getEvent()
-      return () => {}
-    }, [])
-  )
+  useEffect(() => {
+    getEvent()
+  }, [])
 
   const Availability = () => (
     <HStack
@@ -108,7 +124,7 @@ export default EventDetails = ({ navigation, route }) => {
         <Text variant="bodyMedium">Horas ofertadas</Text>
         <HStack items="baseline">
           <Text variant="displaySmall">{event?.offered_hours}</Text>
-          <Text variant="bodyLarge"> hrs.</Text>
+          <Text variant="titleMedium"> hrs.</Text>
         </HStack>
       </VStack>
       <VStack>
@@ -117,8 +133,8 @@ export default EventDetails = ({ navigation, route }) => {
           items="baseline"
           justify="end"
         >
-          <Text variant="displaySmall">{event?.attendance.attendee_list.length}</Text>
-          <Text variant="bodyLarge"> / {event?.vacancy}</Text>
+          <Text variant="displaySmall">{event?.registered_users}</Text>
+          <Text variant="titleMedium"> / {event?.vacancy}</Text>
         </HStack>
       </VStack>
     </HStack>
@@ -133,7 +149,7 @@ export default EventDetails = ({ navigation, route }) => {
         p={20}
         spacing={5}
       >
-        <Text variant="bodyLarge">Descripción</Text>
+        <Text variant="titleMedium">Descripción</Text>
         <Text variant="bodyMedium">{event?.description}</Text>
       </Flex>
     </Card>
@@ -148,7 +164,7 @@ export default EventDetails = ({ navigation, route }) => {
         p={20}
         spacing={5}
       >
-        <Text variant="bodyLarge">Lugar, fecha y hora</Text>
+        <Text variant="titleMedium">Lugar, fecha y hora</Text>
         <VStack spacing={10}>
           <Flex>
             <Text variant="labelSmall">Lugar</Text>
@@ -194,7 +210,7 @@ export default EventDetails = ({ navigation, route }) => {
         p={20}
         spacing={5}
       >
-        <Text variant="bodyLarge">Acerca del evento</Text>
+        <Text variant="titleMedium">Acerca del evento</Text>
         <VStack spacing={10}>
           <Flex>
             <Text variant="labelSmall">Encargado designado</Text>
@@ -218,47 +234,53 @@ export default EventDetails = ({ navigation, route }) => {
       mode="outlined"
     >
       <Flex p={20}>
-        <Text variant="bodyLarge">Lista de participantes</Text>
+        <Text variant="titleMedium">Lista de participantes</Text>
       </Flex>
-      <VStack
-        spacing={10}
-        pb={20}
-      >
-        {event?.attendance.attendee_list.length > 0 ? (
-          event.attendance.attendee_list.map((item) => (
+      {event?.attendance.attendee_list.length > 0 ? (
+        <VStack
+          // spacing={10}
+          pb={20}
+        >
+          {event.attendance.attendee_list.map((item) => (
             <Flex key={item.attendee_register}>
-              <Attendee
-                register={item.attendee_register}
-                attendance={item}
-              />
+              <Attendee attendee={item} />
             </Flex>
-          ))
-        ) : (
-          <InformationMessage
-            icon="account"
-            title="Sin inscripciones"
-            description="Todavía no hay nadie inscrito, ¿quieres agregar a alguien?"
-          />
-        )}
-        <Flex ph={20}>
-          <Button
-            icon="plus"
-            mode="text"
-            onPress={() => navigation.navigate("AddAttendee")}
-          >
-            Inscribir
-          </Button>
-        </Flex>
-      </VStack>
+          ))}
+          {!(event?.attendance.status == "Concluido" || event?.attendance.status == "Concluido por sistema" || event?.attendance.status == "En proceso" || event?.attendance.status == "Por comenzar") && (
+            <Flex center>
+              <Button
+                icon="plus"
+                mode="outlined"
+                onPress={() => navigation.navigate("AddAttendee", { event_identifier, getEvent })}
+              >
+                Inscribir
+              </Button>
+            </Flex>
+          )}
+        </VStack>
+      ) : (
+        <InformationMessage
+          icon="account"
+          title="Sin inscripciones"
+          description="Todavía no hay nadie inscrito, ¿quieres agregar a alguien?"
+          action={() => navigation.navigate("AddAttendee", { event_identifier, getEvent })}
+          buttonTitle="Inscribir"
+          buttonIcon="plus"
+        />
+      )}
     </Card>
   )
 
   const Subscribe = () => (
-    <Flex
-      fill
-      key="Subscribe"
-    >
-      <VStack spacing={20}>
+    <>
+      {
+        {
+          Encargado: <ManagerOptions />,
+          Prestador: <ProviderOptions />
+        }[user?.role]
+      }
+      {/* 
+
         {event?.author_register == user.register ? (
           <Button
             mode="contained"
@@ -266,88 +288,46 @@ export default EventDetails = ({ navigation, route }) => {
           >
             Registrar asistencia
           </Button>
-        ) : event?.attendance.attendee_list.find((item) => {
-            if (item.attendee_register == user.register) {
-              if (item.status == "Inscrito") {
-                return true
-              }
-            }
-
-            return false
-          }) ? (
-          <VStack spacing={20}>
-            <Text
-              variant="bodyLarge"
-              style={{ textAlign: "center" }}
-            >
-              Ya estás inscrito al evento
-            </Text>
-            <Button
-              onPress={() => unsubscribeEvent()}
-              mode="outlined"
-              style={{ backgroundColor: theme.colors.background }}
-            >
-              Desinscribirme al evento
-            </Button>
-            {event?.author_register != user.register && (
-              <Button
-                mode="contained"
-                onPress={() => navigation.navigate("ShowAttendanceCode")}
-              >
-                Tomar asistencia
-              </Button>
-            )}
-          </VStack>
-        ) : (
-          <Button
-            onPress={() => subscribeEvent()}
-            mode="contained"
-          >
-            Inscribirse al evento
-          </Button>
-        )}
-      </VStack>
-    </Flex>
+        ) :  */}
+    </>
   )
 
   /* Componentes de componentes */
 
-  const Attendee = useCallback(({ attendance, register }) => {
-    const [attendee, setAttendee] = useState(undefined)
+  const Attendee = useCallback(
+    ({ attendee }) => {
+      const [avatar, setAvatar] = useState(undefined)
 
-    const requestAttendee = async () => {
-      const request = await fetch(`${localhost}/users/${register}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        }
-      })
-        .then((response) => response.json())
-        .catch(() => null)
+      const requestAvatar = async () => {
+        const request = await fetch(`${localhost}/users/${attendee?.attendee_register}?avatar=true`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          }
+        })
+          .then((response) => response.json())
+          .catch(() => null)
 
-      request?.user ? setAttendee(request.user) : setAttendee(null)
-    }
+        request?.avatar ? setAvatar(request.avatar) : setAvatar(null)
+      }
 
-    useEffect(() => {
-      requestAttendee()
-    }, [])
+      useEffect(() => {
+        requestAvatar()
+      }, [])
 
-    if (attendee !== null) {
       return (
-        <Flex
-          mh={20}
-          style={{ borderRadius: 10, overflow: "hidden" }}
-        >
-          <TouchableRipple onPress={() => navigation.navigate("EditAttendance", { attendance, event_identifier })}>
+        <Flex style={{ borderRadius: 10, overflow: "hidden" }}>
+          <TouchableRipple onPress={() => navigation.navigate("EditAttendance", { attendee, event_identifier, event_status: event?.attendance?.status, getEvent })}>
             <HStack
               spacing={10}
-              // mh={20}
-              //items="center"
+              mh={20}
+              mv={10}
             >
               <Flex>
                 <ProfileImage
-                  image={attendee?.avatar}
+                  image={avatar}
+                  icon="account-outline"
                   width={50}
                   height={50}
                 />
@@ -359,17 +339,12 @@ export default EventDetails = ({ navigation, route }) => {
                 >
                   {attendee?.first_name} {attendee?.first_last_name} {attendee?.second_last_name ?? null}
                 </Text>
-                <Text
-                  variant="bodySmall"
-                  numberOfLines={1}
-                >
-                  {attendee?.register}
-                </Text>
+
                 <Text
                   variant="bodyMedium"
                   numberOfLines={1}
                 >
-                  {attendance?.status}
+                  {attendee?.status}
                 </Text>
               </VStack>
               {/* <IconButton
@@ -381,23 +356,112 @@ export default EventDetails = ({ navigation, route }) => {
           </TouchableRipple>
         </Flex>
       )
-    } else {
-      return (
-        <HStack
-          fill
-          spacing={10}
-          ph={20}
-        >
-          <Text variant="bodyMedium">Ocurrió un problema recuperando la información de este usuario</Text>
-          <IconButton
-            icon="reload"
-            mode="outlined"
-            onPress={() => requestAttendee()}
+    },
+    [event]
+  )
+
+  const ManagerOptions = () => (
+    <VStack
+      fill
+      key="Subscribe"
+      spacing={20}
+    >
+      {event?.author_register == user.register && event?.attendance?.status == "Por publicar" && (
+        <Card mode="outlined">
+          <InformationMessage
+            icon="clock-outline"
+            title="Evento por publicar"
+            description={`Actualmente solo tú puedes ver este evento, el cual será publicado el día ${LongDate(event?.publishing_date)} a las ${Time24(event?.publishing_date)}`}
+            action={() => null}
+            buttonTitle="Publicar ahora"
+            buttonIcon="calendar-check-outline"
           />
-        </HStack>
-      )
-    }
-  }, [])
+        </Card>
+      )}
+
+      {event?.attendance?.status == "En proceso" && (
+        <Button
+          mode="outlined"
+          style={{ backgroundColor: theme.colors.background }}
+          icon="hand-back-left-outline"
+          onPress={() => navigation.navigate("ScanAttendance", { attendeeList: event?.attendance.attendee_list, event_identifier: event_identifier })}
+        >
+          Registrar asistencia
+        </Button>
+      )}
+
+      {event?.attendance?.status == "En proceso" && new Date(event?.ending_date) <= new Date() && (
+        <Button
+          mode="contained"
+          icon="calendar-lock-outline"
+          onPress={() => navigation.navigate("ShowAttendanceCode")}
+        >
+          Concluir evento
+        </Button>
+      )}
+    </VStack>
+  )
+
+  const ProviderOptions = () => {
+    const [status, setStatus] = useState(event?.attendance.attendee_list.find((item) => item.attendee_register == user.register).status)
+
+    return (
+      <>
+        {event?.attendance?.status == "Disponible" &&
+          (event?.attendance.attendee_list.find((item) => {
+            if (item.attendee_register == user.register) {
+              if (item.status == "Inscrito") {
+                return true
+              }
+            }
+
+            return false
+          }) ? (
+            <VStack spacing={20}>
+              <Text
+                variant="titleMedium"
+                style={{ textAlign: "center" }}
+              >
+                Ya estás inscrito al evento
+              </Text>
+              <Button
+                onPress={() => unsubscribeEvent()}
+                mode="outlined"
+                style={{ backgroundColor: theme.colors.background }}
+              >
+                Desinscribirme al evento
+              </Button>
+            </VStack>
+          ) : (
+            <Button
+              onPress={() => subscribeEvent()}
+              mode="contained"
+            >
+              Inscribirse al evento
+            </Button>
+          ))}
+        {event?.attendance?.status == "En proceso" && (
+          <Card mode="outlined">
+            <VStack
+              spacing={20}
+              p={20}
+            >
+              <Flex fill>
+                <Text variant="titleMedium">Estado de la asistencia</Text>
+                <Text variant="bodyMedium">{status == "Inscrito" ? "Sin asistencia" : status}</Text>
+              </Flex>
+              <Button
+                onPress={() => navigation.navigate("ShowAttendanceCode")}
+                mode="contained"
+              >
+                Tomar asistencia
+              </Button>
+            </VStack>
+          </Card>
+        )}
+      </>
+    )
+  }
 
   return (
     <Flex
@@ -409,7 +473,7 @@ export default EventDetails = ({ navigation, route }) => {
           isNaN(event) ? (
             <DisplayDetails
               icon="bulletin-board"
-              image={event?.avatar}
+              image={avatar}
               title={event?.name}
               children={[Availability(), Subscribe(), Description(), Event(), Info(), user.role != "Prestador" && Enrolled()]}
               refreshStatus={loading}
@@ -481,14 +545,17 @@ export default EventDetails = ({ navigation, route }) => {
         )
       ) : null}
 
-      {!(event === undefined || event === null) && user.role != "Prestador" && (
+      {!(event === undefined || event === null) && user.role != "Prestador" && !(event?.attendance.status == "Concluido" || event?.attendance.status == "Concluido por sistema" || event?.attendance.status == "En proceso" || event?.attendance.status == "Por comenzar") && (
         <FAB
           icon="pencil-outline"
           style={{ position: "absolute", margin: 16, right: 0, bottom: 0 }}
           onPress={() =>
             navigation.navigate("EditEvent", {
               event,
-              event_identifier
+              event_identifier,
+              image: avatar,
+              getEvent,
+              getEvents
             })
           }
         />

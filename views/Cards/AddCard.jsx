@@ -1,14 +1,10 @@
 import { Flex, VStack } from "@react-native-material/core"
 import { useHeaderHeight } from "@react-navigation/elements"
 import { useCallback, useContext, useEffect, useState } from "react"
-import Header from "../Shared/Header"
 import Constants from "expo-constants"
 import CreateForm from "../Shared/CreateForm"
 import { Button, TextInput, useTheme, Text } from "react-native-paper"
 import ModalMessage from "../Shared/ModalMessage"
-import { ScrollView } from "react-native"
-import { LongDate } from "../Shared/LocaleDate"
-import { DateAndTimerPicker } from "../Shared/TimeAndDatePicker"
 import ApplicationContext from "../ApplicationContext"
 
 export default AddCard = ({ navigation, route }) => {

@@ -7,37 +7,32 @@ import InformationMessage from "../Shared/InformationMessage"
 import Constants from "expo-constants"
 import ApplicationContext from "../ApplicationContext"
 import ProfileImage from "../Shared/ProfileImage"
+import ModalMessage from "../Shared/ModalMessage"
 
 export default AddAttendee = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const { token } = useContext(ApplicationContext)
+  const { event_identifier, getEvent } = route.params
 
   const [search, setSearch] = useState("")
   const [loading, setLoading] = useState(false)
   const [foundUsers, setFoundUsers] = useState(undefined)
-  const [selectedUsers, setSelectedUsers] = useState([])
 
-  const searchUsers = async () => {
+  const [modalConfirm, setModalConfirm] = useState(false)
+  const [modalLoading, setModalLoading] = useState(false)
+  const [modalSuccess, setModalSuccess] = useState(false)
+  const [modalError, setModalError] = useState(false)
+  const [modalFatal, setModalFatal] = useState(false)
+  const [responseCode, setResponseCode] = useState("")
+
+  async function searchUsers() {
     setLoading(true)
-
-    // let filters = {}
-
-    // if (placeFilter !== "") {
-    //   filters = { ...filters, place: placeFilter }
-    // }
-
-    // if (Object.keys(filters).length === 0 && search === "") {
-    //   setFoundUsers(undefined)
-    //   setLoading(false)
-    //   return
-    // }
 
     const request = await fetch(`${localhost}/users?search=${search.trim()}&filter=${JSON.stringify({ status: "Activo" })}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        "Cache-Control": "no-cache"
+        Authorization: `Bearer ${token}`
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
@@ -51,6 +46,61 @@ export default AddAttendee = ({ navigation, route }) => {
     } else {
       setFoundUsers(request)
     }
+  }
+
+  async function addAttendee(register) {
+    setModalLoading(true)
+
+    const request = await fetch(`${localhost}/agenda/${event_identifier}/attendance/several`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        "Cache-Control": "no-cache"
+      },
+      body: JSON.stringify({
+        attendees: [{ register }]
+      })
+    })
+      .then(async (response) => {
+        console.log(await response.json())
+        return response.status
+      })
+      .catch(() => null)
+
+    setModalLoading(false)
+
+    if (request == 201) {
+      setModalSuccess(true)
+    } else if (request != null) {
+      setResponseCode(request)
+      setModalError(true)
+    } else {
+      setModalFatal(true)
+    }
+    // setLoading(true)
+
+    // const request = await fetch(`${localhost}/agenda/${event_identifier}/attendance/several`, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     Authorization: `Bearer ${token}`,
+    //   },
+    //   body: JSON.stringify({
+    //     register
+    //   })
+    // })
+    //   .then((response) => (response.ok ? response.json() : response.status))
+    //   .catch(() => null)
+
+    // setLoading(false)
+
+    // if (request?.users) {
+    //   setFoundUsers(request.users)
+    //   console.log(request.users)
+    // } else {
+    //   setFoundUsers(request)
+    // }
   }
 
   useEffect(() => {
@@ -78,34 +128,6 @@ export default AddAttendee = ({ navigation, route }) => {
         />
       </Flex>
 
-      {selectedUsers.length > 0 && (
-        <Flex>
-          <Text variant="titleMedium">Usuarios seleccionados</Text>
-          <HStack wrap="wrap-reverse">
-            {selectedUsers?.map((item) => (
-              <Flex
-                key={`${item.register} added`}
-                ml={5}
-                mb={5}
-              >
-                <Chip
-                  mode="outlined"
-                  closeIcon="close"
-                  onClose={() => {
-                    const i = selectedUsers.findIndex((a) => a.register == item.register)
-                    const temp = [...selectedUsers]
-                    temp.splice(i, 1)
-                    setSelectedUsers(temp)
-                  }}
-                >
-                  {item.name}
-                </Chip>
-              </Flex>
-            ))}
-          </HStack>
-        </Flex>
-      )}
-
       <Flex>
         <Text variant="titleMedium">Resultados de la búsqueda</Text>
         {foundUsers !== null ? (
@@ -121,8 +143,8 @@ export default AddAttendee = ({ navigation, route }) => {
             ) : foundUsers == undefined ? (
               <InformationMessage
                 icon="account-plus-outline"
-                title="Agrega a personas"
-                description="Busca a personas para agregarlas como asistentes a este evento, puedes hacerlo mediante su nombre o registro"
+                title="Agrega a un participante"
+                description="Puedes buscarlo mediante su nombre o registro. No importa si ya no hay cupo en el evento, puedes agregar cuantos participantes quieras"
               />
             ) : (
               <InformationMessage
@@ -158,13 +180,6 @@ export default AddAttendee = ({ navigation, route }) => {
           />
         )}
       </Flex>
-
-      {/* <ScrollView>
-        <VStack>
-          {search == "" && (
-          )}
-        </VStack>
-      </ScrollView> */}
     </VStack>
   )
 
@@ -172,6 +187,9 @@ export default AddAttendee = ({ navigation, route }) => {
     <Button
       key="Save"
       mode="contained"
+      disabled={modalLoading}
+      loading={modalLoading}
+      onPress={() => setModalConfirm(true)}
     >
       Guardar
     </Button>
@@ -181,65 +199,123 @@ export default AddAttendee = ({ navigation, route }) => {
     <Button
       key="Cancel"
       mode="outlined"
+      disabled={modalLoading}
       onPress={() => navigation.pop()}
+      icon="close"
     >
       Cancelar
     </Button>
   )
 
-  const Item = useCallback(
-    ({ item, register }) => {
-      return (
-        <Flex
-          ph={0}
-          pv={5}
-          onPress={() => {}}
-        >
-          <Pressable
-            onPress={() => {
-              if (selectedUsers.some((item) => item.register == register) == false) {
-                setSelectedUsers([...selectedUsers, { name: `${item.first_name} ${item.first_last_name}`, register: item.register }])
-              }
-            }}
+  const Item = useCallback(({ item, register }) => {
+    const [avatar, setAvatar] = useState(undefined)
+
+    const requestAvatar = useCallback(async () => {
+      const request = await fetch(`${localhost}/users/${register}?avatar=true`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        }
+      })
+        .then((response) => response.json())
+        .catch(() => null)
+
+      request?.avatar ? setAvatar(request.avatar) : setAvatar(null)
+    }, [])
+
+    useEffect(() => {
+      requestAvatar()
+    }, [])
+    return (
+      <Flex
+        ph={0}
+        pv={5}
+        onPress={() => {}}
+      >
+        <Pressable onPress={() => addAttendee(register)}>
+          <Card
+            mode="outlined"
+            style={{ overflow: "hidden" }}
           >
-            <Card
-              mode="outlined"
-              style={{ overflow: "hidden" }}
-            >
-              <HStack items="center">
-                <ProfileImage image={item.avatar} />
-                <Flex
-                  fill
-                  p={10}
+            <HStack>
+              <ProfileImage
+                image={avatar}
+                icon="account-outline"
+              />
+              <Flex
+                fill
+                p={10}
+              >
+                <Text
+                  variant="titleMedium"
+                  numberOfLines={1}
                 >
-                  <Text
-                    variant="titleMedium"
-                    numberOfLines={1}
-                  >
-                    {item.first_name} {item.first_last_name} {item.second_last_name ?? null}
-                  </Text>
-                  <Text variant="bodySmall">{item.register}</Text>
-                  <Text variant="bodySmall">
-                    {item.role} {item.role == "Prestador" && item.provider_type}
-                  </Text>
-                </Flex>
-              </HStack>
-            </Card>
-          </Pressable>
-        </Flex>
-      )
-    },
-    [selectedUsers]
-  )
+                  {item.first_name} {item.first_last_name} {item.second_last_name ?? null}
+                </Text>
+                <Text variant="bodyMedium">{item.register}</Text>
+              </Flex>
+            </HStack>
+          </Card>
+        </Pressable>
+      </Flex>
+    )
+  }, [])
 
   return (
-    <CreateForm
-      title="Agregar asistentes"
-      navigation={navigation}
-      children={[SearchList()]}
-      actions={[Save(), Cancel()]}
-      refreshingStatus={loading}
-      refreshingAction={() => searchUsers()}
-    />
+    <Flex fill>
+      <CreateForm
+        title="Agregar asistente"
+        navigation={navigation}
+        children={[SearchList()]}
+        actions={[/*Save(), */ Cancel()]}
+        refreshingStatus={loading}
+        refreshingAction={() => searchUsers()}
+      />
+
+      <ModalMessage
+        title="Confirmar asistente"
+        description="¿Seguro que desea agrega a este asistente?"
+        handler={[modalConfirm, () => setModalConfirm(!modalConfirm)]}
+        actions={[["Aceptar", () => null], ["Cancelar"]]}
+        dismissable={true}
+        icon="account-plus-outline"
+      />
+
+      <ModalMessage
+        title="¡Listo!"
+        description="El participante ha sido añadido exitosamente"
+        handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]}
+        actions={[
+          [
+            "Aceptar",
+            () => {
+              getEvent()
+              navigation.pop()
+            }
+          ]
+        ]}
+        dismissable={false}
+        icon="check-circle-outline"
+      />
+
+      <ModalMessage
+        title="Ocurrió un problema"
+        description={`No pudimos añadir al participante, inténtalo más tarde. (${responseCode})`}
+        handler={[modalError, () => setModalError(!modalError)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="close-circle-outline"
+      />
+
+      <ModalMessage
+        title="Sin conexión a internet"
+        description={`Parece que no tienes conexión a internet, conéctate e intenta de nuevo`}
+        handler={[modalFatal, () => setModalFatal(!modalFatal)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="wifi-alert"
+      />
+    </Flex>
   )
 }

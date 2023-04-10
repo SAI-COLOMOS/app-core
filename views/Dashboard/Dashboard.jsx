@@ -10,14 +10,12 @@ import CircularProgress from "react-native-circular-progress-indicator"
 import Constants from "expo-constants"
 import Animated, { interpolate, log, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated"
 import InformationMessage from "../Shared/InformationMessage"
-import { GetCompactMonth, GetDay, ShortDate, Time24 } from "../Shared/LocaleDate"
+import { GetCompactMonth, GetDay, GetMoment, ShortDate, Time24 } from "../Shared/LocaleDate"
 import ApplicationContext from "../ApplicationContext"
 import CacheContext from "../Contexts/CacheContext"
 import ProfileImage from "../Shared/ProfileImage"
 
 export default Dashboard = ({ navigation }) => {
-  const userContext = useContext(ApplicationContext)
-  const cache = useContext(CacheContext)
   const { user, setUser, token, setToken, register, setRegister, achieved_hours, setAchieved_hours } = useContext(ApplicationContext)
   const insets = useSafeAreaInsets()
   const theme = useTheme()
@@ -27,10 +25,6 @@ export default Dashboard = ({ navigation }) => {
 
   const [greeting, setGreeting] = useState("Hola")
   const [timeToSleep, setTimeToSleep] = useState(false)
-  //const [offSet, setOffSet] = useState(0)
-  //const [token, setToken] = useState(undefined)
-  //const [register, setRegister] = useState(undefined)
-  //const [user, setUser] = useState(undefined)
   const [feed, setFeed] = useState(undefined)
   const [loading, setLoading] = useState(false)
 
@@ -106,97 +100,111 @@ export default Dashboard = ({ navigation }) => {
     }, [])
   )
 
-  const WidgetSmall = useCallback(
-    ({ screen, payload, child }) => (
-      <Flex
-        p={5}
-        h={90}
-        w={90}
+  const WidgetSmall = ({ screen, payload, child }) => (
+    <Flex
+      p={5}
+      h={90}
+      w={90}
+    >
+      <Card
+        mode="outlined"
+        style={{ overflow: "hidden" }}
       >
-        <Card
-          mode="outlined"
-          style={{ overflow: "hidden" }}
+        <TouchableRipple
+          onPress={() => {
+            navigation.navigate(screen, { ...payload })
+          }}
         >
-          <TouchableRipple
-            onPress={() => {
-              navigation.navigate(screen, { ...payload })
-            }}
+          <Flex
+            h={"100%"}
+            w={"100%"}
+            center
           >
-            <Flex
-              h={"100%"}
-              w={"100%"}
-              center
-            >
-              {child}
-            </Flex>
-          </TouchableRipple>
-        </Card>
-      </Flex>
-    ),
-    []
+            {child}
+          </Flex>
+        </TouchableRipple>
+      </Card>
+    </Flex>
   )
 
-  const WidgetMedium = useCallback(
-    ({ screen, payload, child, title }) => (
-      <Flex
-        p={5}
-        h={180}
-        w={180}
+  const WidgetMedium = ({ screen, payload, child, title }) => (
+    <Flex
+      p={5}
+      h={180}
+      w={180}
+    >
+      <Card
+        mode="outlined"
+        style={{ overflow: "hidden" }}
       >
-        <Card
-          mode="outlined"
-          style={{ overflow: "hidden" }}
+        <TouchableRipple
+          onPress={() => {
+            navigation.navigate(screen, { ...payload })
+          }}
         >
-          <TouchableRipple
-            onPress={() => {
-              navigation.navigate(screen, { ...payload })
-            }}
+          <VStack
+            ph={10}
+            pv={10}
+            h={"100%"}
+            w={"100%"}
+            spacing={10}
           >
-            <VStack
-              ph={20}
-              pv={10}
-              h={"100%"}
-              w={"100%"}
-              spacing={10}
-            >
+            <Flex ph={5}>
               <Text
                 variant="bodyMedium"
                 numberOfLines={1}
               >
                 {title}
               </Text>
-              <Flex
-                fill
-                center
-              >
-                {child}
-              </Flex>
-            </VStack>
-          </TouchableRipple>
-        </Card>
-      </Flex>
-    ),
-    []
+            </Flex>
+            <Flex
+              fill
+              center
+            >
+              {child}
+            </Flex>
+          </VStack>
+        </TouchableRipple>
+      </Card>
+    </Flex>
   )
 
-  const WidgetLarge = useCallback(
-    ({ screen, payload, child, title }) => (
-      <Flex
-        w={360}
-        h={180}
-        p={5}
+  const WidgetLarge = ({ screen, payload, child, title, image }) => (
+    <Flex
+      w={360}
+      h={180}
+      p={5}
+    >
+      <Card
+        mode="outlined"
+        style={{ overflow: "hidden" }}
       >
-        <Card
-          mode="outlined"
-          style={{ overflow: "hidden" }}
+        <TouchableRipple
+          onPress={() => {
+            navigation.navigate(screen, { ...payload })
+          }}
         >
-          <TouchableRipple
-            onPress={() => {
-              navigation.navigate(screen, { ...payload })
-            }}
-          >
+          <>
+            {image && (
+              <Flex
+                h={"100%"}
+                w={"100%"}
+                style={{ position: "absolute" }}
+              >
+                <Image
+                  source={require("../../assets/images/stocks/events.jpg")}
+                  resizeMode="cover"
+                  style={{ height: "100%", width: "100%" }}
+                />
+                <Flex
+                  h={"100%"}
+                  w={"100%"}
+                  style={{ position: "absolute", backgroundColor: theme.colors.cover }}
+                />
+              </Flex>
+            )}
             <VStack
-              ph={20}
+              ph={10}
               pv={10}
               h={"100%"}
               w={"100%"}
@@ -207,11 +215,10 @@ export default Dashboard = ({ navigation }) => {
               </Flex>
               <Flex fill>{child}</Flex>
             </VStack>
-          </TouchableRipple>
-        </Card>
-      </Flex>
-    ),
-    []
+          </>
+        </TouchableRipple>
+      </Card>
+    </Flex>
   )
 
   const offSet = useSharedValue(0)
@@ -344,60 +351,85 @@ export default Dashboard = ({ navigation }) => {
 
   const VistaEncargado = () => (
     <Wrap justify="center">
-      <WidgetLarge
-        title="A continuación"
-        screen="Events"
-        child={
-          <Flex
-            w={"100%"}
-            h={"100%"}
-          >
+      {/* Widget A continuación */}
+      {feed?.enrolled_event != null && (
+        <WidgetLarge
+          title={GetMoment(feed?.enrolled_event?.starting_date)}
+          screen="EventDetails"
+          payload={{ event_identifier: feed?.enrolled_event?.event_identifier }}
+          image={true}
+          child={
             <Flex
               w={"100%"}
               h={"100%"}
-              justify="end"
-              items="end"
-              style={{ position: "absolute" }}
             >
-              <Avatar.Text
-                label={feed?.enrolled_events?.length}
-                size={25}
-              />
-            </Flex>
-            {feed?.enrolled_events?.map((event) => (
               <HStack
-                key={event.name}
+                // p={10}
+                spacing={15}
+                items="end"
+                h={"100%"}
+              >
+                <Flex center>
+                  <Avatar.Text
+                    label={GetDay(feed?.enrolled_event?.starting_date)}
+                    size={50}
+                  />
+                  <Text variant="bodyMedium">{GetCompactMonth(feed?.enrolled_event?.starting_date)}</Text>
+                </Flex>
+                <VStack fill>
+                  <Text
+                    variant="titleMedium"
+                    numberOfLines={2}
+                  >
+                    {feed?.enrolled_event?.name}
+                  </Text>
+                  <Text
+                    variant="bodySmall"
+                    numberOfLines={1}
+                  >
+                    De {Time24(feed?.enrolled_event?.starting_date)} a {Time24(feed?.enrolled_event?.ending_date)}
+                  </Text>
+                  <Text
+                    variant="bodySmall"
+                    numberOfLines={1}
+                  >
+                    En {feed?.enrolled_event?.place}
+                  </Text>
+                </VStack>
+              </HStack>
+              {/* <HStack
+                key="Following"
                 fill
                 spacing={20}
               >
                 <Flex items="center">
                   <Avatar.Text
-                    label={GetDay(event?.starting_date)}
+                    label={GetDay(feed?.enrolled_event?.starting_date)}
                     size={30}
                   />
-                  <Text variant="bodyMedium">{GetCompactMonth(event?.starting_date)}</Text>
+                  <Text variant="bodyMedium">{GetCompactMonth(feed?.enrolled_event?.starting_date)}</Text>
                 </Flex>
                 <VStack fill>
                   <Text
-                    variant="bodyLarge"
+                    variant="titleMedium"
                     numberOfLines={1}
                   >
-                    {event.name}
+                    {feed?.enrolled_event?.name}
                   </Text>
                   <Flex fill>
                     <Text
                       variant="bodyMedium"
                       numberOfLines={1}
                     >
-                      {Time24(event.starting_date)} - {Time24(event.ending_date)}, {event.place}
+                      {Time24(feed?.enrolled_event?.starting_date)} - {Time24(feed?.enrolled_event?.ending_date)}, {feed?.enrolled_event?.place}
                     </Text>
                   </Flex>
                 </VStack>
-              </HStack>
-            ))}
-          </Flex>
-        }
-      />
+              </HStack> */}
+            </Flex>
+          }
+        />
+      )}
 
       {/* Widget de eventos */}
       <WidgetMedium
@@ -426,7 +458,7 @@ export default Dashboard = ({ navigation }) => {
 
       <Wrap
         h={90}
-        w={360}
+        w={feed?.created_events?.length > 0 ? 180 : 360}
       >
         {/* Usuarios */}
         <WidgetSmall
@@ -469,60 +501,55 @@ export default Dashboard = ({ navigation }) => {
 
   const VistaPrestador = () => (
     <Wrap justify="center">
-      <WidgetLarge
-        title="A continuación"
-        screen="Events"
-        child={
-          <Flex
-            w={"100%"}
-            h={"100%"}
-          >
+      {/* Widget de a continuación */}
+      {feed?.enrolled_event != null && (
+        <WidgetLarge
+          title={GetMoment(feed?.enrolled_event?.starting_date)}
+          screen="EventDetails"
+          payload={{ event_identifier: feed?.enrolled_event?.event_identifier }}
+          image={true}
+          child={
             <Flex
               w={"100%"}
               h={"100%"}
-              justify="end"
-              items="end"
-              style={{ position: "absolute" }}
             >
-              <Avatar.Text
-                label={feed?.enrolled_events?.length}
-                size={25}
-              />
-            </Flex>
-            {feed?.enrolled_events?.map((event) => (
               <HStack
-                key={event.name}
-                fill
-                spacing={20}
+                spacing={15}
+                items="end"
+                h={"100%"}
               >
-                <Flex items="center">
+                <Flex center>
                   <Avatar.Text
-                    label={GetDay(event?.starting_date)}
-                    size={30}
+                    label={GetDay(feed?.enrolled_event?.starting_date)}
+                    size={50}
                   />
-                  <Text variant="bodyMedium">{GetCompactMonth(event?.starting_date)}</Text>
+                  <Text variant="bodyMedium">{GetCompactMonth(feed?.enrolled_event?.starting_date)}</Text>
                 </Flex>
                 <VStack fill>
                   <Text
-                    variant="bodyLarge"
+                    variant="titleMedium"
+                    numberOfLines={2}
+                  >
+                    {feed?.enrolled_event?.name}
+                  </Text>
+                  <Text
+                    variant="bodySmall"
                     numberOfLines={1}
                   >
-                    {event.name}
+                    De {Time24(feed?.enrolled_event?.starting_date)} a {Time24(feed?.enrolled_event?.ending_date)}
                   </Text>
-                  <Flex fill>
-                    <Text
-                      variant="bodyMedium"
-                      numberOfLines={1}
-                    >
-                      {Time24(event.starting_date)} - {Time24(event.ending_date)}, {event.place}
-                    </Text>
-                  </Flex>
+                  <Text
+                    variant="bodySmall"
+                    numberOfLines={1}
+                  >
+                    En {feed?.enrolled_event?.place}
+                  </Text>
                 </VStack>
               </HStack>
-            ))}
-          </Flex>
-        }
-      />
+            </Flex>
+          }
+        />
+      )}
 
       {/* Widget de eventos */}
       {feed?.available_events?.length > 0 ? (
@@ -561,7 +588,7 @@ export default Dashboard = ({ navigation }) => {
                   </Flex>
                   <VStack fill>
                     <Text
-                      variant="bodyLarge"
+                      variant="titleMedium"
                       numberOfLines={1}
                     >
                       {event.name}
@@ -636,7 +663,7 @@ export default Dashboard = ({ navigation }) => {
 
       <Wrap
         h={180}
-        w={180}
+        w={feed?.available_events?.length > 0 ? 180 : 360}
       >
         {/* Widget de perfil */}
         <WidgetSmall

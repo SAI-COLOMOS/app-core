@@ -1,4 +1,4 @@
-import { Flex, HStack, VStack } from "@react-native-material/core"
+import { Flex, HStack, Spacer, VStack } from "@react-native-material/core"
 import { useCallback, useContext, useEffect, useState } from "react"
 import { Card, IconButton, TouchableRipple, Text, TextInput, useTheme, Avatar, FAB, ActivityIndicator } from "react-native-paper"
 import { useHeaderHeight } from "@react-navigation/elements"
@@ -14,6 +14,8 @@ import ApplicationContext from "../ApplicationContext"
 import ProfileImage from "../Shared/ProfileImage"
 import { GetDay, GetCompactMonth, Time24 } from "../Shared/LocaleDate"
 import CacheContext from "../Contexts/CacheContext"
+import Icon from "react-native-vector-icons/MaterialCommunityIcons"
+import DateAndTimePicker from "../Shared/DateAndTimePicker"
 
 export default Users = ({ navigation, route }) => {
   const headerMargin = useHeaderHeight()
@@ -30,22 +32,8 @@ export default Users = ({ navigation, route }) => {
   const [areFilters, setAreFilters] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
 
-  const [placesOptions, setPlacesOptions] = useState()
-  const [areasOptions, setAreasOptions] = useState()
-  const [schoolsOptions, setSchoolsOptions] = useState()
-  const roleOptions = [{ option: "Administrador" }, { option: "Encargado" }, { option: "Prestador" }]
-  const periodOptions = [{ option: "A" }, { option: "B" }]
-  const statusOptions = [{ option: "Activo" }, { option: "Suspendido" }, { option: "Inactivo" }, { option: "Finalizado" }]
-  const providerOptions = [{ option: "Servicio social" }, { option: "Prácticas profesionales" }, { option: "No aplica" }]
-
   const [placeFilter, setPlaceFilter] = useState("")
-  const [areaFilter, setAreaFilter] = useState("")
-  const [roleFilter, setRoleFilter] = useState("")
-  const [yearFilter, setYearFilter] = useState("")
-  const [periodFilter, setPeriodFilter] = useState("")
-  const [schoolFilter, setSchoolFilter] = useState("")
-  const [statusFilter, setStatusFilter] = useState("")
-  const [providerFilter, setProviderFilter] = useState("")
+  const [dateFilter, setDateFilter] = useState("Hola")
 
   const getEvents = async () => {
     setLoading(true)
@@ -78,32 +66,11 @@ export default Users = ({ navigation, route }) => {
       filters = { ...filters, place: placeFilter }
     }
 
-    if (areaFilter !== "") {
-      filters = { ...filters, assigned_area: areaFilter }
-    }
-
-    if (roleFilter !== "") {
-      filters = { ...filters, role: roleFilter }
-    }
-
-    if (yearFilter !== "") {
-      filters = { ...filters, year: yearFilter }
-    }
-
-    if (periodFilter !== "") {
-      filters = { ...filters, period: periodFilter }
-    }
-
-    if (schoolFilter !== "") {
-      filters = { ...filters, school: schoolFilter }
-    }
-
-    if (statusFilter !== "") {
-      filters = { ...filters, status: statusFilter }
-    }
-
-    if (providerFilter !== "") {
-      filters = { ...filters, provider_type: providerFilter }
+    if (dateFilter !== "") {
+      dateFilter.setHours(0)
+      dateFilter.setMinutes(0)
+      dateFilter.setSeconds(0)
+      filters = { ...filters, starting_date: dateFilter }
     }
 
     setAreFilters(filters)
@@ -161,18 +128,6 @@ export default Users = ({ navigation, route }) => {
   }, [showSearch, showFilters])
 
   useEffect(() => {
-    setAreaFilter("")
-    const placeSelected = placesOptions?.find((place) => place.option == placeFilter)
-
-    let areaData = []
-    placeSelected?.areas.forEach((area) => {
-      areaData.push({ option: area.option })
-    })
-
-    setAreasOptions(areaData)
-  }, [placeFilter])
-
-  useEffect(() => {
     if (events === undefined) {
       getEvents()
     }
@@ -209,7 +164,7 @@ export default Users = ({ navigation, route }) => {
         >
           <TouchableRipple
             onPress={() => {
-              navigation.navigate("EventDetails", { event_identifier: item.event_identifier })
+              navigation.navigate("EventDetails", { event_identifier: item.event_identifier, getEvents })
             }}
           >
             <Card
@@ -242,8 +197,17 @@ export default Users = ({ navigation, route }) => {
                   p={10}
                   spacing={15}
                   items="end"
+                  h={"100%"}
                 >
                   <Flex center>
+                    {item.attendance.status === "Por publicar" && (
+                      <Icon
+                        name="clock-outline"
+                        color={theme.colors.primary}
+                        size={50}
+                      />
+                    )}
+                    <Spacer />
                     <Avatar.Text
                       label={GetDay(item.starting_date)}
                       size={50}
@@ -281,9 +245,40 @@ export default Users = ({ navigation, route }) => {
   )
 
   const FilterOptions = () => {
+    const [loading, setLoading] = useState(false)
+    const [placesOptions, setPlacesOptions] = useState()
+
+    async function getPlaces() {
+      setLoading(true)
+
+      const request = await fetch(`${localhost}/places`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        }
+      })
+        .then((response) => (response.ok ? response.json() : response.status))
+        .catch(() => null)
+
+      setLoading(false)
+
+      if (request?.places) {
+        let placesData = []
+        request.places.forEach((place) => {
+          placesData.push({ option: place.place_name })
+        })
+        setPlacesOptions(placesData)
+      }
+    }
+
+    useEffect(() => {
+      getPlaces()
+    }, [])
+
     return (
       <VStack spacing={10}>
-        {user.role == "Administrador" ? (
+        {placesOptions != null ? (
           <HStack items="end">
             <Flex fill>
               <Dropdown
@@ -301,141 +296,53 @@ export default Users = ({ navigation, route }) => {
               />
             ) : null}
           </HStack>
-        ) : null}
-
-        {placeFilter && areasOptions.length > 0 ? (
-          <HStack items="end">
+        ) : loading == true ? (
+          <HStack
+            fill
+            items="center"
+            pv={10}
+            spacing={20}
+          >
             <Flex fill>
-              <Dropdown
-                title="Área asignada"
-                value={areaFilter}
-                selected={setAreaFilter}
-                options={areasOptions}
-              />
+              <Text variant="bodyMedium">Obteniendo la lista de bosques urbanos</Text>
             </Flex>
-            {areaFilter ? (
-              <IconButton
-                icon="delete"
-                mode="outlined"
-                onPress={() => setAreaFilter("")}
-              />
-            ) : null}
+            <ActivityIndicator />
           </HStack>
-        ) : null}
-
-        {user.role == "Administrador" ? (
-          <HStack items="end">
+        ) : (
+          <HStack
+            fill
+            items="center"
+            pv={10}
+            spacing={20}
+          >
             <Flex fill>
-              <Dropdown
-                title="Rol"
-                value={roleFilter}
-                selected={setRoleFilter}
-                options={roleOptions}
-              />
+              <Text variant="bodyMedium">Ocurrió un problema obteniendo la lista de bosques urbanos</Text>
             </Flex>
-            {roleFilter ? (
-              <IconButton
-                icon="delete"
-                mode="outlined"
-                onPress={() => setRoleFilter("")}
-              />
-            ) : null}
+            <IconButton
+              icon="reload"
+              mode="outlined"
+              onPress={() => getPlaces()}
+            />
           </HStack>
-        ) : null}
+        )}
 
         <HStack items="end">
           <Flex fill>
-            <TextInput
-              value={yearFilter}
-              onChangeText={setYearFilter}
-              mode="outlined"
-              label="Año de inscripción"
-              maxLength={4}
-              keyboardType="numeric"
+            <DateAndTimePicker
+              date={dateFilter}
+              setDate={setDateFilter}
+              title="Eventos a partir de la fecha de inicio"
+              hideTime={true}
             />
           </Flex>
-          {yearFilter ? (
+          {dateFilter && (
             <IconButton
               icon="delete"
               mode="outlined"
-              onPress={() => setYearFilter("")}
+              onPress={() => setDateFilter("")}
             />
-          ) : null}
+          )}
         </HStack>
-
-        <HStack items="end">
-          <Flex fill>
-            <Dropdown
-              title="Periodo de inscripción"
-              value={periodFilter}
-              selected={setPeriodFilter}
-              options={periodOptions}
-            />
-          </Flex>
-          {periodFilter ? (
-            <IconButton
-              icon="delete"
-              mode="outlined"
-              onPress={() => setPeriodFilter("")}
-            />
-          ) : null}
-        </HStack>
-
-        <HStack items="end">
-          <Flex fill>
-            <Dropdown
-              title="Escuela"
-              value={schoolFilter}
-              selected={setSchoolFilter}
-              options={schoolsOptions}
-            />
-          </Flex>
-          {schoolFilter ? (
-            <IconButton
-              icon="delete"
-              mode="outlined"
-              onPress={() => setSchoolFilter("")}
-            />
-          ) : null}
-        </HStack>
-
-        <HStack items="end">
-          <Flex fill>
-            <Dropdown
-              title="Estado"
-              value={statusFilter}
-              selected={setStatusFilter}
-              options={statusOptions}
-            />
-          </Flex>
-          {statusFilter ? (
-            <IconButton
-              icon="delete"
-              mode="outlined"
-              onPress={() => setStatusFilter("")}
-            />
-          ) : null}
-        </HStack>
-
-        {user.role == "Administrador" ? (
-          <HStack items="end">
-            <Flex fill>
-              <Dropdown
-                title="Tipo de prestador"
-                value={providerFilter}
-                selected={setProviderFilter}
-                options={providerOptions}
-              />
-            </Flex>
-            {providerFilter ? (
-              <IconButton
-                icon="delete"
-                mode="outlined"
-                onPress={() => setProviderFilter("")}
-              />
-            ) : null}
-          </HStack>
-        ) : null}
       </VStack>
     )
   }

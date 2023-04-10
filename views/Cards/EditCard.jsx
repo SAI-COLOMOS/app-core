@@ -5,7 +5,7 @@ import Constants from "expo-constants"
 import ModalMessage from "../Shared/ModalMessage"
 import { useCallback, useContext, useEffect, useState } from "react"
 import { LongDate } from "../Shared/LocaleDate"
-import { DateAndTimerPicker } from "../Shared/TimeAndDatePicker"
+// import { DateAndTimerPicker } from "../Shared/TimeAndDatePicker"
 import ApplicationContext from "../ApplicationContext"
 
 export default EditCard = ({ navigation, route }) => {
@@ -87,11 +87,31 @@ export default EditCard = ({ navigation, route }) => {
 
   const Activity = (_) => {
     return (
-      <VStack spacing={5} key="Activity">
+      <VStack
+        spacing={5}
+        key="Activity"
+      >
         <Text variant="labelLarge">Actividad</Text>
         <VStack spacing={10}>
-          <TextInput mode="outlined" value={activity_name} onChangeText={setActivity_name} label="Nombre de actividad" maxLength={50} autoComplete="off" autoCorrect={false} />
-          <TextInput mode="outlined" value={hours} onChangeText={setHours} label="Horas a asignar" keyboardType="numeric" maxLength={3} autoComplete="off" autoCorrect={false} />
+          <TextInput
+            mode="outlined"
+            value={activity_name}
+            onChangeText={setActivity_name}
+            label="Nombre de actividad"
+            maxLength={50}
+            autoComplete="off"
+            autoCorrect={false}
+          />
+          <TextInput
+            mode="outlined"
+            value={hours}
+            onChangeText={setHours}
+            label="Horas a asignar"
+            keyboardType="numeric"
+            maxLength={3}
+            autoComplete="off"
+            autoCorrect={false}
+          />
         </VStack>
       </VStack>
     )
@@ -144,7 +164,12 @@ export default EditCard = ({ navigation, route }) => {
 
   return (
     <Flex fill>
-      <CreateForm navigation={navigation} title={"Editar actividad"} children={[Activity(), Delete()]} actions={[Update(), Cancel()]} />
+      <CreateForm
+        navigation={navigation}
+        title={"Editar actividad"}
+        children={[Activity(), Delete()]}
+        actions={[Update(), Cancel()]}
+      />
       <ModalMessage
         title="Eliminar actividad"
         description="¿Seguro que deseas eliminar esta actividad? La acción no se podrá deshacer"
@@ -161,15 +186,50 @@ export default EditCard = ({ navigation, route }) => {
         dismissable={true}
         icon="help-circle-outline"
       />
-      <ModalMessage title="¡Listo!" description="La actividad ha sido actualizada" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[["Aceptar", () => navigation.pop()]]} dismissable={false} icon="check-circle-outline" />
+      <ModalMessage
+        title="¡Listo!"
+        description="La actividad ha sido actualizada"
+        handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]}
+        actions={[["Aceptar", () => navigation.pop()]]}
+        dismissable={false}
+        icon="check-circle-outline"
+      />
 
-      <ModalMessage title="¡Listo!" description="La actividad ha sido eliminada" handler={[modalSuccessDelete, () => setModalSuccessDelete(!modalSuccessDelete)]} actions={[["Aceptar", () => navigation.pop()]]} dismissable={false} icon="check-circle-outline" />
+      <ModalMessage
+        title="¡Listo!"
+        description="La actividad ha sido eliminada"
+        handler={[modalSuccessDelete, () => setModalSuccessDelete(!modalSuccessDelete)]}
+        actions={[["Aceptar", () => navigation.pop()]]}
+        dismissable={false}
+        icon="check-circle-outline"
+      />
 
-      <ModalMessage title="Ocurrió un problema" description={`No pudimos actualizar la actividad, intentalo más tarde. (${responseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[["Aceptar"]]} dismissable={true} icon="close-circle-outline" />
+      <ModalMessage
+        title="Ocurrió un problema"
+        description={`No pudimos actualizar la actividad, intentalo más tarde. (${responseCode})`}
+        handler={[modalError, () => setModalError(!modalError)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="close-circle-outline"
+      />
 
-      <ModalMessage title="Ocurrió un problema" description={`No pudimos eliminar la actividad, intentalo más tarde. (${responseCode})`} handler={[modalErrorDelete, () => setModalErrorDelete(!modalErrorDelete)]} actions={[["Aceptar"]]} dismissable={true} icon="close-circle-outline" />
+      <ModalMessage
+        title="Ocurrió un problema"
+        description={`No pudimos eliminar la actividad, intentalo más tarde. (${responseCode})`}
+        handler={[modalErrorDelete, () => setModalErrorDelete(!modalErrorDelete)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="close-circle-outline"
+      />
 
-      <ModalMessage title="Sin conexión a internet" description={`Parece que no tienes conexión a internet, conectate e intenta de nuevo`} handler={[modalFatal, () => setModalFatal(!modalFatal)]} actions={[["Aceptar"]]} dismissable={true} icon="wifi-alert" />
+      <ModalMessage
+        title="Sin conexión a internet"
+        description={`Parece que no tienes conexión a internet, conectate e intenta de nuevo`}
+        handler={[modalFatal, () => setModalFatal(!modalFatal)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="wifi-alert"
+      />
     </Flex>
   )
 }

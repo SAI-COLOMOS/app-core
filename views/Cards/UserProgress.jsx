@@ -73,12 +73,21 @@ export default UserProgress = ({ navigation, route }) => {
   )
 
   const ProgressRing = () => (
-    <VStack spacing={10} key="Progress">
-      <HStack justify="between" items="baseline">
-        <Text variant="headlineLarge" style={{ fontWeight: "bold", color: theme.colors.primary }}>
+    <VStack
+      spacing={10}
+      key="Progress"
+    >
+      <HStack
+        justify="between"
+        items="baseline"
+      >
+        <Text
+          variant="headlineLarge"
+          style={{ fontWeight: "bold", color: theme.colors.primary }}
+        >
           {achieved_hours} hrs
         </Text>
-        <Text variant="bodyLarge">{total_hours} hrs</Text>
+        <Text variant="titleMedium">{total_hours} hrs</Text>
       </HStack>
       {total_hours > 0 && <ProgressBar progress={achieved_hours / total_hours} />}
     </VStack>
@@ -88,31 +97,58 @@ export default UserProgress = ({ navigation, route }) => {
     return (
       <Flex key="Activity">
         <Flex pv={20}>
-          <Text variant="bodyLarge">Actividades realizadas</Text>
+          <Text variant="titleMedium">Actividades realizadas</Text>
         </Flex>
-        <VStack spacing={25} key="Activity">
+        <VStack
+          spacing={25}
+          key="Activity"
+        >
           {activities.length > 0 ? (
             <VStack spacing={10}>
               {activities.map((activity) => (
-                <Card mode="outlined" key={activity._id}>
-                  <HStack spacing={20} p={20}>
+                <Card
+                  mode="outlined"
+                  key={activity._id}
+                >
+                  <HStack
+                    spacing={20}
+                    p={20}
+                  >
                     <VStack items="center">
-                      <Avatar.Text label={activity?.hours} size={50} />
-                      <Text variant="bodyMedium" style={{ textAlign: "center" }}>
+                      <Avatar.Text
+                        label={activity?.hours}
+                        size={50}
+                      />
+                      <Text
+                        variant="bodyMedium"
+                        style={{ textAlign: "center" }}
+                      >
                         hrs
                       </Text>
                     </VStack>
                     <Flex fill>
-                      <Text variant="bodyLarge" numberOfLines={2}>
+                      <Text
+                        variant="titleMedium"
+                        numberOfLines={2}
+                      >
                         {activity?.activity_name}
                       </Text>
-                      <Text variant="bodyMedium" numberOfLines={1}>
+                      <Text
+                        variant="bodyMedium"
+                        numberOfLines={1}
+                      >
                         {LongDate(activity?.assignation_date)}
                       </Text>
-                      <Text variant="bodyMedium" numberOfLines={1}>
+                      <Text
+                        variant="bodyMedium"
+                        numberOfLines={1}
+                      >
                         {Time24(activity?.assignation_date)}
                       </Text>
-                      <Text variant="bodyMedium" numberOfLines={1}>
+                      <Text
+                        variant="bodyMedium"
+                        numberOfLines={1}
+                      >
                         {activity?.responsible_name}
                       </Text>
                     </Flex>
@@ -121,7 +157,12 @@ export default UserProgress = ({ navigation, route }) => {
               ))}
             </VStack>
           ) : (
-            <InformationMessage key="NoProgress" title="Sin actividades" description="Todavía no tines actividades realizadas, cuando completes algunas, estas aparecerán aquí" icon="alert" />
+            <InformationMessage
+              key="NoProgress"
+              title="Sin actividades"
+              description="Todavía no tines actividades realizadas, cuando completes algunas, estas aparecerán aquí"
+              icon="alert"
+            />
           )}
         </VStack>
       </Flex>
@@ -129,18 +170,43 @@ export default UserProgress = ({ navigation, route }) => {
   }
 
   return (
-    <Flex fill pt={headerMargin - 20}>
-      <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={(_) => getCard()} />}>
+    <Flex
+      fill
+      pt={headerMargin - 20}
+    >
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={(_) => getCard()}
+          />
+        }
+      >
         {activities !== undefined ? (
           activities !== null ? (
             // isNaN(activities) ? (
-            <DisplayDetails title="Tu progreso" children={[ProgressRing(), Activity()]} showHeader={false} />
+            <DisplayDetails
+              title="Tu progreso"
+              children={[ProgressRing(), Activity()]}
+              showHeader={false}
+            />
           ) : (
-            <VStack center spacing={20} p={30}>
-              <Icon color={theme.colors.onBackground} name="wifi-alert" size={50} />
+            <VStack
+              center
+              spacing={20}
+              p={30}
+            >
+              <Icon
+                color={theme.colors.onBackground}
+                name="wifi-alert"
+                size={50}
+              />
               <VStack center>
                 <Text variant="headlineSmall">Sin internet</Text>
-                <Text variant="bodyMedium" style={{ textAlign: "center" }}>
+                <Text
+                  variant="bodyMedium"
+                  style={{ textAlign: "center" }}
+                >
                   No podemos recuperar los datos del usuario, revisa tu conexión a internet e inténtalo de nuevo
                 </Text>
               </VStack>
