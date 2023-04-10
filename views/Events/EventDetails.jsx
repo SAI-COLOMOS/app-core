@@ -133,7 +133,7 @@ export default EventDetails = ({ navigation, route }) => {
           items="baseline"
           justify="end"
         >
-          <Text variant="displaySmall">{event?.attendance.attendee_list.length}</Text>
+          <Text variant="displaySmall">{event?.registered_users}</Text>
           <Text variant="titleMedium"> / {event?.vacancy}</Text>
         </HStack>
       </VStack>
@@ -251,7 +251,7 @@ export default EventDetails = ({ navigation, route }) => {
               <Button
                 icon="plus"
                 mode="outlined"
-                onPress={() => navigation.navigate("AddAttendee", { event_identifier })}
+                onPress={() => navigation.navigate("AddAttendee", { event_identifier, getEvent })}
               >
                 Inscribir
               </Button>
@@ -263,7 +263,7 @@ export default EventDetails = ({ navigation, route }) => {
           icon="account"
           title="Sin inscripciones"
           description="Todavía no hay nadie inscrito, ¿quieres agregar a alguien?"
-          action={() => navigation.navigate("AddAttendee", { event_identifier })}
+          action={() => navigation.navigate("AddAttendee", { event_identifier, getEvent })}
           buttonTitle="Inscribir"
           buttonIcon="plus"
         />
@@ -272,11 +272,7 @@ export default EventDetails = ({ navigation, route }) => {
   )
 
   const Subscribe = () => (
-    <VStack
-      fill
-      key="Subscribe"
-      spacing={20}
-    >
+    <>
       {
         {
           Encargado: <ManagerOptions />,
@@ -293,7 +289,7 @@ export default EventDetails = ({ navigation, route }) => {
             Registrar asistencia
           </Button>
         ) :  */}
-    </VStack>
+    </>
   )
 
   /* Componentes de componentes */
@@ -322,7 +318,7 @@ export default EventDetails = ({ navigation, route }) => {
 
       return (
         <Flex style={{ borderRadius: 10, overflow: "hidden" }}>
-          <TouchableRipple onPress={() => navigation.navigate("EditAttendance", { attendee, event_identifier })}>
+          <TouchableRipple onPress={() => navigation.navigate("EditAttendance", { attendee, event_identifier, event_status: event?.attendance?.status, getEvent })}>
             <HStack
               spacing={10}
               mh={20}
@@ -331,6 +327,7 @@ export default EventDetails = ({ navigation, route }) => {
               <Flex>
                 <ProfileImage
                   image={avatar}
+                  icon="account-outline"
                   width={50}
                   height={50}
                 />
@@ -364,7 +361,11 @@ export default EventDetails = ({ navigation, route }) => {
   )
 
   const ManagerOptions = () => (
-    <>
+    <VStack
+      fill
+      key="Subscribe"
+      spacing={20}
+    >
       {event?.author_register == user.register && event?.attendance?.status == "Por publicar" && (
         <Card mode="outlined">
           <InformationMessage
@@ -383,18 +384,10 @@ export default EventDetails = ({ navigation, route }) => {
           mode="outlined"
           style={{ backgroundColor: theme.colors.background }}
           icon="hand-back-left-outline"
-          onPress={() => navigation.navigate("ScanAttendance", { attendeeList: event?.attendance.attendee_list })}
+          onPress={() => navigation.navigate("ScanAttendance", { attendeeList: event?.attendance.attendee_list, event_identifier: event_identifier })}
         >
           Registrar asistencia
         </Button>
-        // <Button
-        //   mode="outlined"
-        //   onPress={() => navigation.navigate("ShowAttendanceCode")}
-        //   style={{ backgroundColor: theme.colors.background }}
-        //   icon="hand-back-left-outline"
-        // >
-        //   Tomar asistencia
-        // </Button>
       )}
 
       {event?.attendance?.status == "En proceso" && new Date(event?.ending_date) <= new Date() && (
@@ -406,45 +399,69 @@ export default EventDetails = ({ navigation, route }) => {
           Concluir evento
         </Button>
       )}
-    </>
+    </VStack>
   )
 
-  const ProviderOptions = () => (
-    <>
-      {event?.attendance.attendee_list.find((item) => {
-        if (item.attendee_register == user.register) {
-          if (item.status == "Inscrito") {
-            return true
-          }
-        }
+  const ProviderOptions = () => {
+    const [status, setStatus] = useState(event?.attendance.attendee_list.find((item) => item.attendee_register == user.register).status)
 
-        return false
-      }) ? (
-        <VStack spacing={20}>
-          <Text
-            variant="titleMedium"
-            style={{ textAlign: "center" }}
-          >
-            Ya estás inscrito al evento
-          </Text>
-          <Button
-            onPress={() => unsubscribeEvent()}
-            mode="outlined"
-            style={{ backgroundColor: theme.colors.background }}
-          >
-            Desinscribirme al evento
-          </Button>
-        </VStack>
-      ) : (
-        <Button
-          onPress={() => subscribeEvent()}
-          mode="contained"
-        >
-          Inscribirse al evento
-        </Button>
-      )}
-    </>
-  )
+    return (
+      <>
+        {event?.attendance?.status == "Disponible" &&
+          (event?.attendance.attendee_list.find((item) => {
+            if (item.attendee_register == user.register) {
+              if (item.status == "Inscrito") {
+                return true
+              }
+            }
+
+            return false
+          }) ? (
+            <VStack spacing={20}>
+              <Text
+                variant="titleMedium"
+                style={{ textAlign: "center" }}
+              >
+                Ya estás inscrito al evento
+              </Text>
+              <Button
+                onPress={() => unsubscribeEvent()}
+                mode="outlined"
+                style={{ backgroundColor: theme.colors.background }}
+              >
+                Desinscribirme al evento
+              </Button>
+            </VStack>
+          ) : (
+            <Button
+              onPress={() => subscribeEvent()}
+              mode="contained"
+            >
+              Inscribirse al evento
+            </Button>
+          ))}
+        {event?.attendance?.status == "En proceso" && (
+          <Card mode="outlined">
+            <VStack
+              spacing={20}
+              p={20}
+            >
+              <Flex fill>
+                <Text variant="titleMedium">Estado de la asistencia</Text>
+                <Text variant="bodyMedium">{status == "Inscrito" ? "Sin asistencia" : status}</Text>
+              </Flex>
+              <Button
+                onPress={() => navigation.navigate("ShowAttendanceCode")}
+                mode="contained"
+              >
+                Tomar asistencia
+              </Button>
+            </VStack>
+          </Card>
+        )}
+      </>
+    )
+  }
 
   return (
     <Flex

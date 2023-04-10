@@ -2,7 +2,7 @@ import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useContext, useEffect, useState } from "react"
 import { KeyboardAvoidingView, Pressable, ScrollView, useWindowDimensions } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { ActivityIndicator, Button, Text, useTheme } from "react-native-paper"
+import { ActivityIndicator, Button, Switch, Text, useTheme } from "react-native-paper"
 import { Camera, CameraType } from "expo-camera"
 import { BarCodeScanner } from "expo-barcode-scanner"
 import InformationMessage from "../Shared/InformationMessage"
@@ -18,10 +18,12 @@ export default ScanAttendance = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const insets = useSafeAreaInsets()
   const { token } = useContext(ApplicationContext)
-  const { attendeeList } = route.params
+  const { attendeeList, event_identifier } = route.params
 
+  const [doNotMarkRetard, setDoNotMarkRetard] = useState(false)
   const [register, setRegister] = useState("")
   const [attendee, setAttendee] = useState(undefined)
+  const [attendeeAvatar, setAttendeeAvatar] = useState(undefined)
   const [loading, setLoading] = useState(false)
   const [processStatus, setProcessStatus] = useState("ready")
   const [cameraPermissions, requestCameraPermission] = Camera.useCameraPermissions()
@@ -48,26 +50,24 @@ export default ScanAttendance = ({ navigation, route }) => {
     try {
       setProcessStatus("scanned")
 
-      const resultado = attendeeList.find((elemento) => elemento.attendee_register === data)
+      const attendeeFound = attendeeList.find((elemento) => elemento.attendee_register === data)
 
-      if (resultado != undefined) {
-        const request = await fetch(`${localhost}/users/${data}`, {
+      if (attendeeFound != undefined) {
+        const request = await fetch(`${localhost}/users/${attendeeFound.attendee_register}?avatar=true`, {
           method: "GET",
           headers: {
             "Content-Type": "application-json",
-            Authorization: `Bearer ${token}`,
-            "Cache-control": "no-cache"
+            Authorization: `Bearer ${token}`
           }
         })
+          .then((response) => response.json())
+          .catch(() => null)
 
-        if (request.ok) {
-          const response = await request.json()
-          setAttendee(response.user)
-          setProcessStatus("found")
-          return
-        }
+        request?.avatar != null ? setAttendeeAvatar(request.avatar) : setAttendeeAvatar(null)
 
-        setProcessStatus("error")
+        setAttendee(attendeeFound)
+        setProcessStatus("found")
+
         return
       } else {
         setProcessStatus("notFound")
@@ -81,9 +81,38 @@ export default ScanAttendance = ({ navigation, route }) => {
   }
 
   async function checkAttendance() {
-    // TO-DO
     try {
-    } catch (error) {}
+      setLoading(true)
+
+      console.log(`${localhost}/agenda/${event_identifier}/attendance/take`)
+
+      const request = await fetch(`${localhost}/agenda/${event_identifier}/attendance/take`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          attendee_register: attendee?.attendee_register,
+          status: doNotMarkRetard == true ? "Asistió" : null
+        })
+      })
+        .then(async (response) => {
+          console.log(await response.json())
+          return response.status
+        })
+        .catch(() => null)
+
+      setLoading(false)
+
+      if (request == 200) {
+        setProcessStatus("done")
+        return
+      }
+    } catch (error) {
+      console.error("Check attendance", error)
+      setLoading(false)
+    }
   }
 
   useEffect(() => {
@@ -97,7 +126,7 @@ export default ScanAttendance = ({ navigation, route }) => {
   }, [processStatus])
 
   const ScanCamera = () => (
-    <>
+    <Flex key="Camera">
       <Animated.View style={[{ overflow: "hidden" }, animatedHeightCameraViewStyle]}>
         <Flex
           key="ScanCamera"
@@ -119,11 +148,12 @@ export default ScanAttendance = ({ navigation, route }) => {
             ready: <Ready />,
             scanned: <Scanned />,
             notFound: <NotFound />,
-            found: <Found />
+            found: <Found />,
+            done: <Done />
           }[processStatus]
         }
       </>
-    </>
+    </Flex>
   )
 
   const AskForPermissions = () => {
@@ -154,45 +184,40 @@ export default ScanAttendance = ({ navigation, route }) => {
     }
   }
 
-  const StatusBar = () => (
-    <>
-      {
-        {
-          ready: <Ready />,
-          scanned: <Scanned />,
-          notFound: <NotFound />,
-          found: <Found />
-        }[processStatus]
-      }
-    </>
-  )
-
-  const Close = () => (
-    <Button
-      key="CloseButton"
-      icon="close"
-      mode="contained"
-      onPress={() => navigation.pop()}
-    >
-      Cerrar
-    </Button>
-  )
-
   /* Componentes para los estados */
   const Ready = () => (
-    <InformationMessage
-      key="Ready"
-      icon="qrcode-scan"
-      title="Listo para escanear"
-      description="Coloca el código QR dentro del recuadro y espera a que sea detectado"
-      action={() => navigation.pop()}
-      buttonTitle="Finalizar escaneo"
-      buttonIcon="close"
-    />
+    <Flex key="Ready">
+      <VStack
+        // w={250}
+        style={{ alignSelf: "center" }}
+        center
+      >
+        <Switch
+          value={doNotMarkRetard}
+          onValueChange={() => setDoNotMarkRetard(!doNotMarkRetard)}
+        />
+        <Text
+          style={{ textAlign: "center" }}
+          variant="bodyMedium"
+        >
+          {doNotMarkRetard ? "No marcar" : "Marcar"} retardos automáticamente
+        </Text>
+      </VStack>
+
+      <InformationMessage
+        icon="qrcode-scan"
+        title="Listo para escanear"
+        description="Coloca el código QR dentro del recuadro y espera a que sea detectado"
+        action={() => navigation.pop()}
+        buttonTitle="Finalizar escaneo"
+        buttonIcon="close"
+      />
+    </Flex>
   )
 
   const Scanned = () => (
     <VStack
+      key="Scanned"
       center
       spacing={20}
       p={30}
@@ -227,13 +252,15 @@ export default ScanAttendance = ({ navigation, route }) => {
 
   const Found = () => (
     <VStack
+      key="Found"
       center
       spacing={20}
       p={30}
     >
       <ProfileImage
-        image={attendee?.avatar}
-        icon="account"
+        image={attendeeAvatar}
+        icon="account-outline"
+        loading={attendeeAvatar === undefined}
       />
       <VStack center>
         <Text
@@ -253,6 +280,7 @@ export default ScanAttendance = ({ navigation, route }) => {
         <Button
           icon="close"
           mode="outlined"
+          disabled={loading}
           onPress={() => setProcessStatus("ready")}
           textColor={theme.colors.error}
         >
@@ -262,9 +290,11 @@ export default ScanAttendance = ({ navigation, route }) => {
         <Button
           icon="check"
           mode="contained"
-          onPress={() => null}
+          loading={loading}
+          disabled={loading}
+          onPress={() => checkAttendance()}
         >
-          Registrar asistencia
+          Confirmar
         </Button>
       </HStack>
     </VStack>
@@ -282,13 +312,29 @@ export default ScanAttendance = ({ navigation, route }) => {
     />
   )
 
+  const Done = () => (
+    <InformationMessage
+      key="Done"
+      icon="check-circle-outline"
+      title="¡Listo!, asistencia registrada"
+      description={`La asistencia para ${attendee.first_name} ${attendee.first_last_name} ${attendee.second_last_name ?? null} se ha registrado`}
+      action={() => {
+        setAttendee(undefined)
+        setAttendeeAvatar(undefined)
+        setProcessStatus("ready")
+      }}
+      buttonTitle="Continuar"
+      buttonIcon="arrow-right"
+    />
+  )
+
   return (
     <Flex fill>
       <CreateForm
         // actions={[Close()]}
         title="Escaneo de asistencia"
         navigation={navigation}
-        loading={processStatus == "ready" ? false : true}
+        //loading={processStatus == "ready" ? false : true}
         children={cameraPermissions?.granted == true ? [ScanCamera()] : [AskForPermissions()]}
       />
     </Flex>

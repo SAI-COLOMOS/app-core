@@ -20,7 +20,12 @@ export default InformationMessage = ({ icon, title, description, action, buttonI
         />
       ) : null}
       <VStack center>
-        <Text variant="headlineSmall">{title ?? "Titulo"}</Text>
+        <Text
+          variant="headlineSmall"
+          style={{ textAlign: "center" }}
+        >
+          {title ?? "Titulo"}
+        </Text>
         <Text
           variant="bodyMedium"
           style={{ textAlign: "center" }}

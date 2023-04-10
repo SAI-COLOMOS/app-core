@@ -12,12 +12,13 @@ import ModalMessage from "../Shared/ModalMessage"
 export default AddAttendee = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const { token } = useContext(ApplicationContext)
-  const { event_identifier } = route.params
+  const { event_identifier, getEvent } = route.params
 
   const [search, setSearch] = useState("")
   const [loading, setLoading] = useState(false)
   const [foundUsers, setFoundUsers] = useState(undefined)
 
+  const [modalConfirm, setModalConfirm] = useState(false)
   const [modalLoading, setModalLoading] = useState(false)
   const [modalSuccess, setModalSuccess] = useState(false)
   const [modalError, setModalError] = useState(false)
@@ -142,8 +143,8 @@ export default AddAttendee = ({ navigation, route }) => {
             ) : foundUsers == undefined ? (
               <InformationMessage
                 icon="account-plus-outline"
-                title="Agrega a personas"
-                description="Busca a personas para agregarlas como asistentes a este evento, puedes hacerlo mediante su nombre o registro"
+                title="Agrega a un participante"
+                description="Puedes buscarlo mediante su nombre o registro. No importa si ya no hay cupo en el evento, puedes agregar cuantos participantes quieras"
               />
             ) : (
               <InformationMessage
@@ -179,13 +180,6 @@ export default AddAttendee = ({ navigation, route }) => {
           />
         )}
       </Flex>
-
-      {/* <ScrollView>
-        <VStack>
-          {search == "" && (
-          )}
-        </VStack>
-      </ScrollView> */}
     </VStack>
   )
 
@@ -193,6 +187,9 @@ export default AddAttendee = ({ navigation, route }) => {
     <Button
       key="Save"
       mode="contained"
+      disabled={modalLoading}
+      loading={modalLoading}
+      onPress={() => setModalConfirm(true)}
     >
       Guardar
     </Button>
@@ -202,7 +199,9 @@ export default AddAttendee = ({ navigation, route }) => {
     <Button
       key="Cancel"
       mode="outlined"
+      disabled={modalLoading}
       onPress={() => navigation.pop()}
+      icon="close"
     >
       Cancelar
     </Button>
@@ -240,7 +239,10 @@ export default AddAttendee = ({ navigation, route }) => {
             style={{ overflow: "hidden" }}
           >
             <HStack>
-              <ProfileImage image={avatar} />
+              <ProfileImage
+                image={avatar}
+                icon="account-outline"
+              />
               <Flex
                 fill
                 p={10}
@@ -266,9 +268,18 @@ export default AddAttendee = ({ navigation, route }) => {
         title="Agregar asistente"
         navigation={navigation}
         children={[SearchList()]}
-        actions={[Save(), Cancel()]}
+        actions={[/*Save(), */ Cancel()]}
         refreshingStatus={loading}
         refreshingAction={() => searchUsers()}
+      />
+
+      <ModalMessage
+        title="Confirmar asistente"
+        description="¿Seguro que desea agrega a este asistente?"
+        handler={[modalConfirm, () => setModalConfirm(!modalConfirm)]}
+        actions={[["Aceptar", () => null], ["Cancelar"]]}
+        dismissable={true}
+        icon="account-plus-outline"
       />
 
       <ModalMessage
@@ -279,7 +290,7 @@ export default AddAttendee = ({ navigation, route }) => {
           [
             "Aceptar",
             () => {
-              // getEvents()
+              getEvent()
               navigation.pop()
             }
           ]

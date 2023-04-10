@@ -16,8 +16,6 @@ import CacheContext from "../Contexts/CacheContext"
 import ProfileImage from "../Shared/ProfileImage"
 
 export default Dashboard = ({ navigation }) => {
-  const userContext = useContext(ApplicationContext)
-  const cache = useContext(CacheContext)
   const { user, setUser, token, setToken, register, setRegister, achieved_hours, setAchieved_hours } = useContext(ApplicationContext)
   const insets = useSafeAreaInsets()
   const theme = useTheme()
@@ -27,10 +25,6 @@ export default Dashboard = ({ navigation }) => {
 
   const [greeting, setGreeting] = useState("Hola")
   const [timeToSleep, setTimeToSleep] = useState(false)
-  //const [offSet, setOffSet] = useState(0)
-  //const [token, setToken] = useState(undefined)
-  //const [register, setRegister] = useState(undefined)
-  //const [user, setUser] = useState(undefined)
   const [feed, setFeed] = useState(undefined)
   const [loading, setLoading] = useState(false)
 

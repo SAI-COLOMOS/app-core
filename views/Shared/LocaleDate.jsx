@@ -354,13 +354,34 @@ export const GetMoment = (date) => {
     return "Evento para pasado mañana"
   } else if (days === 1) {
     return "Evento para mañana"
-  } else if (hours > 2) {
-    return `Evento para hoy`
-  } else if (hours <= 2 && hours > 0) {
-    return "Evento por comenzar"
+  } else if (hours >= 2) {
+    return `Evento en ${hours} horas`
+  } else if (hours === 1) {
+    return "Evento en una hora"
   } else if (subtraction >= 0) {
-    return "Evento iniciado"
+    return "ahora"
   } else {
-    return "Evento en curso"
+    const hoursFrom = Math.abs(hours)
+    if (hoursFrom >= 24) {
+      return `Evento iniciado hace ${Math.floor(hoursFrom / 24)} días`
+    } else {
+      return `Evento iniciado hace ${hoursFrom} horas`
+    }
   }
+
+  // if (days > 2) {
+  //   return "Evento próximo"
+  // } else if (days === 2) {
+  //   return "Evento para pasado mañana"
+  // } else if (days === 1) {
+  //   return "Evento para mañana"
+  // } else if (hours > 2) {
+  //   return `Evento para hoy`
+  // } else if (hours <= 2 && hours > 0) {
+  //   return "Evento por comenzar"
+  // } else if (subtraction >= 0) {
+  //   return "Evento iniciado"
+  // } else {
+  //   return "Evento en curso"
+  // }
 }
