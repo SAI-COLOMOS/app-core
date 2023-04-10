@@ -7,6 +7,7 @@ import ModalMessage from "../Shared/ModalMessage"
 import Dropdown from "../Shared/Dropdown"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import ApplicationContext from "../ApplicationContext"
+import { event } from "react-native-reanimated"
 
 const defaultQuestion = {
   interrogation: "",
@@ -27,7 +28,7 @@ export default AddForm = ({ navigation, route }) => {
   const [version, setVersion] = useState("")
   const [questions, setQuestions] = useState([
     {
-      interrogation: "",
+      interrogation: "default",
       question_type: "Abierta",
       enum_options: []
     }
@@ -197,42 +198,58 @@ export default AddForm = ({ navigation, route }) => {
     </Button>
   )
 
-  const addQuestion = (questionIndex) => {
-    questions.splice(questionIndex + 1, 0, { ...defaultQuestion, interrogation: "" })
-    setQuestions([...questions])
+  const addQuestion = (interrogation, setInterrogation, question_type, enum_options, setEnum_options) => {
+    const newQuestion = {
+      interrogation: interrogation,
+      question_type: question_type,
+      enum_options: enum_options
+    }
+
+    const updatedQuestions = [...questions]
+    updatedQuestions.unshift(newQuestion)
+    setQuestions(updatedQuestions)
+    setInterrogation("")
+    setEnum_options("")
   }
 
-  const addAnswer = (questionIndex) => {
-    questions.splice(questionIndex + 1, 0, { ...defaultQuestion, enum_options: [""] })
-    setQuestions([...questions])
+  const changeQuestion = (questionIndex, interrogation, setInterrogation, enum_options, setEnum_options) => {
+    const modifyQuestion = questions[questionIndex]
+
+    setInterrogation(modifyQuestion.interrogation)
+    setEnum_options(modifyQuestion.enum_options || [])
+
+    const updatedQuestions = [...questions]
+    updatedQuestions.splice(questionIndex, 1)
+    setQuestions(updatedQuestions)
   }
 
   const deleteQuestion = (questionIndex) => {
-    questions.splice(questionIndex, 1)
-    setQuestions([...questions])
-  }
-
-  const changeQuestion = (questionIndex, text, key) => {
-    questions[questionIndex][key] = text
-    setQuestions([...questions])
+    setQuestions(questions.filter((_, i) => i !== questionIndex))
   }
 
   const Item = ({ questionIndex, question }) => {
     const { question_type } = question
     const [interrogation, setInterrogation] = useState(question.interrogation)
-
+    const [enum_options, setEnum_options] = useState(question.enum_options)
+    // console.log(questions)
     return (
       <VStack
         key="Question"
         spacing={5}
       >
-        <TextInput
+        {/* <TextInput
           mode="outlined"
           value={interrogation}
           onChangeText={setInterrogation}
           onEndEditing={(event) => changeQuestion(questionIndex, event.nativeEvent.text, "interrogation")}
           label="Interrogante"
           autoComplete="off"
+        /> */}
+        <TextInput
+          mode="outlined"
+          value={interrogation}
+          onChangeText={setInterrogation}
+          label="Interrogante"
         />
         <Dropdown
           title="Tipo de pregunta"
@@ -241,13 +258,20 @@ export default AddForm = ({ navigation, route }) => {
           isAnObjectsArray={true}
           objectInfo={{ index: questionIndex, key: "question_type", arr: questions, setArr: setQuestions }}
         />
-        {question_type == "Opción múltiple" || question_type == "Selección múltiple" || question_type == "Escala" ? (
+        {question_type === "Opción múltiple" || question_type === "Selección múltiple" || question_type === "Escala" ? (
+          // <TextInput
+          //   mode="outlined"
+          //   value={enum_options}
+          //   onChangeText={setEnum_options}
+          //   onEndEditing={(event) => changeAnswer(questionIndex, event.nativeEvent.text, "enum_options")}
+          //   label="Respuestas"
+          //   autoComplete="off"
+          // />
           <TextInput
             mode="outlined"
-            // value={question.enum_options}
-            // onChangeText={setQuestions}
+            value={enum_options}
+            onChangeText={setEnum_options}
             label="Respuestas"
-            autoComplete="off"
           />
         ) : null}
 
@@ -259,13 +283,20 @@ export default AddForm = ({ navigation, route }) => {
           <IconButton
             icon="plus"
             mode="contained"
-            onPress={(_) => addQuestion(questionIndex)}
+            onPress={(_) => addQuestion(interrogation, setInterrogation, question_type, enum_options, setEnum_options)}
           />
           <IconButton
-            icon="minus"
+            icon="update"
             mode="contained"
-            onPress={(_) => deleteQuestion(questionIndex)}
+            onPress={(_) => changeQuestion(questionIndex, interrogation, setInterrogation, enum_options, setEnum_options)}
           />
+          {questionIndex > 0 && (
+            <IconButton
+              icon="minus"
+              mode="contained"
+              onPress={(_) => deleteQuestion(questionIndex)}
+            />
+          )}
         </Flex>
       </VStack>
     )
