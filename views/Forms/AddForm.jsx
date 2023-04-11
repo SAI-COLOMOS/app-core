@@ -28,7 +28,7 @@ export default AddForm = ({ navigation, route }) => {
   const [version, setVersion] = useState("")
   const [questions, setQuestions] = useState([
     {
-      interrogation: "default",
+      interrogation: "",
       question_type: "Abierta",
       enum_options: []
     }
@@ -73,7 +73,7 @@ export default AddForm = ({ navigation, route }) => {
         belonging_place: belonging_place.trim(),
         belonging_event_identifier: belonging_event_identifier.trim(),
         version: Number(version),
-        questions: Array(questions),
+        questions: questions,
         isTemplate
       })
     })
@@ -209,14 +209,15 @@ export default AddForm = ({ navigation, route }) => {
     updatedQuestions.unshift(newQuestion)
     setQuestions(updatedQuestions)
     setInterrogation("")
-    setEnum_options("")
+    // setEnum_options("")
   }
 
-  const changeQuestion = (questionIndex, interrogation, setInterrogation, enum_options, setEnum_options) => {
+  //Aun no usar, elimina las preguntas
+  const changeQuestion = (questionIndex, interrogation) => {
     const modifyQuestion = questions[questionIndex]
-
-    setInterrogation(modifyQuestion.interrogation)
-    setEnum_options(modifyQuestion.enum_options || [])
+    modifyQuestion[questionIndex] = { interrogation }
+    // setInterrogation(modifyQuestion.interrogation)
+    // setEnum_options(modifyQuestion.enum_options || [])
 
     const updatedQuestions = [...questions]
     updatedQuestions.splice(questionIndex, 1)
@@ -227,30 +228,35 @@ export default AddForm = ({ navigation, route }) => {
     setQuestions(questions.filter((_, i) => i !== questionIndex))
   }
 
+  const modificarOpcionRespuesta = (e, index, enum_options, setEnum_options) => {
+    const opcionesActualizadas = [...enum_options]
+    opcionesActualizadas[index] = e.target.value
+    setEnum_options(opcionesActualizadas)
+  }
+
+  const addAnswerOptions = (questionIndex, nuevaOpcion, setNewAnswerOption) => {
+    const updatedAnswer = {
+      ...questions[questionIndex],
+      enum_options: [...questions[questionIndex].enum_options, nuevaOpcion]
+    }
+
+    const updatedAnswers = [...questions]
+    updatedAnswers[questionIndex] = updatedAnswer
+    setQuestions(updatedAnswers)
+    setNewAnswerOption("Presionado")
+  }
+
   const Item = ({ questionIndex, question }) => {
     const { question_type } = question
     const [interrogation, setInterrogation] = useState(question.interrogation)
     const [enum_options, setEnum_options] = useState(question.enum_options)
+    const [newAnswerOption, setNewAnswerOption] = useState("")
     // console.log(questions)
     return (
       <VStack
         key="Question"
         spacing={5}
       >
-        {/* <TextInput
-          mode="outlined"
-          value={interrogation}
-          onChangeText={setInterrogation}
-          onEndEditing={(event) => changeQuestion(questionIndex, event.nativeEvent.text, "interrogation")}
-          label="Interrogante"
-          autoComplete="off"
-        /> */}
-        <TextInput
-          mode="outlined"
-          value={interrogation}
-          onChangeText={setInterrogation}
-          label="Interrogante"
-        />
         <Dropdown
           title="Tipo de pregunta"
           options={QuestionType}
@@ -258,46 +264,83 @@ export default AddForm = ({ navigation, route }) => {
           isAnObjectsArray={true}
           objectInfo={{ index: questionIndex, key: "question_type", arr: questions, setArr: setQuestions }}
         />
+        <TextInput
+          mode="outlined"
+          value={interrogation}
+          onChangeText={setInterrogation}
+          label="Interrogante"
+        />
         {question_type === "Opción múltiple" || question_type === "Selección múltiple" || question_type === "Escala" ? (
-          // <TextInput
-          //   mode="outlined"
-          //   value={enum_options}
-          //   onChangeText={setEnum_options}
-          //   onEndEditing={(event) => changeAnswer(questionIndex, event.nativeEvent.text, "enum_options")}
-          //   label="Respuestas"
-          //   autoComplete="off"
-          // />
-          <TextInput
-            mode="outlined"
-            value={enum_options}
-            onChangeText={setEnum_options}
-            label="Respuestas"
-          />
-        ) : null}
-
-        <Flex
-          direction="row"
-          items="center"
-          justify="end"
-        >
-          <IconButton
-            icon="plus"
-            mode="contained"
-            onPress={(_) => addQuestion(interrogation, setInterrogation, question_type, enum_options, setEnum_options)}
-          />
-          <IconButton
-            icon="update"
-            mode="contained"
-            onPress={(_) => changeQuestion(questionIndex, interrogation, setInterrogation, enum_options, setEnum_options)}
-          />
-          {questionIndex > 0 && (
-            <IconButton
-              icon="minus"
-              mode="contained"
-              onPress={(_) => deleteQuestion(questionIndex)}
+          <Flex>
+            <TextInput
+              mode="outlined"
+              value={newAnswerOption}
+              onChangeText={setNewAnswerOption}
+              label="Respuestas"
             />
-          )}
-        </Flex>
+            <Text variant="bodyMedium">Simbologia: </Text>
+            <Text variant="labelSmall">El icono de el pastel con + es para agregar respuestas, El icono + agrega pregunta, El icono de la hoja de papel con un lapiz modifica la pregunta, El icono - borra la pregunta</Text>
+            <Flex
+              direction="row"
+              items="center"
+              justify="end"
+            >
+              <IconButton //Boton agregar respuesta
+                icon="database-plus-outline"
+                mode="contained"
+                onPress={(_) => addAnswerOptions(questionIndex, newAnswerOption, setNewAnswerOption)}
+              />
+
+              <IconButton //Boton agregar pregunta
+                icon="plus"
+                mode="contained"
+                onPress={(_) => addQuestion(interrogation, setInterrogation, question_type, enum_options, setEnum_options)}
+              />
+              <IconButton //Boton modificar pregunta
+                icon="file-document-edit-outline"
+                mode="contained"
+                onPress={(_) => changeQuestion(questionIndex, interrogation)}
+              />
+              {questionIndex > 0 && (
+                <IconButton //Boton eliminar pregunta
+                  icon="minus"
+                  mode="contained"
+                  onPress={(_) => deleteQuestion(questionIndex)}
+                />
+              )}
+            </Flex>
+          </Flex>
+        ) : null}
+        {question_type === "Abierta" || question_type === "Numérica" ? (
+          <Flex>
+            <Text variant="bodyMedium">Simbologia: </Text>
+            <Text variant="labelSmall">El icono + agrega pregunta, El icono de la hoja de papel con un lapiz modifica la pregunta, El icono - borra la pregunta</Text>
+
+            <Flex
+              direction="row"
+              items="center"
+              justify="end"
+            >
+              <IconButton
+                icon="plus"
+                mode="contained"
+                onPress={(_) => addQuestion(interrogation, setInterrogation, question_type, enum_options, setEnum_options)}
+              />
+              <IconButton
+                icon="file-document-edit-outline"
+                mode="contained"
+                onPress={(_) => changeQuestion(questionIndex)}
+              />
+              {questionIndex > 0 && (
+                <IconButton
+                  icon="minus"
+                  mode="contained"
+                  onPress={(_) => deleteQuestion(questionIndex)}
+                />
+              )}
+            </Flex>
+          </Flex>
+        ) : null}
       </VStack>
     )
   }
