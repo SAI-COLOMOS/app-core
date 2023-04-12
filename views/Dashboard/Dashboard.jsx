@@ -740,7 +740,7 @@ export default Dashboard = ({ navigation }) => {
 
               {
                 {
-                  Administrador: <VistaEncargado />,
+                  Administrador: <VistaAdministrador />,
                   Encargado: <VistaEncargado />,
                   Prestador: <VistaPrestador />
                 }[user?.role]
