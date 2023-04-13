@@ -14,7 +14,7 @@ import ApplicationContext from "../ApplicationContext"
 export default FormDetails = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const { token } = useContext(ApplicationContext)
-  const { form_identifier } = route.params
+  const { form_identifier, getForms } = route.params
   const headerMargin = useHeaderHeight()
   const theme = useTheme()
 
@@ -25,7 +25,7 @@ export default FormDetails = ({ navigation, route }) => {
   async function getForm() {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/forms/0101JEfyHr?isTemplate=${isTemplate}`, {
+    const request = await fetch(`${localhost}/forms/${form_identifier}?isTemplate=${isTemplate}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -109,94 +109,87 @@ export default FormDetails = ({ navigation, route }) => {
     </Card>
   )
 
-  /*const Questions = () => (
+  const Questions = () => (
     <Flex key="Preguntas">
-      <VStack p={10} spacing={10}>
+      <VStack
+        // p={5}
+        spacing={15}
+      >
         {form.questions.length > 0 ? (
           form.questions.map((ask) => (
-            <Card mode="outlined" key={ask.interrogation}>
+            <Card
+              mode="outlined"
+              key={ask.interrogation}
+            >
+              <VStack
+                p={10}
+                spacing={10}
+              >
                 <Flex>
-                    <Text variant="labelSmall">Preguntas</Text>
-                    <Text variant="bodyMedium">{ask?.interrogation}</Text>
+                  <Text variant="labelSmall">Pregunta</Text>
+                  <Text variant="bodyMedium">{ask?.interrogation}</Text>
                 </Flex>
+                <Flex>
+                  <Text variant="labelSmall">Tipo de pregunta</Text>
+                  <Text variant="bodyMedium">{ask?.question_type}</Text>
+                </Flex>
+                <Flex>
+                  {ask?.question_type == "Opción múltiple" || ask?.question_type == "Selección múltiple" || ask?.question_type == "Escala" ? (
+                    <Flex>
+                      <Text variant="labelSmall">Respuestas</Text>
+                      <Text variant="bodyMedium">{ask?.enum_options}</Text>
+                    </Flex>
+                  ) : null}
+                </Flex>
+              </VStack>
             </Card>
           ))
-        ):( <Text variant="labelSmall">No hay preguntas en este formulario.</Text> ) }
+        ) : (
+          <Text variant="labelSmall">No hay preguntas en este formulario.</Text>
+        )}
       </VStack>
     </Flex>
   )
-*/
+
   return (
     <Flex
       fill
       pt={headerMargin - 20}
     >
-      <ScrollView
+      {/* <ScrollView
         refreshControl={
           <RefreshControl
             refreshing={loading}
             onRefresh={(_) => getForm()}
           />
         }
-      >
-        {form !== undefined ? (
-          form !== null ? (
-            isNaN(form) ? (
-              <DisplayDetails
-                icon="form-select"
-                title={form?.name}
-                children={[Details()]}
-              />
-            ) : (
-              <VStack
-                p={30}
-                center
-                spacing={20}
-              >
-                <Icon
-                  color={theme.colors.onBackground}
-                  name="alert-circle-outline"
-                  size={50}
-                />
-                <VStack center>
-                  <Text variant="headlineSmall">Ocurrió un problema</Text>
-                  <Text
-                    variant="bodyMedium"
-                    style={{ textAlign: "center" }}
-                  >
-                    No podemos recuperar los datos del formulario, intentalo de nuevo más tarde (Error: {form})
-                  </Text>
-                </VStack>
-                <Flex>
-                  <Button
-                    mode="outlined"
-                    onPress={(_) => {
-                      getForm()
-                    }}
-                  >
-                    Volver a intentar
-                  </Button>
-                </Flex>
-              </VStack>
-            )
+      > */}
+      {form !== undefined ? (
+        form !== null ? (
+          isNaN(form) ? (
+            <DisplayDetails
+              icon="form-select"
+              title={form?.name}
+              children={[Details(), Questions()]}
+            />
           ) : (
             <VStack
+              p={30}
               center
               spacing={20}
-              p={30}
             >
               <Icon
                 color={theme.colors.onBackground}
-                name="wifi-alert"
+                name="alert-circle-outline"
                 size={50}
               />
               <VStack center>
-                <Text variant="headlineSmall">Sin internet</Text>
+                <Text variant="headlineSmall">Ocurrió un problema</Text>
                 <Text
                   variant="bodyMedium"
                   style={{ textAlign: "center" }}
                 >
-                  No podemos recuperar los datos del formulario, revisa tu conexión a internet e intentalo de nuevo
+                  No podemos recuperar los datos del formulario, intentalo de nuevo más tarde (Error: {form})
                 </Text>
               </VStack>
               <Flex>
@@ -211,17 +204,51 @@ export default FormDetails = ({ navigation, route }) => {
               </Flex>
             </VStack>
           )
-        ) : null}
-      </ScrollView>
+        ) : (
+          <VStack
+            center
+            spacing={20}
+            p={30}
+          >
+            <Icon
+              color={theme.colors.onBackground}
+              name="wifi-alert"
+              size={50}
+            />
+            <VStack center>
+              <Text variant="headlineSmall">Sin internet</Text>
+              <Text
+                variant="bodyMedium"
+                style={{ textAlign: "center" }}
+              >
+                No podemos recuperar los datos del formulario, revisa tu conexión a internet e intentalo de nuevo
+              </Text>
+            </VStack>
+            <Flex>
+              <Button
+                mode="outlined"
+                onPress={(_) => {
+                  getForm()
+                }}
+              >
+                Volver a intentar
+              </Button>
+            </Flex>
+          </VStack>
+        )
+      ) : null}
+      {/* </ScrollView> */}
 
       {!(form === undefined || form === null) ? (
         <FAB
           icon="pencil-outline"
           style={{ position: "absolute", margin: 16, right: 0, bottom: 0 }}
           onPress={() => {
-            navigation.navigate("AddSchool", {
+            navigation.navigate("EditForm", {
               token,
-              form
+              form,
+              getForms,
+              getForm
             })
           }}
         />
