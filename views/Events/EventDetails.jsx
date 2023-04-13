@@ -1,7 +1,7 @@
 import { Flex, HStack, VStack, even } from "@react-native-material/core"
 import { useEffect, useState, useCallback, useContext } from "react"
 import { useHeaderHeight } from "@react-navigation/elements"
-import { Text, Card, Button, FAB, useTheme, Avatar, IconButton, TouchableRipple } from "react-native-paper"
+import { Text, Card, Button, FAB, useTheme, Avatar, IconButton, TouchableRipple, ActivityIndicator } from "react-native-paper"
 import Header from "../Shared/Header"
 import Constants from "expo-constants"
 import DisplayDetails from "../Shared/DisplayDetails"
@@ -12,6 +12,7 @@ import { LongDate, Time24 } from "../Shared/LocaleDate"
 import ApplicationContext from "../ApplicationContext"
 import ProfileImage from "../Shared/ProfileImage"
 import InformationMessage from "../Shared/InformationMessage"
+import ModalMessage from "../Shared/ModalMessage"
 // import EventContext from "../Contexts/CacheContext"
 
 export default EventDetails = ({ navigation, route }) => {
@@ -28,6 +29,14 @@ export default EventDetails = ({ navigation, route }) => {
   const [starting_date, setStarting_date] = useState(new Date())
   const [ending_date, setEnding_date] = useState(new Date())
   const [publishing_date, setPublishing_date] = useState(new Date())
+
+  const [showErrorPost, setShowErrorPost] = useState(false)
+  const [showConfirmPost, setShowConfirmPost] = useState(false)
+  const [loadingPost, setLoadingPost] = useState(false)
+
+  const [showErrorFinish, setShowErrorFinish] = useState(false)
+  const [showConfirmFinish, setShowConfirmFinish] = useState(false)
+  const [loadingFinish, setLoadingFinish] = useState(false)
 
   async function getEvent() {
     setLoading(true)
@@ -83,6 +92,55 @@ export default EventDetails = ({ navigation, route }) => {
     }
 
     console.error(await request.json())
+  }
+
+  async function postNow() {
+    setLoadingPost(true)
+
+    const request = await fetch(`${localhost}/agenda/${event_identifier}/status`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        status: "Disponible"
+      })
+    }).catch(() => null)
+
+    setLoadingPost(false)
+
+    if (request?.ok) {
+      getEvents()
+      getEvent()
+      return
+    }
+
+    setShowErrorFinish(true)
+  }
+
+  async function finishEvent() {
+    setLoadingFinish(true)
+
+    const request = await fetch(`${localhost}/agenda/${event_identifier}/status`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        status: "Concluido"
+      })
+    }).catch(() => null)
+
+    setLoadingFinish(false)
+
+    if (request?.ok) {
+      getEvent()
+      return
+    }
+
+    setShowErrorFinish(true)
   }
 
   useEffect(() => {
@@ -237,10 +295,7 @@ export default EventDetails = ({ navigation, route }) => {
         <Text variant="titleMedium">Lista de participantes</Text>
       </Flex>
       {event?.attendance.attendee_list.length > 0 ? (
-        <VStack
-          // spacing={10}
-          pb={20}
-        >
+        <VStack pb={20}>
           {event.attendance.attendee_list.map((item) => (
             <Flex key={item.attendee_register}>
               <Attendee attendee={item} />
@@ -258,14 +313,20 @@ export default EventDetails = ({ navigation, route }) => {
             </Flex>
           )}
         </VStack>
-      ) : (
+      ) : event?.attendance?.status != "Por comenzar" || event?.attendance?.status != "En proceso" || event?.attendance?.status != "Concluido" || event?.attendance?.status != "Concluido por sistema" ? (
         <InformationMessage
-          icon="account"
+          icon="account-outline"
           title="Sin inscripciones"
           description="Todavía no hay nadie inscrito, ¿quieres agregar a alguien?"
           action={() => navigation.navigate("AddAttendee", { event_identifier, getEvent })}
           buttonTitle="Inscribir"
           buttonIcon="plus"
+        />
+      ) : (
+        <InformationMessage
+          icon="account-alert-outline"
+          title="Sin inscripciones"
+          description="Este evento no tiene a ningún participante"
         />
       )}
     </Card>
@@ -318,7 +379,13 @@ export default EventDetails = ({ navigation, route }) => {
 
       return (
         <Flex style={{ borderRadius: 10, overflow: "hidden" }}>
-          <TouchableRipple onPress={() => navigation.navigate("EditAttendance", { attendee, event_identifier, event_status: event?.attendance?.status, getEvent })}>
+          <TouchableRipple
+            onPress={() => {
+              if (!(event?.attendance?.status == "Concluido" || event?.attendance?.status == "Concluido por sistema")) {
+                navigation.navigate("EditAttendance", { attendee, event_identifier, event_status: event?.attendance?.status, getEvent })
+              }
+            }}
+          >
             <HStack
               spacing={10}
               mh={20}
@@ -368,23 +435,34 @@ export default EventDetails = ({ navigation, route }) => {
     >
       {event?.author_register == user.register && event?.attendance?.status == "Por publicar" && (
         <Card mode="outlined">
-          <InformationMessage
-            icon="clock-outline"
-            title="Evento por publicar"
-            description={`Actualmente solo tú puedes ver este evento, el cual será publicado el día ${LongDate(event?.publishing_date)} a las ${Time24(event?.publishing_date)}`}
-            action={() => null}
-            buttonTitle="Publicar ahora"
-            buttonIcon="calendar-check-outline"
-          />
+          {loadingPost == false ? (
+            <InformationMessage
+              icon="clock-outline"
+              title="Evento por publicar"
+              description={`Actualmente solo tú puedes ver este evento, el cual será publicado el día ${LongDate(event?.publishing_date)} a las ${Time24(event?.publishing_date)}`}
+              action={() => setShowConfirmPost(true)}
+              buttonTitle="Publicar ahora"
+              buttonIcon="calendar-check-outline"
+            />
+          ) : (
+            <Flex
+              fill
+              center
+              p={50}
+            >
+              <ActivityIndicator size={75} />
+            </Flex>
+          )}
         </Card>
       )}
 
       {event?.attendance?.status == "En proceso" && (
         <Button
+          disabled={loadingFinish}
           mode="outlined"
           style={{ backgroundColor: theme.colors.background }}
-          icon="hand-back-left-outline"
-          onPress={() => navigation.navigate("ScanAttendance", { attendeeList: event?.attendance.attendee_list, event_identifier: event_identifier })}
+          icon="qrcode-scan"
+          onPress={() => navigation.navigate("ScanAttendance", { attendeeList: event?.attendance?.attendee_list, event_identifier: event_identifier })}
         >
           Registrar asistencia
         </Button>
@@ -392,9 +470,11 @@ export default EventDetails = ({ navigation, route }) => {
 
       {event?.attendance?.status == "En proceso" && new Date(event?.ending_date) <= new Date() && (
         <Button
+          disabled={loadingFinish}
+          loading={loadingFinish}
           mode="contained"
           icon="calendar-lock-outline"
-          onPress={() => navigation.navigate("ShowAttendanceCode")}
+          onPress={() => setShowConfirmFinish(true)}
         >
           Concluir evento
         </Button>
@@ -560,6 +640,54 @@ export default EventDetails = ({ navigation, route }) => {
           }
         />
       )}
+
+      <ModalMessage
+        title="Publicar ahora"
+        description="¿Seguro que desea que el evento se publique ahora? Esta acción no se puede deshacer"
+        icon="help-circle-outline"
+        handler={[showConfirmPost, () => setShowConfirmPost(!showConfirmPost)]}
+        actions={[
+          ["Cancelar"],
+          [
+            "Aceptar",
+            () => {
+              setShowConfirmPost(false)
+              postNow()
+            }
+          ]
+        ]}
+      />
+
+      <ModalMessage
+        title="Ocurrió un problema"
+        description="No pudimos publicar el evento, inténtalo de nuevo más tarde"
+        icon="close-circle-outline"
+        handler={[showErrorPost, () => setShowErrorPost(!showErrorPost)]}
+      />
+
+      <ModalMessage
+        title="Finalizar evento"
+        description="¿Seguro que desea finalizar el evento? Una vez concluido no podrá registrar ni modificar asistencias"
+        icon="help-circle-outline"
+        handler={[showConfirmFinish, () => setShowConfirmFinish(!showConfirmFinish)]}
+        actions={[
+          ["Cancelar"],
+          [
+            "Aceptar",
+            () => {
+              setShowConfirmFinish(false)
+              finishEvent()
+            }
+          ]
+        ]}
+      />
+
+      <ModalMessage
+        title="Ocurrió un problema"
+        description="No pudimos finalizar el evento, inténtalo de nuevo más tarde"
+        icon="close-circle-outline"
+        handler={[showErrorFinish, () => setShowErrorFinish(!showErrorFinish)]}
+      />
     </Flex>
   )
 }

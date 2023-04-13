@@ -251,7 +251,7 @@ export default AddForm = ({ navigation, route }) => {
     const [interrogation, setInterrogation] = useState(question.interrogation)
     const [enum_options, setEnum_options] = useState(question.enum_options)
     const [newAnswerOption, setNewAnswerOption] = useState("")
-    // console.log(questions)
+    console.log(questions)
     return (
       <VStack
         key="Question"

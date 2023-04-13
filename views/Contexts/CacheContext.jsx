@@ -9,6 +9,7 @@ const CacheProvider = ({ children }) => {
   const [places, setPlaces] = useState(undefined)
   const [schools, setSchools] = useState(undefined)
   const [events, setEvents] = useState(undefined)
+  const [activities, setActivities] = useState(undefined)
 
   const [attendees, setAttendees] = useState(undefined)
   const [profiles, setProfiles] = useState(undefined)
@@ -59,6 +60,8 @@ const CacheProvider = ({ children }) => {
     setSchools,
     events,
     setEvents,
+    activities,
+    setActivities,
     attendees,
     setAttendees,
     profiles,

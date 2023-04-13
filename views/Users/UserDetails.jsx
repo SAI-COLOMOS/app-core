@@ -1,7 +1,7 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useCallback, useContext, useEffect, useState } from "react"
 import { FlatList, RefreshControl, ScrollView } from "react-native"
-import { ActivityIndicator, Avatar, Button, Card, FAB, ProgressBar, Text, useTheme } from "react-native-paper"
+import { ActivityIndicator, Avatar, Button, Card, FAB, ProgressBar, Text, TouchableRipple, useTheme } from "react-native-paper"
 import { useHeaderHeight } from "@react-navigation/elements"
 import Constants from "expo-constants"
 import Header from "../Shared/Header"
@@ -9,6 +9,7 @@ import DisplayDetails from "../Shared/DisplayDetails"
 import { useFocusEffect } from "@react-navigation/native"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import ApplicationContext from "../ApplicationContext"
+import { LongDate, ShortDate, Time24 } from "../Shared/LocaleDate"
 
 export default UserDetails = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
@@ -20,6 +21,9 @@ export default UserDetails = ({ navigation, route }) => {
 
   const [loading, setLoading] = useState(false)
   const [profile, setProfile] = useState(undefined)
+  const [activities, setActivities] = useState(undefined)
+  const [achieved_hours, setAchieved_hours] = useState(0)
+  const [total_hours, setTotal_hours] = useState(0)
 
   async function getUser() {
     setLoading(true)
@@ -38,6 +42,30 @@ export default UserDetails = ({ navigation, route }) => {
     if (request?.user) {
       console.log(request.profile)
       setProfile(request.user)
+    }
+  }
+
+  async function getCard() {
+    setLoading(true)
+
+    const request = await fetch(`${localhost}/cards/${register}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        "Cache-Control": "no-cache"
+      }
+    })
+      .then((response) => (response.ok ? response.json() : response.status))
+      .catch(() => null)
+
+    setLoading(false)
+
+    if (request?.activities) {
+      console.log(request.activities)
+      setActivities(request.activities)
+      setAchieved_hours(request.achieved_hours)
+      setTotal_hours(request.total_hours)
     }
   }
 
@@ -69,7 +97,70 @@ export default UserDetails = ({ navigation, route }) => {
 
   useEffect(() => {
     getUser()
+    getCard()
   }, [])
+
+  const Progress = () => (
+    <Flex key="Progress">
+      <VStack spacing={5}>
+        <HStack
+          justify="between"
+          items="baseline"
+        >
+          <Text
+            variant="headlineLarge"
+            style={{ fontWeight: "bold", color: theme.colors.primary }}
+          >
+            {achieved_hours} hrs
+          </Text>
+          <Text variant="titleMedium">{total_hours} hrs</Text>
+        </HStack>
+        {total_hours > 0 && <ProgressBar progress={achieved_hours / total_hours} />}
+      </VStack>
+    </Flex>
+  )
+
+  const LatestActivities = () => (
+    <Card
+      key="Latest activities"
+      mode="outlined"
+    >
+      <Flex p={20}>
+        <Text variant="titleMedium">Últimas actividades realizadas</Text>
+      </Flex>
+      <VStack>
+        {activities?.slice(0, 3).map((activity) => (
+          <Activity
+            key={activity._id}
+            activity={activity}
+          />
+        ))}
+        <HStack
+          p={20}
+          justify="between"
+          reverse={true}
+        >
+          <Button
+            icon="plus"
+            mode="contained"
+            onPress={() => navigation.navigate("AddCard", { register: profile?.register })}
+          >
+            Agregar
+          </Button>
+
+          {activities?.length > 3 && (
+            <Button
+              icon="format-list-bulleted"
+              mode="outlined"
+              onPress={() => navigation.navigate("CardDetails", { register: profile?.register })}
+            >
+              Ver todas
+            </Button>
+          )}
+        </HStack>
+      </VStack>
+    </Card>
+  )
 
   const PersonalData = () => (
     <Card
@@ -212,6 +303,58 @@ export default UserDetails = ({ navigation, route }) => {
     </Card>
   )
 
+  const Activity = useCallback(({ activity }) => {
+    return (
+      <Flex style={{ borderRadius: 10, overflow: "hidden" }}>
+        <TouchableRipple
+          onPress={() => {
+            navigation.navigate("EditCard", { register: profile?.register, activity })
+          }}
+        >
+          <HStack
+            spacing={10}
+            mh={20}
+            mv={10}
+          >
+            <VStack
+              spacing={5}
+              center
+            >
+              <Avatar.Text
+                label={activity?.hours}
+                size={50}
+                style={{ backgroundColor: activity?.hours <= 0 ? theme.colors.error : theme.colors.primary }}
+              />
+              <Text variant="labelMedium">hrs</Text>
+            </VStack>
+            <VStack fill>
+              <Text
+                variant="bodyMedium"
+                numberOfLines={1}
+              >
+                {activity?.activity_name}
+              </Text>
+
+              <Text
+                variant="bodyMedium"
+                numberOfLines={1}
+              >
+                Por {activity?.responsible_name}
+              </Text>
+
+              <Text
+                variant="bodyMedium"
+                numberOfLines={1}
+              >
+                El {ShortDate(activity?.assignation_date)} a las {Time24(activity?.assignation_date)}
+              </Text>
+            </VStack>
+          </HStack>
+        </TouchableRipple>
+      </Flex>
+    )
+  }, [])
+
   return (
     <Flex
       fill
@@ -224,7 +367,7 @@ export default UserDetails = ({ navigation, route }) => {
               avatar={avatar}
               icon="account-outline"
               title={`${profile?.first_name} ${profile?.first_last_name} ${profile?.second_last_name == undefined ? "" : profile?.second_last_name}`}
-              children={[PersonalData(), ContactData(), EmergencyData(), AccountData()]}
+              children={[profile?.role == "Prestador" && Progress(), profile?.role == "Prestador" && LatestActivities(), PersonalData(), ContactData(), EmergencyData(), AccountData()]}
               refreshStatus={loading}
               refreshAction={getUser}
             />

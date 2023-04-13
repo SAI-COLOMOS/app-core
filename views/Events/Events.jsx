@@ -1,6 +1,6 @@
 import { Flex, HStack, Spacer, VStack } from "@react-native-material/core"
 import { useCallback, useContext, useEffect, useState } from "react"
-import { Card, IconButton, TouchableRipple, Text, TextInput, useTheme, Avatar, FAB, ActivityIndicator } from "react-native-paper"
+import { Card, IconButton, TouchableRipple, Text, TextInput, useTheme, Avatar, FAB, ActivityIndicator, Tooltip } from "react-native-paper"
 import { useHeaderHeight } from "@react-navigation/elements"
 import Header from "../Shared/Header"
 import Constants from "expo-constants"
@@ -31,6 +31,7 @@ export default Users = ({ navigation, route }) => {
   const [showSearch, setShowSearch] = useState(null)
   const [areFilters, setAreFilters] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
+  const [history, setHistory] = useState(false)
 
   const [placeFilter, setPlaceFilter] = useState("")
   const [dateFilter, setDateFilter] = useState("Hola")
@@ -38,7 +39,7 @@ export default Users = ({ navigation, route }) => {
   const getEvents = async () => {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/agenda`, {
+    const request = await fetch(`${localhost}/agenda?history=${history}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -81,7 +82,7 @@ export default Users = ({ navigation, route }) => {
       return
     }
 
-    const request = await fetch(`${localhost}/agenda?search=${search.trim()}&filter=${JSON.stringify(filters)}`, {
+    const request = await fetch(`${localhost}/agenda?search=${search.trim()}&filter=${JSON.stringify(filters)}&history=${history}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -108,6 +109,26 @@ export default Users = ({ navigation, route }) => {
           {...props}
           children={
             user?.role != "Prestador" && [
+              <Tooltip
+                key="DraftsButton"
+                title="Ver borradores"
+              >
+                <IconButton
+                  icon="archive-outline"
+                  onPress={() => setHistory(!history)}
+                />
+              </Tooltip>,
+              <Tooltip
+                key="HistoryButton"
+                title={history == true ? "Ocultar concluidos" : "Mostrar concluidos"}
+              >
+                <IconButton
+                  icon="history"
+                  onPress={() => {
+                    setHistory(!history)
+                  }}
+                />
+              </Tooltip>,
               <IconButton
                 key="FilterButton"
                 icon="filter-outline"
@@ -125,13 +146,17 @@ export default Users = ({ navigation, route }) => {
       headerTransparent: true,
       headerTitle: "Eventos"
     })
-  }, [showSearch, showFilters])
+  }, [showSearch, showFilters, history])
 
   useEffect(() => {
     if (events === undefined) {
       getEvents()
     }
   }, [])
+
+  useEffect(() => {
+    getEvents()
+  }, [history])
 
   const Item = useCallback(
     ({ item }) => {

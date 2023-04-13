@@ -8,16 +8,29 @@ export default Header = ({ options, navigation, children }) => {
 
   return (
     <Flex>
-      <Flex pt={insets.top} style={{ backgroundColor: theme.colors.elevation.level5, borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
-        <HStack p={10} justify="between" items="center">
-          <HStack items="center" spacing={10}>
+      <Flex
+        pt={insets.top}
+        style={{ backgroundColor: theme.colors.elevation.level5, borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}
+      >
+        <HStack
+          p={10}
+          justify="between"
+          items="center"
+        >
+          <HStack
+            items="center"
+            spacing={10}
+          >
             <IconButton
               icon="arrow-left"
               onPress={() => {
                 navigation.pop()
               }}
             />
-            <Text variant="headlineSmall" numberOfLines={1}>
+            <Text
+              variant="headlineSmall"
+              numberOfLines={1}
+            >
               {options.headerTitle}
             </Text>
           </HStack>

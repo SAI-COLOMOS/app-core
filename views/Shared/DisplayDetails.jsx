@@ -79,7 +79,7 @@ export default SchoolDetails = ({ icon, image, title, children, actions, avatar,
       >
         <VStack
           spacing={20}
-          pt={50}
+          pt={40}
           pb={100}
           ph={20}
         >

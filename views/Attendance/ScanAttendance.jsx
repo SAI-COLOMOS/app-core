@@ -12,8 +12,10 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import Constants from "expo-constants"
 import ProfileImage from "../Shared/ProfileImage"
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
+import { useKeepAwake } from "expo-keep-awake"
 
 export default ScanAttendance = ({ navigation, route }) => {
+  useKeepAwake()
   const theme = useTheme()
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const insets = useSafeAreaInsets()

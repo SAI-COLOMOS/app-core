@@ -1,13 +1,13 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useEffect, useState, useCallback, useContext } from "react"
 import { useHeaderHeight } from "@react-navigation/elements"
-import { Text, Card, Button, FAB, useTheme, Avatar, IconButton, ProgressBar } from "react-native-paper"
+import { Text, Card, Button, FAB, useTheme, Avatar, IconButton, ProgressBar, TouchableRipple } from "react-native-paper"
 import Header from "../Shared/Header"
 import Constants from "expo-constants"
 import DisplayDetails from "../Shared/DisplayDetails"
 import { useFocusEffect } from "@react-navigation/native"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
-import { LongDate, Time24 } from "../Shared/LocaleDate"
+import { LongDate, ShortDate, Time24 } from "../Shared/LocaleDate"
 import ApplicationContext from "../ApplicationContext"
 import InformationMessage from "../Shared/InformationMessage"
 
@@ -19,7 +19,7 @@ export default CardDetails = ({ navigation, route }) => {
   const theme = useTheme()
 
   const [loading, setLoading] = useState(false)
-  const [card, setCard] = useState(undefined)
+  const [activities, setActivities] = useState(undefined)
   const [achieved_hours, setAchieved_hours] = useState(0)
   const [total_hours, setTotal_hours] = useState(0)
 
@@ -41,7 +41,7 @@ export default CardDetails = ({ navigation, route }) => {
 
     if (request?.activities) {
       console.log(request.activities)
-      setCard(request.activities)
+      setActivities(request.activities)
       setAchieved_hours(request.achieved_hours)
       setTotal_hours(request.total_hours)
     }
@@ -82,101 +82,87 @@ export default CardDetails = ({ navigation, route }) => {
     </Flex>
   )
 
-  const Activity = () => {
-    return (
-      <Flex key="Activity">
-        <Flex pv={20}>
-          <Text variant="titleMedium">Actividades realizadas</Text>
-        </Flex>
+  const Activities = () => (
+    <Card
+      key="Latest activities"
+      mode="outlined"
+    >
+      <VStack>
+        {activities?.map((activity) => (
+          <Activity
+            key={activity._id}
+            activity={activity}
+          />
+        ))}
+      </VStack>
+    </Card>
+  )
 
-        <VStack spacing={25}>
-          {card.length > 0 ? (
-            <VStack spacing={10}>
-              {card.map((activity) => (
-                <Card
-                  mode="outlined"
-                  key={activity._id}
-                >
-                  <VStack
-                    spacing={10}
-                    p={20}
-                  >
-                    <HStack spacing={20}>
-                      <VStack items="center">
-                        <Avatar.Text
-                          label={activity?.hours}
-                          size={50}
-                        />
-                        <Text
-                          variant="bodyMedium"
-                          style={{ textAlign: "center" }}
-                        >
-                          hrs
-                        </Text>
-                      </VStack>
-                      <Flex fill>
-                        <Text
-                          variant="titleMedium"
-                          numberOfLines={2}
-                        >
-                          {activity?.activity_name}
-                        </Text>
-                        <Text
-                          variant="bodyMedium"
-                          numberOfLines={1}
-                        >
-                          {LongDate(activity?.assignation_date)}
-                        </Text>
-                        <Text
-                          variant="bodyMedium"
-                          numberOfLines={1}
-                        >
-                          {Time24(activity?.assignation_date)}
-                        </Text>
-                        <Text
-                          variant="bodyMedium"
-                          numberOfLines={1}
-                        >
-                          {activity?.responsible_name}
-                        </Text>
-                      </Flex>
-                    </HStack>
-                    <Button
-                      mode="text"
-                      icon="pencil-outline"
-                      onPress={() => navigation.navigate("EditCard", { register, activity })}
-                    >
-                      Editar actividad
-                    </Button>
-                  </VStack>
-                </Card>
-              ))}
+  const Activity = useCallback(({ activity }) => {
+    return (
+      <Flex style={{ borderRadius: 10, overflow: "hidden" }}>
+        <TouchableRipple
+          onPress={() => {
+            navigation.navigate("EditCard", { register: profile?.register, activity })
+          }}
+        >
+          <HStack
+            spacing={10}
+            mh={20}
+            mv={10}
+          >
+            <VStack
+              spacing={5}
+              center
+            >
+              <Avatar.Text
+                label={activity?.hours}
+                size={50}
+                style={{ backgroundColor: activity?.hours <= 0 ? theme.colors.error : theme.colors.primary }}
+              />
+              <Text variant="labelMedium">hrs</Text>
             </VStack>
-          ) : (
-            <InformationMessage
-              key="NoProgress"
-              title="Sin actividades"
-              description="Todavía no tines actividades realizadas, cuando completes algunas, estas aparecerán aquí"
-              icon="alert"
-            />
-          )}
-        </VStack>
+            <VStack fill>
+              <Text
+                variant="bodyMedium"
+                numberOfLines={1}
+              >
+                {activity?.activity_name}
+              </Text>
+
+              <Text
+                variant="bodyMedium"
+                numberOfLines={1}
+              >
+                Por {activity?.responsible_name}
+              </Text>
+
+              <Text
+                variant="bodyMedium"
+                numberOfLines={1}
+              >
+                El {ShortDate(activity?.assignation_date)} a las {Time24(activity?.assignation_date)}
+              </Text>
+            </VStack>
+          </HStack>
+        </TouchableRipple>
       </Flex>
     )
-  }
+  }, [])
 
   return (
     <Flex
       fill
       pt={headerMargin - 20}
     >
-      {card !== undefined &&
-        (card !== null ? (
-          // isNaN(card) ? (
+      {activities !== undefined &&
+        (activities !== null ? (
+          // isNaN(activities) ? (
           <DisplayDetails
-            avatar={user?.avatar}
-            title={`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name == undefined ? "" : user?.second_last_name}`}
-            children={[ProgressRing(), Activity()]}
+            // avatar={user?.avatar}
+            // title={`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name == undefined ? "" : user?.second_last_name}`}
+            showHeader={false}
+            children={[Activities()]}
             refreshStatus={loading}
             refreshAction={() => getCard()}
           />
@@ -213,7 +199,7 @@ export default CardDetails = ({ navigation, route }) => {
           </VStack>
         ))}
 
-      {!(card === undefined || card === null) && (
+      {!(activities === undefined || activities === null) && (
         <FAB
           icon="pencil-outline"
           style={{ position: "absolute", margin: 16, right: 0, bottom: 0 }}
