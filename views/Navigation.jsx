@@ -59,6 +59,7 @@ import UserProgress from "./Cards/UserProgress"
 import Forms from "./Forms/Forms"
 import FormDetails from "./Forms/FormDetails"
 import AddForm from "./Forms/AddForm"
+import EditForm from "./Forms/EditForm"
 import AddAttendee from "./Events/AddAttendee"
 import EditAttendance from "./Attendance/EditAttendance"
 
@@ -319,6 +320,11 @@ export default Navigation = () => {
             <Stack.Screen
               name="AddForm"
               component={AddForm}
+              options={{ headerShown: false, presentation: "containedTransparentModal" }}
+            />
+            <Stack.Screen
+              name="EditForm"
+              component={EditForm}
               options={{ headerShown: false, presentation: "containedTransparentModal" }}
             />
           </Stack.Group>

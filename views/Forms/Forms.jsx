@@ -121,7 +121,7 @@ export default Forms = ({ navigation, route }) => {
         >
           <TouchableRipple
             onPress={() => {
-              navigation.navigate("FormDetails", { token, form_identifier })
+              navigation.navigate("FormDetails", { token, form_identifier, getForms })
             }}
           >
             <Flex p={10}>
