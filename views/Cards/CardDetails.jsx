@@ -10,18 +10,20 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import { LongDate, ShortDate, Time24 } from "../Shared/LocaleDate"
 import ApplicationContext from "../ApplicationContext"
 import InformationMessage from "../Shared/InformationMessage"
+import { CardContext } from "../Users/UserDetails"
 
 export default CardDetails = ({ navigation, route }) => {
+  const { user, register } = route.params
+  const { activities, setActivities, achieved_hours, setAchieved_hours, total_hours, setTotal_hours } = useContext(CardContext)
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const headerMargin = useHeaderHeight()
-  const { user, register } = route.params
   const { token } = useContext(ApplicationContext)
   const theme = useTheme()
 
   const [loading, setLoading] = useState(false)
-  const [activities, setActivities] = useState(undefined)
-  const [achieved_hours, setAchieved_hours] = useState(0)
-  const [total_hours, setTotal_hours] = useState(0)
+  //const [activities, setActivities] = useState(undefined)
+  // const [achieved_hours, setAchieved_hours] = useState(0)
+  // const [total_hours, setTotal_hours] = useState(0)
 
   async function getCard() {
     setLoading(true)
@@ -55,16 +57,13 @@ export default CardDetails = ({ navigation, route }) => {
     })
   }, [])
 
-  useFocusEffect(
-    useCallback(() => {
-      getCard()
-      return () => {}
-    }, [])
-  )
+  // useEffect(() => {
+  //   getCard()
+  // }, [])
 
-  const ProgressRing = () => (
+  const Progress = () => (
     <Flex key="Progress">
-      <VStack spacing={10}>
+      <VStack spacing={5}>
         <HStack
           justify="between"
           items="baseline"
@@ -87,7 +86,10 @@ export default CardDetails = ({ navigation, route }) => {
       key="Latest activities"
       mode="outlined"
     >
-      <VStack>
+      <Flex p={20}>
+        <Text variant="titleMedium">Actividades realizadas</Text>
+      </Flex>
+      <VStack pb={20}>
         {activities?.map((activity) => (
           <Activity
             key={activity._id}
@@ -103,7 +105,7 @@ export default CardDetails = ({ navigation, route }) => {
       <Flex style={{ borderRadius: 10, overflow: "hidden" }}>
         <TouchableRipple
           onPress={() => {
-            navigation.navigate("EditCard", { register: profile?.register, activity })
+            navigation.navigate("EditCard", { register: register, activity, getCard })
           }}
         >
           <HStack
@@ -162,7 +164,7 @@ export default CardDetails = ({ navigation, route }) => {
             // avatar={user?.avatar}
             // title={`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name == undefined ? "" : user?.second_last_name}`}
             showHeader={false}
-            children={[Activities()]}
+            children={[Progress(), Activities()]}
             refreshStatus={loading}
             refreshAction={() => getCard()}
           />
@@ -201,10 +203,10 @@ export default CardDetails = ({ navigation, route }) => {
 
       {!(activities === undefined || activities === null) && (
         <FAB
-          icon="pencil-outline"
+          icon="plus"
           style={{ position: "absolute", margin: 16, right: 0, bottom: 0 }}
           onPress={() => {
-            navigation.navigate("AddCard", { register })
+            navigation.navigate("AddCard", { register, getCard })
           }}
         />
       )}

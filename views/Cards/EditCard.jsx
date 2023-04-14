@@ -1,5 +1,5 @@
-import { Flex, VStack } from "@react-native-material/core"
-import { Button, TextInput, useTheme, Text } from "react-native-paper"
+import { Flex, HStack, VStack } from "@react-native-material/core"
+import { Button, TextInput, useTheme, Text, Switch } from "react-native-paper"
 import CreateForm from "../Shared/CreateForm"
 import Constants from "expo-constants"
 import ModalMessage from "../Shared/ModalMessage"
@@ -9,7 +9,7 @@ import { LongDate } from "../Shared/LocaleDate"
 import ApplicationContext from "../ApplicationContext"
 
 export default EditCard = ({ navigation, route }) => {
-  const { register, activity } = route.params
+  const { register, activity, getCard } = route.params
   const { token } = useContext(ApplicationContext)
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const theme = useTheme()
@@ -18,6 +18,7 @@ export default EditCard = ({ navigation, route }) => {
   const [hours, setHours] = useState(`${activity?.hours ?? ""}`)
   const [responsible_register, setResponsible_register] = useState(`${activity?.responsible_register ?? ""}`)
   const [assignation_date, setAssignation_date] = useState(new Date(`${activity?.assignation_date}`))
+  const [penalized, setPenalized] = useState(activity?.toSubstract ?? false)
   const [_id, set_id] = useState(`${activity?._id}`)
 
   const [modalConfirm, setModalConfirm] = useState(false)
@@ -40,13 +41,17 @@ export default EditCard = ({ navigation, route }) => {
       },
       body: JSON.stringify({
         activity_name: activity_name.trim(),
-        hours: Number(hours),
+        hours: Math.abs(Number(hours)),
         responsible_register: responsible_register.trim(),
         assignation_date: assignation_date,
+        toSubstract: penalized,
         _id: _id.trim()
       })
     })
-      .then((response) => response.status)
+      .then(async (response) => {
+        console.log(await response.json())
+        return response.status
+      })
       .catch((_) => null)
     setModalLoading(false)
 
@@ -111,7 +116,20 @@ export default EditCard = ({ navigation, route }) => {
             maxLength={3}
             autoComplete="off"
             autoCorrect={false}
+            left={penalized == true && <TextInput.Affix text="-" />}
+            right={<TextInput.Affix text="hrs" />}
           />
+
+          <HStack
+            items="center"
+            spacing={10}
+          >
+            <Switch
+              value={penalized}
+              onValueChange={() => setPenalized(!penalized)}
+            />
+            <Text variant="bodyMedium">{penalized == true ? "Horas en contra" : "Horas a favor"}</Text>
+          </HStack>
         </VStack>
       </VStack>
     )
@@ -120,6 +138,8 @@ export default EditCard = ({ navigation, route }) => {
   const Update = () => {
     return (
       <Button
+        loading={modalLoading}
+        disabled={modalLoading}
         mode="contained"
         icon="content-save-outline"
         key="Update"
@@ -135,6 +155,7 @@ export default EditCard = ({ navigation, route }) => {
   const Cancel = () => {
     return (
       <Button
+        disabled={modalLoading}
         mode="outlined"
         icon="close"
         key="Cancel"
@@ -150,6 +171,7 @@ export default EditCard = ({ navigation, route }) => {
   const Delete = () => {
     return (
       <Button
+        disabled={modalLoading}
         mode="contained"
         icon="trash-can-outline"
         key="Delete"
@@ -165,6 +187,7 @@ export default EditCard = ({ navigation, route }) => {
   return (
     <Flex fill>
       <CreateForm
+        loading={modalLoading}
         navigation={navigation}
         title={"Editar actividad"}
         children={[Activity(), Delete()]}
@@ -190,7 +213,15 @@ export default EditCard = ({ navigation, route }) => {
         title="¡Listo!"
         description="La actividad ha sido actualizada"
         handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]}
-        actions={[["Aceptar", () => navigation.pop()]]}
+        actions={[
+          [
+            "Aceptar",
+            () => {
+              getCard()
+              navigation.pop()
+            }
+          ]
+        ]}
         dismissable={false}
         icon="check-circle-outline"
       />
@@ -199,7 +230,15 @@ export default EditCard = ({ navigation, route }) => {
         title="¡Listo!"
         description="La actividad ha sido eliminada"
         handler={[modalSuccessDelete, () => setModalSuccessDelete(!modalSuccessDelete)]}
-        actions={[["Aceptar", () => navigation.pop()]]}
+        actions={[
+          [
+            "Aceptar",
+            () => {
+              getCard()
+              navigation.pop()
+            }
+          ]
+        ]}
         dismissable={false}
         icon="check-circle-outline"
       />

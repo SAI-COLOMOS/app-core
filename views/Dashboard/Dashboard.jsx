@@ -397,35 +397,6 @@ export default Dashboard = ({ navigation }) => {
                   </Text>
                 </VStack>
               </HStack>
-              {/* <HStack
-                key="Following"
-                fill
-                spacing={20}
-              >
-                <Flex items="center">
-                  <Avatar.Text
-                    label={GetDay(feed?.enrolled_event?.starting_date)}
-                    size={30}
-                  />
-                  <Text variant="bodyMedium">{GetCompactMonth(feed?.enrolled_event?.starting_date)}</Text>
-                </Flex>
-                <VStack fill>
-                  <Text
-                    variant="titleMedium"
-                    numberOfLines={1}
-                  >
-                    {feed?.enrolled_event?.name}
-                  </Text>
-                  <Flex fill>
-                    <Text
-                      variant="bodyMedium"
-                      numberOfLines={1}
-                    >
-                      {Time24(feed?.enrolled_event?.starting_date)} - {Time24(feed?.enrolled_event?.ending_date)}, {feed?.enrolled_event?.place}
-                    </Text>
-                  </Flex>
-                </VStack>
-              </HStack> */}
             </Flex>
           }
         />
@@ -443,14 +414,14 @@ export default Dashboard = ({ navigation }) => {
         }
       />
 
-      {/* Horas de servicio */}
+      {/* Usuarios */}
       <WidgetMedium
-        title="Horas de servicio"
-        screen="Cards"
+        title="Usuarios"
+        screen="Users"
         // payload={{ user, token }}
         child={
           <Avatar.Icon
-            icon={"clock-time-four-outline"}
+            icon={"account-supervisor-outline"}
             size={100}
           />
         }
@@ -460,17 +431,6 @@ export default Dashboard = ({ navigation }) => {
         h={90}
         w={feed?.created_events?.length > 0 ? 180 : 360}
       >
-        {/* Usuarios */}
-        <WidgetSmall
-          screen="Users"
-          child={
-            <Avatar.Icon
-              icon={"account-supervisor-outline"}
-              size={50}
-            />
-          }
-        />
-
         {/* Formularios */}
         <WidgetSmall
           screen="Forms"

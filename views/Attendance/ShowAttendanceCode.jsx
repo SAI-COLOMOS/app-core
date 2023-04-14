@@ -6,9 +6,29 @@ import { Avatar, Button, Text, useTheme } from "react-native-paper"
 import Code from "react-native-qrcode-svg"
 import CreateForm from "../Shared/CreateForm"
 import ApplicationContext from "../ApplicationContext"
+import * as Brightness from "expo-brightness"
+import { useKeepAwake } from "expo-keep-awake"
+
 export default ShowAttendanceCode = ({ navigation, route }) => {
   const theme = useTheme()
+  const { getEvent } = route.params
   const { register, user } = useContext(ApplicationContext)
+
+  const [actualBright, setActualBright] = useState()
+  useKeepAwake()
+
+  useEffect(() => {
+    const bright = async () => {
+      const { status } = await Brightness.requestPermissionsAsync()
+
+      if (status === "granted") {
+        setActualBright(await Brightness.getBrightnessAsync())
+        Brightness.setSystemBrightnessAsync(1)
+      }
+    }
+
+    bright()
+  }, [])
 
   const QR = useCallback(
     () => (
@@ -53,12 +73,16 @@ export default ShowAttendanceCode = ({ navigation, route }) => {
       <Button
         mode="contained"
         icon="close"
-        onPress={() => navigation.pop()}
+        onPress={async () => {
+          await Brightness.setSystemBrightnessAsync(actualBright)
+          getEvent()
+          navigation.pop()
+        }}
       >
         Salir
       </Button>
     ),
-    []
+    [actualBright]
   )
 
   const ProximityModeButton = useCallback(

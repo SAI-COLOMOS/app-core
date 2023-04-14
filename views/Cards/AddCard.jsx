@@ -1,21 +1,22 @@
-import { Flex, VStack } from "@react-native-material/core"
+import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useHeaderHeight } from "@react-navigation/elements"
 import { useCallback, useContext, useEffect, useState } from "react"
 import Constants from "expo-constants"
 import CreateForm from "../Shared/CreateForm"
-import { Button, TextInput, useTheme, Text } from "react-native-paper"
+import { Button, TextInput, useTheme, Text, Switch } from "react-native-paper"
 import ModalMessage from "../Shared/ModalMessage"
 import ApplicationContext from "../ApplicationContext"
 
 export default AddCard = ({ navigation, route }) => {
   const headerMargin = useHeaderHeight()
   const { token } = useContext(ApplicationContext)
-  const { register } = route.params
+  const { register, getCard } = route.params
   const localhost = Constants.expoConfig.extra.API_LOCAL
   const theme = useTheme()
 
   const [activity_name, setActivity_name] = useState("")
   const [hours, setHours] = useState("")
+  const [penalized, setPenalized] = useState(false)
 
   const [loading, setLoading] = useState(false)
   const [modalSuccess, setModalSuccess] = useState(false)
@@ -35,7 +36,8 @@ export default AddCard = ({ navigation, route }) => {
       },
       body: JSON.stringify({
         activity_name: activity_name.trim(),
-        hours: Number(hours)
+        hours: Math.abs(Number(hours)),
+        toSubstract: penalized
       })
     })
       .then((response) => response.status)
@@ -66,10 +68,10 @@ export default AddCard = ({ navigation, route }) => {
             onChangeText={setActivity_name}
             label="Nombre de actividad"
             maxLength={50}
-            autoCapitalize="words"
             autoComplete="off"
             autoCorrect={false}
           />
+
           <TextInput
             mode="outlined"
             value={hours}
@@ -79,7 +81,20 @@ export default AddCard = ({ navigation, route }) => {
             maxLength={3}
             autoComplete="off"
             autoCorrect={false}
+            left={penalized == true && <TextInput.Affix text="-" />}
+            right={<TextInput.Affix text="hrs" />}
           />
+
+          <HStack
+            items="center"
+            spacing={10}
+          >
+            <Switch
+              value={penalized}
+              onValueChange={() => setPenalized(!penalized)}
+            />
+            <Text variant="bodyMedium">{penalized == true ? "Horas en contra" : "Horas a favor"}</Text>
+          </HStack>
         </VStack>
       </VStack>
     )
@@ -91,6 +106,8 @@ export default AddCard = ({ navigation, route }) => {
         mode="contained"
         icon="content-save-outline"
         key="Save"
+        disabled={loading}
+        loading={loading}
         onPress={() => {
           SaveCard()
         }}
@@ -103,6 +120,7 @@ export default AddCard = ({ navigation, route }) => {
   const Cancel = () => {
     return (
       <Button
+        disabled={loading}
         mode="outlined"
         icon="close"
         key="Cancel"
@@ -129,7 +147,15 @@ export default AddCard = ({ navigation, route }) => {
         title="¡Listo!"
         description="La actividad ha sido creada"
         handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]}
-        actions={[["Aceptar", () => navigation.pop()]]}
+        actions={[
+          [
+            "Aceptar",
+            () => {
+              getCard()
+              navigation.pop()
+            }
+          ]
+        ]}
         dismissable={false}
         icon="check-circle-outline"
       />

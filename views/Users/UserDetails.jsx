@@ -1,5 +1,5 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
-import { useCallback, useContext, useEffect, useState } from "react"
+import { createContext, useCallback, useContext, useEffect, useState } from "react"
 import { FlatList, RefreshControl, ScrollView } from "react-native"
 import { ActivityIndicator, Avatar, Button, Card, FAB, ProgressBar, Text, TouchableRipple, useTheme } from "react-native-paper"
 import { useHeaderHeight } from "@react-navigation/elements"
@@ -11,8 +11,30 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import ApplicationContext from "../ApplicationContext"
 import { LongDate, ShortDate, Time24 } from "../Shared/LocaleDate"
 
+const CardContext = createContext()
+
+const CardProvider = ({ children }) => {
+  const [activities, setActivities] = useState(undefined)
+  const [achieved_hours, setAchieved_hours] = useState(0)
+  const [total_hours, setTotal_hours] = useState(0)
+
+  const params = {
+    activities,
+    setActivities,
+    achieved_hours,
+    setAchieved_hours,
+    total_hours,
+    setTotal_hours
+  }
+
+  return <CardContext.Provider value={params}>{children}</CardContext.Provider>
+}
+
+export { CardProvider, CardContext }
+
 export default UserDetails = ({ navigation, route }) => {
   const localhost = Constants.expoConfig.extra.API_LOCAL
+  const { activities, setActivities, achieved_hours, setAchieved_hours, total_hours, setTotal_hours } = useContext(CardContext)
   const { token } = useContext(ApplicationContext)
   const { register, getUsers } = route.params
   const headerMargin = useHeaderHeight()
@@ -21,9 +43,6 @@ export default UserDetails = ({ navigation, route }) => {
 
   const [loading, setLoading] = useState(false)
   const [profile, setProfile] = useState(undefined)
-  const [activities, setActivities] = useState(undefined)
-  const [achieved_hours, setAchieved_hours] = useState(0)
-  const [total_hours, setTotal_hours] = useState(0)
 
   async function getUser() {
     setLoading(true)
@@ -67,6 +86,11 @@ export default UserDetails = ({ navigation, route }) => {
       setAchieved_hours(request.achieved_hours)
       setTotal_hours(request.total_hours)
     }
+  }
+
+  function update() {
+    getUser()
+    getCard()
   }
 
   useEffect(() => {
@@ -143,7 +167,7 @@ export default UserDetails = ({ navigation, route }) => {
           <Button
             icon="plus"
             mode="contained"
-            onPress={() => navigation.navigate("AddCard", { register: profile?.register })}
+            onPress={() => navigation.navigate("AddCard", { register: profile?.register, getCard })}
           >
             Agregar
           </Button>
@@ -152,7 +176,7 @@ export default UserDetails = ({ navigation, route }) => {
             <Button
               icon="format-list-bulleted"
               mode="outlined"
-              onPress={() => navigation.navigate("CardDetails", { register: profile?.register })}
+              onPress={() => navigation.navigate("CardDetails", { register: profile?.register, context: CardContext })}
             >
               Ver todas
             </Button>
@@ -303,73 +327,79 @@ export default UserDetails = ({ navigation, route }) => {
     </Card>
   )
 
-  const Activity = useCallback(({ activity }) => {
-    return (
-      <Flex style={{ borderRadius: 10, overflow: "hidden" }}>
-        <TouchableRipple
-          onPress={() => {
-            navigation.navigate("EditCard", { register: profile?.register, activity })
-          }}
-        >
-          <HStack
-            spacing={10}
-            mh={20}
-            mv={10}
+  const Activity = useCallback(
+    ({ activity }) => {
+      return (
+        <Flex style={{ borderRadius: 10, overflow: "hidden" }}>
+          <TouchableRipple
+            onPress={() => {
+              navigation.navigate("EditCard", { register: profile?.register, activity, getCard })
+            }}
           >
-            <VStack
-              spacing={5}
-              center
+            <HStack
+              spacing={10}
+              mh={20}
+              mv={10}
             >
-              <Avatar.Text
-                label={activity?.hours}
-                size={50}
-                style={{ backgroundColor: activity?.hours <= 0 ? theme.colors.error : theme.colors.primary }}
-              />
-              <Text variant="labelMedium">hrs</Text>
-            </VStack>
-            <VStack fill>
-              <Text
-                variant="bodyMedium"
-                numberOfLines={1}
+              <VStack
+                spacing={5}
+                center
               >
-                {activity?.activity_name}
-              </Text>
+                <Avatar.Text
+                  label={activity?.hours}
+                  size={50}
+                  style={{ backgroundColor: activity?.hours <= 0 ? theme.colors.error : theme.colors.primary }}
+                />
+                <Text variant="labelMedium">hrs</Text>
+              </VStack>
+              <VStack fill>
+                <Text
+                  variant="bodyMedium"
+                  numberOfLines={1}
+                >
+                  {activity?.activity_name}
+                </Text>
 
-              <Text
-                variant="bodyMedium"
-                numberOfLines={1}
-              >
-                Por {activity?.responsible_name}
-              </Text>
+                <Text
+                  variant="bodyMedium"
+                  numberOfLines={1}
+                >
+                  Por {activity?.responsible_name}
+                </Text>
 
-              <Text
-                variant="bodyMedium"
-                numberOfLines={1}
-              >
-                El {ShortDate(activity?.assignation_date)} a las {Time24(activity?.assignation_date)}
-              </Text>
-            </VStack>
-          </HStack>
-        </TouchableRipple>
-      </Flex>
-    )
-  }, [])
+                <Text
+                  variant="bodyMedium"
+                  numberOfLines={1}
+                >
+                  El {ShortDate(activity?.assignation_date)} a las {Time24(activity?.assignation_date)}
+                </Text>
+              </VStack>
+            </HStack>
+          </TouchableRipple>
+        </Flex>
+      )
+    },
+    [profile?.register]
+  )
 
   return (
     <Flex
       fill
       mt={headerMargin - 20}
     >
-      {profile !== undefined ? (
-        profile !== null ? (
-          isNaN(profile) ? (
+      {profile !== undefined && activities != undefined ? (
+        profile !== null && activities !== null ? (
+          isNaN(profile) && isNaN(activities) ? (
             <DisplayDetails
               avatar={avatar}
               icon="account-outline"
               title={`${profile?.first_name} ${profile?.first_last_name} ${profile?.second_last_name == undefined ? "" : profile?.second_last_name}`}
               children={[profile?.role == "Prestador" && Progress(), profile?.role == "Prestador" && LatestActivities(), PersonalData(), ContactData(), EmergencyData(), AccountData()]}
               refreshStatus={loading}
-              refreshAction={getUser}
+              refreshAction={() => {
+                getUser()
+                getCard()
+              }}
             />
           ) : (
             <VStack

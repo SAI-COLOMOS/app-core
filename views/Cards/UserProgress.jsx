@@ -1,14 +1,14 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useEffect, useState, useCallback, useContext } from "react"
 import { useHeaderHeight } from "@react-navigation/elements"
-import { Text, Card, Button, FAB, useTheme, Avatar, ActivityIndicator, ProgressBar } from "react-native-paper"
+import { Text, Card, Button, FAB, useTheme, Avatar, ActivityIndicator, ProgressBar, TouchableRipple } from "react-native-paper"
 import Header from "../Shared/Header"
 import Constants from "expo-constants"
 import DisplayDetails from "../Shared/DisplayDetails"
 import { ScrollView, RefreshControl } from "react-native"
 import { useFocusEffect } from "@react-navigation/native"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
-import { LongDate, Time24 } from "../Shared/LocaleDate"
+import { LongDate, ShortDate, Time24 } from "../Shared/LocaleDate"
 import UserContext from "../ApplicationContext"
 import CircularProgress from "react-native-circular-progress-indicator"
 import InformationMessage from "../Shared/InformationMessage"
@@ -72,7 +72,42 @@ export default UserProgress = ({ navigation, route }) => {
     }, [])
   )
 
-  const ProgressRing = () => (
+  const Title = () => {
+    const percentage = Number((achieved_hours / total_hours) * 100).toFixed(2)
+    const favorHours = activities?.filter((activity) => activity?.toSubstract == false || activity?.toSubstract == undefined).map((activity) => activity.hours)
+    const favorSum = favorHours.reduce((acum, actual) => acum + actual, 0)
+
+    const negativeHours = activities?.filter((activity) => activity?.toSubstract == true).map((activity) => activity.hours)
+    const negativeSum = negativeHours.reduce((acum, actual) => acum + actual, 0)
+
+    const harmonicMean = (array) => {
+      var sum = 0
+      for (var i = 0; i < array.length; i++) {
+        sum += 1 / array[i]
+      }
+      return array.length / sum
+    }
+
+    return (
+      <VStack
+        spacing={10}
+        key="Title"
+      >
+        <Text variant="headlineSmall">Tu progreso, en contexto</Text>
+        <Text variant="bodyMedium">Actualmente llevas concluido el {percentage} % del total de horas que necesitas completar.</Text>
+        <Text variant="bodyMedium">
+          Promedias {harmonicMean(favorHours)} horas por actividad, con este ritmo necesitas completar más o menos {Number(total_hours / harmonicMean(favorHours)).toFixed(0)} eventos para concluir.
+        </Text>
+        {negativeHours.length > 0 && (
+          <Text variant="bodyMedium">
+            Sumas en total {favorSum} horas a favor, sin embargo, tienes {negativeSum} horas en contra
+          </Text>
+        )}
+      </VStack>
+    )
+  }
+
+  const Progress = () => (
     <VStack
       spacing={10}
       key="Progress"
@@ -93,81 +128,148 @@ export default UserProgress = ({ navigation, route }) => {
     </VStack>
   )
 
-  const Activity = () => {
+  // const Activity = () => {
+  //   return (
+  //     <Flex key="Activity">
+  //       <Flex pv={20}>
+  //         <Text variant="titleMedium">Actividades realizadas</Text>
+  //       </Flex>
+  //       <VStack
+  //         spacing={25}
+  //         key="Activity"
+  //       >
+  //         {activities.length > 0 ? (
+  //           <VStack spacing={10}>
+  //             {activities.map((activity) => (
+  //               <Card
+  //                 mode="outlined"
+  //                 key={activity._id}
+  //               >
+  //                 <HStack
+  //                   spacing={20}
+  //                   p={20}
+  //                 >
+  //                   <VStack items="center">
+  //                     <Avatar.Text
+  //                       label={activity?.hours}
+  //                       size={50}
+  //                     />
+  //                     <Text
+  //                       variant="bodyMedium"
+  //                       style={{ textAlign: "center" }}
+  //                     >
+  //                       hrs
+  //                     </Text>
+  //                   </VStack>
+  //                   <Flex fill>
+  //                     <Text
+  //                       variant="titleMedium"
+  //                       numberOfLines={2}
+  //                     >
+  //                       {activity?.activity_name}
+  //                     </Text>
+  //                     <Text
+  //                       variant="bodyMedium"
+  //                       numberOfLines={1}
+  //                     >
+  //                       {LongDate(activity?.assignation_date)}
+  //                     </Text>
+  //                     <Text
+  //                       variant="bodyMedium"
+  //                       numberOfLines={1}
+  //                     >
+  //                       {Time24(activity?.assignation_date)}
+  //                     </Text>
+  //                     <Text
+  //                       variant="bodyMedium"
+  //                       numberOfLines={1}
+  //                     >
+  //                       {activity?.responsible_name}
+  //                     </Text>
+  //                   </Flex>
+  //                 </HStack>
+  //               </Card>
+  //             ))}
+  //           </VStack>
+  //         ) : (
+  //           <InformationMessage
+  //             key="NoProgress"
+  //             title="Sin actividades"
+  //             description="Todavía no tines actividades realizadas, cuando completes algunas, estas aparecerán aquí"
+  //             icon="alert"
+  //           />
+  //         )}
+  //       </VStack>
+  //     </Flex>
+  //   )
+  // }
+
+  const Activities = () => (
+    <Card
+      key="Latest activities"
+      mode="outlined"
+    >
+      <Flex p={20}>
+        <Text variant="titleMedium">Actividades realizadas</Text>
+      </Flex>
+      <VStack pb={20}>
+        {activities?.map((activity) => (
+          <Activity
+            key={activity._id}
+            activity={activity}
+          />
+        ))}
+      </VStack>
+    </Card>
+  )
+
+  const Activity = useCallback(({ activity }) => {
     return (
-      <Flex key="Activity">
-        <Flex pv={20}>
-          <Text variant="titleMedium">Actividades realizadas</Text>
-        </Flex>
-        <VStack
-          spacing={25}
-          key="Activity"
-        >
-          {activities.length > 0 ? (
-            <VStack spacing={10}>
-              {activities.map((activity) => (
-                <Card
-                  mode="outlined"
-                  key={activity._id}
-                >
-                  <HStack
-                    spacing={20}
-                    p={20}
-                  >
-                    <VStack items="center">
-                      <Avatar.Text
-                        label={activity?.hours}
-                        size={50}
-                      />
-                      <Text
-                        variant="bodyMedium"
-                        style={{ textAlign: "center" }}
-                      >
-                        hrs
-                      </Text>
-                    </VStack>
-                    <Flex fill>
-                      <Text
-                        variant="titleMedium"
-                        numberOfLines={2}
-                      >
-                        {activity?.activity_name}
-                      </Text>
-                      <Text
-                        variant="bodyMedium"
-                        numberOfLines={1}
-                      >
-                        {LongDate(activity?.assignation_date)}
-                      </Text>
-                      <Text
-                        variant="bodyMedium"
-                        numberOfLines={1}
-                      >
-                        {Time24(activity?.assignation_date)}
-                      </Text>
-                      <Text
-                        variant="bodyMedium"
-                        numberOfLines={1}
-                      >
-                        {activity?.responsible_name}
-                      </Text>
-                    </Flex>
-                  </HStack>
-                </Card>
-              ))}
+      <Flex style={{ borderRadius: 10, overflow: "hidden" }}>
+        <TouchableRipple onPress={() => null}>
+          <HStack
+            spacing={10}
+            mh={20}
+            mv={10}
+          >
+            <VStack
+              spacing={5}
+              center
+            >
+              <Avatar.Text
+                label={activity?.hours}
+                size={50}
+                style={{ backgroundColor: activity?.hours <= 0 ? theme.colors.error : theme.colors.primary }}
+              />
+              <Text variant="labelMedium">hrs</Text>
             </VStack>
-          ) : (
-            <InformationMessage
-              key="NoProgress"
-              title="Sin actividades"
-              description="Todavía no tines actividades realizadas, cuando completes algunas, estas aparecerán aquí"
-              icon="alert"
-            />
-          )}
-        </VStack>
+            <VStack fill>
+              <Text
+                variant="bodyMedium"
+                numberOfLines={1}
+              >
+                {activity?.activity_name}
+              </Text>
+
+              <Text
+                variant="bodyMedium"
+                numberOfLines={1}
+              >
+                Por {activity?.responsible_name}
+              </Text>
+
+              <Text
+                variant="bodyMedium"
+                numberOfLines={1}
+              >
+                El {ShortDate(activity?.assignation_date)} a las {Time24(activity?.assignation_date)}
+              </Text>
+            </VStack>
+          </HStack>
+        </TouchableRipple>
       </Flex>
     )
-  }
+  }, [])
 
   return (
     <Flex
@@ -187,7 +289,7 @@ export default UserProgress = ({ navigation, route }) => {
             // isNaN(activities) ? (
             <DisplayDetails
               title="Tu progreso"
-              children={[ProgressRing(), Activity()]}
+              children={[Title(), Progress(), Activities()]}
               showHeader={false}
             />
           ) : (

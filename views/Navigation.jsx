@@ -38,7 +38,7 @@ import EditSchool from "./Schools/EditSchool"
 // Users
 import Users from "./Users/Users"
 import AddUser from "./Users/AddUser"
-import UserDetails from "./Users/UserDetails"
+import UserDetails, { CardProvider } from "./Users/UserDetails"
 import EditUser from "./Users/EditUser"
 
 // Attendance
@@ -69,266 +69,268 @@ export default Navigation = () => {
   return (
     <ApplicationProvider>
       <CacheProvider>
-        <Stack.Navigator initialRouteName="Login">
-          {/*Authentication */}
-          <Stack.Group
-            navigationKey="authentication"
-            screenOptions={{ headerShown: false, animation: "fade_from_bottom", animationTypeForReplace: "pop" }}
-          >
-            <Stack.Screen
-              name="Login"
-              component={Login}
-              options={{ animation: "fade_from_bottom" }}
-            />
-            <Stack.Screen
-              name="ResetPassword"
-              component={ResetPassword}
-              options={{ headerShown: false, presentation: "containedTransparentModal" }}
-            />
-            <Stack.Screen
-              name="SetNewPassword"
-              component={SetNewPassword}
-              options={{ headerShown: false, presentation: "containedTransparentModal" }}
-            />
-            <Stack.Screen
-              name="FirstAccess"
-              component={FirstAccess}
-              options={{ headerShown: false }}
-            />
-          </Stack.Group>
+        <CardProvider>
+          <Stack.Navigator initialRouteName="Login">
+            {/*Authentication */}
+            <Stack.Group
+              navigationKey="authentication"
+              screenOptions={{ headerShown: false, animation: "fade_from_bottom", animationTypeForReplace: "pop" }}
+            >
+              <Stack.Screen
+                name="Login"
+                component={Login}
+                options={{ animation: "fade_from_bottom" }}
+              />
+              <Stack.Screen
+                name="ResetPassword"
+                component={ResetPassword}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+              <Stack.Screen
+                name="SetNewPassword"
+                component={SetNewPassword}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+              <Stack.Screen
+                name="FirstAccess"
+                component={FirstAccess}
+                options={{ headerShown: false }}
+              />
+            </Stack.Group>
 
-          {/* Dashboard */}
-          <Stack.Group
-            navigationKey="dashboard"
-            screenOptions={{ headerShown: false, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
-          >
-            <Stack.Screen
-              name="Dashboard"
-              component={Dashboard}
-            />
-          </Stack.Group>
+            {/* Dashboard */}
+            <Stack.Group
+              navigationKey="dashboard"
+              screenOptions={{ headerShown: false, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
+            >
+              <Stack.Screen
+                name="Dashboard"
+                component={Dashboard}
+              />
+            </Stack.Group>
 
-          {/* Schools */}
-          <Stack.Group
-            navigationKey="schools"
-            screenOptions={{ headerShown: true, animation: "fade_from_bottom", animationTypeForReplace: "pop" }}
-          >
-            <Stack.Screen
-              name="Schools"
-              component={Schools}
-            />
-            <Stack.Screen
-              name="SchoolDetails"
-              component={SchoolDetails}
-            />
-            <Stack.Screen
-              name="AddSchool"
-              component={AddSchool}
-              options={{ headerShown: false, presentation: "containedTransparentModal" }}
-            />
-            <Stack.Screen
-              name="EditSchool"
-              component={EditSchool}
-              options={{ headerShown: false, presentation: "containedTransparentModal" }}
-            />
-          </Stack.Group>
+            {/* Schools */}
+            <Stack.Group
+              navigationKey="schools"
+              screenOptions={{ headerShown: true, animation: "fade_from_bottom", animationTypeForReplace: "pop" }}
+            >
+              <Stack.Screen
+                name="Schools"
+                component={Schools}
+              />
+              <Stack.Screen
+                name="SchoolDetails"
+                component={SchoolDetails}
+              />
+              <Stack.Screen
+                name="AddSchool"
+                component={AddSchool}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+              <Stack.Screen
+                name="EditSchool"
+                component={EditSchool}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+            </Stack.Group>
 
-          {/* Events */}
-          <Stack.Group
-            navigationKey="events"
-            screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
-          >
-            <Stack.Screen
-              name="Events"
-              component={Events}
-            />
-            <Stack.Screen
-              name="EventDetails"
-              component={EventDetails}
-            />
-            <Stack.Screen
-              name="AddEvent"
-              component={AddEvent}
-              options={{ headerShown: false, presentation: "containedTransparentModal" }}
-            />
-            <Stack.Screen
-              name="EditEvent"
-              component={EditEvent}
-              options={{ headerShown: false, presentation: "containedTransparentModal" }}
-            />
-            <Stack.Screen
-              name="AddAttendee"
-              component={AddAttendee}
-              options={{ headerShown: false, presentation: "containedTransparentModal" }}
-            />
-          </Stack.Group>
+            {/* Events */}
+            <Stack.Group
+              navigationKey="events"
+              screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
+            >
+              <Stack.Screen
+                name="Events"
+                component={Events}
+              />
+              <Stack.Screen
+                name="EventDetails"
+                component={EventDetails}
+              />
+              <Stack.Screen
+                name="AddEvent"
+                component={AddEvent}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+              <Stack.Screen
+                name="EditEvent"
+                component={EditEvent}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+              <Stack.Screen
+                name="AddAttendee"
+                component={AddAttendee}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+            </Stack.Group>
 
-          {/* Places and areas */}
-          <Stack.Group
-            navigationKey="placesAndAreas"
-            screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
-          >
-            <Stack.Screen
-              name="PlacesAndAreas"
-              component={PlacesAndAreas}
-            />
-            <Stack.Screen
-              name="PlaceDetails"
-              component={PlaceDetails}
-            />
-            <Stack.Screen
-              name="AddPlace"
-              component={AddPlace}
-              options={{ headerShown: false, presentation: "containedTransparentModal" }}
-            />
-            <Stack.Screen
-              name="EditPlace"
-              component={EditPlace}
-              options={{ headerShown: false, presentation: "containedTransparentModal" }}
-            />
-            <Stack.Screen
-              name="AddArea"
-              component={AddArea}
-              options={{ headerShown: false, presentation: "containedTransparentModal" }}
-            />
-            <Stack.Screen
-              name="EditArea"
-              component={EditArea}
-              options={{ headerShown: false, presentation: "containedTransparentModal" }}
-            />
-          </Stack.Group>
+            {/* Places and areas */}
+            <Stack.Group
+              navigationKey="placesAndAreas"
+              screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
+            >
+              <Stack.Screen
+                name="PlacesAndAreas"
+                component={PlacesAndAreas}
+              />
+              <Stack.Screen
+                name="PlaceDetails"
+                component={PlaceDetails}
+              />
+              <Stack.Screen
+                name="AddPlace"
+                component={AddPlace}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+              <Stack.Screen
+                name="EditPlace"
+                component={EditPlace}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+              <Stack.Screen
+                name="AddArea"
+                component={AddArea}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+              <Stack.Screen
+                name="EditArea"
+                component={EditArea}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+            </Stack.Group>
 
-          {/* Users */}
-          <Stack.Group
-            navigationKey="users"
-            screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
-          >
-            <Stack.Screen
-              name="Users"
-              component={Users}
-            />
-            <Stack.Screen
-              name="UserDetails"
-              component={UserDetails}
-            />
-            <Stack.Screen
-              name="AddUser"
-              component={AddUser}
-              options={{ headerShown: false, presentation: "containedTransparentModal" }}
-            />
-            <Stack.Screen
-              name="EditUser"
-              component={EditUser}
-              options={{ headerShown: false, presentation: "containedTransparentModal" }}
-            />
-          </Stack.Group>
+            {/* Profile */}
+            <Stack.Group
+              navigationKey="profile"
+              screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
+            >
+              <Stack.Screen
+                name="Profile"
+                component={Profile}
+              />
+              <Stack.Screen
+                name="UpdatePassword"
+                component={UpdatePassword}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+            </Stack.Group>
 
-          {/* Profile */}
-          <Stack.Group
-            navigationKey="profile"
-            screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
-          >
-            <Stack.Screen
-              name="Profile"
-              component={Profile}
-            />
-            <Stack.Screen
-              name="UpdatePassword"
-              component={UpdatePassword}
-              options={{ headerShown: false, presentation: "containedTransparentModal" }}
-            />
-          </Stack.Group>
+            {/* Users */}
+            <Stack.Group
+              navigationKey="users"
+              screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
+            >
+              <Stack.Screen
+                name="Users"
+                component={Users}
+              />
+              <Stack.Screen
+                name="UserDetails"
+                component={UserDetails}
+              />
+              <Stack.Screen
+                name="AddUser"
+                component={AddUser}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+              <Stack.Screen
+                name="EditUser"
+                component={EditUser}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+            </Stack.Group>
 
-          {/* Cards */}
-          <Stack.Group
-            navigationKey="cards"
-            screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
-          >
-            <Stack.Screen
-              name="Cards"
-              component={Cards}
-            />
-            <Stack.Screen
-              name="CardDetails"
-              component={CardDetails}
-            />
-            <Stack.Screen
-              name="UserProgress"
-              component={UserProgress}
-            />
-            <Stack.Screen
-              name="EditCard"
-              component={EditCard}
-              options={{ headerShown: false, presentation: "containedTransparentModal" }}
-            />
-            <Stack.Screen
-              name="AddCard"
-              component={AddCard}
-              options={{ headerShown: false, presentation: "containedTransparentModal" }}
-            />
-          </Stack.Group>
+            {/* Cards */}
+            <Stack.Group
+              navigationKey="cards"
+              screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
+            >
+              <Stack.Screen
+                name="Cards"
+                component={Cards}
+              />
+              <Stack.Screen
+                name="CardDetails"
+                component={CardDetails}
+              />
+              <Stack.Screen
+                name="UserProgress"
+                component={UserProgress}
+              />
+              <Stack.Screen
+                name="EditCard"
+                component={EditCard}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+              <Stack.Screen
+                name="AddCard"
+                component={AddCard}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+            </Stack.Group>
 
-          {/* Attendance */}
-          <Stack.Group
-            navigationKey="attendance"
-            screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
-          >
-            <Stack.Screen
-              name="AttendanceDetails"
-              component={AttendanceDetails}
-            />
-            <Stack.Screen
-              name="EditAttendance"
-              component={EditAttendance}
-              options={{ headerShown: false, presentation: "containedTransparentModal" }}
-            />
-            <Stack.Screen
-              name="TakeAttendance"
-              component={TakeAttendance}
-            />
-            <Stack.Screen
-              name="ScanAttendance"
-              component={ScanAttendance}
-              options={{ headerShown: false, presentation: "containedTransparentModal" }}
-            />
-            <Stack.Screen
-              name="AttendanceProximityClient"
-              component={AttendanceProximityClient}
-              options={{ headerShown: false, presentation: "containedTransparentModal" }}
-            />
-            <Stack.Screen
-              name="ShowAttendanceCode"
-              component={ShowAttendanceCode}
-              options={{ headerShown: false, presentation: "containedTransparentModal" }}
-            />
+            {/* Attendance */}
+            <Stack.Group
+              navigationKey="attendance"
+              screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
+            >
+              <Stack.Screen
+                name="AttendanceDetails"
+                component={AttendanceDetails}
+              />
+              <Stack.Screen
+                name="EditAttendance"
+                component={EditAttendance}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+              <Stack.Screen
+                name="TakeAttendance"
+                component={TakeAttendance}
+              />
+              <Stack.Screen
+                name="ScanAttendance"
+                component={ScanAttendance}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+              <Stack.Screen
+                name="AttendanceProximityClient"
+                component={AttendanceProximityClient}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+              <Stack.Screen
+                name="ShowAttendanceCode"
+                component={ShowAttendanceCode}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
 
-            {/* <Stack.Screen name="UpdatePassword" component={UpdatePassword} options={{ headerShown: false, presentation: 'containedTransparentModal' }} /> */}
-          </Stack.Group>
+              {/* <Stack.Screen name="UpdatePassword" component={UpdatePassword} options={{ headerShown: false, presentation: 'containedTransparentModal' }} /> */}
+            </Stack.Group>
 
-          <Stack.Group
-            navigationKey="Forms"
-            screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
-          >
-            <Stack.Screen
-              name="Forms"
-              component={Forms}
-            />
-            <Stack.Screen
-              name="FormDetails"
-              component={FormDetails}
-            />
-            <Stack.Screen
-              name="AddForm"
-              component={AddForm}
-              options={{ headerShown: false, presentation: "containedTransparentModal" }}
-            />
-            <Stack.Screen
-              name="EditForm"
-              component={EditForm}
-              options={{ headerShown: false, presentation: "containedTransparentModal" }}
-            />
-          </Stack.Group>
-        </Stack.Navigator>
+            <Stack.Group
+              navigationKey="Forms"
+              screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
+            >
+              <Stack.Screen
+                name="Forms"
+                component={Forms}
+              />
+              <Stack.Screen
+                name="FormDetails"
+                component={FormDetails}
+              />
+              <Stack.Screen
+                name="AddForm"
+                component={AddForm}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+              <Stack.Screen
+                name="EditForm"
+                component={EditForm}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+            </Stack.Group>
+          </Stack.Navigator>
+        </CardProvider>
       </CacheProvider>
     </ApplicationProvider>
   )

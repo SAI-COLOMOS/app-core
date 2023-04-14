@@ -86,7 +86,7 @@ export default SchoolDetails = ({ icon, image, title, children, actions, avatar,
           {showHeader != false && (
             <Flex
               fill
-              center
+              // center
             >
               {image && <Flex h={200} />}
 
@@ -105,7 +105,7 @@ export default SchoolDetails = ({ icon, image, title, children, actions, avatar,
           {showHeader != false && (
             <Text
               variant="headlineSmall"
-              style={{ textAlign: "center" }}
+              // style={{ textAlign: "center" }}
             >
               {title}
             </Text>

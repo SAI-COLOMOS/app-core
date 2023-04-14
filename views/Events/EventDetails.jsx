@@ -313,7 +313,7 @@ export default EventDetails = ({ navigation, route }) => {
             </Flex>
           )}
         </VStack>
-      ) : event?.attendance?.status != "Por comenzar" || event?.attendance?.status != "En proceso" || event?.attendance?.status != "Concluido" || event?.attendance?.status != "Concluido por sistema" ? (
+      ) : event?.attendance?.status != "Por comenzar" && event?.attendance?.status != "En proceso" && event?.attendance?.status != "Concluido" && event?.attendance?.status != "Concluido por sistema" ? (
         <InformationMessage
           icon="account-outline"
           title="Sin inscripciones"
@@ -323,21 +323,23 @@ export default EventDetails = ({ navigation, route }) => {
           buttonIcon="plus"
         />
       ) : (
-        <InformationMessage
-          icon="account-alert-outline"
-          title="Sin inscripciones"
-          description="Este evento no tiene a ningún participante"
-        />
+        <Flex pb={20}>
+          <InformationMessage
+            icon="account-alert-outline"
+            title="Sin inscripciones"
+            description="Este evento no tiene a ningún participante"
+          />
+        </Flex>
       )}
     </Card>
   )
 
   const Subscribe = () => (
-    <>
+    <Flex key="Subscribe">
       {
         {
-          Encargado: <ManagerOptions />,
-          Prestador: <ProviderOptions />
+          Encargado: <ManagerOptions key="M" />,
+          Prestador: <ProviderOptions key="P" />
         }[user?.role]
       }
       {/* 
@@ -350,7 +352,7 @@ export default EventDetails = ({ navigation, route }) => {
             Registrar asistencia
           </Button>
         ) :  */}
-    </>
+    </Flex>
   )
 
   /* Componentes de componentes */
@@ -486,7 +488,11 @@ export default EventDetails = ({ navigation, route }) => {
     const [status, setStatus] = useState(event?.attendance.attendee_list.find((item) => item.attendee_register == user.register).status)
 
     return (
-      <>
+      <VStack
+        fill
+        key="Provider"
+        spacing={20}
+      >
         {event?.attendance?.status == "Disponible" &&
           (event?.attendance.attendee_list.find((item) => {
             if (item.attendee_register == user.register) {
@@ -530,16 +536,18 @@ export default EventDetails = ({ navigation, route }) => {
                 <Text variant="titleMedium">Estado de la asistencia</Text>
                 <Text variant="bodyMedium">{status == "Inscrito" ? "Sin asistencia" : status}</Text>
               </Flex>
-              <Button
-                onPress={() => navigation.navigate("ShowAttendanceCode")}
-                mode="contained"
-              >
-                Tomar asistencia
-              </Button>
+              {status == "Inscrito" && (
+                <Button
+                  onPress={() => navigation.navigate("ShowAttendanceCode", { getEvent })}
+                  mode="contained"
+                >
+                  Tomar asistencia
+                </Button>
+              )}
             </VStack>
           </Card>
         )}
-      </>
+      </VStack>
     )
   }
 
