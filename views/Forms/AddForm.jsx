@@ -244,18 +244,6 @@ export default AddForm = ({ navigation, route }) => {
     setEnum_options(opcionesActualizadas)
   }
 
-  // const addAnswerOptions = (questionIndex, nuevaOpcion, setNewAnswerOption) => {
-  //   const updatedAnswer = {
-  //     ...questions[questionIndex],
-  //     enum_options: [...questions[questionIndex].enum_options, nuevaOpcion]
-  //   }
-
-  //   const updatedAnswers = [...questions]
-  //   updatedAnswers[questionIndex] = updatedAnswer
-  //   setQuestions(updatedAnswers)
-  //   setNewAnswerOption("Presionado")
-  // }
-
   const addOption = (nuevaOpcion, setNewAnswerOption) => {
     if (nuevaOpcion.trim() !== "") {
       setQuestions((questions) => {
