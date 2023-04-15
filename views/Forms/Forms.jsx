@@ -46,7 +46,7 @@ export default Forms = ({ navigation, route }) => {
 
     if (request?.forms) {
       setForms(request.forms)
-      console.log(request)
+      // console.log(request)
     } else {
       setForms(request)
     }
