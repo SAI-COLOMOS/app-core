@@ -1,5 +1,5 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
-import { useEffect, useState, useContext, Component } from "react"
+import { useEffect, useState, useContext, Component, useFocusEffect, useCallback } from "react"
 import { Button, Text, TextInput, useTheme, IconButton } from "react-native-paper"
 import CreateForm from "../Shared/CreateForm"
 import Constants from "expo-constants"
@@ -9,11 +9,11 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import ApplicationContext from "../ApplicationContext"
 import { event } from "react-native-reanimated"
 
-const defaultQuestion = {
-  interrogation: "",
-  question_type: "Abierta",
-  enum_options: []
-}
+// const defaultQuestion = {
+//   interrogation: "Nombre",
+//   question_type: "Abierta",
+//   enum_options: []
+// }
 
 export default AddForm = ({ navigation, route }) => {
   const theme = useTheme()
@@ -59,6 +59,7 @@ export default AddForm = ({ navigation, route }) => {
   const [responseCode, setResponseCode] = useState("")
 
   async function SaveForm() {
+    // elimnarVacio()
     const request = await fetch(`${localhost}/forms`, {
       method: "POST",
       headers: {
@@ -123,7 +124,7 @@ export default AddForm = ({ navigation, route }) => {
             numberOfLines={5}
             autoCapitalize="sentences"
           />
-          <TextInput
+          {/* <TextInput
             mode="outlined"
             value={belonging_place}
             onChangeText={setBelonging_place}
@@ -137,7 +138,7 @@ export default AddForm = ({ navigation, route }) => {
             onChangeText={setBeging_area}
             maxLength={150}
             label="Área de origen"
-          />
+          /> */}
           <TextInput
             mode="outlined"
             value={belonging_event_identifier}
@@ -178,6 +179,7 @@ export default AddForm = ({ navigation, route }) => {
       // disabled={modalLoading || !verified}
       loading={modalLoading}
       onPress={() => {
+        // elimnarVacio()
         SaveForm()
       }}
     >
@@ -198,6 +200,14 @@ export default AddForm = ({ navigation, route }) => {
     </Button>
   )
 
+  const elimnarVacio = () => {
+    setQuestions((questions) => {
+      const nuevosDatos = questions.filter((dato) => dato.interrogation.trim() !== "")
+      return nuevosDatos
+    })
+    // console.log("Si entra")
+  }
+
   const addQuestion = (interrogation, setInterrogation, question_type, enum_options, setEnum_options) => {
     const newQuestion = {
       interrogation: interrogation,
@@ -206,7 +216,7 @@ export default AddForm = ({ navigation, route }) => {
     }
 
     const updatedQuestions = [...questions]
-    updatedQuestions.unshift(newQuestion)
+    updatedQuestions.push(newQuestion)
     setQuestions(updatedQuestions)
     setInterrogation("")
     // setEnum_options("")
@@ -234,16 +244,29 @@ export default AddForm = ({ navigation, route }) => {
     setEnum_options(opcionesActualizadas)
   }
 
-  const addAnswerOptions = (questionIndex, nuevaOpcion, setNewAnswerOption) => {
-    const updatedAnswer = {
-      ...questions[questionIndex],
-      enum_options: [...questions[questionIndex].enum_options, nuevaOpcion]
-    }
+  // const addAnswerOptions = (questionIndex, nuevaOpcion, setNewAnswerOption) => {
+  //   const updatedAnswer = {
+  //     ...questions[questionIndex],
+  //     enum_options: [...questions[questionIndex].enum_options, nuevaOpcion]
+  //   }
 
-    const updatedAnswers = [...questions]
-    updatedAnswers[questionIndex] = updatedAnswer
-    setQuestions(updatedAnswers)
-    setNewAnswerOption("Presionado")
+  //   const updatedAnswers = [...questions]
+  //   updatedAnswers[questionIndex] = updatedAnswer
+  //   setQuestions(updatedAnswers)
+  //   setNewAnswerOption("Presionado")
+  // }
+
+  const addOption = (nuevaOpcion, setNewAnswerOption) => {
+    if (nuevaOpcion.trim() !== "") {
+      setQuestions((questions) => {
+        const nuevosDatos = [...questions]
+        nuevosDatos.forEach((dato) => {
+          dato.enum_options.push(nuevaOpcion)
+        })
+        return nuevosDatos
+      })
+      setNewAnswerOption("")
+    }
   }
 
   const Item = ({ questionIndex, question }) => {
@@ -288,7 +311,8 @@ export default AddForm = ({ navigation, route }) => {
               <IconButton //Boton agregar respuesta
                 icon="database-plus-outline"
                 mode="contained"
-                onPress={(_) => addAnswerOptions(questionIndex, newAnswerOption, setNewAnswerOption)}
+                // onPress={(_) => addAnswerOptions(questionIndex, newAnswerOption, setNewAnswerOption)}
+                onPress={(_) => addOption(newAnswerOption, setNewAnswerOption)}
               />
 
               <IconButton //Boton agregar pregunta
@@ -299,7 +323,7 @@ export default AddForm = ({ navigation, route }) => {
               <IconButton //Boton modificar pregunta
                 icon="file-document-edit-outline"
                 mode="contained"
-                onPress={(_) => changeQuestion(questionIndex, interrogation)}
+                // onPress={(_) => changeQuestion(questionIndex, interrogation)}
               />
               {questionIndex > 0 && (
                 <IconButton //Boton eliminar pregunta
@@ -329,7 +353,7 @@ export default AddForm = ({ navigation, route }) => {
               <IconButton
                 icon="file-document-edit-outline"
                 mode="contained"
-                onPress={(_) => changeQuestion(questionIndex)}
+                // onPress={(_) => changeQuestion(questionIndex)}
               />
               {questionIndex > 0 && (
                 <IconButton
