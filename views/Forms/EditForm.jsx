@@ -46,9 +46,13 @@ export default EditForm = ({ navigation, route }) => {
       option: "Escala"
     }
   ]
-  const [modalSuccess, setModalSuccess] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [modalConfirm, setModalConfirm] = useState(false)
   const [modalLoading, setModalLoading] = useState(false)
+  const [modalSuccess, setModalSuccess] = useState(false)
+  const [modalSuccessDelete, setModalSuccessDelete] = useState(false)
   const [modalError, setModalError] = useState(false)
+  const [modalErrorDelete, setModalErrorDelete] = useState(false)
   const [modalFatal, setModalFatal] = useState(false)
   const [responseCode, setResponseCode] = useState("")
 
@@ -74,7 +78,7 @@ export default EditForm = ({ navigation, route }) => {
       .then((response) => response.json() /*response.status*/)
       .catch((error) => console.error("Error: ", error))
 
-    console.log(request)
+    // console.log(request)
 
     if (request == 201) {
       setModalSuccess(true)
@@ -164,6 +168,35 @@ export default EditForm = ({ navigation, route }) => {
     )
   }
 
+  async function deleteForm() {
+    const request = await fetch(`${localhost}/forms/${form.form_identifier}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        "Cache-Control": "no-cache"
+      },
+      body: JSON.stringify({
+        isTemplate
+      })
+    })
+      .then((response) => /*response.json()*/ response.status)
+      .catch((error) => console.error("Error: ", error))
+
+    // console.log(request)
+
+    if (request == 201) {
+      setModalSuccess(true)
+    } else if (request != null) {
+      setResponseCode(request)
+      setModalError(true)
+    } else {
+      setModalFatal(true)
+    }
+  }
+
+  ////// Funciones para las preguntas //////
+
   const addQuestion = (interrogation, setInterrogation, question_type, enum_options, setEnum_options) => {
     const newQuestion = {
       interrogation: interrogation,
@@ -192,12 +225,6 @@ export default EditForm = ({ navigation, route }) => {
 
   const deleteQuestion = (questionIndex) => {
     setQuestions(questions.filter((_, i) => i !== questionIndex))
-  }
-
-  const modificarOpcionRespuesta = (e, index, enum_options, setEnum_options) => {
-    const opcionesActualizadas = [...enum_options]
-    opcionesActualizadas[index] = e.target.value
-    setEnum_options(opcionesActualizadas)
   }
 
   const addAnswerOptions = (questionIndex, nuevaOpcion, setNewAnswerOption) => {
@@ -311,6 +338,27 @@ export default EditForm = ({ navigation, route }) => {
     )
   }
 
+  const Delete = () => (
+    <VStack
+      key="Delete"
+      spacing={5}
+    >
+      <Text variant="labelLarge">Eliminar al formulario</Text>
+      <VStack spacing={10}>
+        <Button
+          textColor={theme.colors.error}
+          icon="trash-can-outline"
+          mode="outlined"
+          onPress={() => {
+            setModalConfirm(!modalConfirm)
+          }}
+        >
+          Eliminar
+        </Button>
+      </VStack>
+    </VStack>
+  )
+
   const Save = () => (
     <Button
       key="SaveButton"
@@ -343,9 +391,89 @@ export default EditForm = ({ navigation, route }) => {
     <Flex fill>
       <CreateForm
         title="Editar formulario"
-        children={[FormData()]}
+        children={[FormData(), Delete()]}
         actions={[Save(), Cancel()]}
         navigation={navigation}
+      />
+
+      <ModalMessage
+        title="Eliminar formulario"
+        description="¿Seguro que deseas eliminar este formulario? La acción no se puede deshacer"
+        handler={[modalConfirm, () => setModalConfirm(!modalConfirm)]}
+        actions={[
+          ["Cancelar", () => setModalConfirm(!modalConfirm)],
+          [
+            "Aceptar",
+            () => {
+              setModalConfirm(!modalConfirm)
+              deleteForm()
+            }
+          ]
+        ]}
+        dismissable={true}
+        icon="help-circle-outline"
+      />
+
+      <ModalMessage
+        title="¡Listo!"
+        description="El formulario ha sido actualizado"
+        handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]}
+        actions={[
+          [
+            "Aceptar",
+            () => {
+              getForm()
+              getForms()
+              navigation.pop()
+            }
+          ]
+        ]}
+        dismissable={false}
+        icon="check-circle-outline"
+      />
+
+      <ModalMessage
+        title="¡Listo!"
+        description="El formulario ha sido eliminado"
+        handler={[modalSuccessDelete, () => setModalSuccessDelete(!modalSuccessDelete)]}
+        actions={[
+          [
+            "Aceptar",
+            () => {
+              navigation.pop(2)
+              getForms()
+            }
+          ]
+        ]}
+        dismissable={false}
+        icon="check-circle-outline"
+      />
+
+      <ModalMessage
+        title="Ocurrió un problema"
+        description={`No pudimos actualizar al formulario, inténtalo más tarde. (${responseCode})`}
+        handler={[modalError, () => setModalError(!modalError)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="close-circle-outline"
+      />
+
+      <ModalMessage
+        title="Ocurrió un problema"
+        description={`No pudimos eliminar al formulario, inténtalo más tarde. (${responseCode})`}
+        handler={[modalErrorDelete, () => setModalErrorDelete(!modalErrorDelete)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="close-circle-outline"
+      />
+
+      <ModalMessage
+        title="Sin conexión a internet"
+        description={`Parece que no tienes conexión a internet, conéctate e intenta de nuevo`}
+        handler={[modalFatal, () => setModalFatal(!modalFatal)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="wifi-alert"
       />
     </Flex>
   )
