@@ -116,7 +116,7 @@ export default FormDetails = ({ navigation, route }) => {
         spacing={15}
       >
         {form.questions.length > 0 ? (
-          form.questions.map((ask) => (
+          form.questions.map((ask, index) => (
             <Card
               mode="outlined"
               key={ask.interrogation}
@@ -126,7 +126,7 @@ export default FormDetails = ({ navigation, route }) => {
                 spacing={10}
               >
                 <Flex>
-                  <Text variant="labelSmall">Pregunta</Text>
+                  <Text variant="labelSmall">Pregunta {index + 1}</Text>
                   <Text variant="bodyMedium">{ask?.interrogation}</Text>
                 </Flex>
                 <Flex>
@@ -135,11 +135,19 @@ export default FormDetails = ({ navigation, route }) => {
                 </Flex>
                 <Flex>
                   {ask?.question_type == "Opción múltiple" || ask?.question_type == "Selección múltiple" || ask?.question_type == "Escala" ? (
-                    <Flex>
+                    <VStack pb={5}>
                       <Text variant="labelSmall">Respuestas</Text>
-                      <Text variant="bodyMedium">{ask?.enum_options}</Text>
-                    </Flex>
+                    </VStack>
                   ) : null}
+                  {ask?.question_type == "Opción múltiple" || ask?.question_type == "Selección múltiple" || ask?.question_type == "Escala"
+                    ? ask?.enum_options.map((opt, index) => (
+                        <Flex>
+                          <Text variant="bodyMedium">
+                            {index + 1}.- {opt}
+                          </Text>
+                        </Flex>
+                      ))
+                    : null}
                 </Flex>
               </VStack>
             </Card>
