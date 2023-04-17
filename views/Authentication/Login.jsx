@@ -8,13 +8,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 import Constants from "expo-constants"
 import * as Linking from "expo-linking"
 import ModalMessage from "../Shared/ModalMessage"
-import UserContext from "../ApplicationContext"
+import ApplicationContext from "../ApplicationContext"
 
 export default Login = ({ navigation }) => {
-  const userContext = useContext(UserContext)
+  const { host, setToken, setRegister } = useContext(ApplicationContext)
   const insets = useSafeAreaInsets()
   const theme = useTheme()
-  const localhost = Constants.expoConfig.extra.API_LOCAL
   const url = Linking.useURL()
 
   const [credential, setCredential] = useState("")
@@ -33,7 +32,7 @@ export default Login = ({ navigation }) => {
     try {
       setModalLoading(true)
 
-      const request = await fetch(`${localhost}/auth/login`, {
+      const request = await fetch(`${host}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -52,8 +51,8 @@ export default Login = ({ navigation }) => {
         const response = await request.json()
         const payload = jwtDecode(response.token)
 
-        userContext.setToken(response.token)
-        userContext.setRegister(payload.register)
+        setToken(response.token)
+        setRegister(payload.register)
 
         if (rememberUser == true) {
           await SecureStore.setItemAsync("token", response.token)
@@ -95,8 +94,8 @@ export default Login = ({ navigation }) => {
 
         if (payload.exp > Math.floor(Date.now() / 1000)) {
           //await SecureStore.setItemAsync("register", payload.register)
-          userContext.setRegister(payload.register)
-          userContext.setToken(token)
+          setRegister(payload.register)
+          setToken(token)
           setActiveSession(true)
           navigation.replace("Dashboard")
         }

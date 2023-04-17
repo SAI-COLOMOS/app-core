@@ -9,8 +9,7 @@ import ApplicationContext from "../ApplicationContext"
 
 export default UpdatePassword = ({ navigation, route }) => {
   const theme = useTheme()
-  const localhost = Constants.expoConfig.extra.API_LOCAL
-  const { token, register } = useContext(ApplicationContext)
+  const { host, token, register } = useContext(ApplicationContext)
 
   const [newPassword, setNewPassword] = useState("")
   const [showNewPassword, setShowNewPassword] = useState(false)
@@ -32,7 +31,7 @@ export default UpdatePassword = ({ navigation, route }) => {
   async function updatePassword() {
     setModalLoading(true)
 
-    const request = await fetch(`${localhost}/users/${register}/password`, {
+    const request = await fetch(`${host}/users/${register}/password`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",

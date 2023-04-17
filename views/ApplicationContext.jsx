@@ -1,4 +1,5 @@
-import { createContext, useState } from "react"
+import { createContext, useMemo, useState } from "react"
+import Constants from "expo-constants"
 
 const ApplicationContext = createContext()
 
@@ -8,7 +9,21 @@ const ApplicationProvider = ({ children }) => {
   const [token, setToken] = useState(null)
   const [achieved_hours, setAchieved_hours] = useState(0)
 
+  const host = useMemo(() => {
+    switch (Constants.expoConfig.extra.environment) {
+      case "production":
+        return Constants.expoConfig.extra.api_production
+
+      case "development":
+        return Constants.expoConfig.extra.api_development
+
+      default:
+        return Constants.expoConfig.extra.api_development
+    }
+  }, [])
+
   const params = {
+    host,
     register,
     setRegister,
     user,

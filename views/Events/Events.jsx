@@ -19,9 +19,8 @@ import DateAndTimePicker from "../Shared/DateAndTimePicker"
 
 export default Users = ({ navigation, route }) => {
   const headerMargin = useHeaderHeight()
-  const { user, token } = useContext(ApplicationContext)
+  const { host, user, token } = useContext(ApplicationContext)
   const { events, setEvents } = useContext(CacheContext)
-  const localhost = Constants.expoConfig.extra.API_LOCAL
   const theme = useTheme()
 
   const [loading, setLoading] = useState(false)
@@ -39,7 +38,7 @@ export default Users = ({ navigation, route }) => {
   const getEvents = async () => {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/agenda?history=${history}`, {
+    const request = await fetch(`${host}/agenda?history=${history}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -82,7 +81,7 @@ export default Users = ({ navigation, route }) => {
       return
     }
 
-    const request = await fetch(`${localhost}/agenda?search=${search.trim()}&filter=${JSON.stringify(filters)}&history=${history}`, {
+    const request = await fetch(`${host}/agenda?search=${search.trim()}&filter=${JSON.stringify(filters)}&history=${history}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -165,7 +164,7 @@ export default Users = ({ navigation, route }) => {
 
       useEffect(() => {
         const getAvatar = async () => {
-          const request = await fetch(`${localhost}/agenda/${item.event_identifier}?avatar=true`, {
+          const request = await fetch(`${host}/agenda/${item.event_identifier}?avatar=true`, {
             method: "GET",
             headers: {
               "Content-type": "application/json",
@@ -276,7 +275,7 @@ export default Users = ({ navigation, route }) => {
     async function getPlaces() {
       setLoading(true)
 
-      const request = await fetch(`${localhost}/places`, {
+      const request = await fetch(`${host}/places`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

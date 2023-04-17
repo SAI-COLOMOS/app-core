@@ -12,8 +12,7 @@ import InformationMessage from "../Shared/InformationMessage"
 import ProfileImage from "../Shared/ProfileImage"
 
 export default PlaceDetails = ({ navigation, route }) => {
-  const localhost = Constants.expoConfig.extra.API_LOCAL
-  const { token } = useContext(ApplicationContext)
+  const { host, token } = useContext(ApplicationContext)
   const headerMargin = useHeaderHeight()
   const { place_identifier, getPlaces } = route.params
   const theme = useTheme()
@@ -25,7 +24,7 @@ export default PlaceDetails = ({ navigation, route }) => {
   async function getPlace() {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/places/${place_identifier}`, {
+    const request = await fetch(`${host}/places/${place_identifier}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -54,7 +53,7 @@ export default PlaceDetails = ({ navigation, route }) => {
 
   useEffect(() => {
     const requestAvatar = async () => {
-      const request = await fetch(`${localhost}/places/${place_identifier}?avatar=true`, {
+      const request = await fetch(`${host}/places/${place_identifier}?avatar=true`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

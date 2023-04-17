@@ -8,8 +8,7 @@ import ImageSelector from "../Shared/ImageSelector"
 import ApplicationContext from "../ApplicationContext"
 
 export default AddPlace = ({ navigation, route }) => {
-  const { token } = useContext(ApplicationContext)
-  const localhost = Constants.expoConfig.extra.API_LOCAL
+  const { host, token } = useContext(ApplicationContext)
 
   const [place_name, setPlace_name] = useState("")
   const [street, setStreet] = useState("")
@@ -31,7 +30,7 @@ export default AddPlace = ({ navigation, route }) => {
   async function savePlace() {
     setModalLoading(true)
 
-    const request = await fetch(`${localhost}/places`, {
+    const request = await fetch(`${host}/places`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

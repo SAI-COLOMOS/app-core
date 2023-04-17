@@ -8,13 +8,12 @@ import Constants from "expo-constants"
 import { KeyboardAvoidingView, ScrollView } from "react-native"
 import ModalMessage from "../Shared/ModalMessage"
 import ModalLoading from "../Shared/ModalLoading"
-import UserContext from "../ApplicationContext"
+import ApplicationContext from "../ApplicationContext"
 
 export default FirstAccess = ({ navigation }) => {
-  const userContext = useContext(UserContext)
+  const { host, token, register, setRegister, setToken } = useContext(ApplicationContext)
   const insets = useSafeAreaInsets()
   const theme = useTheme()
-  const localhost = Constants.expoConfig.extra.API_LOCAL
 
   const [newPassword, setNewPassword] = useState("")
   const [showNewPassword, setShowNewPassword] = useState(false)
@@ -36,11 +35,11 @@ export default FirstAccess = ({ navigation }) => {
   async function changePassword() {
     setModalLoading(true)
 
-    const request = await fetch(`${localhost}/users/${userContext.register}/password`, {
+    const request = await fetch(`${host}/users/${register}/password`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${userContext.token}`,
+        Authorization: `Bearer ${token}`,
         "Cache-Control": `no-cache`
       },
       body: JSON.stringify({
@@ -77,14 +76,31 @@ export default FirstAccess = ({ navigation }) => {
   }, [confirmationNewPassword])
 
   return (
-    <Flex fill pt={insets.top} style={{ backgroundColor: theme.colors.backdrop }}>
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ width: "100%", height: "100%" }}>
+    <Flex
+      fill
+      pt={insets.top}
+      style={{ backgroundColor: theme.colors.backdrop }}
+    >
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ width: "100%", height: "100%" }}
+      >
         <Flex fill>
           <ScrollView>
-            <VStack center spacing={20} p={30}>
-              <IconButton icon="key-alert-outline" size={50} />
+            <VStack
+              center
+              spacing={20}
+              p={30}
+            >
+              <IconButton
+                icon="key-alert-outline"
+                size={50}
+              />
               <VStack spacing={5}>
-                <Text variant="headlineSmall" style={{ textAlign: "center" }}>
+                <Text
+                  variant="headlineSmall"
+                  style={{ textAlign: "center" }}
+                >
                   Hola, por primera vez
                 </Text>
 
@@ -94,51 +110,115 @@ export default FirstAccess = ({ navigation }) => {
               </VStack>
 
               <VStack spacing={0}>
-                <HStack items="center" spacing={5}>
-                  <Icon size={20} color={passLength ? theme.colors.onBackground : theme.colors.error} name={passLength ? "check-circle-outline" : "alert-circle-outline"} />
-                  <Text variant="bodyMedium" style={{ color: passLength ? theme.colors.onBackground : theme.colors.error }}>
+                <HStack
+                  items="center"
+                  spacing={5}
+                >
+                  <Icon
+                    size={20}
+                    color={passLength ? theme.colors.onBackground : theme.colors.error}
+                    name={passLength ? "check-circle-outline" : "alert-circle-outline"}
+                  />
+                  <Text
+                    variant="bodyMedium"
+                    style={{ color: passLength ? theme.colors.onBackground : theme.colors.error }}
+                  >
                     Tiene al menos ocho caracteres
                   </Text>
                 </HStack>
 
-                <HStack items="center" spacing={5}>
-                  <Icon size={20} color={hasUppercase ? theme.colors.onBackground : theme.colors.error} name={hasUppercase ? "check-circle-outline" : "alert-circle-outline"} />
-                  <Text variant="bodyMedium" style={{ color: hasUppercase ? theme.colors.onBackground : theme.colors.error }}>
+                <HStack
+                  items="center"
+                  spacing={5}
+                >
+                  <Icon
+                    size={20}
+                    color={hasUppercase ? theme.colors.onBackground : theme.colors.error}
+                    name={hasUppercase ? "check-circle-outline" : "alert-circle-outline"}
+                  />
+                  <Text
+                    variant="bodyMedium"
+                    style={{ color: hasUppercase ? theme.colors.onBackground : theme.colors.error }}
+                  >
                     Tiene al menos una letra mayúscula
                   </Text>
                 </HStack>
 
-                <HStack items="center" spacing={5}>
-                  <Icon size={20} color={hasLowercase ? theme.colors.onBackground : theme.colors.error} name={hasLowercase ? "check-circle-outline" : "alert-circle-outline"} />
-                  <Text variant="bodyMedium" style={{ color: hasLowercase ? theme.colors.onBackground : theme.colors.error }}>
+                <HStack
+                  items="center"
+                  spacing={5}
+                >
+                  <Icon
+                    size={20}
+                    color={hasLowercase ? theme.colors.onBackground : theme.colors.error}
+                    name={hasLowercase ? "check-circle-outline" : "alert-circle-outline"}
+                  />
+                  <Text
+                    variant="bodyMedium"
+                    style={{ color: hasLowercase ? theme.colors.onBackground : theme.colors.error }}
+                  >
                     Tiene al menos una letra minúscula
                   </Text>
                 </HStack>
 
-                <HStack items="center" spacing={5}>
-                  <Icon size={20} color={hasNumber ? theme.colors.onBackground : theme.colors.error} name={hasNumber ? "check-circle-outline" : "alert-circle-outline"} />
-                  <Text variant="bodyMedium" style={{ color: hasNumber ? theme.colors.onBackground : theme.colors.error }}>
+                <HStack
+                  items="center"
+                  spacing={5}
+                >
+                  <Icon
+                    size={20}
+                    color={hasNumber ? theme.colors.onBackground : theme.colors.error}
+                    name={hasNumber ? "check-circle-outline" : "alert-circle-outline"}
+                  />
+                  <Text
+                    variant="bodyMedium"
+                    style={{ color: hasNumber ? theme.colors.onBackground : theme.colors.error }}
+                  >
                     Tiene al menos un número
                   </Text>
                 </HStack>
 
-                <HStack items="center" spacing={5}>
-                  <Icon size={20} color={hasSpecial ? theme.colors.onBackground : theme.colors.error} name={hasSpecial ? "check-circle-outline" : "alert-circle-outline"} />
-                  <Text variant="bodyMedium" style={{ color: hasSpecial ? theme.colors.onBackground : theme.colors.error }}>
+                <HStack
+                  items="center"
+                  spacing={5}
+                >
+                  <Icon
+                    size={20}
+                    color={hasSpecial ? theme.colors.onBackground : theme.colors.error}
+                    name={hasSpecial ? "check-circle-outline" : "alert-circle-outline"}
+                  />
+                  <Text
+                    variant="bodyMedium"
+                    style={{ color: hasSpecial ? theme.colors.onBackground : theme.colors.error }}
+                  >
                     Tiene al menos un carácter especial
                   </Text>
                 </HStack>
 
-                <HStack items="center" spacing={5}>
-                  <Icon size={20} color={areSamePassword ? theme.colors.onBackground : theme.colors.error} name={areSamePassword ? "check-circle-outline" : "alert-circle-outline"} />
-                  <Text variant="bodyMedium" style={{ color: areSamePassword ? theme.colors.onBackground : theme.colors.error }}>
+                <HStack
+                  items="center"
+                  spacing={5}
+                >
+                  <Icon
+                    size={20}
+                    color={areSamePassword ? theme.colors.onBackground : theme.colors.error}
+                    name={areSamePassword ? "check-circle-outline" : "alert-circle-outline"}
+                  />
+                  <Text
+                    variant="bodyMedium"
+                    style={{ color: areSamePassword ? theme.colors.onBackground : theme.colors.error }}
+                  >
                     Tienes que confirmar tu nueva contraseña
                   </Text>
                 </HStack>
               </VStack>
             </VStack>
 
-            <VStack ph={25} pb={50} spacing={5}>
+            <VStack
+              ph={25}
+              pb={50}
+              spacing={5}
+            >
               <VStack spacing={10}>
                 <TextInput
                   mode="outlined"
@@ -177,15 +257,20 @@ export default FirstAccess = ({ navigation }) => {
             </VStack>
           </ScrollView>
 
-          <HStack spacing={20} justify="between" pv={20} ph={20}>
+          <HStack
+            spacing={20}
+            justify="between"
+            pv={20}
+            ph={20}
+          >
             <Button
               icon="logout"
               disabled={modalLoading}
               mode="outlined"
               onPress={async (_) => {
                 await SecureStore.deleteItemAsync("token")
-                userContext.setToken(null)
-                userContext.setRegister(null)
+                setToken(null)
+                setRegister(null)
                 navigation.replace("Login")
               }}
             >
@@ -209,11 +294,32 @@ export default FirstAccess = ({ navigation }) => {
 
       {/* <ModalLoading handler={[modalLoading, () => setModalLoading(!modalLoading)]} dismissable={false}/> */}
 
-      <ModalMessage title="¡Listo!" description="La contraseña ha sido actualizada, ahora puedes acceder a la aplicación" handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]} actions={[["Aceptar", () => navigation.replace("Dashboard")]]} dismissable={false} icon="check-circle-outline" />
+      <ModalMessage
+        title="¡Listo!"
+        description="La contraseña ha sido actualizada, ahora puedes acceder a la aplicación"
+        handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]}
+        actions={[["Aceptar", () => navigation.replace("Dashboard")]]}
+        dismissable={false}
+        icon="check-circle-outline"
+      />
 
-      <ModalMessage title="Ocurrió un problema" description={`No pudimos actualizar tu contraseña, inténtalo más tarde. (${responseCode})`} handler={[modalError, () => setModalError(!modalError)]} actions={[["Aceptar"]]} dismissable={true} icon="close-circle-outline" />
+      <ModalMessage
+        title="Ocurrió un problema"
+        description={`No pudimos actualizar tu contraseña, inténtalo más tarde. (${responseCode})`}
+        handler={[modalError, () => setModalError(!modalError)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="close-circle-outline"
+      />
 
-      <ModalMessage title="Sin conexión a internet" description={`Parece que no tienes conexión a internet, conéctate e intenta de nuevo`} handler={[modalFatal, () => setModalFatal(!modalFatal)]} actions={[["Aceptar"]]} dismissable={true} icon="wifi-alert" />
+      <ModalMessage
+        title="Sin conexión a internet"
+        description={`Parece que no tienes conexión a internet, conéctate e intenta de nuevo`}
+        handler={[modalFatal, () => setModalFatal(!modalFatal)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="wifi-alert"
+      />
     </Flex>
   )
 }

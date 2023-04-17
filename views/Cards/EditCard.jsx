@@ -10,8 +10,7 @@ import ApplicationContext from "../ApplicationContext"
 
 export default EditCard = ({ navigation, route }) => {
   const { register, activity, getCard } = route.params
-  const { token } = useContext(ApplicationContext)
-  const localhost = Constants.expoConfig.extra.API_LOCAL
+  const { host, token } = useContext(ApplicationContext)
   const theme = useTheme()
 
   const [activity_name, setActivity_name] = useState(`${activity?.activity_name ?? ""}`)
@@ -32,7 +31,7 @@ export default EditCard = ({ navigation, route }) => {
 
   async function UpdateCard() {
     setModalLoading(true)
-    const request = await fetch(`${localhost}/cards/${register}/activity`, {
+    const request = await fetch(`${host}/cards/${register}/activity`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -66,7 +65,7 @@ export default EditCard = ({ navigation, route }) => {
   }
 
   async function DeleteCard() {
-    const request = await fetch(`${localhost}/cards/${register}/activity`, {
+    const request = await fetch(`${host}/cards/${register}/activity`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

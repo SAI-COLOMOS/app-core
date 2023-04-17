@@ -14,9 +14,8 @@ import { it } from "react-native-paper-dates"
 import ApplicationContext from "../ApplicationContext"
 
 export default Forms = ({ navigation, route }) => {
-  const localhost = Constants.expoConfig.extra.API_LOCAL
   const theme = useTheme()
-  const { user, token } = useContext(ApplicationContext)
+  const { host, user, token } = useContext(ApplicationContext)
   const headerMargin = useHeaderHeight()
 
   const [forms, setForms] = useState(undefined)
@@ -31,7 +30,7 @@ export default Forms = ({ navigation, route }) => {
   async function getForms() {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/forms?isTemplate=${isTemplate}`, {
+    const request = await fetch(`${host}/forms?isTemplate=${isTemplate}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -61,7 +60,7 @@ export default Forms = ({ navigation, route }) => {
       return
     }
 
-    const request = await fetch(`${localhost}/forms?search=${search}`, {
+    const request = await fetch(`${host}/forms?search=${search}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

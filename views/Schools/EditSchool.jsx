@@ -7,9 +7,8 @@ import ModalMessage from "../Shared/ModalMessage"
 import ApplicationContext from "../ApplicationContext"
 
 export default EditSchool = ({ navigation, route }) => {
-  const localhost = Constants.expoConfig.extra.API_LOCAL
   const theme = useTheme()
-  const { token } = useContext(ApplicationContext)
+  const { host, token } = useContext(ApplicationContext)
   const { school, getSchool, getSchools } = route.params
 
   const [school_name, setSchool_name] = useState(`${school.school_name}`)
@@ -34,7 +33,7 @@ export default EditSchool = ({ navigation, route }) => {
   async function saveSchool() {
     setModalLoading(true)
 
-    const request = await fetch(`${localhost}/schools/${school.school_identifier}`, {
+    const request = await fetch(`${host}/schools/${school.school_identifier}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -70,7 +69,7 @@ export default EditSchool = ({ navigation, route }) => {
   async function deleteSchool() {
     setModalLoading(true)
 
-    const request = await fetch(`${localhost}/schools/${school.school_identifier}`, {
+    const request = await fetch(`${host}/schools/${school.school_identifier}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

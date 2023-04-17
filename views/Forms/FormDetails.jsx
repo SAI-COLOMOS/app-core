@@ -12,8 +12,7 @@ import { log } from "react-native-reanimated"
 import ApplicationContext from "../ApplicationContext"
 
 export default FormDetails = ({ navigation, route }) => {
-  const localhost = Constants.expoConfig.extra.API_LOCAL
-  const { token } = useContext(ApplicationContext)
+  const { host, token } = useContext(ApplicationContext)
   const { form_identifier, getForms } = route.params
   const headerMargin = useHeaderHeight()
   const theme = useTheme()
@@ -25,7 +24,7 @@ export default FormDetails = ({ navigation, route }) => {
   async function getForm() {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/forms/${form_identifier}?isTemplate=${isTemplate}`, {
+    const request = await fetch(`${host}/forms/${form_identifier}?isTemplate=${isTemplate}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

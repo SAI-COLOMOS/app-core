@@ -1,5 +1,5 @@
 import { Flex, Spacer, VStack } from "@react-native-material/core"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useContext, useEffect, useState } from "react"
 import { Image, useWindowDimensions, ScrollView } from "react-native"
 import { Avatar, Button, Card, Text, useTheme } from "react-native-paper"
 import { useHeaderHeight } from "@react-navigation/elements"
@@ -8,11 +8,12 @@ import Header from "../Shared/Header"
 import Constants from "expo-constants"
 import { useFocusEffect } from "@react-navigation/native"
 import { LinearGradient } from "expo-linear-gradient"
+import ApplicationContext from "../ApplicationContext"
 
 export default AttendanceDetails = ({ navigation, route }) => {
   const { width } = useWindowDimensions()
   const theme = useTheme()
-  const localhost = Constants.expoConfig.extra.API_LOCAL
+  const { host } = useContext(ApplicationContext)
   const headerMargin = useHeaderHeight()
   const { actualUser, token } = route.params
 
@@ -22,7 +23,7 @@ export default AttendanceDetails = ({ navigation, route }) => {
   async function getProfile() {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/profile/${actualUser.register}`, {
+    const request = await fetch(`${host}/profile/${actualUser.register}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

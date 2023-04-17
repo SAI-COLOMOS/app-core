@@ -8,9 +8,8 @@ import ApplicationContext from "../ApplicationContext"
 import Dropdown from "../Shared/Dropdown"
 
 export default EditSchool = ({ navigation, route }) => {
-  const localhost = Constants.expoConfig.extra.API_LOCAL
   const theme = useTheme()
-  const { token } = useContext(ApplicationContext)
+  const { host, token } = useContext(ApplicationContext)
   const { attendee, event_identifier, event_status, getEvent } = route.params
 
   const [status, setStatus] = useState(attendee?.status)
@@ -29,7 +28,7 @@ export default EditSchool = ({ navigation, route }) => {
   async function updateAttendance() {
     setModalLoading(true)
 
-    const request = await fetch(`${localhost}/agenda/${event_identifier}/attendance`, {
+    const request = await fetch(`${host}/agenda/${event_identifier}/attendance`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -61,7 +60,7 @@ export default EditSchool = ({ navigation, route }) => {
   async function deleteAttendance() {
     setModalLoading(true)
 
-    const request = await fetch(`${localhost}/agenda/${event_identifier}/attendance`, {
+    const request = await fetch(`${host}/agenda/${event_identifier}/attendance`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",

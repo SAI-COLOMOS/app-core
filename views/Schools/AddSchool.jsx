@@ -7,8 +7,7 @@ import ModalMessage from "../Shared/ModalMessage"
 import ApplicationContext from "../ApplicationContext"
 
 export default AddSchool = ({ navigation, route }) => {
-  const localhost = Constants.expoConfig.extra.API_LOCAL
-  const { token } = useContext(ApplicationContext)
+  const { host, token } = useContext(ApplicationContext)
   const { getSchools } = route.params
 
   const [school_name, setSchool_name] = useState("")
@@ -30,7 +29,7 @@ export default AddSchool = ({ navigation, route }) => {
   async function saveSchool() {
     setModalLoading(true)
 
-    const request = await fetch(`${localhost}/schools`, {
+    const request = await fetch(`${host}/schools`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

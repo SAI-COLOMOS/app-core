@@ -9,16 +9,13 @@ import { ScrollView, RefreshControl } from "react-native"
 import { useFocusEffect } from "@react-navigation/native"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import { LongDate, ShortDate, Time24 } from "../Shared/LocaleDate"
-import UserContext from "../ApplicationContext"
+import ApplicationContext from "../ApplicationContext"
 import CircularProgress from "react-native-circular-progress-indicator"
 import InformationMessage from "../Shared/InformationMessage"
 
 export default UserProgress = ({ navigation, route }) => {
-  const localhost = Constants.expoConfig.extra.API_LOCAL
-  const { register, token, achieved_hours, setAchieved_hours } = useContext(UserContext)
-  const userContext = useContext(UserContext)
+  const { host, register, token, achieved_hours, setAchieved_hours } = useContext(ApplicationContext)
   const headerMargin = useHeaderHeight()
-  // const { token, user } = route.params
   const theme = useTheme()
 
   const [loading, setLoading] = useState(false)
@@ -29,7 +26,7 @@ export default UserProgress = ({ navigation, route }) => {
     try {
       setLoading(true)
 
-      const request = await fetch(`${localhost}/cards/${register}`, {
+      const request = await fetch(`${host}/cards/${register}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

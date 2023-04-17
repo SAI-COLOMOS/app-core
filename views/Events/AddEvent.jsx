@@ -12,8 +12,7 @@ import DateAndTimePicker, { CalendarPicker, ClockPicker } from "../Shared/DateAn
 import { LongDate } from "../Shared/LocaleDate"
 
 export default AddEvent = ({ navigation, route }) => {
-  const { token } = useContext(ApplicationContext)
-  const localhost = Constants.expoConfig.extra.API_LOCAL
+  const { host, token } = useContext(ApplicationContext)
   const { getEvents } = route.params
 
   const [name, setName] = useState("")
@@ -43,7 +42,7 @@ export default AddEvent = ({ navigation, route }) => {
     try {
       setModalLoading(true)
 
-      const request = await fetch(`${localhost}/agenda`, {
+      const request = await fetch(`${host}/agenda`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -85,7 +84,7 @@ export default AddEvent = ({ navigation, route }) => {
   async function getPlaces() {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/places`, {
+    const request = await fetch(`${host}/places`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

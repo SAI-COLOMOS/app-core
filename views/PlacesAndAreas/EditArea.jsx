@@ -7,8 +7,7 @@ import ModalMessage from "../Shared/ModalMessage"
 import ApplicationContext from "../ApplicationContext"
 
 export default EditArea = ({ navigation, route }) => {
-  const localhost = Constants.expoConfig.extra.API_LOCAL
-  const { token } = useContext(ApplicationContext)
+  const { host, token } = useContext(ApplicationContext)
   const theme = useTheme()
   const { area, place_identifier, getPlace } = route.params
 
@@ -28,7 +27,7 @@ export default EditArea = ({ navigation, route }) => {
   async function saveArea() {
     setModalLoading(true)
 
-    const request = await fetch(`${localhost}/places/${place_identifier}/areas/${area.area_identifier}`, {
+    const request = await fetch(`${host}/places/${place_identifier}/areas/${area.area_identifier}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -58,7 +57,7 @@ export default EditArea = ({ navigation, route }) => {
   async function deleteArea() {
     setModalLoading(true)
 
-    const request = await fetch(`${localhost}/places/${place_identifier}/areas/${area.area_identifier}`, {
+    const request = await fetch(`${host}/places/${place_identifier}/areas/${area.area_identifier}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

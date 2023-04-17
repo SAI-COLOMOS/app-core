@@ -11,8 +11,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import ApplicationContext from "../ApplicationContext"
 
 export default SchoolDetails = ({ navigation, route }) => {
-  const localhost = Constants.expoConfig.extra.API_LOCAL
-  const { token } = useContext(ApplicationContext)
+  const { host, token } = useContext(ApplicationContext)
   const { school_identifier, getSchools } = route.params
   const headerMargin = useHeaderHeight()
   const theme = useTheme()
@@ -23,7 +22,7 @@ export default SchoolDetails = ({ navigation, route }) => {
   async function getSchool() {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/schools/${school_identifier}`, {
+    const request = await fetch(`${host}/schools/${school_identifier}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

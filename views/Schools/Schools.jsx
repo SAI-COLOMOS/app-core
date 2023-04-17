@@ -15,9 +15,8 @@ import CacheContext from "../Contexts/CacheContext"
 import ProfileImage from "../Shared/ProfileImage"
 
 export default Schools = ({ navigation, route }) => {
-  const localhost = Constants.expoConfig.extra.API_LOCAL
   const theme = useTheme()
-  const { token, user } = useContext(ApplicationContext)
+  const { host, token, user } = useContext(ApplicationContext)
   const { schools, setSchools } = useContext(CacheContext)
   // const { user, token } = route.params
   const headerMargin = useHeaderHeight()
@@ -31,7 +30,7 @@ export default Schools = ({ navigation, route }) => {
   async function getSchools() {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/schools`, {
+    const request = await fetch(`${host}/schools`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -59,7 +58,7 @@ export default Schools = ({ navigation, route }) => {
       return
     }
 
-    const request = await fetch(`${localhost}/schools?search=${search}`, {
+    const request = await fetch(`${host}/schools?search=${search}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

@@ -10,8 +10,7 @@ import ProfileImage from "../Shared/ProfileImage"
 import ModalMessage from "../Shared/ModalMessage"
 
 export default AddAttendee = ({ navigation, route }) => {
-  const localhost = Constants.expoConfig.extra.API_LOCAL
-  const { token } = useContext(ApplicationContext)
+  const { host, token } = useContext(ApplicationContext)
   const { event_identifier, getEvent } = route.params
 
   const [search, setSearch] = useState("")
@@ -28,7 +27,7 @@ export default AddAttendee = ({ navigation, route }) => {
   async function searchUsers() {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/users?search=${search.trim()}&filter=${JSON.stringify({ status: "Activo" })}`, {
+    const request = await fetch(`${host}/users?search=${search.trim()}&filter=${JSON.stringify({ status: "Activo" })}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -51,7 +50,7 @@ export default AddAttendee = ({ navigation, route }) => {
   async function addAttendee(register) {
     setModalLoading(true)
 
-    const request = await fetch(`${localhost}/agenda/${event_identifier}/attendance/several`, {
+    const request = await fetch(`${host}/agenda/${event_identifier}/attendance/several`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -80,7 +79,7 @@ export default AddAttendee = ({ navigation, route }) => {
     }
     // setLoading(true)
 
-    // const request = await fetch(`${localhost}/agenda/${event_identifier}/attendance/several`, {
+    // const request = await fetch(`${host}/agenda/${event_identifier}/attendance/several`, {
     //   method: "POST",
     //   headers: {
     //     "Content-Type": "application/json",
@@ -211,7 +210,7 @@ export default AddAttendee = ({ navigation, route }) => {
     const [avatar, setAvatar] = useState(undefined)
 
     const requestAvatar = useCallback(async () => {
-      const request = await fetch(`${localhost}/users/${register}?avatar=true`, {
+      const request = await fetch(`${host}/users/${register}?avatar=true`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

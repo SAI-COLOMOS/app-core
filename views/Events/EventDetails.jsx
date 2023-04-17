@@ -16,8 +16,7 @@ import ModalMessage from "../Shared/ModalMessage"
 // import EventContext from "../Contexts/CacheContext"
 
 export default EventDetails = ({ navigation, route }) => {
-  const localhost = Constants.expoConfig.extra.API_LOCAL
-  const { user, token } = useContext(ApplicationContext)
+  const { host, user, token } = useContext(ApplicationContext)
   //const { event, setEvent, attendees, setAttendees, profiles, setProfiles } = useContext(EventContext)
   const headerMargin = useHeaderHeight()
   const { event_identifier, getEvents } = route.params
@@ -41,7 +40,7 @@ export default EventDetails = ({ navigation, route }) => {
   async function getEvent() {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/agenda/${event_identifier}`, {
+    const request = await fetch(`${host}/agenda/${event_identifier}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -65,7 +64,7 @@ export default EventDetails = ({ navigation, route }) => {
   }
 
   async function subscribeEvent() {
-    const request = await fetch(`${localhost}/agenda/${event_identifier}/attendance`, {
+    const request = await fetch(`${host}/agenda/${event_identifier}/attendance`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -79,7 +78,7 @@ export default EventDetails = ({ navigation, route }) => {
   }
 
   async function unsubscribeEvent() {
-    const request = await fetch(`${localhost}/agenda/${event_identifier}/attendance`, {
+    const request = await fetch(`${host}/agenda/${event_identifier}/attendance`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -97,7 +96,7 @@ export default EventDetails = ({ navigation, route }) => {
   async function postNow() {
     setLoadingPost(true)
 
-    const request = await fetch(`${localhost}/agenda/${event_identifier}/status`, {
+    const request = await fetch(`${host}/agenda/${event_identifier}/status`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -122,7 +121,7 @@ export default EventDetails = ({ navigation, route }) => {
   async function finishEvent() {
     setLoadingFinish(true)
 
-    const request = await fetch(`${localhost}/agenda/${event_identifier}/status`, {
+    const request = await fetch(`${host}/agenda/${event_identifier}/status`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -145,7 +144,7 @@ export default EventDetails = ({ navigation, route }) => {
 
   useEffect(() => {
     const requestAvatar = async () => {
-      const request = await fetch(`${localhost}/agenda/${event_identifier}?avatar=true`, {
+      const request = await fetch(`${host}/agenda/${event_identifier}?avatar=true`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -362,7 +361,7 @@ export default EventDetails = ({ navigation, route }) => {
       const [avatar, setAvatar] = useState(undefined)
 
       const requestAvatar = async () => {
-        const request = await fetch(`${localhost}/users/${attendee?.attendee_register}?avatar=true`, {
+        const request = await fetch(`${host}/users/${attendee?.attendee_register}?avatar=true`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

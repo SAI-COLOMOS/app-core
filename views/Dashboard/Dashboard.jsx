@@ -16,11 +16,10 @@ import CacheContext from "../Contexts/CacheContext"
 import ProfileImage from "../Shared/ProfileImage"
 
 export default Dashboard = ({ navigation }) => {
-  const { user, setUser, token, setToken, register, setRegister, achieved_hours, setAchieved_hours } = useContext(ApplicationContext)
+  const { host, user, setUser, token, setToken, register, setRegister, achieved_hours, setAchieved_hours } = useContext(ApplicationContext)
   const insets = useSafeAreaInsets()
   const theme = useTheme()
   const { width } = useWindowDimensions()
-  const localhost = Constants.expoConfig.extra.API_LOCAL
   const selectedImage = useMemo(() => Math.floor(Math.random() * 4), [])
 
   const [greeting, setGreeting] = useState("Hola")
@@ -35,7 +34,7 @@ export default Dashboard = ({ navigation }) => {
       }
 
       const requests = await Promise.all([
-        await fetch(`${localhost}/profile/${register}`, {
+        await fetch(`${host}/profile/${register}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -43,7 +42,7 @@ export default Dashboard = ({ navigation }) => {
             "Cache-Control": "no-cache"
           }
         }),
-        await fetch(`${localhost}/feed`, {
+        await fetch(`${host}/feed`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

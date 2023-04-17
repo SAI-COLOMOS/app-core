@@ -15,8 +15,7 @@ import ApplicationContext from "../ApplicationContext"
 import CacheContext from "../Contexts/CacheContext"
 
 export default PlaceAndAreas = ({ navigation, route }) => {
-  const localhost = Constants.expoConfig.extra.API_LOCAL
-  const { token } = useContext(ApplicationContext)
+  const { host, token } = useContext(ApplicationContext)
   const { places, setPlaces } = useContext(CacheContext)
   const theme = useTheme()
   const headerMargin = useHeaderHeight()
@@ -30,7 +29,7 @@ export default PlaceAndAreas = ({ navigation, route }) => {
   async function getPlaces() {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/places`, {
+    const request = await fetch(`${host}/places`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -58,7 +57,7 @@ export default PlaceAndAreas = ({ navigation, route }) => {
       setLoading(false)
       return
     }
-    const request = await fetch(`${localhost}/places?search=${search}`, {
+    const request = await fetch(`${host}/places?search=${search}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -110,7 +109,7 @@ export default PlaceAndAreas = ({ navigation, route }) => {
 
       useEffect(() => {
         const requestAvatar = async () => {
-          const request = await fetch(`${localhost}/places/${place_identifier}?avatar=true`, {
+          const request = await fetch(`${host}/places/${place_identifier}?avatar=true`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",

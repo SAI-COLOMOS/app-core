@@ -16,9 +16,8 @@ import CacheContext from "../Contexts/CacheContext"
 
 export default Users = ({ navigation, route }) => {
   const headerMargin = useHeaderHeight()
-  const { user, token } = useContext(ApplicationContext)
+  const { host, user, token } = useContext(ApplicationContext)
   const { users, setUsers } = useContext(CacheContext)
-  const localhost = Constants.expoConfig.extra.API_LOCAL
   const theme = useTheme()
 
   const [loading, setLoading] = useState(false)
@@ -49,7 +48,7 @@ export default Users = ({ navigation, route }) => {
   const getUsers = async () => {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/users`, {
+    const request = await fetch(`${host}/users`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -113,7 +112,7 @@ export default Users = ({ navigation, route }) => {
       return
     }
 
-    const request = await fetch(`${localhost}/users?search=${search.trim()}&filter=${JSON.stringify(filters)}`, {
+    const request = await fetch(`${host}/users?search=${search.trim()}&filter=${JSON.stringify(filters)}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -133,7 +132,7 @@ export default Users = ({ navigation, route }) => {
   }
 
   const getPlaces = async () => {
-    const request = await fetch(`${localhost}/places`, {
+    const request = await fetch(`${host}/places`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -160,7 +159,7 @@ export default Users = ({ navigation, route }) => {
   }
 
   const getSchools = async () => {
-    const request = await fetch(`${localhost}/schools`, {
+    const request = await fetch(`${host}/schools`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -230,7 +229,7 @@ export default Users = ({ navigation, route }) => {
 
       useEffect(() => {
         const requestAvatar = async () => {
-          const request = await fetch(`${localhost}/users/${register}?avatar=true`, {
+          const request = await fetch(`${host}/users/${register}?avatar=true`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",

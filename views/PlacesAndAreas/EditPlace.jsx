@@ -7,8 +7,7 @@ import ModalMessage from "../Shared/ModalMessage"
 import ApplicationContext from "../ApplicationContext"
 
 export default EditPlace = ({ navigation, route }) => {
-  const localhost = Constants.expoConfig.extra.API_LOCAL
-  const { token } = useContext(ApplicationContext)
+  const { host, token } = useContext(ApplicationContext)
   const theme = useTheme()
   const { place, image, getPlace, getPlaces } = route.params
 
@@ -35,7 +34,7 @@ export default EditPlace = ({ navigation, route }) => {
   async function savePlace() {
     setModalLoading(true)
 
-    const request = await fetch(`${localhost}/places/${place.place_identifier}`, {
+    const request = await fetch(`${host}/places/${place.place_identifier}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -72,7 +71,7 @@ export default EditPlace = ({ navigation, route }) => {
   async function deletePlace() {
     setModalLoading(true)
 
-    const request = await fetch(`${localhost}/places/${places.place_identifier}`, {
+    const request = await fetch(`${host}/places/${places.place_identifier}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

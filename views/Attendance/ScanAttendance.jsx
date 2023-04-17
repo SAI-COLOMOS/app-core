@@ -17,9 +17,8 @@ import { useKeepAwake } from "expo-keep-awake"
 export default ScanAttendance = ({ navigation, route }) => {
   useKeepAwake()
   const theme = useTheme()
-  const localhost = Constants.expoConfig.extra.API_LOCAL
   const insets = useSafeAreaInsets()
-  const { token } = useContext(ApplicationContext)
+  const { host, token } = useContext(ApplicationContext)
   const { attendeeList, event_identifier } = route.params
 
   const [doNotMarkRetard, setDoNotMarkRetard] = useState(false)
@@ -55,7 +54,7 @@ export default ScanAttendance = ({ navigation, route }) => {
       const attendeeFound = attendeeList.find((elemento) => elemento.attendee_register === data)
 
       if (attendeeFound != undefined) {
-        const request = await fetch(`${localhost}/users/${attendeeFound.attendee_register}?avatar=true`, {
+        const request = await fetch(`${host}/users/${attendeeFound.attendee_register}?avatar=true`, {
           method: "GET",
           headers: {
             "Content-Type": "application-json",
@@ -86,9 +85,9 @@ export default ScanAttendance = ({ navigation, route }) => {
     try {
       setLoading(true)
 
-      console.log(`${localhost}/agenda/${event_identifier}/attendance/take`)
+      console.log(`${host}/agenda/${event_identifier}/attendance/take`)
 
-      const request = await fetch(`${localhost}/agenda/${event_identifier}/attendance/take`, {
+      const request = await fetch(`${host}/agenda/${event_identifier}/attendance/take`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

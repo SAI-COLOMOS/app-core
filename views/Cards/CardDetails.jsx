@@ -15,9 +15,8 @@ import { CardContext } from "../Users/UserDetails"
 export default CardDetails = ({ navigation, route }) => {
   const { user, register } = route.params
   const { activities, setActivities, achieved_hours, setAchieved_hours, total_hours, setTotal_hours } = useContext(CardContext)
-  const localhost = Constants.expoConfig.extra.API_LOCAL
   const headerMargin = useHeaderHeight()
-  const { token } = useContext(ApplicationContext)
+  const { host, token } = useContext(ApplicationContext)
   const theme = useTheme()
 
   const [loading, setLoading] = useState(false)
@@ -28,7 +27,7 @@ export default CardDetails = ({ navigation, route }) => {
   async function getCard() {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/cards/${register}`, {
+    const request = await fetch(`${host}/cards/${register}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

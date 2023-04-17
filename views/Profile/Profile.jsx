@@ -14,7 +14,6 @@ import { manipulateAsync, FlipType, SaveFormat } from "expo-image-manipulator"
 import ApplicationContext from "../ApplicationContext"
 
 export default Profile = ({ navigation, route }) => {
-  const localhost = Constants.expoConfig.extra.API_LOCAL
   const headerMargin = useHeaderHeight()
   const { user, token } = useContext(ApplicationContext)
 

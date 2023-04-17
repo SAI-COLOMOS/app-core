@@ -10,8 +10,7 @@ import ApplicationContext from "../ApplicationContext"
 
 export default EditForm = ({ navigation, route }) => {
   const theme = useTheme()
-  const { user, token } = useContext(ApplicationContext)
-  const localhost = Constants.expoConfig.extra.API_LOCAL
+  const { host, user, token } = useContext(ApplicationContext)
   const { form, getForms, getForm } = route.params
 
   const [name, setName] = useState(`${form?.name ?? ""}`)
@@ -57,7 +56,7 @@ export default EditForm = ({ navigation, route }) => {
   const [responseCode, setResponseCode] = useState("")
 
   async function SaveForm() {
-    const request = await fetch(`${localhost}/forms`, {
+    const request = await fetch(`${host}/forms`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -169,7 +168,7 @@ export default EditForm = ({ navigation, route }) => {
   }
 
   async function deleteForm() {
-    const request = await fetch(`${localhost}/forms/${form.form_identifier}`, {
+    const request = await fetch(`${host}/forms/${form.form_identifier}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

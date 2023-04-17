@@ -9,16 +9,9 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import ApplicationContext from "../ApplicationContext"
 import { event } from "react-native-reanimated"
 
-// const defaultQuestion = {
-//   interrogation: "Nombre",
-//   question_type: "Abierta",
-//   enum_options: []
-// }
-
 export default AddForm = ({ navigation, route }) => {
   const theme = useTheme()
-  const { user, token } = useContext(ApplicationContext)
-  const localhost = Constants.expoConfig.extra.API_LOCAL
+  const { host, user, token } = useContext(ApplicationContext)
 
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
@@ -60,7 +53,7 @@ export default AddForm = ({ navigation, route }) => {
 
   async function SaveForm() {
     // elimnarVacio()
-    const request = await fetch(`${localhost}/forms`, {
+    const request = await fetch(`${host}/forms`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

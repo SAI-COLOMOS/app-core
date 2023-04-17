@@ -9,8 +9,7 @@ import DateAndTimePicker from "../Shared/DateAndTimePicker"
 import Dropdown from "../Shared/Dropdown"
 
 export default EditEvent = ({ navigation, route }) => {
-  const localhost = Constants.expoConfig.extra.API_LOCAL
-  const { token } = useContext(ApplicationContext)
+  const { host, token } = useContext(ApplicationContext)
   const theme = useTheme()
   const { event, event_identifier, image, getEvent, getEvents } = route.params
 
@@ -40,7 +39,7 @@ export default EditEvent = ({ navigation, route }) => {
   async function savePlace() {
     setModalLoading(true)
 
-    const request = await fetch(`${localhost}/agenda/${event_identifier}`, {
+    const request = await fetch(`${host}/agenda/${event_identifier}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -78,7 +77,7 @@ export default EditEvent = ({ navigation, route }) => {
   async function deleteEvent() {
     setModalLoading(true)
 
-    const request = await fetch(`${localhost}/agenda/${event_identifier}`, {
+    const request = await fetch(`${host}/agenda/${event_identifier}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -106,7 +105,7 @@ export default EditEvent = ({ navigation, route }) => {
   async function getPlaces() {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/places`, {
+    const request = await fetch(`${host}/places`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

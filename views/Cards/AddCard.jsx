@@ -9,9 +9,8 @@ import ApplicationContext from "../ApplicationContext"
 
 export default AddCard = ({ navigation, route }) => {
   const headerMargin = useHeaderHeight()
-  const { token } = useContext(ApplicationContext)
+  const { host, token } = useContext(ApplicationContext)
   const { register, getCard } = route.params
-  const localhost = Constants.expoConfig.extra.API_LOCAL
   const theme = useTheme()
 
   const [activity_name, setActivity_name] = useState("")
@@ -27,7 +26,7 @@ export default AddCard = ({ navigation, route }) => {
   async function SaveCard() {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/cards/${register}`, {
+    const request = await fetch(`${host}/cards/${register}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

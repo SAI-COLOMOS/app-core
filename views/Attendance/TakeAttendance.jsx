@@ -17,9 +17,8 @@ import ProfileImage from "../Shared/ProfileImage"
 export default TakeAttendance = ({ navigation, route }) => {
   const theme = useTheme()
   const headerMargin = useHeaderHeight()
-  const localhost = Constants.expoConfig.extra.API_LOCAL
   const { event_identifier } = route.params
-  const { user, token } = useContext(ApplicationContext)
+  const { host, user, token } = useContext(ApplicationContext)
 
   const [showPicker, setShowPicker] = useState(false)
   const [date, setDate] = useState(new Date())
@@ -32,7 +31,7 @@ export default TakeAttendance = ({ navigation, route }) => {
     try {
       setLoading(true)
 
-      const request = await fetch(`${localhost}/agenda/${event_identifier}/attendance`, {
+      const request = await fetch(`${host}/agenda/${event_identifier}/attendance`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -77,7 +76,7 @@ export default TakeAttendance = ({ navigation, route }) => {
     const [attendee, setAttendee] = useState(undefined)
 
     const requestAttendee = async () => {
-      const request = await fetch(`${localhost}/users/${register}`, {
+      const request = await fetch(`${host}/users/${register}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

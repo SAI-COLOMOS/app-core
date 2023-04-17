@@ -10,8 +10,7 @@ import ApplicationContext from "../ApplicationContext"
 import ImageSelector from "../Shared/ImageSelector"
 
 export default EditUser = ({ navigation, route }) => {
-  const localhost = Constants.expoConfig.extra.API_LOCAL
-  const { user, token } = useContext(ApplicationContext)
+  const { host, user, token } = useContext(ApplicationContext)
   const theme = useTheme()
   const { profile, image, getUsers, getUser } = route.params
 
@@ -138,7 +137,7 @@ export default EditUser = ({ navigation, route }) => {
       }
     }
 
-    const request = await fetch(`${localhost}/users/${profile.register}`, {
+    const request = await fetch(`${host}/users/${profile.register}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -164,7 +163,7 @@ export default EditUser = ({ navigation, route }) => {
 
   async function deleteUser() {
     setModalLoading(true)
-    const request = await fetch(`${localhost}/users/${profile.register}`, {
+    const request = await fetch(`${host}/users/${profile.register}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -192,14 +191,14 @@ export default EditUser = ({ navigation, route }) => {
     setLoading(true)
 
     const requests = await Promise.all([
-      await fetch(`${localhost}/places`, {
+      await fetch(`${host}/places`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json"
         }
       }).catch((error) => console.error("Get places:", error)),
-      await fetch(`${localhost}/schools`, {
+      await fetch(`${host}/schools`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,

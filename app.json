@@ -60,6 +60,9 @@
       ]
     ],
     "extra": {
+      "environment": "development",
+      "api_development": "http://192.168.100.14:3000",
+      "api_production": "https://api.sai-colomos.dev",
       "API_LOCAL": "http://192.168.100.14:3000"
     }
   }

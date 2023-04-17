@@ -13,8 +13,7 @@ import InformationMessage from "../Shared/InformationMessage"
 import ApplicationContext from "../ApplicationContext"
 
 export default Events = ({ navigation, route }) => {
-  const localhost = Constants.expoConfig.extra.API_LOCAL
-  const { user, token } = useContext(ApplicationContext)
+  const { host, user, token } = useContext(ApplicationContext)
   const theme = useTheme()
   //const { user, token } = route.params
   const headerMargin = useHeaderHeight()
@@ -38,7 +37,7 @@ export default Events = ({ navigation, route }) => {
   async function getEvents() {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/agenda`, {
+    const request = await fetch(`${host}/agenda`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -67,7 +66,7 @@ export default Events = ({ navigation, route }) => {
       setLoading(false)
       return
     }
-    const request = await fetch(`${localhost}/agenda?search=${search}`, {
+    const request = await fetch(`${host}/agenda?search=${search}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

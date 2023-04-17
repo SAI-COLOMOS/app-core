@@ -33,9 +33,8 @@ const CardProvider = ({ children }) => {
 export { CardProvider, CardContext }
 
 export default UserDetails = ({ navigation, route }) => {
-  const localhost = Constants.expoConfig.extra.API_LOCAL
   const { activities, setActivities, achieved_hours, setAchieved_hours, total_hours, setTotal_hours } = useContext(CardContext)
-  const { token } = useContext(ApplicationContext)
+  const { host, token } = useContext(ApplicationContext)
   const { register, getUsers } = route.params
   const headerMargin = useHeaderHeight()
   const theme = useTheme()
@@ -46,7 +45,7 @@ export default UserDetails = ({ navigation, route }) => {
 
   async function getUser() {
     setLoading(true)
-    const request = await fetch(`${localhost}/users/${register}`, {
+    const request = await fetch(`${host}/users/${register}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -67,7 +66,7 @@ export default UserDetails = ({ navigation, route }) => {
   async function getCard() {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/cards/${register}`, {
+    const request = await fetch(`${host}/cards/${register}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -95,7 +94,7 @@ export default UserDetails = ({ navigation, route }) => {
 
   useEffect(() => {
     const requestAvatar = async () => {
-      const request = await fetch(`${localhost}/users/${register}?avatar=true`, {
+      const request = await fetch(`${host}/users/${register}?avatar=true`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

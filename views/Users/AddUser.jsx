@@ -11,9 +11,8 @@ import ApplicationContext from "../ApplicationContext"
 
 export default AddUser = ({ navigation, route }) => {
   const theme = useTheme()
-  const { token, user } = useContext(ApplicationContext)
+  const { host, token, user } = useContext(ApplicationContext)
   const { getUsers } = route.params
-  const localhost = Constants.expoConfig.extra.API_LOCAL
 
   const [first_name, setFirst_name] = useState("")
   const [first_last_name, setFirst_last_name] = useState("")
@@ -94,14 +93,14 @@ export default AddUser = ({ navigation, route }) => {
     setLoading(true)
 
     const requests = await Promise.all([
-      await fetch(`${localhost}/places`, {
+      await fetch(`${host}/places`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json"
         }
       }).catch((error) => console.error("Get places:", error)),
-      await fetch(`${localhost}/schools`, {
+      await fetch(`${host}/schools`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -144,7 +143,7 @@ export default AddUser = ({ navigation, route }) => {
 
   async function SaveUser() {
     setModalLoading(true)
-    const request = await fetch(`${localhost}/users`, {
+    const request = await fetch(`${host}/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

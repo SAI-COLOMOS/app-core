@@ -15,8 +15,7 @@ import ProfileImage from "../Shared/ProfileImage"
 
 export default Cards = ({ navigation, route }) => {
   const headerMargin = useHeaderHeight()
-  const { user, token } = useContext(ApplicationContext)
-  const localhost = Constants.expoConfig.extra.API_LOCAL
+  const { host, user, token } = useContext(ApplicationContext)
   const theme = useTheme()
 
   const [loading, setLoading] = useState(false)
@@ -46,7 +45,7 @@ export default Cards = ({ navigation, route }) => {
   const getUsers = async () => {
     setLoading(true)
 
-    const request = await fetch(`${localhost}/users?filter=${JSON.stringify({ role: "Prestador" })}`, {
+    const request = await fetch(`${host}/users?filter=${JSON.stringify({ role: "Prestador" })}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -107,7 +106,7 @@ export default Cards = ({ navigation, route }) => {
       return
     }
 
-    const request = await fetch(`${localhost}/users?search=${search.trim()}&filter=${JSON.stringify({ role: "Prestador", ...filters })}`, {
+    const request = await fetch(`${host}/users?search=${search.trim()}&filter=${JSON.stringify({ role: "Prestador", ...filters })}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -128,7 +127,7 @@ export default Cards = ({ navigation, route }) => {
   }
 
   const getPlaces = async () => {
-    const request = await fetch(`${localhost}/places`, {
+    const request = await fetch(`${host}/places`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -156,7 +155,7 @@ export default Cards = ({ navigation, route }) => {
   }
 
   const getSchools = async () => {
-    const request = await fetch(`${localhost}/schools`, {
+    const request = await fetch(`${host}/schools`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

@@ -8,9 +8,7 @@ import ApplicationContext from "../ApplicationContext"
 
 export default AddArea = ({ navigation, route }) => {
   const { place_identifier, getPlaces } = route.params
-  const { token } = useContext(ApplicationContext)
-
-  const localhost = Constants.expoConfig.extra.API_LOCAL
+  const { host, token } = useContext(ApplicationContext)
 
   const [area_name, setArea_name] = useState("")
   const [phone, setPhone] = useState("")
@@ -25,7 +23,7 @@ export default AddArea = ({ navigation, route }) => {
   async function saveArea() {
     setModalLoading(true)
 
-    const request = await fetch(`${localhost}/places/${place_identifier}`, {
+    const request = await fetch(`${host}/places/${place_identifier}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
