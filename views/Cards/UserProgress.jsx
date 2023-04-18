@@ -1,4 +1,4 @@
-import { Flex, HStack, VStack } from "@react-native-material/core"
+import { Flex, HStack, VStack, Wrap } from "@react-native-material/core"
 import { useEffect, useState, useCallback, useContext } from "react"
 import { useHeaderHeight } from "@react-navigation/elements"
 import { Text, Card, Button, FAB, useTheme, Avatar, ActivityIndicator, ProgressBar, TouchableRipple } from "react-native-paper"
@@ -82,25 +82,82 @@ export default UserProgress = ({ navigation, route }) => {
       for (var i = 0; i < array.length; i++) {
         sum += 1 / array[i]
       }
-      return array.length / sum
+      return (array.length / sum).toFixed(2)
+    }
+
+    const moda = (array) => {
+      let freq = {}
+      let maxFreq = 0
+      let mode
+
+      for (let i = 0; i < array.length; i++) {
+        freq[array[i]] = (freq[array[i]] || 0) + 1
+
+        if (freq[array[i]] > maxFreq) {
+          maxFreq = freq[array[i]]
+          mode = array[i]
+        }
+      }
+
+      return mode
     }
 
     return (
-      <VStack
-        spacing={10}
-        key="Title"
+      <Card
+        key="Latest activities"
+        mode="outlined"
       >
-        <Text variant="headlineSmall">Tu progreso, en contexto</Text>
-        <Text variant="bodyMedium">Actualmente llevas concluido el {percentage} % del total de horas que necesitas completar.</Text>
-        <Text variant="bodyMedium">
-          Promedias {harmonicMean(favorHours)} horas por actividad, con este ritmo necesitas completar más o menos {Number(total_hours / harmonicMean(favorHours)).toFixed(0)} eventos para concluir.
-        </Text>
-        {negativeHours.length > 0 && (
-          <Text variant="bodyMedium">
-            Sumas en total {favorSum} horas a favor, sin embargo, tienes {negativeSum} horas en contra
-          </Text>
-        )}
-      </VStack>
+        <VStack
+          spacing={10}
+          key="Title"
+        >
+          <Flex p={20}>
+            <Text variant="titleMedium">Tu progreso en contexto</Text>
+          </Flex>
+
+          <VStack
+            mh={20}
+            spacing={20}
+            pb={20}
+          >
+            <HStack spacing={10}>
+              <Avatar.Icon
+                icon="flag-checkered"
+                size={50}
+              />
+              <Flex fill>
+                <Text variant="bodyMedium">Actualmente llevas concluido el {percentage} % del total de horas que necesitas completar.</Text>
+              </Flex>
+            </HStack>
+
+            <HStack spacing={10}>
+              <Avatar.Icon
+                icon="chart-timeline-variant-shimmer"
+                size={50}
+              />
+              <Flex fill>
+                <Text variant="bodyMedium">
+                  En promedio obtienes {moda(favorHours)} horas por actividad, con este ritmo necesitas completar más o menos {Number(total_hours / moda(favorHours)).toFixed(0)} eventos para concluir.
+                </Text>
+              </Flex>
+            </HStack>
+
+            {negativeHours.length > 0 && (
+              <HStack spacing={10}>
+                <Avatar.Icon
+                  icon="clock-minus-outline"
+                  size={50}
+                />
+                <Flex fill>
+                  <Text variant="bodyMedium">
+                    Sumas en total {favorSum} horas a favor, sin embargo, tienes {negativeSum} horas en contra
+                  </Text>
+                </Flex>
+              </HStack>
+            )}
+          </VStack>
+        </VStack>
+      </Card>
     )
   }
 
@@ -124,82 +181,6 @@ export default UserProgress = ({ navigation, route }) => {
       {total_hours > 0 && <ProgressBar progress={achieved_hours / total_hours} />}
     </VStack>
   )
-
-  // const Activity = () => {
-  //   return (
-  //     <Flex key="Activity">
-  //       <Flex pv={20}>
-  //         <Text variant="titleMedium">Actividades realizadas</Text>
-  //       </Flex>
-  //       <VStack
-  //         spacing={25}
-  //         key="Activity"
-  //       >
-  //         {activities.length > 0 ? (
-  //           <VStack spacing={10}>
-  //             {activities.map((activity) => (
-  //               <Card
-  //                 mode="outlined"
-  //                 key={activity._id}
-  //               >
-  //                 <HStack
-  //                   spacing={20}
-  //                   p={20}
-  //                 >
-  //                   <VStack items="center">
-  //                     <Avatar.Text
-  //                       label={activity?.hours}
-  //                       size={50}
-  //                     />
-  //                     <Text
-  //                       variant="bodyMedium"
-  //                       style={{ textAlign: "center" }}
-  //                     >
-  //                       hrs
-  //                     </Text>
-  //                   </VStack>
-  //                   <Flex fill>
-  //                     <Text
-  //                       variant="titleMedium"
-  //                       numberOfLines={2}
-  //                     >
-  //                       {activity?.activity_name}
-  //                     </Text>
-  //                     <Text
-  //                       variant="bodyMedium"
-  //                       numberOfLines={1}
-  //                     >
-  //                       {LongDate(activity?.assignation_date)}
-  //                     </Text>
-  //                     <Text
-  //                       variant="bodyMedium"
-  //                       numberOfLines={1}
-  //                     >
-  //                       {Time24(activity?.assignation_date)}
-  //                     </Text>
-  //                     <Text
-  //                       variant="bodyMedium"
-  //                       numberOfLines={1}
-  //                     >
-  //                       {activity?.responsible_name}
-  //                     </Text>
-  //                   </Flex>
-  //                 </HStack>
-  //               </Card>
-  //             ))}
-  //           </VStack>
-  //         ) : (
-  //           <InformationMessage
-  //             key="NoProgress"
-  //             title="Sin actividades"
-  //             description="Todavía no tines actividades realizadas, cuando completes algunas, estas aparecerán aquí"
-  //             icon="alert"
-  //           />
-  //         )}
-  //       </VStack>
-  //     </Flex>
-  //   )
-  // }
 
   const Activities = () => (
     <Card
@@ -234,9 +215,9 @@ export default UserProgress = ({ navigation, route }) => {
               center
             >
               <Avatar.Text
-                label={activity?.hours}
+                label={activity?.toSubstract == true ? `-${activity?.hours}` : activity?.hours}
                 size={50}
-                style={{ backgroundColor: activity?.hours <= 0 ? theme.colors.error : theme.colors.primary }}
+                style={{ backgroundColor: activity?.toSubstract == true ? theme.colors.error : theme.colors.primary }}
               />
               <Text variant="labelMedium">hrs</Text>
             </VStack>
@@ -286,7 +267,7 @@ export default UserProgress = ({ navigation, route }) => {
             // isNaN(activities) ? (
             <DisplayDetails
               title="Tu progreso"
-              children={[Title(), Progress(), Activities()]}
+              children={[Progress(), Title(), Activities()]}
               showHeader={false}
             />
           ) : (

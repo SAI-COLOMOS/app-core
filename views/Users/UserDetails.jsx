@@ -345,9 +345,9 @@ export default UserDetails = ({ navigation, route }) => {
                 center
               >
                 <Avatar.Text
-                  label={activity?.hours}
+                  label={activity?.toSubstract == true ? `-${activity?.hours}` : activity?.hours}
                   size={50}
-                  style={{ backgroundColor: activity?.hours <= 0 ? theme.colors.error : theme.colors.primary }}
+                  style={{ backgroundColor: activity?.toSubstract == true ? theme.colors.error : theme.colors.primary }}
                 />
                 <Text variant="labelMedium">hrs</Text>
               </VStack>
@@ -381,43 +381,180 @@ export default UserDetails = ({ navigation, route }) => {
     [profile?.register]
   )
 
-  return (
-    <Flex
-      fill
-      mt={headerMargin - 20}
-    >
-      {profile !== undefined && activities != undefined ? (
-        profile !== null && activities !== null ? (
-          isNaN(profile) && isNaN(activities) ? (
-            <DisplayDetails
-              avatar={avatar}
-              icon="account-outline"
-              title={`${profile?.first_name} ${profile?.first_last_name} ${profile?.second_last_name == undefined ? "" : profile?.second_last_name}`}
-              children={[profile?.role == "Prestador" && Progress(), profile?.role == "Prestador" && LatestActivities(), PersonalData(), ContactData(), EmergencyData(), AccountData()]}
-              refreshStatus={loading}
-              refreshAction={() => {
-                getUser()
-                getCard()
-              }}
-            />
+  if (profile?.role == "Prestador") {
+    return (
+      <Flex
+        fill
+        mt={headerMargin - 20}
+      >
+        {profile !== undefined &&
+          activities != undefined &&
+          (profile !== null && activities !== null ? (
+            isNaN(profile) && isNaN(activities) ? (
+              <DisplayDetails
+                avatar={avatar}
+                icon="account-outline"
+                title={`${profile?.first_name} ${profile?.first_last_name} ${profile?.second_last_name == undefined ? "" : profile?.second_last_name}`}
+                children={[Progress(), LatestActivities(), PersonalData(), ContactData(), EmergencyData(), AccountData()]}
+                refreshStatus={loading}
+                refreshAction={() => {
+                  getUser()
+                  getCard()
+                }}
+              />
+            ) : (
+              <VStack
+                p={30}
+                center
+                spacing={20}
+              >
+                <Icon
+                  color={theme.colors.onBackground}
+                  name="alert-circle-outline"
+                  size={50}
+                />
+                <VStack center>
+                  <Text variant="headlineSmall">Ocurrió un problema</Text>
+                  <Text
+                    variant="bodyMedium"
+                    style={{ textAlign: "center" }}
+                  >
+                    No podemos recuperar los datos del usuario, inténtalo de nuevo más tarde (Error: {profile})
+                  </Text>
+                </VStack>
+                <Flex>
+                  <Button
+                    mode="outlined"
+                    onPress={() => {
+                      getUser()
+                      getCard()
+                    }}
+                  >
+                    Volver a intentar
+                  </Button>
+                </Flex>
+              </VStack>
+            )
           ) : (
             <VStack
-              p={30}
               center
               spacing={20}
+              p={30}
             >
               <Icon
                 color={theme.colors.onBackground}
-                name="alert-circle-outline"
+                name="wifi-alert"
                 size={50}
               />
               <VStack center>
-                <Text variant="headlineSmall">Ocurrió un problema</Text>
+                <Text variant="headlineSmall">Sin internet</Text>
                 <Text
                   variant="bodyMedium"
                   style={{ textAlign: "center" }}
                 >
-                  No podemos recuperar los datos de la escuela, inténtalo de nuevo más tarde (Error: {profile})
+                  No podemos recuperar los datos del usuario, revisa tu conexión a internet e inténtalo de nuevo
+                </Text>
+              </VStack>
+              <Flex>
+                <Button
+                  mode="outlined"
+                  onPress={() => {
+                    getUser()
+                    getCard()
+                  }}
+                >
+                  Volver a intentar
+                </Button>
+              </Flex>
+            </VStack>
+          ))}
+
+        {!(profile === undefined || profile === null) && (
+          <FAB
+            icon="pencil-outline"
+            style={{ position: "absolute", margin: 16, right: 0, bottom: 0 }}
+            onPress={() => {
+              navigation.navigate("EditUser", {
+                profile,
+                image: avatar,
+                getUsers,
+                getUser
+              })
+            }}
+          />
+        )}
+      </Flex>
+    )
+  } else {
+    return (
+      <Flex
+        fill
+        mt={headerMargin - 20}
+      >
+        {profile !== undefined &&
+          (profile !== null ? (
+            isNaN(profile) ? (
+              <DisplayDetails
+                avatar={avatar}
+                icon="account-outline"
+                title={`${profile?.first_name} ${profile?.first_last_name} ${profile?.second_last_name == undefined ? "" : profile?.second_last_name}`}
+                children={[PersonalData(), ContactData(), EmergencyData(), AccountData()]}
+                refreshStatus={loading}
+                refreshAction={() => {
+                  getUser()
+                  getCard()
+                }}
+              />
+            ) : (
+              <VStack
+                p={30}
+                center
+                spacing={20}
+              >
+                <Icon
+                  color={theme.colors.onBackground}
+                  name="alert-circle-outline"
+                  size={50}
+                />
+                <VStack center>
+                  <Text variant="headlineSmall">Ocurrió un problema</Text>
+                  <Text
+                    variant="bodyMedium"
+                    style={{ textAlign: "center" }}
+                  >
+                    No podemos recuperar los datos del usuario, inténtalo de nuevo más tarde (Error: {profile})
+                  </Text>
+                </VStack>
+                <Flex>
+                  <Button
+                    mode="outlined"
+                    onPress={() => {
+                      getUser()
+                    }}
+                  >
+                    Volver a intentar
+                  </Button>
+                </Flex>
+              </VStack>
+            )
+          ) : (
+            <VStack
+              center
+              spacing={20}
+              p={30}
+            >
+              <Icon
+                color={theme.colors.onBackground}
+                name="wifi-alert"
+                size={50}
+              />
+              <VStack center>
+                <Text variant="headlineSmall">Sin internet</Text>
+                <Text
+                  variant="bodyMedium"
+                  style={{ textAlign: "center" }}
+                >
+                  No podemos recuperar los datos del usuario, revisa tu conexión a internet e inténtalo de nuevo
                 </Text>
               </VStack>
               <Flex>
@@ -431,55 +568,23 @@ export default UserDetails = ({ navigation, route }) => {
                 </Button>
               </Flex>
             </VStack>
-          )
-        ) : (
-          <VStack
-            center
-            spacing={20}
-            p={30}
-          >
-            <Icon
-              color={theme.colors.onBackground}
-              name="wifi-alert"
-              size={50}
-            />
-            <VStack center>
-              <Text variant="headlineSmall">Sin internet</Text>
-              <Text
-                variant="bodyMedium"
-                style={{ textAlign: "center" }}
-              >
-                No podemos recuperar los datos de la escuela, revisa tu conexión a internet e inténtalo de nuevo
-              </Text>
-            </VStack>
-            <Flex>
-              <Button
-                mode="outlined"
-                onPress={() => {
-                  getUser()
-                }}
-              >
-                Volver a intentar
-              </Button>
-            </Flex>
-          </VStack>
-        )
-      ) : null}
+          ))}
 
-      {!(profile === undefined || profile === null) ? (
-        <FAB
-          icon="pencil-outline"
-          style={{ position: "absolute", margin: 16, right: 0, bottom: 0 }}
-          onPress={() => {
-            navigation.navigate("EditUser", {
-              profile,
-              image: avatar,
-              getUsers,
-              getUser
-            })
-          }}
-        />
-      ) : null}
-    </Flex>
-  )
+        {!(profile === undefined || profile === null) && (
+          <FAB
+            icon="pencil-outline"
+            style={{ position: "absolute", margin: 16, right: 0, bottom: 0 }}
+            onPress={() => {
+              navigation.navigate("EditUser", {
+                profile,
+                image: avatar,
+                getUsers,
+                getUser
+              })
+            }}
+          />
+        )}
+      </Flex>
+    )
+  }
 }

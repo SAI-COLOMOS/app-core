@@ -117,9 +117,9 @@ export default CardDetails = ({ navigation, route }) => {
               center
             >
               <Avatar.Text
-                label={activity?.hours}
+                label={activity?.toSubstract == true ? `-${activity?.hours}` : activity?.hours}
                 size={50}
-                style={{ backgroundColor: activity?.hours <= 0 ? theme.colors.error : theme.colors.primary }}
+                style={{ backgroundColor: activity?.toSubstract == true ? theme.colors.error : theme.colors.primary }}
               />
               <Text variant="labelMedium">hrs</Text>
             </VStack>

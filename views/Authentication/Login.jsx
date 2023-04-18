@@ -113,6 +113,7 @@ export default Login = ({ navigation }) => {
     <Flex
       fill
       pt={insets.top}
+      pb={insets.bottom}
     >
       {activeSession === undefined ? (
         <Flex
@@ -129,7 +130,6 @@ export default Login = ({ navigation }) => {
         <ScrollView>
           <VStack
             p={20}
-            pb={50}
             spacing={50}
           >
             <Flex center>
@@ -157,7 +157,7 @@ export default Login = ({ navigation }) => {
                 right={
                   <TextInput.Icon
                     icon="eye"
-                    onPress={(_) => {
+                    onPress={() => {
                       setShowPassword(!showPassword)
                     }}
                   />
@@ -169,7 +169,7 @@ export default Login = ({ navigation }) => {
               >
                 <Switch
                   value={rememberUser}
-                  onValueChange={(_) => {
+                  onValueChange={() => {
                     setRememberUser(!rememberUser)
                   }}
                 />
@@ -182,7 +182,7 @@ export default Login = ({ navigation }) => {
                 disabled={modalLoading}
                 loading={modalLoading}
                 mode="contained"
-                onPress={(_) => {
+                onPress={() => {
                   getSession()
                 }}
               >
@@ -192,7 +192,7 @@ export default Login = ({ navigation }) => {
               <Button
                 disabled={modalLoading}
                 mode="text"
-                onPress={(_) => {
+                onPress={() => {
                   navigation.navigate("ResetPassword")
                 }}
               >

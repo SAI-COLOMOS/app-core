@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "sai",
-    "slug": "sai",
+    "name": "Servicio social",
+    "slug": "sai-colomos",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -34,12 +34,19 @@
           "data": [
             {
               "scheme": "sai",
-              "host": "*.sai.dev",
+              "host": "*.sai-colomos.dev",
               "pathPrefix": "/login"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
+      ],
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.CAMERA"
       ]
     },
     "web": {
@@ -60,10 +67,13 @@
       ]
     ],
     "extra": {
-      "environment": "development",
+      "environment": "production",
       "api_development": "http://192.168.100.14:3000",
       "api_production": "https://api.sai-colomos.dev",
-      "API_LOCAL": "http://192.168.100.14:3000"
-    }
+      "eas": {
+        "projectId": "28c70686-5791-4e1a-8272-9f86861b6cad"
+      }
+    },
+    "owner": "sai-colomos"
   }
 }
