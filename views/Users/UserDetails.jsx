@@ -10,6 +10,7 @@ import { useFocusEffect } from "@react-navigation/native"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import ApplicationContext from "../ApplicationContext"
 import { LongDate, ShortDate, Time24 } from "../Shared/LocaleDate"
+import InformationMessage from "../Shared/InformationMessage"
 
 const CardContext = createContext()
 
@@ -58,7 +59,7 @@ export default UserDetails = ({ navigation, route }) => {
     setLoading(false)
 
     if (request?.user) {
-      console.log(request.profile)
+      console.log(request.user)
       setProfile(request.user)
     }
   }
@@ -80,7 +81,7 @@ export default UserDetails = ({ navigation, route }) => {
     setLoading(false)
 
     if (request?.activities) {
-      console.log(request.activities)
+      console.log("Activities ", request.activities)
       setActivities(request.activities)
       setAchieved_hours(request.achieved_hours)
       setTotal_hours(request.total_hours)
@@ -152,12 +153,20 @@ export default UserDetails = ({ navigation, route }) => {
         <Text variant="titleMedium">Últimas actividades realizadas</Text>
       </Flex>
       <VStack>
-        {activities?.slice(0, 3).map((activity) => (
-          <Activity
-            key={activity._id}
-            activity={activity}
+        {activities?.length > 0 ? (
+          activities?.slice(0, 3).map((activity) => (
+            <Activity
+              key={activity._id}
+              activity={activity}
+            />
+          ))
+        ) : (
+          <InformationMessage
+            title="Sin actividades"
+            description="Este prestador todavía no tiene actividades realizadas"
+            icon="calendar-blank-outline"
           />
-        ))}
+        )}
         <HStack
           p={20}
           justify="between"
@@ -388,9 +397,9 @@ export default UserDetails = ({ navigation, route }) => {
         mt={headerMargin - 20}
       >
         {profile !== undefined &&
-          activities != undefined &&
+          activities !== undefined &&
           (profile !== null && activities !== null ? (
-            isNaN(profile) && isNaN(activities) ? (
+            isNaN(profile) ? (
               <DisplayDetails
                 avatar={avatar}
                 icon="account-outline"
@@ -498,7 +507,7 @@ export default UserDetails = ({ navigation, route }) => {
                 avatar={avatar}
                 icon="account-outline"
                 title={`${profile?.first_name} ${profile?.first_last_name} ${profile?.second_last_name == undefined ? "" : profile?.second_last_name}`}
-                children={[PersonalData(), ContactData(), EmergencyData(), AccountData()]}
+                children={[Progress(), LatestActivities(), PersonalData(), ContactData(), EmergencyData(), AccountData()]}
                 refreshStatus={loading}
                 refreshAction={() => {
                   getUser()
