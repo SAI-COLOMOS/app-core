@@ -2,7 +2,7 @@
   "expo": {
     "name": "Servicio social",
     "slug": "sai-colomos",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "jsEngine": "hermes",
@@ -47,7 +47,8 @@
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.CAMERA"
-      ]
+      ],
+      "package": "com.sai_colomos.app_core"
     },
     "web": {
       "favicon": "./assets/favicon.png"

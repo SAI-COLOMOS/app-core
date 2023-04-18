@@ -507,7 +507,7 @@ export default UserDetails = ({ navigation, route }) => {
                 avatar={avatar}
                 icon="account-outline"
                 title={`${profile?.first_name} ${profile?.first_last_name} ${profile?.second_last_name == undefined ? "" : profile?.second_last_name}`}
-                children={[Progress(), LatestActivities(), PersonalData(), ContactData(), EmergencyData(), AccountData()]}
+                children={[PersonalData(), ContactData(), EmergencyData(), AccountData()]}
                 refreshStatus={loading}
                 refreshAction={() => {
                   getUser()
