@@ -12,7 +12,7 @@ export default Modal = ({ questions, setter, index, handler, dismissable }) => {
   const [interrogation, setInterrogation] = useState("")
   const [enum_options, setEnum_options] = useState([])
 
-  const questionTypes = [{ option: "Abierta" }, { option: "Numérica" }, { option: "Opción multiple" }, { option: "Selección multiple" }, { option: "Escala" }]
+  const questionTypes = [{ option: "Abierta" }, { option: "Numérica" }, { option: "Opción múltiple" }, { option: "Selección múltiple" }, { option: "Escala" }]
 
   function saveQuestion() {
     const question = {
@@ -65,7 +65,6 @@ export default Modal = ({ questions, setter, index, handler, dismissable }) => {
                 label="Pregunta"
                 maxLength={150}
                 autoComplete="off"
-                autoCapitalize="none"
               />
               <Flex>
                 <Dropdown
@@ -76,7 +75,7 @@ export default Modal = ({ questions, setter, index, handler, dismissable }) => {
                 />
               </Flex>
 
-              {(question_type == "Selección multiple" || question_type == "Opción multiple") && (
+              {(question_type == "Selección múltiple" || question_type == "Opción múltiple") && (
                 <Flex>
                   <Text>Respuestas</Text>
                   <VStack spacing={10}>
@@ -98,7 +97,6 @@ export default Modal = ({ questions, setter, index, handler, dismissable }) => {
                               label={`Respuesta número ${index + 1}`}
                               maxLength={150}
                               autoComplete="off"
-                              autoCapitalize="none"
                             />
                           </Flex>
                           <IconButton

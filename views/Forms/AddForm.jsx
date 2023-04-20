@@ -19,8 +19,6 @@ export default AddForm = ({ navigation, route }) => {
   const [questions, setQuestions] = useState([])
   const [selectedIndex, setSelectedIndex] = useState(0)
 
-  const [school_name, setSchool_name] = useState("")
-  const [phone, setPhone] = useState("")
   const [verified, setVerified] = useState(false)
 
   const [showQuestionMaker, setShowQuestionMaker] = useState(false)
@@ -31,22 +29,28 @@ export default AddForm = ({ navigation, route }) => {
   const [modalFatal, setModalFatal] = useState(false)
   const [responseCode, setResponseCode] = useState("")
 
-  async function saveSchool() {
+  async function saveForm() {
     setModalLoading(true)
 
-    const request = await fetch(`${host}/schools`, {
+    const request = await fetch(`${host}/forms`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`
       },
       body: JSON.stringify({
-        school_name: school_name.trim(),
-        phone: phone.trim()
+        name: name.trim(),
+        description: description.trim(),
+        //        belonging_area: belonging_area.trim(),
+        //        belonging_place: belonging_place.trim(),
+        belonging_event_identifier: "AAA",
+        version: Number(version),
+        questions: questions,
+        isTemplate: true
       })
     })
       .then((response) => response.status)
-      .catch((_) => null)
+      .catch(() => null)
 
     setModalLoading(false)
 
@@ -193,11 +197,11 @@ export default AddForm = ({ navigation, route }) => {
     <Button
       key="SaveButton"
       icon="content-save-outline"
-      disabled={modalLoading || !verified}
+      // disabled={modalLoading || !verified}
       loading={modalLoading}
       mode="contained"
       onPress={() => {
-        saveSchool()
+        saveForm()
       }}
     >
       Guardar
@@ -235,7 +239,7 @@ export default AddForm = ({ navigation, route }) => {
           [
             "Aceptar",
             () => {
-              getSchools()
+              //getSchools()
               navigation.pop()
             }
           ]

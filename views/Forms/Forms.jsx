@@ -30,7 +30,7 @@ export default Forms = ({ navigation, route }) => {
   async function getForms() {
     setLoading(true)
 
-    const request = await fetch(`${host}/forms?isTemplate=${isTemplate}`, {
+    const request = await fetch(`${host}/forms?isTemplate=${true}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

@@ -10,6 +10,7 @@ import { useFocusEffect } from "@react-navigation/native"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import { log } from "react-native-reanimated"
 import ApplicationContext from "../ApplicationContext"
+import { MultipleOption, MultipleSelection, NumericQuestion, OpenQuestion, ScaleQuestion } from "../Shared/FormsComponents"
 
 export default FormDetails = ({ navigation, route }) => {
   const { host, token } = useContext(ApplicationContext)
@@ -17,6 +18,7 @@ export default FormDetails = ({ navigation, route }) => {
   const headerMargin = useHeaderHeight()
   const theme = useTheme()
 
+  const [answers, setAnswers] = useState({})
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState(undefined)
   const [isTemplate, setIsTemplate] = useState(false)
@@ -24,7 +26,7 @@ export default FormDetails = ({ navigation, route }) => {
   async function getForm() {
     setLoading(true)
 
-    const request = await fetch(`${host}/forms/${form_identifier}?isTemplate=${isTemplate}`, {
+    const request = await fetch(`${host}/forms/${form_identifier}?isTemplate=${true}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -33,7 +35,7 @@ export default FormDetails = ({ navigation, route }) => {
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
-      .catch((_) => null)
+      .catch(() => null)
 
     //const json = await request.json()
     //console.log("String: " + json)
@@ -55,6 +57,16 @@ export default FormDetails = ({ navigation, route }) => {
       headerTitle: "Datos del formulario"
     })
   }, [])
+
+  useEffect(() => {
+    if (form?.questions !== undefined) {
+      const object = {}
+      form?.questions.forEach((element) => {
+        object[element?.question_identifier] = null
+      })
+      setAnswers({ ...object })
+    }
+  }, [form])
 
   useFocusEffect(
     useCallback(() => {
@@ -109,54 +121,112 @@ export default FormDetails = ({ navigation, route }) => {
   )
 
   const Questions = () => (
-    <Flex key="Preguntas">
-      <VStack
-        // p={5}
-        spacing={15}
-      >
-        {form.questions.length > 0 ? (
-          form.questions.map((ask, index) => (
-            <Card
-              mode="outlined"
-              key={ask.interrogation}
-            >
-              <VStack
-                p={10}
-                spacing={10}
-              >
-                <Flex>
-                  <Text variant="labelSmall">Pregunta {index + 1}</Text>
-                  <Text variant="bodyMedium">{ask?.interrogation}</Text>
-                </Flex>
-                <Flex>
-                  <Text variant="labelSmall">Tipo de pregunta</Text>
-                  <Text variant="bodyMedium">{ask?.question_type}</Text>
-                </Flex>
-                <Flex>
-                  {ask?.question_type == "Opción múltiple" || ask?.question_type == "Selección múltiple" || ask?.question_type == "Escala" ? (
-                    <VStack pb={5}>
-                      <Text variant="labelSmall">Respuestas</Text>
-                    </VStack>
-                  ) : null}
-                  {ask?.question_type == "Opción múltiple" || ask?.question_type == "Selección múltiple" || ask?.question_type == "Escala"
-                    ? ask?.enum_options.map((opt, index) => (
-                        <Flex>
-                          <Text variant="bodyMedium">
-                            {index + 1}.- {opt}
-                          </Text>
-                        </Flex>
-                      ))
-                    : null}
-                </Flex>
-              </VStack>
-            </Card>
-          ))
-        ) : (
-          <Text variant="labelSmall">No hay preguntas en este formulario.</Text>
-        )}
-      </VStack>
-    </Flex>
+    <VStack spacing={20}>
+      <Text>{JSON.stringify(answers)}</Text>
+      {form?.questions.length > 0 &&
+        form.questions.map((question, index) => (
+          <Flex key={question.interrogation}>
+            {
+              {
+                "Opción múltiple": (
+                  <MultipleOption
+                    question={question.interrogation}
+                    options={question.enum_options}
+                    id={question.question_identifier}
+                    getter={answers}
+                    setter={setAnswers}
+                  />
+                ),
+                Abierta: (
+                  <OpenQuestion
+                    question={question.interrogation}
+                    id={question.question_identifier}
+                    getter={answers}
+                    setter={setAnswers}
+                  />
+                ),
+                Numérica: (
+                  <NumericQuestion
+                    question={question.interrogation}
+                    id={question.question_identifier}
+                    getter={answers}
+                    setter={setAnswers}
+                  />
+                ),
+                "Selección múltiple": (
+                  <MultipleSelection
+                    question={question.interrogation}
+                    options={question.enum_options}
+                    id={question.question_identifier}
+                    getter={answers}
+                    setter={setAnswers}
+                  />
+                ),
+                Escala: (
+                  <ScaleQuestion
+                    question={question.interrogation}
+                    options={question.enum_options}
+                    id={question.question_identifier}
+                    getter={answers}
+                    setter={setAnswers}
+                  />
+                )
+              }[question.question_type]
+            }
+          </Flex>
+        ))}
+    </VStack>
   )
+
+  // const Questions = () => (
+  //   <Flex key="Preguntas">
+  //     <VStack
+  //       // p={5}
+  //       spacing={15}
+  //     >
+  //       {form.questions.length > 0 ? (
+  //         form.questions.map((ask, index) => (
+  //           <Card
+  //             mode="outlined"
+  //             key={ask.interrogation}
+  //           >
+  //             <VStack
+  //               p={10}
+  //               spacing={10}
+  //             >
+  //               <Flex>
+  //                 <Text variant="labelSmall">Pregunta {index + 1}</Text>
+  //                 <Text variant="bodyMedium">{ask?.interrogation}</Text>
+  //               </Flex>
+  //               <Flex>
+  //                 <Text variant="labelSmall">Tipo de pregunta</Text>
+  //                 <Text variant="bodyMedium">{ask?.question_type}</Text>
+  //               </Flex>
+  //               <Flex>
+  //                 {ask?.question_type == "Opción múltiple" || ask?.question_type == "Selección múltiple" || ask?.question_type == "Escala" ? (
+  //                   <VStack pb={5}>
+  //                     <Text variant="labelSmall">Respuestas</Text>
+  //                   </VStack>
+  //                 ) : null}
+  //                 {ask?.question_type == "Opción múltiple" || ask?.question_type == "Selección múltiple" || ask?.question_type == "Escala"
+  //                   ? ask?.enum_options.map((opt, index) => (
+  //                       <Flex>
+  //                         <Text variant="bodyMedium">
+  //                           {index + 1}.- {opt}
+  //                         </Text>
+  //                       </Flex>
+  //                     ))
+  //                   : null}
+  //               </Flex>
+  //             </VStack>
+  //           </Card>
+  //         ))
+  //       ) : (
+  //         <Text variant="labelSmall">No hay preguntas en este formulario.</Text>
+  //       )}
+  //     </VStack>
+  //   </Flex>
+  // )
 
   return (
     <Flex
