@@ -266,7 +266,7 @@ export default FormDetails = ({ navigation, route }) => {
                   variant="bodyMedium"
                   style={{ textAlign: "center" }}
                 >
-                  No podemos recuperar los datos del formulario, intentalo de nuevo más tarde (Error: {form})
+                  No podemos recuperar los datos del formulario, inténtalo de nuevo más tarde (Error: {form})
                 </Text>
               </VStack>
               <Flex>
@@ -298,7 +298,7 @@ export default FormDetails = ({ navigation, route }) => {
                 variant="bodyMedium"
                 style={{ textAlign: "center" }}
               >
-                No podemos recuperar los datos del formulario, revisa tu conexión a internet e intentalo de nuevo
+                No podemos recuperar los datos del formulario, revisa tu conexión a internet e inténtalo de nuevo
               </Text>
             </VStack>
             <Flex>
