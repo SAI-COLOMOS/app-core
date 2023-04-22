@@ -175,7 +175,6 @@ export default EditUser = ({ navigation, route }) => {
       .catch(() => null)
 
     setModalLoading(false)
-    console.log(request)
 
     if (request == 200) {
       setModalSuccessDelete(true)
@@ -285,7 +284,6 @@ export default EditUser = ({ navigation, route }) => {
   }, [first_name, first_last_name, age, blood_type, email, phone, emergency_contact, emergency_phone, provider_type, place, assigned_area, school, role, status, total_hours, curp])
 
   useEffect(() => {
-    console.log(profile)
     if (role != "Prestador") {
       setProvider_type("")
       setSchool("")
