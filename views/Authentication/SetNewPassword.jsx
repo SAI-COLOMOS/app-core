@@ -61,14 +61,9 @@ export default SetNewPassword = ({ navigation, route }) => {
     }
   }
 
-  useEffect(() => {
-    console.log("params: ", route.params)
-  }, [])
-
   useFocusEffect(
     useCallback(() => {
       try {
-        console.log(token)
         const payload = jwtDecode(token)
 
         if (payload.exp > Math.floor(Date.now() / 1000)) {
@@ -78,7 +73,6 @@ export default SetNewPassword = ({ navigation, route }) => {
         }
       } catch (error) {
         setValidToken(null)
-        console.log("Error en el token")
       }
 
       return () => {}

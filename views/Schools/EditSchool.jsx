@@ -80,8 +80,6 @@ export default EditSchool = ({ navigation, route }) => {
       .then((response) => response.status)
       .catch((_) => null)
 
-    console.log(request)
-
     setModalLoading(false)
 
     if (request == 200) {

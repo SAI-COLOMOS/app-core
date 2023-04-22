@@ -29,7 +29,6 @@ export default SearchBar = ({ label, value, setter, show, action }) => {
   })
 
   function handler(input) {
-    console.log(input, timer, action)
     setter(input)
     clearTimeout(timer)
     setTimer(setTimeout(() => action(input), 2000))
@@ -43,7 +42,6 @@ export default SearchBar = ({ label, value, setter, show, action }) => {
       displaySearchBarHeight.value = 0
       displaySearchBarOpacity.value = 0
     }
-    console.log(show)
   }, [show])
 
   useEffect(() => {
