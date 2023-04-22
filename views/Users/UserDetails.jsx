@@ -59,7 +59,6 @@ export default UserDetails = ({ navigation, route }) => {
     setLoading(false)
 
     if (request?.user) {
-      console.log(request.user)
       setProfile(request.user)
     }
   }
@@ -81,7 +80,6 @@ export default UserDetails = ({ navigation, route }) => {
     setLoading(false)
 
     if (request?.activities) {
-      console.log("Activities ", request.activities)
       setActivities(request.activities)
       setAchieved_hours(request.achieved_hours)
       setTotal_hours(request.total_hours)

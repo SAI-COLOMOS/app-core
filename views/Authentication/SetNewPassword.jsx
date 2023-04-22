@@ -12,7 +12,8 @@ import ApplicationContext from "../ApplicationContext"
 
 export default SetNewPassword = ({ navigation, route }) => {
   const theme = useTheme()
-  const { token, host } = useContext(ApplicationContext)
+  const { host, setToken } = useContext(ApplicationContext)
+  const { token } = route.params
 
   const [validToken, setValidToken] = useState(undefined)
   const [newPassword, setNewPassword] = useState("")
@@ -30,7 +31,7 @@ export default SetNewPassword = ({ navigation, route }) => {
   const [modalSuccess, setModalSuccess] = useState(false)
   const [modalError, setModalError] = useState(false)
   const [modalFatal, setModalFatal] = useState(false)
-  const [reponseCode, setReponseCode] = useState("")
+  const [responseCode, setResponseCode] = useState("")
 
   async function changePassword() {
     setModalLoading(true)
@@ -53,7 +54,7 @@ export default SetNewPassword = ({ navigation, route }) => {
     if (request == 200) {
       setModalSuccess(true)
     } else if (request != null) {
-      setReponseCode(request)
+      setResponseCode(request)
       setModalError(true)
     } else {
       setModalFatal(true)
@@ -63,7 +64,6 @@ export default SetNewPassword = ({ navigation, route }) => {
   useFocusEffect(
     useCallback(() => {
       try {
-        console.log(token)
         const payload = jwtDecode(token)
 
         if (payload.exp > Math.floor(Date.now() / 1000)) {
@@ -71,9 +71,8 @@ export default SetNewPassword = ({ navigation, route }) => {
         } else {
           setValidToken(false)
         }
-      } catch (erro) {
+      } catch (error) {
         setValidToken(null)
-        console.log(erro)
       }
 
       return () => {}
@@ -94,7 +93,10 @@ export default SetNewPassword = ({ navigation, route }) => {
 
   const Information = () => {
     return (
-      <VStack spacing={5}>
+      <VStack
+        key="Information"
+        spacing={5}
+      >
         <Text variant="bodyMedium">Para poder cambiar tu contraseña es necesario que cumplas con los siguientes requisitos:</Text>
         <VStack spacing={0}>
           <HStack
@@ -206,6 +208,7 @@ export default SetNewPassword = ({ navigation, route }) => {
   const OutOfTime = () => {
     return (
       <VStack
+        key="OutOfTime"
         center
         spacing={20}
         p={30}
@@ -229,6 +232,7 @@ export default SetNewPassword = ({ navigation, route }) => {
   const NotValid = () => {
     return (
       <VStack
+        key="NotValid"
         center
         spacing={20}
         p={30}
@@ -251,7 +255,10 @@ export default SetNewPassword = ({ navigation, route }) => {
 
   const Form = () => {
     return (
-      <VStack spacing={5}>
+      <VStack
+        key="Form"
+        spacing={5}
+      >
         <VStack spacing={10}>
           <TextInput
             mode="outlined"
@@ -263,7 +270,7 @@ export default SetNewPassword = ({ navigation, route }) => {
             right={
               <TextInput.Icon
                 icon="eye"
-                onPress={(_) => {
+                onPress={() => {
                   setShowNewPassword(!showNewPassword)
                 }}
               />
@@ -280,7 +287,7 @@ export default SetNewPassword = ({ navigation, route }) => {
             right={
               <TextInput.Icon
                 icon="eye"
-                onPress={(_) => {
+                onPress={() => {
                   setShowConfirmationNewPassword(!showConfirmationNewPassword)
                 }}
               />
@@ -291,7 +298,7 @@ export default SetNewPassword = ({ navigation, route }) => {
     )
   }
 
-  const Save = (_) => {
+  const Save = () => {
     return (
       <Button
         loading={modalLoading}
@@ -306,12 +313,12 @@ export default SetNewPassword = ({ navigation, route }) => {
     )
   }
 
-  const Cancel = (_) => {
+  const Cancel = () => {
     return (
       <Button
         disabled={modalLoading}
         mode="outlined"
-        onPress={(_) => {
+        onPress={() => {
           navigation.pop()
         }}
       >
@@ -320,12 +327,12 @@ export default SetNewPassword = ({ navigation, route }) => {
     )
   }
 
-  const Accept = (_) => {
+  const Accept = () => {
     return (
       <Button
         mode="contained"
-        onPress={(_) => {
-          token = null
+        onPress={() => {
+          setToken(null)
           navigation.pop()
         }}
       >
@@ -373,7 +380,7 @@ export default SetNewPassword = ({ navigation, route }) => {
 
       <ModalMessage
         title="Ocurrió un problema"
-        description={`No pudimos actualizar tu contraseña, intentalo más tarde. (${reponseCode})`}
+        description={`No pudimos actualizar tu contraseña, inténtalo más tarde. (${responseCode})`}
         handler={[modalError, () => setModalError(!modalError)]}
         actions={[["Aceptar"]]}
         dismissable={true}
@@ -382,7 +389,7 @@ export default SetNewPassword = ({ navigation, route }) => {
 
       <ModalMessage
         title="Sin conexión a internet"
-        description={`Parece que no tienes conexión a internet, conectate e intenta de nuevo`}
+        description={`Parece que no tienes conexión a internet, conéctate e intenta de nuevo`}
         handler={[modalFatal, () => setModalFatal(!modalFatal)]}
         actions={[["Aceptar"]]}
         dismissable={true}

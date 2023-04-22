@@ -37,7 +37,6 @@ export default SchoolDetails = ({ navigation, route }) => {
 
     if (request?.school) {
       setSchool(request.school)
-      console.log(request)
     } else {
       setSchool(request)
     }

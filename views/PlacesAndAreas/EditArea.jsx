@@ -68,8 +68,6 @@ export default EditArea = ({ navigation, route }) => {
       .then((response) => response.status)
       .catch(() => null)
 
-    console.log(request)
-
     setModalLoading(false)
 
     if (request == 200) {

@@ -1,30 +1,26 @@
 import { Flex, HStack, Spacer, VStack } from "@react-native-material/core"
 import { useCallback, useContext, useEffect, useState } from "react"
-import { Card, IconButton, TouchableRipple, Text, TextInput, useTheme, Avatar, FAB, ActivityIndicator, Tooltip } from "react-native-paper"
+import { Card, IconButton, TouchableRipple, Text, useTheme, Avatar, FAB, ActivityIndicator, Tooltip } from "react-native-paper"
 import { useHeaderHeight } from "@react-navigation/elements"
 import Header from "../Shared/Header"
-import Constants from "expo-constants"
-import { FlatList, Image, Pressable } from "react-native"
-import { useFocusEffect } from "@react-navigation/native"
+import { FlatList, Image } from "react-native"
 import SearchBar from "../Shared/SearchBar"
 import ModalFilters from "../Shared/ModalFilters"
 import Dropdown from "../Shared/Dropdown"
 import InformationMessage from "../Shared/InformationMessage"
 import ApplicationContext from "../ApplicationContext"
-import ProfileImage from "../Shared/ProfileImage"
 import { GetDay, GetCompactMonth, Time24 } from "../Shared/LocaleDate"
 import CacheContext from "../Contexts/CacheContext"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import DateAndTimePicker from "../Shared/DateAndTimePicker"
 
-export default Users = ({ navigation, route }) => {
+export default Users = ({ navigation }) => {
   const headerMargin = useHeaderHeight()
   const { host, user, token } = useContext(ApplicationContext)
   const { events, setEvents } = useContext(CacheContext)
   const theme = useTheme()
 
   const [loading, setLoading] = useState(false)
-  //const [events, setEvents] = useState(undefined)
   const [foundEvents, setFoundEvents] = useState(undefined)
   const [search, setSearch] = useState("")
   const [showSearch, setShowSearch] = useState(null)
@@ -33,7 +29,7 @@ export default Users = ({ navigation, route }) => {
   const [history, setHistory] = useState(false)
 
   const [placeFilter, setPlaceFilter] = useState("")
-  const [dateFilter, setDateFilter] = useState("Hola")
+  const [dateFilter, setDateFilter] = useState("")
 
   const getEvents = async () => {
     setLoading(true)
@@ -108,15 +104,15 @@ export default Users = ({ navigation, route }) => {
           {...props}
           children={
             user?.role != "Prestador" && [
-              <Tooltip
-                key="DraftsButton"
-                title="Ver borradores"
-              >
-                <IconButton
-                  icon="archive-outline"
-                  onPress={() => setHistory(!history)}
-                />
-              </Tooltip>,
+              // <Tooltip
+              //   key="DraftsButton"
+              //   title="Ver borradores"
+              // >
+              //   <IconButton
+              //     icon="archive-outline"
+              //     onPress={() => setHistory(!history)}
+              //   />
+              // </Tooltip>,
               <Tooltip
                 key="HistoryButton"
                 title={history == true ? "Ocultar concluidos" : "Mostrar concluidos"}

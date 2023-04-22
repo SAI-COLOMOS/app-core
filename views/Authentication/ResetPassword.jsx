@@ -15,7 +15,7 @@ export default ResetPassword = ({ navigation }) => {
   const [modalSuccess, setModalSuccess] = useState(false)
   const [modalError, setModalError] = useState(false)
   const [modalFatal, setModalFatal] = useState(false)
-  const [reponseCode, setReponseCode] = useState("")
+  const [responseCode, setResponseCode] = useState("")
 
   const getRecovery = async () => {
     setModalLoading(true)
@@ -31,14 +31,14 @@ export default ResetPassword = ({ navigation }) => {
       })
     })
       .then((response) => response.status)
-      .catch((_) => null)
+      .catch(() => null)
 
     setModalLoading(false)
 
     if (request == 200) {
       setModalSuccess(true)
     } else if (request != null) {
-      setReponseCode(request)
+      setResponseCode(request)
       setModalError(true)
     } else {
       setModalFatal(true)
@@ -47,9 +47,12 @@ export default ResetPassword = ({ navigation }) => {
     return
   }
 
-  const Form = (_) => {
+  const Form = () => {
     return (
-      <VStack spacing={5}>
+      <VStack
+        key="Form"
+        spacing={5}
+      >
         <TextInput
           mode="outlined"
           label="Registro, email o teléfono"
@@ -62,17 +65,21 @@ export default ResetPassword = ({ navigation }) => {
     )
   }
 
-  const Info = (_) => {
+  const Info = () => {
     return (
-      <VStack spacing={5}>
-        <Text variant="bodyMedium">¿Olvidaste tu contraseña? No te preocupes, puedes reestablcerla fácilmente, solo introduce tu registro, correo electrónico o teléfono para solicitar el cambio de contraseña</Text>
+      <VStack
+        key="Info"
+        spacing={5}
+      >
+        <Text variant="bodyMedium">¿Olvidaste tu contraseña? No te preocupes, puedes restablecerla fácilmente, solo introduce tu registro, correo electrónico o teléfono para solicitar el cambio de contraseña</Text>
       </VStack>
     )
   }
 
-  const Submit = (_) => {
+  const Submit = () => {
     return (
       <Button
+        key="Submit"
         icon="lock-reset"
         mode="contained"
         loading={modalLoading}
@@ -86,13 +93,14 @@ export default ResetPassword = ({ navigation }) => {
     )
   }
 
-  const Cancel = (_) => {
+  const Cancel = () => {
     return (
       <Button
+        key="Cancel"
         icon="close"
         mode="outlined"
         disabled={modalLoading}
-        onPress={(_) => {
+        onPress={() => {
           navigation.pop()
         }}
       >
@@ -105,13 +113,11 @@ export default ResetPassword = ({ navigation }) => {
     <Flex fill>
       <CreateForm
         navigation={navigation}
-        title="Reestablecer tu contraseña"
+        title="Restablecer tu contraseña"
         loading={modalLoading}
         children={[Info(), Form()]}
         actions={[Submit(), Cancel()]}
       />
-
-      {/* <ModalLoaading handler={[modalLoading, () => setModalLoading(!modalLoading)]} dismissable={false}/> */}
 
       <ModalMessage
         title="¡Listo!"
@@ -124,7 +130,7 @@ export default ResetPassword = ({ navigation }) => {
 
       <ModalMessage
         title="Ocurrió un problema"
-        description={`No pudimos solicitar tu cambio de contraseña, intentalo más tarde. (${reponseCode})`}
+        description={`No pudimos solicitar tu cambio de contraseña, inténtalo más tarde. (${responseCode})`}
         handler={[modalError, () => setModalError(!modalError)]}
         actions={[["Aceptar"]]}
         dismissable={true}
@@ -133,7 +139,7 @@ export default ResetPassword = ({ navigation }) => {
 
       <ModalMessage
         title="Sin conexión a internet"
-        description={`Parece que no tienes conexión a internet, conectate e intenta de nuevo`}
+        description={`Parece que no tienes conexión a internet, conéctate e intenta de nuevo`}
         handler={[modalFatal, () => setModalFatal(!modalFatal)]}
         actions={[["Aceptar"]]}
         dismissable={true}

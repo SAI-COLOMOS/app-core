@@ -22,12 +22,9 @@ const CacheProvider = ({ children }) => {
         const image = images.find((item) => item?.id == id)
 
         if (image != undefined) {
-          console.log("true", id)
           return image.image
         }
       }
-
-      console.log("false", id)
 
       const request = await fetch(url, {
         method: "GET",
@@ -41,7 +38,6 @@ const CacheProvider = ({ children }) => {
 
       if (request?.avatar) {
         images.push({ id: id, image: request.avatar })
-        // console.log(id, request.avatar)
         return request.avatar
       }
 
