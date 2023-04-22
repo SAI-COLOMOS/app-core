@@ -1,7 +1,7 @@
 import { NavigationContainer } from "@react-navigation/native"
 import { StatusBar } from "expo-status-bar"
-import { useEffect, useCallback, useRef } from "react"
-import { StyleSheet, useColorScheme, View } from "react-native"
+import { useCallback, useRef } from "react"
+import { useColorScheme } from "react-native"
 import { Provider, configureFonts } from "react-native-paper"
 import { useFonts } from "expo-font"
 import * as Linking from "expo-linking"
@@ -14,7 +14,6 @@ import { darkTheme, lightTheme } from "./assets/themes/themeGreen"
 SplashScreen.preventAutoHideAsync()
 
 export default function App() {
-  const url = Linking.useURL()
   const schema = useColorScheme()
   const recovery = useRef()
   let dth = darkTheme
@@ -136,19 +135,6 @@ export default function App() {
       await SplashScreen.hideAsync()
     }
   }, [fontsLoaded])
-
-  // useEffect(() => {
-  //     console.log(url)
-  //     if(url) {
-  //         const {hostname, path, queryParams} = Linking.parse(url)
-  //         if(path === "recovery" && queryParams?.tkn) {
-  //             recovery.current.navigate("SetNewPassword", {token: queryParams.tkn})
-  //             console.log(queryParams)
-  //         }
-  //     }
-  // }, [url])
-
-  /* Deep link */
 
   const linking = {
     prefixes: [Linking.createURL("/"), "https://api.sai-colomos.dev"],
