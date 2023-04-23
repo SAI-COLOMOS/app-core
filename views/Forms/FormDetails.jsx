@@ -122,7 +122,6 @@ export default FormDetails = ({ navigation, route }) => {
 
   const Questions = () => (
     <VStack spacing={20}>
-      <Text>{JSON.stringify(answers)}</Text>
       {form?.questions.length > 0 &&
         form.questions.map((question, index) => (
           <Flex key={question.interrogation}>
@@ -177,56 +176,6 @@ export default FormDetails = ({ navigation, route }) => {
         ))}
     </VStack>
   )
-
-  // const Questions = () => (
-  //   <Flex key="Preguntas">
-  //     <VStack
-  //       // p={5}
-  //       spacing={15}
-  //     >
-  //       {form.questions.length > 0 ? (
-  //         form.questions.map((ask, index) => (
-  //           <Card
-  //             mode="outlined"
-  //             key={ask.interrogation}
-  //           >
-  //             <VStack
-  //               p={10}
-  //               spacing={10}
-  //             >
-  //               <Flex>
-  //                 <Text variant="labelSmall">Pregunta {index + 1}</Text>
-  //                 <Text variant="bodyMedium">{ask?.interrogation}</Text>
-  //               </Flex>
-  //               <Flex>
-  //                 <Text variant="labelSmall">Tipo de pregunta</Text>
-  //                 <Text variant="bodyMedium">{ask?.question_type}</Text>
-  //               </Flex>
-  //               <Flex>
-  //                 {ask?.question_type == "Opción múltiple" || ask?.question_type == "Selección múltiple" || ask?.question_type == "Escala" ? (
-  //                   <VStack pb={5}>
-  //                     <Text variant="labelSmall">Respuestas</Text>
-  //                   </VStack>
-  //                 ) : null}
-  //                 {ask?.question_type == "Opción múltiple" || ask?.question_type == "Selección múltiple" || ask?.question_type == "Escala"
-  //                   ? ask?.enum_options.map((opt, index) => (
-  //                       <Flex>
-  //                         <Text variant="bodyMedium">
-  //                           {index + 1}.- {opt}
-  //                         </Text>
-  //                       </Flex>
-  //                     ))
-  //                   : null}
-  //               </Flex>
-  //             </VStack>
-  //           </Card>
-  //         ))
-  //       ) : (
-  //         <Text variant="labelSmall">No hay preguntas en este formulario.</Text>
-  //       )}
-  //     </VStack>
-  //   </Flex>
-  // )
 
   return (
     <Flex
@@ -316,20 +265,19 @@ export default FormDetails = ({ navigation, route }) => {
       ) : null}
       {/* </ScrollView> */}
 
-      {!(form === undefined || form === null) ? (
+      {!(form === undefined || form === null) && (
         <FAB
           icon="pencil-outline"
           style={{ position: "absolute", margin: 16, right: 0, bottom: 0 }}
           onPress={() => {
             navigation.navigate("EditForm", {
-              token,
               form,
               getForms,
               getForm
             })
           }}
         />
-      ) : null}
+      )}
     </Flex>
   )
 }

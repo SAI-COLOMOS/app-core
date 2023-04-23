@@ -9,7 +9,6 @@ import ModalQuestion from "../Shared/ModalQuestion"
 
 export default AddForm = ({ navigation, route }) => {
   const { host, token } = useContext(ApplicationContext)
-  const { getSchools } = route.params
 
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
@@ -18,10 +17,9 @@ export default AddForm = ({ navigation, route }) => {
   const [isTemplate, setIsTemplate] = useState(true)
   const [questions, setQuestions] = useState([])
   const [selectedIndex, setSelectedIndex] = useState(0)
+  const [showQuestionMaker, setShowQuestionMaker] = useState(false)
 
   const [verified, setVerified] = useState(false)
-
-  const [showQuestionMaker, setShowQuestionMaker] = useState(false)
 
   const [modalLoading, setModalLoading] = useState(false)
   const [modalSuccess, setModalSuccess] = useState(false)
@@ -160,10 +158,22 @@ export default AddForm = ({ navigation, route }) => {
                 </Flex>
 
                 <HStack
-                  reverse={true}
                   items="baseline"
                   justify="between"
                 >
+                  <Button
+                    mode="outlined"
+                    icon="delete"
+                    onPress={() => {
+                      const newArray = [...questions]
+                      newArray.splice(index, 1)
+                      console.log("AAAA", newArray)
+                      setQuestions(newArray)
+                    }}
+                  >
+                    Eliminar
+                  </Button>
+
                   <Button
                     mode="contained"
                     icon="pencil-outline"
@@ -174,18 +184,6 @@ export default AddForm = ({ navigation, route }) => {
                   >
                     Editar
                   </Button>
-
-                  <HStack>
-                    <IconButton
-                      icon="delete"
-                      mode="outlined"
-                      onPress={() => {
-                        const newArray = [...questions]
-                        newArray.splice(index, 1)
-                        setQuestions(newArray)
-                      }}
-                    />
-                  </HStack>
                 </HStack>
               </VStack>
             </Card>
