@@ -127,7 +127,7 @@ export default AddForm = ({ navigation, route }) => {
           mode="outlined"
           value={version}
           onChangeText={setVersion}
-          label="Versión del formulario"
+          label="Folio del formulario"
           maxLength={150}
           autoComplete="off"
         />

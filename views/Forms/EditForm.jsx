@@ -17,9 +17,6 @@ export default EditForm = ({ navigation, route }) => {
 
   const [name, setName] = useState(`${form?.name ?? ""}`)
   const [description, setDescription] = useState(`${form?.description ?? ""}`)
-  const [belonging_area, setBeging_area] = useState(`${form?.belonging_area ?? ""}`)
-  const [belonging_place, setBelonging_place] = useState(`${form?.belonging_place ?? ""}`)
-  const [belonging_event_identifier, setBelonging_event_identifier] = useState(`${form?.belonging_event_identifier ?? ""}`)
   const [version, setVersion] = useState(`${form?.version}`)
   const [questions, setQuestions] = useState(form.questions)
   const [isTemplate, setIsTemplate] = useState(false)
@@ -57,30 +54,27 @@ export default EditForm = ({ navigation, route }) => {
   const [responseCode, setResponseCode] = useState("")
 
   async function saveForm() {
-    const request = await fetch(`${host}/forms`, {
+    setModalLoading(true)
+    const request = await fetch(`${host}/forms/${form.form_identifier}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        "Cache-Control": "no-cache"
+        Authorization: `Bearer ${token}`
       },
       body: JSON.stringify({
         name: name.trim(),
         description: description.trim(),
-        belonging_area: belonging_area.trim(),
-        belonging_place: belonging_place.trim(),
-        belonging_event_identifier: belonging_event_identifier.trim(),
         version: Number(version),
         questions: questions,
-        isTemplate
+        isTemplate: true
       })
     })
-      .then((response) => response.json() /*response.status*/)
+      .then((response) => response.status)
       .catch((error) => console.error("Error: ", error))
 
-    // console.log(request)
+    setModalLoading(false)
 
-    if (request == 201) {
+    if (request == 200) {
       setModalSuccess(true)
     } else if (request != null) {
       setResponseCode(request)
@@ -95,8 +89,7 @@ export default EditForm = ({ navigation, route }) => {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        "Cache-Control": "no-cache"
+        Authorization: `Bearer ${token}`
       },
       body: JSON.stringify({
         isTemplate: true
@@ -187,7 +180,7 @@ export default EditForm = ({ navigation, route }) => {
           mode="outlined"
           value={version}
           onChangeText={setVersion}
-          label="Versión del formulario"
+          label="Folio del formulario"
           maxLength={150}
           autoComplete="off"
         />
@@ -287,6 +280,7 @@ export default EditForm = ({ navigation, route }) => {
           textColor={theme.colors.error}
           icon="trash-can-outline"
           mode="outlined"
+          disabled={modalLoading}
           onPress={() => {
             setModalConfirm(!modalConfirm)
           }}
@@ -305,7 +299,7 @@ export default EditForm = ({ navigation, route }) => {
       disabled={modalLoading || !verified}
       loading={modalLoading}
       onPress={() => {
-        // saveForm()
+        saveForm()
       }}
     >
       Guardar
@@ -316,6 +310,7 @@ export default EditForm = ({ navigation, route }) => {
     <Button
       key="CancelButton"
       mode="outlined"
+      disabled={modalLoading}
       icon="close"
       onPress={() => {
         navigation.pop()

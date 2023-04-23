@@ -139,7 +139,7 @@ export default Forms = ({ navigation, route }) => {
                   variant="bodySmall"
                   numberOfLines={2}
                 >
-                  {item.description}
+                  {item.version}
                 </Text>
               </Flex>
             </HStack>
@@ -148,42 +148,6 @@ export default Forms = ({ navigation, route }) => {
       </Flex>
     )
   }
-
-  // const Item = ({ form_name, description, form_identifier }) => {
-  //   return (
-  //     <Flex
-  //       ph={20}
-  //       pv={5}
-  //       onPress={() => {}}
-  //     >
-  //       <Card
-  //         mode="outlined"
-  //         style={{ overflow: "hidden" }}
-  //       >
-  //         <TouchableRipple
-  //           onPress={() => {
-  //             navigation.navigate("FormDetails", { token, form_identifier, getForms })
-  //           }}
-  //         >
-  //           <Flex p={10}>
-  //             <Card.Title
-  //               title={form_name}
-  //               titleNumberOfLines={2}
-  //               subtitle={description}
-  //               subtitleNumberOfLines={1}
-  //               left={(props) => (
-  //                 <Avatar.Icon
-  //                   {...props}
-  //                   icon="form-select"
-  //                 />
-  //               )}
-  //             />
-  //           </Flex>
-  //         </TouchableRipple>
-  //       </Card>
-  //     </Flex>
-  //   )
-  // }
 
   return (
     <Flex

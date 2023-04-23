@@ -62,6 +62,7 @@ const MultipleOption = ({ question, options, id, getter, setter }) => {
         {options?.length > 0 &&
           options.map((option, index) => (
             <RadioButton.Item
+              key={index.toString()}
               style={{ paddingHorizontal: 20 }}
               label={option}
               value={option}
@@ -87,6 +88,7 @@ const MultipleSelection = ({ question, options, id, getter, setter }) => {
       {options?.length > 0 &&
         options.map((option, index) => (
           <Checkbox.Item
+            key={index.toString()}
             label={option}
             onPress={() => {
               const newArray = getter[id] === null ? [] : [...getter[id]]

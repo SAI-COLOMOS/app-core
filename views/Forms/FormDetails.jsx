@@ -87,33 +87,13 @@ export default FormDetails = ({ navigation, route }) => {
         <Text variant="titleMedium">Datos del formulario</Text>
         <VStack spacing={10}>
           <Flex>
-            <Text variant="labelSmall">Descripción</Text>
+            <Text variant="labelSmall">Descripción del evento</Text>
             <Text variant="bodyMedium">{form?.description}</Text>
           </Flex>
 
           <Flex>
-            <Text variant="labelSmall">Registro del autor </Text>
-            <Text variant="bodyMedium">{form?.author_register}</Text>
-          </Flex>
-
-          <Flex>
-            <Text variant="labelSmall">Área al que pertenece </Text>
-            <Text variant="bodyMedium">{form?.belonging_area}</Text>
-          </Flex>
-
-          <Flex>
-            <Text variant="labelSmall">Parque al que pertenece </Text>
-            <Text variant="bodyMedium">{form?.belonging_place}</Text>
-          </Flex>
-
-          <Flex>
-            <Text variant="labelSmall">Version </Text>
+            <Text variant="labelSmall">Folio del formulario</Text>
             <Text variant="bodyMedium">{form?.version}</Text>
-          </Flex>
-
-          <Flex>
-            <Text variant="labelSmall">ID </Text>
-            <Text variant="bodyMedium">{form?.form_identifier}</Text>
           </Flex>
         </VStack>
       </VStack>
@@ -121,10 +101,13 @@ export default FormDetails = ({ navigation, route }) => {
   )
 
   const Questions = () => (
-    <VStack spacing={20}>
+    <VStack
+      key="Questions"
+      spacing={20}
+    >
       {form?.questions.length > 0 &&
         form.questions.map((question, index) => (
-          <Flex key={question.interrogation}>
+          <Flex key={index.toString()}>
             {
               {
                 "Opción múltiple": (
