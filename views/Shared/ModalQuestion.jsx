@@ -17,9 +17,13 @@ export default Modal = ({ questions, setter, index, handler, dismissable }) => {
   function saveQuestion() {
     const question = {
       interrogation: interrogation,
-      question_type: question_type,
-      enum_options: enum_options
+      question_type: question_type
+      // enum_options: enum_options
       // val: questions.length
+    }
+
+    if (question_type == "Selección múltiple" || question_type == "Opción múltiple" || question_type == "Escala") {
+      question["enum_options"] = enum_options
     }
 
     const newArray = [...questions]
@@ -63,7 +67,8 @@ export default Modal = ({ questions, setter, index, handler, dismissable }) => {
                 value={interrogation}
                 onChangeText={setInterrogation}
                 label="Pregunta"
-                maxLength={150}
+                maxLength={500}
+                multiline={true}
                 autoComplete="off"
               />
               <Flex>
@@ -76,75 +81,158 @@ export default Modal = ({ questions, setter, index, handler, dismissable }) => {
               </Flex>
 
               {(question_type == "Selección múltiple" || question_type == "Opción múltiple") && (
-                <Flex>
-                  <Text>Respuestas</Text>
-                  <VStack spacing={10}>
-                    {enum_options?.length > 0 ? (
-                      enum_options.map((item, index) => (
-                        <HStack
-                          key={index.toString()}
-                          items="end"
-                        >
-                          <Flex fill>
-                            <TextInput
-                              mode="outlined"
-                              value={enum_options[index]}
-                              onChangeText={(text) => {
-                                const newArray = [...enum_options]
-                                newArray[index] = text
-                                setEnum_options(newArray)
-                              }}
-                              label={`Respuesta número ${index + 1}`}
-                              maxLength={150}
-                              autoComplete="off"
-                            />
-                          </Flex>
-                          <IconButton
-                            icon="delete"
-                            iconColor={theme.colors.error}
+                <VStack spacing={10}>
+                  {enum_options?.length > 0 ? (
+                    enum_options.map((item, index) => (
+                      <HStack
+                        key={index.toString()}
+                        items="end"
+                      >
+                        <Flex fill>
+                          <TextInput
                             mode="outlined"
-                            onPress={() => {
+                            value={enum_options[index]}
+                            onChangeText={(text) => {
                               const newArray = [...enum_options]
-                              newArray.splice(index, 1)
+                              newArray[index] = text
                               setEnum_options(newArray)
                             }}
+                            label={`Respuesta número ${index + 1}`}
+                            maxLength={150}
+                            autoComplete="off"
                           />
-                        </HStack>
-                      ))
-                    ) : (
-                      <InformationMessage
-                        title="Sin respuestas"
-                        description="Presiona el botón para agregar respuestas"
-                      />
-                    )}
-                    <Button
-                      mode="outlined"
-                      onPress={() => {
-                        const newArray = [...enum_options, ""]
-                        setEnum_options(newArray)
-                      }}
-                    >
-                      Agregar respuesta
-                    </Button>
-                    {/* <HStack reverse={true}>
+                        </Flex>
+                        <IconButton
+                          icon="delete"
+                          iconColor={theme.colors.error}
+                          mode="outlined"
+                          onPress={() => {
+                            const newArray = [...enum_options]
+                            newArray.splice(index, 1)
+                            setEnum_options(newArray)
+                          }}
+                        />
+                      </HStack>
+                    ))
+                  ) : (
                     <Flex>
-                      <Text>AG</Text>
+                      <Text variant="titleMedium">Sin respuestas</Text>
+                      <Text variant="bodyMedium">Presiona el botón para agregar una respuesta</Text>
                     </Flex>
-                    <IconButton
-                      mode="contained"
-                      icon="plus"
-                      onPress={() => }
-                    />
-                  </HStack> */}
-                  </VStack>
-                </Flex>
+                  )}
+                  <Button
+                    mode="outlined"
+                    icon="plus"
+                    disabled={enum_options[enum_options.length - 1] == ""}
+                    onPress={() => {
+                      const newArray = [...enum_options, ""]
+                      setEnum_options(newArray)
+                    }}
+                  >
+                    Agregar respuesta
+                  </Button>
+                </VStack>
+              )}
+
+              {question_type == "Escala" && (
+                <VStack spacing={10}>
+                  <HStack
+                    items="end"
+                    spacing={10}
+                  >
+                    <Flex fill>
+                      <TextInput
+                        mode="outlined"
+                        value={enum_options[0]}
+                        onChangeText={(text) => {
+                          const newArray = [...enum_options]
+                          newArray[0] = text
+                          setEnum_options(newArray)
+                        }}
+                        label="Mínimo"
+                        keyboardType="numeric"
+                        maxLength={2}
+                        autoComplete="off"
+                      />
+                    </Flex>
+                    {/* <Flex fill>
+                      <TextInput
+                        mode="outlined"
+                        value={enum_options[0]?.label}
+                        onChangeText={(text) => {
+                          const newArray = [...enum_options]
+                          newArray[0] = {
+                            ...newArray[0],
+                            label: text
+                          }
+                          setEnum_options(newArray)
+                        }}
+                        label="Etiqueta"
+                        maxLength={100}
+                        autoComplete="off"
+                      />
+                    </Flex> */}
+                  </HStack>
+
+                  <HStack
+                    items="end"
+                    spacing={10}
+                  >
+                    <Flex fill>
+                      <TextInput
+                        mode="outlined"
+                        value={enum_options[1]}
+                        onChangeText={(text) => {
+                          const newArray = [...enum_options]
+                          newArray[1] = text
+                          setEnum_options(newArray)
+                        }}
+                        label="Máximo"
+                        maxLength={2}
+                        keyboardType="numeric"
+                        autoComplete="off"
+                      />
+                    </Flex>
+                    {/* <Flex fill>
+                      <TextInput
+                        mode="outlined"
+                        value={enum_options[1]?.label}
+                        onChangeText={(text) => {
+                          const newArray = [...enum_options]
+                          newArray[1] = {
+                            ...newArray[1],
+                            label: text
+                          }
+                          setEnum_options(newArray)
+                        }}
+                        label="Etiqueta"
+                        maxLength={100}
+                        autoComplete="off"
+                      /> 
+                    </Flex> */}
+                  </HStack>
+                </VStack>
               )}
             </VStack>
           </ScrollView>
         </Dialog.ScrollArea>
         <Dialog.Actions>
-          <HStack>
+          <HStack
+            fill
+            justify="between"
+          >
             <Button
+              icon="close"
+              mode="outlined"
+              onPress={() => {
+                handler[1]()
+              }}
+            >
+              Cancelar
+            </Button>
+
+            <Button
+              icon="content-save-outline"
               mode="contained"
               onPress={() => {
                 saveQuestion()

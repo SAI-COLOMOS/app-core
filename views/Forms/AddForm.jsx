@@ -64,25 +64,46 @@ export default AddForm = ({ navigation, route }) => {
     }
   }
 
-  // useEffect(() => {
-  //   let check = true
+  useEffect(() => {
+    let valid = true
 
-  //   school_name.length > 0 ? null : (check = false)
-  //   phone.length == 10 ? null : (check = false)
+    if (name.length <= 0) {
+      valid = false
+    }
 
-  //   if (check) {
-  //     setVerified(true)
-  //   } else {
-  //     setVerified(false)
-  //   }
-  // }, [school_name, municipality, street, postal_code, exterior_number, colony, phone])
+    if (description.length <= 0) {
+      valid = false
+    }
+
+    if (version.length <= 0) {
+      valid = false
+    }
+
+    if (questions?.length == 0) {
+      valid = false
+    }
+
+    questions?.forEach((question) => {
+      if (question.interrogation == "") {
+        valid = false
+      }
+      if (question.question_type == "") {
+        valid = false
+      }
+      if (question?.enum_options?.length <= 0) {
+        valid = false
+      }
+    })
+
+    setVerified(valid)
+  }, [questions, name, description, version])
 
   const Data = () => (
     <VStack
       key="Data"
       spacing={5}
     >
-      <Text variant="labelLarge">Datos de la escuela</Text>
+      <Text variant="labelLarge">Datos del formulario</Text>
       <VStack spacing={10}>
         <TextInput
           mode="outlined"
@@ -91,7 +112,6 @@ export default AddForm = ({ navigation, route }) => {
           label="Nombre del formulario"
           maxLength={150}
           autoComplete="off"
-          autoCapitalize="none"
         />
 
         <TextInput
@@ -101,9 +121,8 @@ export default AddForm = ({ navigation, route }) => {
           multiline={true}
           numberOfLines={3}
           label="Descripción del formulario"
-          maxLength={150}
+          maxLength={500}
           autoComplete="off"
-          autoCapitalize="none"
         />
 
         <TextInput
@@ -113,7 +132,6 @@ export default AddForm = ({ navigation, route }) => {
           label="Versión del formulario"
           maxLength={150}
           autoComplete="off"
-          autoCapitalize="none"
         />
       </VStack>
     </VStack>
@@ -132,15 +150,23 @@ export default AddForm = ({ navigation, route }) => {
               mode="outlined"
               key={index.toString()}
             >
-              <VStack p={20}>
-                <Text variant="titleMedium">{questions[index].interrogation == "" ? "Pregunta vacía" : questions[index].interrogation}</Text>
-                <Text variant="bodyMedium">{questions[index].question_type}</Text>
+              <VStack
+                p={20}
+                spacing={20}
+              >
+                <Flex fill>
+                  <Text variant="titleMedium">{questions[index].interrogation == "" ? "Pregunta vacía" : questions[index].interrogation}</Text>
+                  <Text variant="bodyMedium">Tipo de pregunta: {questions[index].question_type == "" ? "Sin definir" : questions[index].question_type}</Text>
+                </Flex>
+
                 <HStack
                   reverse={true}
+                  items="baseline"
                   justify="between"
                 >
                   <Button
                     mode="contained"
+                    icon="pencil-outline"
                     onPress={() => {
                       setSelectedIndex(index)
                       setShowQuestionMaker(true)
@@ -148,19 +174,18 @@ export default AddForm = ({ navigation, route }) => {
                   >
                     Editar
                   </Button>
-                  <Button
-                    mode="outlined"
-                    onPress={() => {
-                      const newArray = [...questions]
-                      newArray.splice(index, 1)
-                      setQuestions(newArray)
-                      //console.log(questions.splice(index, 1))
-                      // const newArray = questions.splice(index, 1)
-                      // console.log(newArray)
-                    }}
-                  >
-                    Eliminar
-                  </Button>
+
+                  <HStack>
+                    <IconButton
+                      icon="delete"
+                      mode="outlined"
+                      onPress={() => {
+                        const newArray = [...questions]
+                        newArray.splice(index, 1)
+                        setQuestions(newArray)
+                      }}
+                    />
+                  </HStack>
                 </HStack>
               </VStack>
             </Card>
@@ -173,14 +198,14 @@ export default AddForm = ({ navigation, route }) => {
           />
         )}
         <HStack reverse={true}>
-          <Button onPress={() => console.log(questions)}>LOG</Button>
           <Button
+            icon="plus"
+            disabled={questions[questions?.length - 1]?.interrogation == "" || questions[questions?.length - 1]?.question_type == ""}
             mode="outlined"
             onPress={() => {
               let newQuestion = {
                 interrogation: "",
-                question_type: "",
-                val: questions.length
+                question_type: ""
               }
 
               setQuestions([...questions, newQuestion])
@@ -197,7 +222,7 @@ export default AddForm = ({ navigation, route }) => {
     <Button
       key="SaveButton"
       icon="content-save-outline"
-      // disabled={modalLoading || !verified}
+      disabled={modalLoading || !verified}
       loading={modalLoading}
       mode="contained"
       onPress={() => {
