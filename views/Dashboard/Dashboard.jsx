@@ -704,6 +704,15 @@ export default Dashboard = ({ navigation }) => {
                   Prestador: <VistaPrestador />
                 }[user?.role]
               }
+              <Flex>
+                <Text variant="labelMedium">Opciones del desarrollador</Text>
+                <WidgetSmall
+                  key="Survey"
+                  child={<Text>Encuesta</Text>}
+                  screen={"ApplySurvey"}
+                  payload={{ form_identifier: "0101NaGKGz" }}
+                />
+              </Flex>
             </Flex>
           </VStack>
         ) : loading == false ? (

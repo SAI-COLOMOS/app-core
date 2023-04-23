@@ -63,6 +63,10 @@ import EditForm from "./Forms/EditForm"
 import AddAttendee from "./Events/AddAttendee"
 import EditAttendance from "./Attendance/EditAttendance"
 
+// Survey
+import ApplySurvey from "./Surveys/ApplySurvey"
+import SurveyResume from "./Surveys/SurveyResume"
+
 export default Navigation = () => {
   const Stack = createNativeStackNavigator()
 
@@ -306,6 +310,7 @@ export default Navigation = () => {
               {/* <Stack.Screen name="UpdatePassword" component={UpdatePassword} options={{ headerShown: false, presentation: 'containedTransparentModal' }} /> */}
             </Stack.Group>
 
+            {/* Forms */}
             <Stack.Group
               navigationKey="Forms"
               screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
@@ -326,6 +331,23 @@ export default Navigation = () => {
               <Stack.Screen
                 name="EditForm"
                 component={EditForm}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+            </Stack.Group>
+
+            {/* Surveys */}
+            <Stack.Group
+              navigationKey="Surveys"
+              screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
+            >
+              <Stack.Screen
+                name="ApplySurvey"
+                component={ApplySurvey}
+              />
+
+              <Stack.Screen
+                name="SurveyResume"
+                component={SurveyResume}
                 options={{ headerShown: false, presentation: "containedTransparentModal" }}
               />
             </Stack.Group>

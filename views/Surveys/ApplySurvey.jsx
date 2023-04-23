@@ -1,24 +1,27 @@
-import { Flex, VStack } from "@react-native-material/core"
-import { Text, useTheme } from "react-native-paper"
+import { Flex, HStack, VStack } from "@react-native-material/core"
+import { useHeaderHeight } from "@react-navigation/elements"
+import { Button, Card, Text, useTheme } from "react-native-paper"
 import { MultipleOption, MultipleSelection, NumericQuestion, OpenQuestion, ScaleQuestion } from "../Shared/FormsComponents"
 import { useContext, useEffect, useState } from "react"
 import ApplicationContext from "../ApplicationContext"
 import Header from "../Shared/Header"
+import DisplayDetails from "../Shared/DisplayDetails"
 
 export default ApplySurvey = ({ navigation, route }) => {
+  const headerMargin = useHeaderHeight()
   const { host, token } = useContext(ApplicationContext)
   const { form_identifier, getForms } = route.params
   const theme = useTheme()
 
   const [answers, setAnswers] = useState({})
   const [loading, setLoading] = useState(false)
-  const [form, setForm] = useState(undefined)
+  const [survey, setSurvey] = useState(undefined)
   const [isTemplate, setIsTemplate] = useState(false)
 
   async function getForm() {
     setLoading(true)
 
-    const request = await fetch(`${host}/forms/${form_identifier}`, {
+    const request = await fetch(`${host}/forms/${form_identifier}?isTemplate=true`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -32,10 +35,10 @@ export default ApplySurvey = ({ navigation, route }) => {
     setLoading(false)
 
     if (request?.form) {
-      setForm(request.form)
+      setSurvey(request.form)
       console.log(request)
     } else {
-      setForm(request)
+      setSurvey(request)
     }
   }
 
@@ -48,20 +51,66 @@ export default ApplySurvey = ({ navigation, route }) => {
   }, [])
 
   useEffect(() => {
-    if (form?.questions !== undefined) {
+    if (survey?.questions !== undefined) {
       const object = {}
-      form?.questions.forEach((element) => {
+      survey?.questions.forEach((element) => {
         object[element?.question_identifier] = null
       })
       setAnswers({ ...object })
     }
-  }, [form])
+  }, [survey])
+
+  useEffect(() => {
+    getForm()
+  }, [])
+
+  const Info = () => (
+    // <VStack
+    //   spacing={20}
+    // >
+    //   <Text variant="headlineSmall">{survey?.name ?? "Encuesta"}</Text>
+    //   {survey?.description && <Text variant="bodyMedium">{survey?.description}</Text>}
+    //   <Text
+    //     fill
+    //     variant="bodyMedium"
+    //   >
+    //     A continuación, se muestran las preguntas correspondientes a esta encuesta
+    //   </Text>
+    // </VStack>
+
+    <Card
+      key="Info"
+      mode="outlined"
+    >
+      <VStack
+        p={20}
+        spacing={5}
+      >
+        <Text variant="titleMedium">Datos de la encuesta</Text>
+        <VStack spacing={10}>
+          <Flex>
+            <Text variant="labelSmall">Nombre</Text>
+            <Text variant="bodyMedium">{survey?.name ?? "Sin nombre"}</Text>
+          </Flex>
+
+          <Flex>
+            <Text variant="labelSmall">Descripción</Text>
+            <Text variant="bodyMedium">{survey?.description ?? "Sin descripción"}</Text>
+          </Flex>
+
+          <Flex>
+            <Text variant="labelSmall">Versión</Text>
+            <Text variant="bodyMedium">{survey?.version ?? "Sin versión"}</Text>
+          </Flex>
+        </VStack>
+      </VStack>
+    </Card>
+  )
 
   const Questions = () => (
     <VStack spacing={20}>
-      <Text>{JSON.stringify(answers)}</Text>
-      {form?.questions.length > 0 &&
-        form.questions.map((question, index) => (
+      {survey?.questions.length > 0 &&
+        survey.questions.map((question, index) => (
           <Flex key={question.interrogation}>
             {
               {
@@ -115,18 +164,40 @@ export default ApplySurvey = ({ navigation, route }) => {
     </VStack>
   )
 
+  const Buttons = () => (
+    <HStack
+      key="Button"
+      justify="between"
+    >
+      <Button
+        mode="outlined"
+        icon="close"
+        onPress={() => navigation.pop()}
+      >
+        Cancelar
+      </Button>
+      <Button
+        mode="contained"
+        onPress={() => navigation.navigate("SurveyResume", { questions: survey?.questions, answers })}
+        icon="page-next-outline"
+      >
+        Continuar
+      </Button>
+    </HStack>
+  )
+
   return (
     <Flex
       fill
       pt={headerMargin - 20}
     >
-      {form !== undefined ? (
-        form !== null ? (
-          isNaN(form) ? (
+      {survey !== undefined ? (
+        survey !== null ? (
+          isNaN(survey) ? (
             <DisplayDetails
-              icon="form-select"
-              title={form?.name}
-              children={[Questions()]}
+              showHeader={false}
+              title={survey?.name}
+              children={[Info(), Questions(), Buttons()]}
             />
           ) : (
             <VStack
@@ -145,13 +216,13 @@ export default ApplySurvey = ({ navigation, route }) => {
                   variant="bodyMedium"
                   style={{ textAlign: "center" }}
                 >
-                  No podemos recuperar los datos del formulario, inténtalo de nuevo más tarde (Error: {form})
+                  No podemos recuperar los datos del formulario, inténtalo de nuevo más tarde (Error: {survey})
                 </Text>
               </VStack>
               <Flex>
                 <Button
                   mode="outlined"
-                  onPress={(_) => {
+                  onPress={() => {
                     getForm()
                   }}
                 >

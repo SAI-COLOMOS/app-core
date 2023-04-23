@@ -2,8 +2,9 @@ import { Slider } from "@miblanchard/react-native-slider"
 import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useState } from "react"
 import { Card, Checkbox, RadioButton, Text, TextInput, TouchableRipple, useTheme } from "react-native-paper"
+import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 
-const Base = ({ question, description, child }) => {
+const Base = ({ question, icon, description, child }) => {
   const theme = useTheme()
 
   return (
@@ -12,16 +13,29 @@ const Base = ({ question, description, child }) => {
       style={{ overflow: "hidden", backgroundColor: theme.colors.background }}
     >
       <>
-        <Flex
+        <HStack
           style={{ backgroundColor: theme.colors.primaryContainer }}
           p={20}
+          spacing={10}
+          items="start"
         >
-          <Text variant="titleMedium">{question}</Text>
-        </Flex>
+          {icon && (
+            <Flex pt={3}>
+              <Icon
+                name={icon}
+                size={20}
+                color={theme.colors.onPrimaryContainer}
+              />
+            </Flex>
+          )}
+          <Flex fill>
+            <Text variant="titleMedium">{question}</Text>
+          </Flex>
+        </HStack>
 
         {description && (
           <Flex
-            style={{ backgroundColor: theme.colors.backdrop }}
+            style={{ backgroundColor: theme.colors.elevation.level1 }}
             ph={20}
             pv={10}
           >
@@ -60,6 +74,7 @@ const MultipleOption = ({ question, options, id, getter, setter }) => {
   return (
     <Base
       question={question}
+      icon="checkbox-marked-circle-outline"
       description="Selecciona solo una respuesta"
       child={Child()}
     />
@@ -96,6 +111,7 @@ const MultipleSelection = ({ question, options, id, getter, setter }) => {
   return (
     <Base
       question={question}
+      icon="checkbox-multiple-marked-circle-outline"
       description="Puedes seleccionar varias respuestas"
       child={Child()}
     />
@@ -126,6 +142,7 @@ const OpenQuestion = ({ question, id, getter, setter }) => {
   return (
     <Base
       question={question}
+      icon="alphabetical-variant"
       child={Child()}
     />
   )
@@ -155,6 +172,7 @@ const NumericQuestion = ({ question, id, getter, setter }) => {
   return (
     <Base
       question={question}
+      icon="numeric"
       child={Child()}
     />
   )
@@ -202,6 +220,7 @@ const ScaleQuestion = ({ question, options, id, getter, setter }) => {
   return (
     <Base
       question={question}
+      icon="format-list-bulleted"
       child={Child()}
     />
   )
