@@ -728,7 +728,7 @@ export default EventDetails = ({ navigation, route }) => {
         )
       ) : null}
 
-      {!(event === undefined || event === null) && user.role != "Prestador" && !(event?.attendance.status == "Concluido" || event?.attendance.status == "Concluido por sistema" || event?.attendance.status == "En proceso" || event?.attendance.status == "Por comenzar") && (
+      {!(event === undefined || event === null) && user.role != "Prestador" && !(event?.attendance?.status == "Concluido" || event?.attendance?.status == "Concluido por sistema" || event?.attendance?.status == "En proceso" || event?.attendance?.status == "Por comenzar") && (
         <FAB
           icon="pencil-outline"
           style={{ position: "absolute", margin: 16, right: 0, bottom: 0 }}
