@@ -1,10 +1,53 @@
 import { Flex, VStack } from "@react-native-material/core"
 import CreateForm from "../Shared/CreateForm"
 import { Button, Card, Text, useTheme } from "react-native-paper"
+import { useContext, useState } from "react"
+import ApplicationContext from "../ApplicationContext"
 
 export default SurveyResume = ({ navigation, route }) => {
   const theme = useTheme()
-  const { questions, answers } = route.params
+  const { host, token } = useContext(ApplicationContext)
+  const { questions, answers, survey_identifier } = route.params
+
+  const [loading, setLoading] = useState(false)
+
+  async function sendResponses() {
+    loading(true)
+
+    const request = await fetch(`${host}/surveys/${survey_identifier}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        "Cache-Control": "no-cache"
+      },
+      body: JSON.stringify({
+        name: name.trim(),
+        description: description.trim(),
+        offered_hours: Number(offered_hours.trim()),
+        tolerance: Number(tolerance.trim()),
+        vacancy: Number(vacancy.trim()),
+        starting_date: starting_date.toISOString(),
+        ending_date: ending_date.toISOString(),
+        publishing_date: publishing_date.toISOString(),
+        place: place.trim(),
+        avatar: avatar
+      })
+    })
+      .then((response) => response.status)
+      .catch(() => null)
+
+    loading(false)
+
+    if (request == 200) {
+      setModalSuccess(true)
+    } else if (request != null) {
+      setResponseCode(request)
+      setModalError(true)
+    } else {
+      setModalFatal(true)
+    }
+  }
 
   const arrayToString = (array) => {
     let string = ""

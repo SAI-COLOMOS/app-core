@@ -19,7 +19,7 @@ export default EventDetails = ({ navigation, route }) => {
   const { host, user, token } = useContext(ApplicationContext)
   //const { event, setEvent, attendees, setAttendees, profiles, setProfiles } = useContext(EventContext)
   const headerMargin = useHeaderHeight()
-  const { event_identifier, getEvents } = route.params
+  const { event_identifier, getEvents, fetchData } = route.params
   const theme = useTheme()
 
   const [avatar, setAvatar] = useState(undefined)
@@ -36,6 +36,10 @@ export default EventDetails = ({ navigation, route }) => {
   const [showErrorFinish, setShowErrorFinish] = useState(false)
   const [showConfirmFinish, setShowConfirmFinish] = useState(false)
   const [loadingFinish, setLoadingFinish] = useState(false)
+
+  const [showErrorUnlinkForm, setShowErrorUnlinkForm] = useState(false)
+  const [showConfirmUnlinkForm, setShowConfirmUnlinkForm] = useState(false)
+  const [loadingUnlinkForm, setLoadingUnlinkForm] = useState(false)
 
   async function getEvent() {
     setLoading(true)
@@ -140,6 +144,27 @@ export default EventDetails = ({ navigation, route }) => {
     }
 
     setShowErrorFinish(true)
+  }
+
+  async function unlinkFrom() {
+    setLoadingUnlinkForm(true)
+
+    const request = await fetch(`${host}/surveys/${event?.survey_identifier}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      }
+    }).catch(() => null)
+
+    setLoadingUnlinkForm(false)
+
+    if (request?.ok) {
+      getEvent()
+      return
+    }
+
+    setShowErrorUnlinkForm(true)
   }
 
   useEffect(() => {
@@ -457,16 +482,6 @@ export default EventDetails = ({ navigation, route }) => {
         </Card>
       )}
 
-      {event?.attendance?.status != "Por comenzar" && event?.attendance?.status != "Concluido" && event?.attendance?.status != "Concluido por sistema" && event?.attendance?.status != "En proceso" && (
-        <Button
-          mode="outlined"
-          style={{ backgroundColor: theme.colors.background }}
-          onPress={() => navigation.navigate("AddSurvey", { event_identifier, getEvent })}
-        >
-          Vincular formulario
-        </Button>
-      )}
-
       {event?.attendance?.status == "En proceso" && (
         <Button
           disabled={loadingFinish}
@@ -490,6 +505,77 @@ export default EventDetails = ({ navigation, route }) => {
           Concluir evento
         </Button>
       )}
+
+      <Card
+        key="Description"
+        mode="outlined"
+      >
+        <Flex
+          p={20}
+          spacing={5}
+        >
+          <Text variant="titleMedium">Encuestas</Text>
+          <VStack
+            pt={20}
+            spacing={10}
+          >
+            {event?.survey_identifier == null && event?.attendance?.status != "Concluido" && event?.attendance?.status != "Concluido por sistema" && event?.attendance?.status != "En proceso" && (
+              <Button
+                mode="outlined"
+                icon="plus"
+                style={{ backgroundColor: theme.colors.background }}
+                onPress={() => navigation.navigate("AddSurvey", { event_identifier, getEvent })}
+              >
+                Vincular formulario
+              </Button>
+            )}
+
+            {event?.survey_identifier != null && event?.attendance?.status != "Concluido" && event?.attendance?.status != "Concluido por sistema" && event?.attendance?.status != "En proceso" && (
+              <Button
+                mode="outlined"
+                icon="minus"
+                disabled={loadingUnlinkForm}
+                loading={loadingUnlinkForm}
+                style={{ backgroundColor: theme.colors.background }}
+                onPress={() => setShowConfirmUnlinkForm(true)}
+              >
+                Desvincular formulario
+              </Button>
+            )}
+
+            {event?.survey_identifier != null ? (
+              <VStack spacing={10}>
+                {event?.attendance?.status == "En proceso" && (
+                  <Button
+                    mode="outlined"
+                    style={{ backgroundColor: theme.colors.background }}
+                    icon="form-select"
+                    onPress={() => navigation.navigate("ApplySurvey", { survey_identifier: event?.survey_identifier })}
+                  >
+                    Realizar encuesta
+                  </Button>
+                )}
+
+                {event?.attendance?.status == "En proceso" && event?.attendance?.status != "Concluido" && event?.attendance?.status != "Concluido por sistema" && (
+                  <Button
+                    mode="outlined"
+                    style={{ backgroundColor: theme.colors.background }}
+                    icon="form-select"
+                    onPress={() => navigation.navigate("ApplySurvey", { survey_identifier: "0101NaGKGz" })}
+                  >
+                    Resultados de la encuesta
+                  </Button>
+                )}
+              </VStack>
+            ) : (
+              <InformationMessage
+                title="Sin encuesta"
+                description="Este evento no tiene una encuesta vinculada"
+              />
+            )}
+          </VStack>
+        </Flex>
+      </Card>
     </VStack>
   )
 
@@ -652,7 +738,7 @@ export default EventDetails = ({ navigation, route }) => {
               event_identifier,
               image: avatar,
               getEvent,
-              getEvents
+              getEvents: getEvents || fetchData
             })
           }
         />
@@ -697,6 +783,30 @@ export default EventDetails = ({ navigation, route }) => {
             }
           ]
         ]}
+      />
+
+      <ModalMessage
+        title="Desvincular formulario"
+        description="¿Seguro que desea desvincular el evento? Esta acción no se puede deshacer"
+        icon="help-circle-outline"
+        handler={[showConfirmUnlinkForm, () => setShowConfirmUnlinkForm(!showConfirmUnlinkForm)]}
+        actions={[
+          ["Cancelar"],
+          [
+            "Aceptar",
+            () => {
+              setShowConfirmUnlinkForm(false)
+              unlinkFrom()
+            }
+          ]
+        ]}
+      />
+
+      <ModalMessage
+        title="Ocurrió un problema"
+        description="No pudimos desvincular el formulario, inténtalo de nuevo más tarde"
+        icon="close-circle-outline"
+        handler={[showErrorUnlinkForm, () => setShowErrorUnlinkForm(!showErrorUnlinkForm)]}
       />
 
       <ModalMessage

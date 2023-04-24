@@ -6,11 +6,12 @@ import { useContext, useEffect, useState } from "react"
 import ApplicationContext from "../ApplicationContext"
 import Header from "../Shared/Header"
 import DisplayDetails from "../Shared/DisplayDetails"
+import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 
 export default ApplySurvey = ({ navigation, route }) => {
   const headerMargin = useHeaderHeight()
   const { host, token } = useContext(ApplicationContext)
-  const { form_identifier, getForms } = route.params
+  const { survey_identifier, getForms } = route.params
   const theme = useTheme()
 
   const [answers, setAnswers] = useState({})
@@ -21,22 +22,28 @@ export default ApplySurvey = ({ navigation, route }) => {
   async function getForm() {
     setLoading(true)
 
-    const request = await fetch(`${host}/forms/${form_identifier}?isTemplate=true`, {
+    const request = await fetch(`${host}/surveys/${survey_identifier}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        "Cache-Control": "no-cache"
+        Authorization: `Bearer ${token}`
       }
     })
-      .then((response) => (response.ok ? response.json() : response.status))
+      .then(async (response) => {
+        if (response.ok) {
+          return response.json()
+        } else {
+          console.error(await response.json())
+          return response.status
+        }
+      })
       .catch(() => null)
 
     setLoading(false)
+    console.log(request)
 
-    if (request?.form) {
-      setSurvey(request.form)
-      console.log(request)
+    if (request?.survey) {
+      setSurvey(request.survey)
     } else {
       setSurvey(request)
     }
@@ -178,7 +185,7 @@ export default ApplySurvey = ({ navigation, route }) => {
       </Button>
       <Button
         mode="contained"
-        onPress={() => navigation.navigate("SurveyResume", { questions: survey?.questions, answers })}
+        onPress={() => navigation.navigate("SurveyResume", { questions: survey?.questions, answers, survey_identifier })}
         icon="page-next-outline"
       >
         Continuar

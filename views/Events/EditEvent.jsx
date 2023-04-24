@@ -369,7 +369,7 @@ export default EditEvent = ({ navigation, route }) => {
             "Aceptar",
             () => {
               getEvent()
-              //getEvents()
+              getEvents()
               navigation.pop()
             }
           ]

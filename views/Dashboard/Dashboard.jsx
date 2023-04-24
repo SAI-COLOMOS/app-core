@@ -355,7 +355,7 @@ export default Dashboard = ({ navigation }) => {
         <WidgetLarge
           title={GetMoment(feed?.enrolled_event?.starting_date)}
           screen="EventDetails"
-          payload={{ event_identifier: feed?.enrolled_event?.event_identifier }}
+          payload={{ event_identifier: feed?.enrolled_event?.event_identifier, fetchData }}
           image={true}
           child={
             <Flex
