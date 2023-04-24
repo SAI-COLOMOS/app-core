@@ -16,6 +16,7 @@ import Events from "./Events/Events"
 import EventDetails from "./Events/EventDetails"
 import AddEvent from "./Events/AddEvent"
 import EditEvent from "./Events/EditEvent"
+import AddAttendee from "./Events/AddAttendee"
 
 // Profile
 import Profile from "./Profile/Profile"
@@ -47,6 +48,7 @@ import TakeAttendance from "./Attendance/TakeAttendance"
 import ScanAttendance from "./Attendance/ScanAttendance"
 import AttendanceProximityClient from "./Attendance/AttendanceProximityClient"
 import ShowAttendanceCode from "./Attendance/ShowAttendanceCode"
+import EditAttendance from "./Attendance/EditAttendance"
 
 // Cards
 import Cards from "./Cards/Cards"
@@ -60,12 +62,11 @@ import Forms from "./Forms/Forms"
 import FormDetails from "./Forms/FormDetails"
 import AddForm from "./Forms/AddForm"
 import EditForm from "./Forms/EditForm"
-import AddAttendee from "./Events/AddAttendee"
-import EditAttendance from "./Attendance/EditAttendance"
 
 // Survey
 import ApplySurvey from "./Surveys/ApplySurvey"
 import SurveyResume from "./Surveys/SurveyResume"
+import AddSurvey from "./Surveys/AddSurvey"
 
 export default Navigation = () => {
   const Stack = createNativeStackNavigator()
@@ -340,6 +341,12 @@ export default Navigation = () => {
               navigationKey="Surveys"
               screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
             >
+              <Stack.Screen
+                name="AddSurvey"
+                component={AddSurvey}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+
               <Stack.Screen
                 name="ApplySurvey"
                 component={ApplySurvey}
