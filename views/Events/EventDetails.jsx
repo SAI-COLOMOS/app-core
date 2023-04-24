@@ -457,6 +457,16 @@ export default EventDetails = ({ navigation, route }) => {
         </Card>
       )}
 
+      {event?.attendance?.status != "Por comenzar" && event?.attendance?.status != "Concluido" && event?.attendance?.status != "Concluido por sistema" && event?.attendance?.status != "En proceso" && (
+        <Button
+          mode="outlined"
+          style={{ backgroundColor: theme.colors.background }}
+          onPress={() => navigation.navigate("AddSurvey", { event_identifier, getEvent })}
+        >
+          Vincular formulario
+        </Button>
+      )}
+
       {event?.attendance?.status == "En proceso" && (
         <Button
           disabled={loadingFinish}
