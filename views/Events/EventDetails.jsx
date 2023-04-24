@@ -37,7 +37,7 @@ export default EventDetails = ({ navigation, route }) => {
   const [showConfirmFinish, setShowConfirmFinish] = useState(false)
   const [loadingFinish, setLoadingFinish] = useState(false)
 
-  async function getEvent() {
+  async function getEvent () {
     setLoading(true)
 
     const request = await fetch(`${host}/agenda/${event_identifier}`, {
@@ -63,7 +63,7 @@ export default EventDetails = ({ navigation, route }) => {
     }
   }
 
-  async function subscribeEvent() {
+  async function subscribeEvent () {
     const request = await fetch(`${host}/agenda/${event_identifier}/attendance`, {
       method: "POST",
       headers: {
@@ -77,7 +77,7 @@ export default EventDetails = ({ navigation, route }) => {
     }
   }
 
-  async function unsubscribeEvent() {
+  async function unsubscribeEvent () {
     const request = await fetch(`${host}/agenda/${event_identifier}/attendance`, {
       method: "DELETE",
       headers: {
@@ -93,7 +93,7 @@ export default EventDetails = ({ navigation, route }) => {
     console.error(await request.json())
   }
 
-  async function postNow() {
+  async function postNow () {
     setLoadingPost(true)
 
     const request = await fetch(`${host}/agenda/${event_identifier}/status`, {
@@ -118,7 +118,7 @@ export default EventDetails = ({ navigation, route }) => {
     setShowErrorFinish(true)
   }
 
-  async function finishEvent() {
+  async function finishEvent () {
     setLoadingFinish(true)
 
     const request = await fetch(`${host}/agenda/${event_identifier}/status`, {
@@ -642,7 +642,7 @@ export default EventDetails = ({ navigation, route }) => {
         )
       ) : null}
 
-      {!(event === undefined || event === null) && user.role != "Prestador" && !(event?.attendance.status == "Concluido" || event?.attendance.status == "Concluido por sistema" || event?.attendance.status == "En proceso" || event?.attendance.status == "Por comenzar") && (
+      {!(event === undefined || event === null) && user.role != "Prestador" && !(event?.attendance?.status == "Concluido" || event?.attendance?.status == "Concluido por sistema" || event?.attendance?.status == "En proceso" || event?.attendance?.status == "Por comenzar") && (
         <FAB
           icon="pencil-outline"
           style={{ position: "absolute", margin: 16, right: 0, bottom: 0 }}
