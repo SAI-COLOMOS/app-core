@@ -92,7 +92,7 @@ export default ApplySurvey = ({ navigation, route }) => {
           </Flex>
 
           <Flex>
-            <Text variant="labelSmall">Versión</Text>
+            <Text variant="labelSmall">Folio</Text>
             <Text variant="bodyMedium">{survey?.version ?? "Sin versión"}</Text>
           </Flex>
         </VStack>

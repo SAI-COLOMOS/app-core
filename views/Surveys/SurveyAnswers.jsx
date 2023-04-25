@@ -1,10 +1,11 @@
-import { Flex, VStack } from "@react-native-material/core"
-import { Card, List, Text, useTheme } from "react-native-paper"
+import { Flex, HStack, VStack } from "@react-native-material/core"
+import { Button, Card, Dialog, IconButton, List, Portal, Text, Tooltip, useTheme } from "react-native-paper"
 import DisplayDetails from "../Shared/DisplayDetails"
 import { useContext, useEffect, useState } from "react"
 import ApplicationContext from "../ApplicationContext"
 import { useHeaderHeight } from "@react-navigation/elements"
 import Header from "../Shared/Header"
+import Dropdown from "../Shared/Dropdown"
 
 export default SurveyAnswers = ({ navigation, route }) => {
   const theme = useTheme()
@@ -15,6 +16,8 @@ export default SurveyAnswers = ({ navigation, route }) => {
   const [survey, setSurvey] = useState(undefined)
   const [loading, setLoading] = useState(false)
   const [statusCode, setStatusCode] = useState("")
+  const [showDialog, setShowDialog] = useState(false)
+  const [downloadFormat, setDownloadFormat] = useState("")
 
   async function getSurvey() {
     try {
@@ -46,7 +49,22 @@ export default SurveyAnswers = ({ navigation, route }) => {
 
   useEffect(() => {
     navigation.setOptions({
-      header: (props) => <Header {...props} />,
+      header: (props) => (
+        <Header
+          {...props}
+          children={[
+            <Tooltip
+              key="DownloadButton"
+              title="Descargar respuestas"
+            >
+              <IconButton
+                icon="tray-arrow-down"
+                onPress={() => setShowDialog(true)}
+              />
+            </Tooltip>
+          ]}
+        />
+      ),
       headerTransparent: true,
       headerTitle: "Detalles de la encuesta"
     })
@@ -78,7 +96,7 @@ export default SurveyAnswers = ({ navigation, route }) => {
           </Flex>
 
           <Flex>
-            <Text variant="labelSmall">Versión</Text>
+            <Text variant="labelSmall">Folio</Text>
             <Text variant="bodyMedium">{survey?.version ?? "Sin versión"}</Text>
           </Flex>
         </VStack>
@@ -106,9 +124,8 @@ export default SurveyAnswers = ({ navigation, route }) => {
             <VStack spacing={10}>
               {totalAnswers?.length > 0 &&
                 totalAnswers.map((answer, index) => (
-                  <Flex>
+                  <Flex key={index.toString()}>
                     <List.Accordion
-                      key={index.toString()}
                       id={index.toString()}
                       title={`Encuesta #${index + 1}`} //{survey?.questions?.find((question) => question.question_identifier == answer.question_referenced)?.interrogation}
                       style={{ backgroundColor: theme.colors.elevation.level5 }}
@@ -118,11 +135,14 @@ export default SurveyAnswers = ({ navigation, route }) => {
                         spacing={10}
                         p={20}
                         // mt={-10}
-                        style={{ backgroundColor: theme.colors.elevation.level2, borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}
+                        style={{ backgroundColor: theme.colors.elevation.level2, borderBottomLeftRadius: 10, borderBottomRightRadius: 10 }}
                         //style={{ borderRadius: 10, borderColor: theme.colors.onSurface, borderWidth: 0.5, zIndex: -1 }}
                       >
                         {survey?.questions.map((question) => (
-                          <Flex fill>
+                          <Flex
+                            key={question?.interrogation}
+                            fill
+                          >
                             <Text variant="labelMedium">{question?.interrogation}</Text>
                             <Text variant="bodyLarge">{survey?.answers.find((answer) => answer.question_referenced == question?.question_identifier)?.answer[index]}</Text>
                           </Flex>
@@ -140,6 +160,61 @@ export default SurveyAnswers = ({ navigation, route }) => {
     )
   }
 
+  const DownloadDialog = () => {
+    const formats = [{ option: "PDF" }, { option: "Hoja de calculo" }, { option: "CSV" }]
+    return (
+      <Portal>
+        <Dialog
+          visible={showDialog}
+          onDismiss={() => {
+            setShowDialog(false)
+            setDownloadFormat("")
+          }}
+        >
+          <Dialog.Title style={{ textAlign: "center" }}>Descargar respuestas</Dialog.Title>
+          <Dialog.Content>
+            <VStack spacing={10}>
+              <Text variant="bodyMedium">Selecciona el formato de descarga</Text>
+              <Flex>
+                <Dropdown
+                  title="Formato"
+                  options={formats}
+                  value={downloadFormat}
+                  selected={setDownloadFormat}
+                />
+              </Flex>
+            </VStack>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <HStack
+              fill
+              justify="between"
+            >
+              <Button
+                mode="outlined"
+                icon="close"
+                onPress={() => {
+                  setShowDialog(false)
+                  setDownloadFormat("")
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                disabled={downloadFormat == ""}
+                mode="contained"
+                icon="tray-arrow-down"
+                onPress={() => null}
+              >
+                Descargar
+              </Button>
+            </HStack>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+    )
+  }
+
   return (
     <Flex
       fill
@@ -151,7 +226,8 @@ export default SurveyAnswers = ({ navigation, route }) => {
         refreshAction={() => getSurvey()}
         children={[Info(), Responses()]}
       />
-      <Text>Hola</Text>
+
+      <DownloadDialog />
     </Flex>
   )
 }

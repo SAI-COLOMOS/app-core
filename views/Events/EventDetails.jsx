@@ -519,30 +519,6 @@ export default EventDetails = ({ navigation, route }) => {
             pt={20}
             spacing={10}
           >
-            {event?.survey_identifier == null && event?.attendance?.status != "Concluido" && event?.attendance?.status != "Concluido por sistema" && event?.attendance?.status != "En proceso" && (
-              <Button
-                mode="outlined"
-                icon="plus"
-                style={{ backgroundColor: theme.colors.background }}
-                onPress={() => navigation.navigate("AddSurvey", { event_identifier, getEvent })}
-              >
-                Vincular formulario
-              </Button>
-            )}
-
-            {event?.survey_identifier != null && event?.attendance?.status != "Concluido" && event?.attendance?.status != "Concluido por sistema" && event?.attendance?.status != "En proceso" && (
-              <Button
-                mode="outlined"
-                icon="minus"
-                disabled={loadingUnlinkForm}
-                loading={loadingUnlinkForm}
-                style={{ backgroundColor: theme.colors.background }}
-                onPress={() => setShowConfirmUnlinkForm(true)}
-              >
-                Desvincular formulario
-              </Button>
-            )}
-
             {event?.survey_identifier != null ? (
               <VStack spacing={10}>
                 {event?.attendance?.status == "En proceso" && (
@@ -572,6 +548,30 @@ export default EventDetails = ({ navigation, route }) => {
                 title="Sin encuesta"
                 description="Este evento no tiene una encuesta vinculada"
               />
+            )}
+
+            {event?.survey_identifier == null && event?.attendance?.status != "Concluido" && event?.attendance?.status != "Concluido por sistema" && event?.attendance?.status != "En proceso" && (
+              <Button
+                mode="outlined"
+                icon="plus"
+                style={{ backgroundColor: theme.colors.background }}
+                onPress={() => navigation.navigate("AddSurvey", { event_identifier, getEvent })}
+              >
+                Vincular formulario
+              </Button>
+            )}
+
+            {event?.survey_identifier != null && event?.attendance?.status != "Concluido" && event?.attendance?.status != "Concluido por sistema" && event?.attendance?.status != "En proceso" && (
+              <Button
+                mode="outlined"
+                icon="minus"
+                disabled={loadingUnlinkForm}
+                loading={loadingUnlinkForm}
+                style={{ backgroundColor: theme.colors.background }}
+                onPress={() => setShowConfirmUnlinkForm(true)}
+              >
+                Desvincular formulario
+              </Button>
             )}
           </VStack>
         </Flex>
