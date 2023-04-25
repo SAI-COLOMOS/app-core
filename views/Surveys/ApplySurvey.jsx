@@ -40,7 +40,6 @@ export default ApplySurvey = ({ navigation, route }) => {
       .catch(() => null)
 
     setLoading(false)
-    console.log(request)
 
     if (request?.survey) {
       setSurvey(request.survey)
@@ -72,19 +71,6 @@ export default ApplySurvey = ({ navigation, route }) => {
   }, [])
 
   const Info = () => (
-    // <VStack
-    //   spacing={20}
-    // >
-    //   <Text variant="headlineSmall">{survey?.name ?? "Encuesta"}</Text>
-    //   {survey?.description && <Text variant="bodyMedium">{survey?.description}</Text>}
-    //   <Text
-    //     fill
-    //     variant="bodyMedium"
-    //   >
-    //     A continuación, se muestran las preguntas correspondientes a esta encuesta
-    //   </Text>
-    // </VStack>
-
     <Card
       key="Info"
       mode="outlined"
@@ -115,7 +101,10 @@ export default ApplySurvey = ({ navigation, route }) => {
   )
 
   const Questions = () => (
-    <VStack spacing={20}>
+    <VStack
+      key="Questions"
+      spacing={20}
+    >
       {survey?.questions.length > 0 &&
         survey.questions.map((question, index) => (
           <Flex key={question.interrogation}>

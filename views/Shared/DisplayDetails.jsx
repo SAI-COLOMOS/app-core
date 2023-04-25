@@ -6,7 +6,7 @@ import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanima
 import { useEffect } from "react"
 import ProfileImage from "./ProfileImage"
 
-export default SchoolDetails = ({ icon, image, title, children, actions, avatar, showHeader, refreshStatus, refreshAction, fetchStatus }) => {
+export default SchoolDetails = ({ icon, image, title, children, actions, avatar, showHeader, refreshStatus, refreshAction }) => {
   const { width } = useWindowDimensions()
   const theme = useTheme()
 

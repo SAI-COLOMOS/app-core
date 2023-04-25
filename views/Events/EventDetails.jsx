@@ -561,7 +561,7 @@ export default EventDetails = ({ navigation, route }) => {
                     mode="outlined"
                     style={{ backgroundColor: theme.colors.background }}
                     icon="form-select"
-                    onPress={() => navigation.navigate("ApplySurvey", { survey_identifier: "0101NaGKGz" })}
+                    onPress={() => navigation.navigate("SurveyAnswers", { survey_identifier: event?.survey_identifier })}
                   >
                     Resultados de la encuesta
                   </Button>

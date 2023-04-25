@@ -3,6 +3,7 @@ import CreateForm from "../Shared/CreateForm"
 import { Button, Card, Text, useTheme } from "react-native-paper"
 import { useContext, useState } from "react"
 import ApplicationContext from "../ApplicationContext"
+import ModalMessage from "../Shared/ModalMessage"
 
 export default SurveyResume = ({ navigation, route }) => {
   const theme = useTheme()
@@ -10,41 +11,39 @@ export default SurveyResume = ({ navigation, route }) => {
   const { questions, answers, survey_identifier } = route.params
 
   const [loading, setLoading] = useState(false)
+  const [modalSuccess, setModalSuccess] = useState(false)
+  const [modalError, setModalError] = useState(false)
+  const [modalFatal, setModalFatal] = useState(false)
+  const [responseCode, setResponseCode] = useState("")
 
   async function sendResponses() {
-    loading(true)
+    try {
+      setLoading(true)
 
-    const request = await fetch(`${host}/surveys/${survey_identifier}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        "Cache-Control": "no-cache"
-      },
-      body: JSON.stringify({
-        name: name.trim(),
-        description: description.trim(),
-        offered_hours: Number(offered_hours.trim()),
-        tolerance: Number(tolerance.trim()),
-        vacancy: Number(vacancy.trim()),
-        starting_date: starting_date.toISOString(),
-        ending_date: ending_date.toISOString(),
-        publishing_date: publishing_date.toISOString(),
-        place: place.trim(),
-        avatar: avatar
+      const request = await fetch(`${host}/surveys/${survey_identifier}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          answers
+        })
       })
-    })
-      .then((response) => response.status)
-      .catch(() => null)
 
-    loading(false)
+      setLoading(false)
 
-    if (request == 200) {
-      setModalSuccess(true)
-    } else if (request != null) {
-      setResponseCode(request)
+      if (request?.ok) {
+        setModalSuccess(true)
+        return
+      }
+
+      setResponseCode(request.status)
       setModalError(true)
-    } else {
+      return
+    } catch (error) {
+      console.error(error)
+      setLoading(false)
       setModalFatal(true)
     }
   }
@@ -109,6 +108,7 @@ export default SurveyResume = ({ navigation, route }) => {
   const Back = () => (
     <Button
       key="Back"
+      disabled={loading}
       icon="page-previous-outline"
       onPress={() => navigation.pop()}
       mode="outlined"
@@ -121,7 +121,9 @@ export default SurveyResume = ({ navigation, route }) => {
     <Button
       key="Submit"
       icon="send-outline"
-      onPress={() => navigation.pop()}
+      disabled={loading}
+      loading={loading}
+      onPress={() => sendResponses()}
       mode="contained"
     >
       Enviar
@@ -135,6 +137,41 @@ export default SurveyResume = ({ navigation, route }) => {
         title="Resumen de la encuesta"
         children={[Answers()]}
         actions={[Submit(), Back()]}
+        loading={loading}
+      />
+
+      <ModalMessage
+        title="¡Listo!"
+        description="La encuesta ha sido guardada"
+        handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]}
+        actions={[
+          [
+            "Aceptar",
+            () => {
+              navigation.pop(2)
+            }
+          ]
+        ]}
+        dismissable={false}
+        icon="check-circle-outline"
+      />
+
+      <ModalMessage
+        title="Ocurrió un problema"
+        description={`No pudimos guardar la encuesta, inténtalo más tarde (${responseCode})`}
+        handler={[modalError, () => setModalError(!modalError)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="close-circle-outline"
+      />
+
+      <ModalMessage
+        title="Sin conexión a internet"
+        description={`Parece que no tienes conexión a internet, conéctate e intenta de nuevo`}
+        handler={[modalFatal, () => setModalFatal(!modalFatal)]}
+        actions={[["Aceptar"]]}
+        dismissable={true}
+        icon="wifi-alert"
       />
     </Flex>
   )

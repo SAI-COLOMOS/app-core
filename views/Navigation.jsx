@@ -67,6 +67,7 @@ import EditForm from "./Forms/EditForm"
 import ApplySurvey from "./Surveys/ApplySurvey"
 import SurveyResume from "./Surveys/SurveyResume"
 import AddSurvey from "./Surveys/AddSurvey"
+import SurveyAnswers from "./Surveys/SurveyAnswers"
 
 export default Navigation = () => {
   const Stack = createNativeStackNavigator()
@@ -350,6 +351,11 @@ export default Navigation = () => {
               <Stack.Screen
                 name="ApplySurvey"
                 component={ApplySurvey}
+              />
+
+              <Stack.Screen
+                name="SurveyAnswers"
+                component={SurveyAnswers}
               />
 
               <Stack.Screen
