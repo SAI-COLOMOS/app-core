@@ -1,7 +1,6 @@
 import { Flex, VStack } from "@react-native-material/core"
 import { useContext, useEffect, useState } from "react"
 import { Button, Text, TextInput, useTheme } from "react-native-paper"
-import Constants from "expo-constants"
 import CreateForm from "../Shared/CreateForm"
 import ModalMessage from "../Shared/ModalMessage"
 import ApplicationContext from "../ApplicationContext"
@@ -105,16 +104,18 @@ export default EditArea = ({ navigation, route }) => {
           value={area_name}
           onChangeText={setArea_name}
           label="Nombre del área"
-          maxLength={50}
-          autoCapitalize="words"
-          autoComplete="off"
+          maxLength={150}
+          multiline={true}
+          numberOfLines={1}
         />
         <TextInput
           mode="outlined"
           value={phone}
           onChangeText={setPhone}
-          label="Número telefónico"
+          label="Número de teléfono"
           maxLength={10}
+          multiline={true}
+          numberOfLines={1}
           keyboardType="phone-pad"
           autoComplete="off"
         />

@@ -82,10 +82,12 @@ export default PlaceDetails = ({ navigation, route }) => {
         p={20}
         spacing={5}
       >
-        <Text variant="titleMedium">Bosque urbano</Text>
+        <Text variant="titleMedium">Detalles del bosque urbano</Text>
         <VStack spacing={10}>
-          <Text variant="labelSmall">Domicilio</Text>
-          <Text variant="bodyMedium">{`${place?.street} #${place?.exterior_number}\n${place?.colony}, ${place?.municipality}, ${place?.postal_code}`}</Text>
+          <Flex>
+            <Text variant="labelSmall">Domicilio</Text>
+            <Text variant="bodyMedium">{`${place?.street} #${place?.exterior_number}\n${place?.colony}, ${place?.municipality}, ${place?.postal_code}`}</Text>
+          </Flex>
 
           <Flex>
             <Text variant="labelSmall">Referencia</Text>
@@ -124,18 +126,19 @@ export default PlaceDetails = ({ navigation, route }) => {
           ))
         ) : (
           <InformationMessage
-            icon="account"
-            title="Sin inscripciones"
-            description="Todavía no hay nadie inscrito, ¿quieres agregar a alguien?"
+            icon="tree-outline"
+            title="Sin áreas"
+            description="Todavía no hay áreas registradas, ¿quieres agregar a alguna?"
           />
         )}
         <Flex ph={20}>
           <Button
             icon="plus"
-            mode="text"
+            mode="outlined"
             onPress={() =>
               navigation.navigate("AddArea", {
                 place_identifier,
+                getPlaces,
                 getPlace
               })
             }
@@ -149,20 +152,22 @@ export default PlaceDetails = ({ navigation, route }) => {
 
   const Area = useCallback(({ area, place_identifier }) => {
     return (
-      <Flex
-        mh={20}
-        style={{ borderRadius: 10, overflow: "hidden" }}
-      >
+      <Flex style={{ borderRadius: 10, overflow: "hidden" }}>
         <TouchableRipple
           onPress={() =>
             navigation.navigate("EditArea", {
               area,
               place_identifier,
+              getPlaces,
               getPlace
             })
           }
         >
-          <HStack spacing={10}>
+          <HStack
+            spacing={10}
+            mh={20}
+            mv={10}
+          >
             <Flex>
               <ProfileImage
                 icon="tree-outline"
@@ -229,7 +234,7 @@ export default PlaceDetails = ({ navigation, route }) => {
               <Flex>
                 <Button
                   mode="outlined"
-                  onPress={(_) => {
+                  onPress={() => {
                     getPlace()
                   }}
                 >

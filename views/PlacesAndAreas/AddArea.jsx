@@ -1,13 +1,12 @@
 import { Flex, VStack } from "@react-native-material/core"
 import { useContext, useEffect, useState } from "react"
 import { Button, Text, TextInput } from "react-native-paper"
-import Constants from "expo-constants"
 import CreateForm from "../Shared/CreateForm"
 import ModalMessage from "../Shared/ModalMessage"
 import ApplicationContext from "../ApplicationContext"
 
 export default AddArea = ({ navigation, route }) => {
-  const { place_identifier, getPlaces } = route.params
+  const { place_identifier, getPlaces, getPlace } = route.params
   const { host, token } = useContext(ApplicationContext)
 
   const [area_name, setArea_name] = useState("")
@@ -75,16 +74,18 @@ export default AddArea = ({ navigation, route }) => {
           value={area_name}
           onChangeText={setArea_name}
           label="Nombre del área"
-          maxLength={50}
-          autoCapitalize="words"
-          autoComplete="off"
+          maxLength={150}
+          multiline={true}
+          numberOfLines={1}
         />
         <TextInput
           mode="outlined"
           value={phone}
           onChangeText={setPhone}
-          label="Número telefónico"
+          label="Número de teléfono"
           maxLength={10}
+          multiline={true}
+          numberOfLines={1}
           keyboardType="phone-pad"
           autoComplete="off"
         />
@@ -139,8 +140,9 @@ export default AddArea = ({ navigation, route }) => {
           [
             "Aceptar",
             () => {
-              navigation.pop()
               getPlaces()
+              getPlace()
+              navigation.pop()
             }
           ]
         ]}

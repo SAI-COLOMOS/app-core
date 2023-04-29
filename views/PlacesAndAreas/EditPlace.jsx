@@ -1,7 +1,6 @@
 import { Flex, VStack } from "@react-native-material/core"
 import { useContext, useEffect, useState } from "react"
 import { Button, Text, TextInput, useTheme } from "react-native-paper"
-import Constants from "expo-constants"
 import CreateForm from "../Shared/CreateForm"
 import ModalMessage from "../Shared/ModalMessage"
 import ApplicationContext from "../ApplicationContext"
@@ -71,7 +70,7 @@ export default EditPlace = ({ navigation, route }) => {
   async function deletePlace() {
     setModalLoading(true)
 
-    const request = await fetch(`${host}/places/${places.place_identifier}`, {
+    const request = await fetch(`${host}/places/${place.place_identifier}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -123,41 +122,47 @@ export default EditPlace = ({ navigation, route }) => {
           mode="outlined"
           value={place_name}
           onChangeText={setPlace_name}
-          autoCapitalize="words"
           label="Nombre del bosque urbano"
-          maxLength={50}
+          maxLength={150}
+          multiline={true}
+          numberOfLines={1}
         />
         <TextInput
           mode="outlined"
           value={street}
           onChangeText={setStreet}
-          label="Nombre de la calle"
-          maxLength={50}
+          label="Calle"
+          maxLength={150}
+          multiline={true}
+          numberOfLines={1}
         />
         <TextInput
           mode="outlined"
           value={exterior_number}
           onChangeText={setExterior_number}
           label="Número del domicilio"
-          maxLength={50}
-          keyboardType="number-pad"
-          autoComplete="off"
+          maxLength={150}
+          multiline={true}
+          numberOfLines={1}
+          keyboardType="numeric"
         />
         <TextInput
           mode="outlined"
           value={colony}
           onChangeText={setColony}
-          autoCapitalize="words"
-          label="Nombre de la colonia"
-          maxLength={50}
+          label="Colonia"
+          maxLength={150}
+          multiline={true}
+          numberOfLines={1}
         />
         <TextInput
           mode="outlined"
           value={municipality}
           onChangeText={setMunicipality}
-          autoCapitalize="words"
-          label="Nombre del municipio"
-          maxLength={50}
+          label="Municipio"
+          maxLength={150}
+          multiline={true}
+          numberOfLines={1}
         />
         <TextInput
           mode="outlined"
@@ -165,7 +170,9 @@ export default EditPlace = ({ navigation, route }) => {
           onChangeText={setPostal_code}
           label="Código postal"
           maxLength={5}
-          keyboardType="number-pad"
+          multiline={true}
+          numberOfLines={1}
+          keyboardType="numeric"
           autoComplete="off"
         />
         <TextInput
@@ -174,6 +181,8 @@ export default EditPlace = ({ navigation, route }) => {
           onChangeText={setPhone}
           label="Número telefónico"
           maxLength={10}
+          multiline={true}
+          numberOfLines={1}
           keyboardType="phone-pad"
           autoComplete="off"
         />
@@ -182,7 +191,9 @@ export default EditPlace = ({ navigation, route }) => {
           value={reference}
           onChangeText={setReference}
           label="Referencia del lugar"
-          maxLength={250}
+          maxLength={500}
+          multiline={true}
+          numberOfLines={3}
         />
       </VStack>
     </VStack>

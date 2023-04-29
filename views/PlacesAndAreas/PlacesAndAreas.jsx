@@ -1,13 +1,9 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useState, useEffect, useCallback, useContext } from "react"
-import { ActivityIndicator, Avatar, Button, Card, FAB, IconButton, Text, TouchableRipple, useTheme } from "react-native-paper"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { ActivityIndicator, Avatar, Card, FAB, IconButton, Text, useTheme } from "react-native-paper"
 import { useHeaderHeight } from "@react-navigation/elements"
 import Header from "../Shared/Header"
-import Constants from "expo-constants"
 import { FlatList, Pressable } from "react-native"
-import { useFocusEffect } from "@react-navigation/native"
-import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import SearchBar from "../Shared/SearchBar"
 import InformationMessage from "../Shared/InformationMessage"
 import { Image } from "react-native"
@@ -20,7 +16,6 @@ export default PlaceAndAreas = ({ navigation, route }) => {
   const theme = useTheme()
   const headerMargin = useHeaderHeight()
 
-  // const [places, setPlaces] = useState(undefined)
   const [loading, setLoading] = useState(false)
   const [showSearch, setShowSearch] = useState(null)
   const [search, setSearch] = useState("")
