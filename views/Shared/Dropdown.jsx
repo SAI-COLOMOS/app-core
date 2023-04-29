@@ -33,23 +33,22 @@ export default Dropdown = ({ title, options, selected, value, isAnObjectsArray, 
         </Pressable>
       }
     >
-      {options?.length > 0
-        ? options.map((option) => (
-            <Menu.Item
-              key={`Menu item ${option?.value ?? option?.option}`}
-              title={option?.option}
-              onPress={() => {
-                if (!isAnObjectsArray) selected(option?.value ? { option: option.option, value: option.value } : option.option)
-                else {
-                  const selectedValue = option?.value ? { option: option.option, value: option.value } : option.option
-                  objectInfo.arr[objectInfo.index][objectInfo.key] = selectedValue
-                  objectInfo.setArr([...objectInfo.arr])
-                }
-                setShow(!show)
-              }}
-            />
-          ))
-        : null}
+      {options?.length > 0 &&
+        options.map((option) => (
+          <Menu.Item
+            key={`Menu item ${option?.value ?? option?.option}`}
+            title={option?.option}
+            onPress={() => {
+              if (!isAnObjectsArray) selected(option?.value ? { option: option.option, value: option.value } : option.option)
+              else {
+                const selectedValue = option?.value ? { option: option.option, value: option.value } : option.option
+                objectInfo.arr[objectInfo.index][objectInfo.key] = selectedValue
+                objectInfo.setArr([...objectInfo.arr])
+              }
+              setShow(!show)
+            }}
+          />
+        ))}
     </Menu>
   )
 }
