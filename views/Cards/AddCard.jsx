@@ -6,6 +6,7 @@ import CreateForm from "../Shared/CreateForm"
 import { Button, TextInput, useTheme, Text, Switch } from "react-native-paper"
 import ModalMessage from "../Shared/ModalMessage"
 import ApplicationContext from "../ApplicationContext"
+import { Pressable } from "react-native"
 
 export default AddCard = ({ navigation, route }) => {
   const headerMargin = useHeaderHeight()
@@ -16,6 +17,7 @@ export default AddCard = ({ navigation, route }) => {
   const [activity_name, setActivity_name] = useState("")
   const [hours, setHours] = useState("")
   const [penalized, setPenalized] = useState(false)
+  const [validated, setValidated] = useState(false)
 
   const [loading, setLoading] = useState(false)
   const [modalSuccess, setModalSuccess] = useState(false)
@@ -53,37 +55,46 @@ export default AddCard = ({ navigation, route }) => {
     }
   }
 
-  const Activity = () => {
-    return (
-      <VStack
-        spacing={5}
-        key="Activity"
-      >
-        <Text variant="labelLarge">Actividad realizada</Text>
-        <VStack spacing={10}>
-          <TextInput
-            mode="outlined"
-            value={activity_name}
-            onChangeText={setActivity_name}
-            label="Nombre de actividad"
-            maxLength={50}
-            autoComplete="off"
-            autoCorrect={false}
-          />
+  useEffect(() => {
+    let valid = true
 
-          <TextInput
-            mode="outlined"
-            value={hours}
-            onChangeText={setHours}
-            label="Horas a asignar"
-            keyboardType="numeric"
-            maxLength={3}
-            autoComplete="off"
-            autoCorrect={false}
-            left={penalized == true && <TextInput.Affix text="-" />}
-            right={<TextInput.Affix text="hrs" />}
-          />
+    activity_name?.length == 0 ? (valid = false) : null
+    hours?.length == 0 ? (valid = false) : null
 
+    setValidated(valid)
+  }, [activity_name, hours])
+
+  const Activity = () => (
+    <VStack
+      spacing={5}
+      key="Activity"
+    >
+      <Text variant="labelLarge">Actividad realizada</Text>
+      <VStack spacing={10}>
+        <TextInput
+          mode="outlined"
+          value={activity_name}
+          onChangeText={setActivity_name}
+          label="Nombre de actividad"
+          maxLength={150}
+          numberOfLines={1}
+          multiline={true}
+        />
+
+        <TextInput
+          mode="outlined"
+          value={hours}
+          onChangeText={setHours}
+          label="Horas a asignar"
+          keyboardType="numeric"
+          maxLength={3}
+          numberOfLines={1}
+          multiline={true}
+          left={penalized == true && <TextInput.Affix text="-" />}
+          right={<TextInput.Affix text="hrs" />}
+        />
+
+        <Pressable onPress={() => setPenalized(!penalized)}>
           <HStack
             items="center"
             spacing={10}
@@ -94,10 +105,10 @@ export default AddCard = ({ navigation, route }) => {
             />
             <Text variant="bodyMedium">{penalized == true ? "Horas en contra" : "Horas a favor"}</Text>
           </HStack>
-        </VStack>
+        </Pressable>
       </VStack>
-    )
-  }
+    </VStack>
+  )
 
   const Save = () => {
     return (
@@ -105,7 +116,7 @@ export default AddCard = ({ navigation, route }) => {
         mode="contained"
         icon="content-save-outline"
         key="Save"
-        disabled={loading}
+        disabled={loading || !validated}
         loading={loading}
         onPress={() => {
           SaveCard()
