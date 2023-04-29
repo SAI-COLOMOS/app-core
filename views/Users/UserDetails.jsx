@@ -170,13 +170,15 @@ export default UserDetails = ({ navigation, route }) => {
           justify="between"
           reverse={true}
         >
-          <Button
-            icon="plus"
-            mode="contained"
-            onPress={() => navigation.navigate("AddCard", { register: profile?.register, getCard })}
-          >
-            Agregar
-          </Button>
+          {profile.status == "Activo" && (
+            <Button
+              icon="plus"
+              mode="contained"
+              onPress={() => navigation.navigate("AddCard", { register: profile?.register, getCard })}
+            >
+              Agregar
+            </Button>
+          )}
 
           {activities?.length > 3 && (
             <Button

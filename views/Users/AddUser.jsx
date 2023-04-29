@@ -194,6 +194,7 @@ export default AddUser = ({ navigation, route }) => {
 
     if (user?.role == "Encargado") {
       total_hours?.length > 0 ? null : (check = false)
+      provider_type?.length > 0 ? null : (check = false)
     }
 
     if (user?.role == "Administrador") {
@@ -206,11 +207,11 @@ export default AddUser = ({ navigation, route }) => {
         provider_type?.length > 0 ? null : (check = false)
         school?.length > 0 ? null : (check = false)
         total_hours?.length > 0 ? null : (check = false)
-        place?.length > 0 ? null : (check = false)
-        assigned_area?.length > 0 ? null : (check = false)
       }
 
       role?.length > 0 ? null : (check = false)
+      place?.length > 0 ? null : (check = false)
+      assigned_area?.length > 0 ? null : (check = false)
     }
 
     first_name?.length > 0 ? null : (check = false)
@@ -264,9 +265,9 @@ export default AddUser = ({ navigation, route }) => {
           value={first_name}
           onChangeText={setFirst_name}
           label="Nombre"
-          maxLength={50}
-          autoComplete="off"
-          autoCorrect={false}
+          maxLength={150}
+          multiline={true}
+          numberOfLines={1}
           autoCapitalize="words"
         />
         <TextInput
@@ -274,18 +275,20 @@ export default AddUser = ({ navigation, route }) => {
           value={first_last_name}
           onChangeText={setFirst_last_name}
           label="Apellido paterno"
-          maxLength={50}
-          autoComplete="off"
-          autoCorrect={false}
+          maxLength={150}
+          multiline={true}
+          numberOfLines={1}
+          autoCapitalize="words"
         />
         <TextInput
           mode="outlined"
           value={second_last_name}
           onChangeText={setSecond_last_name}
           label="Apellido materno"
-          maxLength={50}
-          autoComplete="off"
-          autoCorrect={false}
+          maxLength={150}
+          multiline={true}
+          numberOfLines={1}
+          autoCapitalize="words"
         />
         <TextInput
           mode="outlined"
@@ -294,8 +297,9 @@ export default AddUser = ({ navigation, route }) => {
           label="Edad"
           keyboardType="numeric"
           maxLength={2}
+          multiline={true}
+          numberOfLines={1}
           autoComplete="off"
-          autoCorrect={false}
         />
         <Flex fill>
           <Dropdown
@@ -312,8 +316,8 @@ export default AddUser = ({ navigation, route }) => {
           label="CURP"
           autoCapitalize="characters"
           maxLength={18}
-          autoComplete="off"
-          autoCorrect={false}
+          multiline={true}
+          numberOfLines={1}
         />
       </VStack>
     </VStack>
@@ -333,7 +337,9 @@ export default AddUser = ({ navigation, route }) => {
           label="Correo electrónico"
           keyboardType="email-address"
           autoCapitalize="none"
-          maxLength={50}
+          maxLength={150}
+          multiline={true}
+          numberOfLines={1}
           autoComplete="off"
           autoCorrect={false}
         />
@@ -342,8 +348,10 @@ export default AddUser = ({ navigation, route }) => {
           value={phone}
           onChangeText={setPhone}
           label="Teléfono"
-          keyboardType="numeric"
+          keyboardType="phone-pad"
           maxLength={10}
+          multiline={true}
+          numberOfLines={1}
           autoComplete="off"
           autoCorrect={false}
         />
@@ -352,18 +360,20 @@ export default AddUser = ({ navigation, route }) => {
           value={emergency_contact}
           onChangeText={setEmergency_contact}
           label="Contacto de emergencia"
-          maxLength={50}
+          maxLength={150}
           autoCapitalize="words"
-          autoComplete="off"
-          autoCorrect={false}
+          multiline={true}
+          numberOfLines={1}
         />
         <TextInput
           mode="outlined"
           value={emergency_phone}
           onChangeText={setEmergency_phone}
           label="Teléfono de emergencia"
-          keyboardType="numeric"
+          keyboardType="phone-pad"
           maxLength={10}
+          multiline={true}
+          numberOfLines={1}
           autoComplete="off"
           autoCorrect={false}
         />
@@ -389,17 +399,16 @@ export default AddUser = ({ navigation, route }) => {
           </Flex>
         )}
 
-        {role == "Prestador" ||
-          (user.role == "Encargado" && (
-            <Flex fill>
-              <Dropdown
-                title="Tipo de prestador"
-                options={providerTypes}
-                value={provider_type}
-                selected={setProvider_type}
-              />
-            </Flex>
-          ))}
+        {(role == "Prestador" || user.role == "Encargado") && (
+          <Flex fill>
+            <Dropdown
+              title="Tipo de prestador"
+              options={providerTypes}
+              value={provider_type}
+              selected={setProvider_type}
+            />
+          </Flex>
+        )}
 
         {user.role == "Administrador" && (
           <Flex>
@@ -479,61 +488,59 @@ export default AddUser = ({ navigation, route }) => {
             )
           ))}
 
-        {role == "Prestador" ||
-          (user.role == "Encargado" && (
-            <Flex>
-              {placesOptions != null ? (
-                <Dropdown
-                  value={school}
-                  selected={setSchool}
-                  title="Escuela"
-                  options={schoolsOptions}
+        {(role == "Prestador" || user.role == "Encargado") && (
+          <Flex>
+            {placesOptions != null ? (
+              <Dropdown
+                value={school}
+                selected={setSchool}
+                title="Escuela"
+                options={schoolsOptions}
+              />
+            ) : loading == true ? (
+              <HStack
+                fill
+                items="center"
+                pv={10}
+                spacing={20}
+              >
+                <Flex fill>
+                  <Text variant="bodyMedium">Obteniendo la lista de escuelas</Text>
+                </Flex>
+                <ActivityIndicator />
+              </HStack>
+            ) : (
+              <HStack
+                fill
+                items="center"
+                pv={10}
+                spacing={20}
+              >
+                <Flex fill>
+                  <Text variant="bodyMedium">Ocurrió un problema obteniendo la lista de escuelas</Text>
+                </Flex>
+                <IconButton
+                  icon="reload"
+                  mode="outlined"
+                  onPress={() => getData()}
                 />
-              ) : loading == true ? (
-                <HStack
-                  fill
-                  items="center"
-                  pv={10}
-                  spacing={20}
-                >
-                  <Flex fill>
-                    <Text variant="bodyMedium">Obteniendo la lista de escuelas</Text>
-                  </Flex>
-                  <ActivityIndicator />
-                </HStack>
-              ) : (
-                <HStack
-                  fill
-                  items="center"
-                  pv={10}
-                  spacing={20}
-                >
-                  <Flex fill>
-                    <Text variant="bodyMedium">Ocurrió un problema obteniendo la lista de escuelas</Text>
-                  </Flex>
-                  <IconButton
-                    icon="reload"
-                    mode="outlined"
-                    onPress={() => getData()}
-                  />
-                </HStack>
-              )}
-            </Flex>
-          ))}
+              </HStack>
+            )}
+          </Flex>
+        )}
 
-        {role == "Prestador" ||
-          (user.role == "Encargado" && (
-            <TextInput
-              mode="outlined"
-              value={total_hours}
-              onChangeText={setTotal_hours}
-              label="Total de horas"
-              keyboardType="number-pad"
-              maxLength={3}
-              autoComplete="off"
-              autoCorrect={false}
-            />
-          ))}
+        {(role == "Prestador" || user.role == "Encargado") && (
+          <TextInput
+            mode="outlined"
+            value={total_hours}
+            onChangeText={setTotal_hours}
+            label="Total de horas"
+            keyboardType="number-pad"
+            maxLength={3}
+            autoComplete="off"
+            autoCorrect={false}
+          />
+        )}
       </VStack>
     </VStack>
   )
@@ -574,6 +581,7 @@ export default AddUser = ({ navigation, route }) => {
       key="CancelButton"
       mode="outlined"
       icon="close"
+      disabled={modalLoading}
       onPress={() => {
         navigation.pop()
       }}

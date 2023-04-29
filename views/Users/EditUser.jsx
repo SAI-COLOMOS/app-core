@@ -324,27 +324,30 @@ export default EditUser = ({ navigation, route }) => {
           value={first_name}
           onChangeText={setFirst_name}
           label="Nombre"
-          maxLength={50}
-          autoComplete="off"
-          autoCorrect={false}
+          maxLength={150}
+          multiline={true}
+          numberOfLines={1}
+          autoCapitalize="words"
         />
         <TextInput
           mode="outlined"
           value={first_last_name}
           onChangeText={setFirst_last_name}
           label="Apellido paterno"
-          maxLength={50}
-          autoComplete="off"
-          autoCorrect={false}
+          maxLength={150}
+          multiline={true}
+          numberOfLines={1}
+          autoCapitalize="words"
         />
         <TextInput
           mode="outlined"
           value={second_last_name}
           onChangeText={setSecond_last_name}
           label="Apellido materno"
-          maxLength={50}
-          autoComplete="off"
-          autoCorrect={false}
+          maxLength={150}
+          multiline={true}
+          numberOfLines={1}
+          autoCapitalize="words"
         />
         <TextInput
           mode="outlined"
@@ -353,8 +356,9 @@ export default EditUser = ({ navigation, route }) => {
           label="Edad"
           keyboardType="numeric"
           maxLength={2}
+          multiline={true}
+          numberOfLines={1}
           autoComplete="off"
-          autoCorrect={false}
         />
         <Flex fill>
           <Dropdown
@@ -371,8 +375,8 @@ export default EditUser = ({ navigation, route }) => {
           label="CURP"
           autoCapitalize="characters"
           maxLength={18}
-          autoComplete="off"
-          autoCorrect={false}
+          multiline={true}
+          numberOfLines={1}
         />
       </VStack>
     </VStack>
@@ -392,7 +396,9 @@ export default EditUser = ({ navigation, route }) => {
           label="Correo electrónico"
           keyboardType="email-address"
           autoCapitalize="none"
-          maxLength={50}
+          maxLength={150}
+          multiline={true}
+          numberOfLines={1}
           autoComplete="off"
           autoCorrect={false}
         />
@@ -401,8 +407,10 @@ export default EditUser = ({ navigation, route }) => {
           value={phone}
           onChangeText={setPhone}
           label="Teléfono"
-          keyboardType="numeric"
+          keyboardType="phone-pad"
           maxLength={10}
+          multiline={true}
+          numberOfLines={1}
           autoComplete="off"
           autoCorrect={false}
         />
@@ -411,18 +419,20 @@ export default EditUser = ({ navigation, route }) => {
           value={emergency_contact}
           onChangeText={setEmergency_contact}
           label="Contacto de emergencia"
-          maxLength={50}
+          maxLength={150}
           autoCapitalize="words"
-          autoComplete="off"
-          autoCorrect={false}
+          multiline={true}
+          numberOfLines={1}
         />
         <TextInput
           mode="outlined"
           value={emergency_phone}
           onChangeText={setEmergency_phone}
           label="Teléfono de emergencia"
-          keyboardType="numeric"
+          keyboardType="phone-pad"
           maxLength={10}
+          multiline={true}
+          numberOfLines={1}
           autoComplete="off"
           autoCorrect={false}
         />
@@ -437,7 +447,7 @@ export default EditUser = ({ navigation, route }) => {
     >
       <Text variant="labelLarge">Datos del usuario</Text>
       <VStack spacing={10}>
-        {user?.role == "Administrador" ? (
+        {user?.role == "Administrador" && (
           <Flex fill>
             <Dropdown
               title="Rol"
@@ -446,8 +456,9 @@ export default EditUser = ({ navigation, route }) => {
               selected={setRole}
             />
           </Flex>
-        ) : null}
-        {user?.role == "Encargado" || user.role == "Encargado" ? (
+        )}
+
+        {(role == "Prestador" || user.role == "Encargado") && (
           <Flex fill>
             <Dropdown
               title="Tipo de prestador"
@@ -456,7 +467,7 @@ export default EditUser = ({ navigation, route }) => {
               selected={setProvider_type}
             />
           </Flex>
-        ) : null}
+        )}
 
         {user?.role == "Administrador" && (
           <Flex>
@@ -577,19 +588,18 @@ export default EditUser = ({ navigation, route }) => {
           </Flex>
         )}
 
-        {role == "Prestador" ||
-          (user.role == "Encargado" && (
-            <TextInput
-              mode="outlined"
-              value={total_hours}
-              onChangeText={setTotal_hours}
-              label="Total de horas"
-              keyboardType="number-pad"
-              maxLength={3}
-              autoComplete="off"
-              autoCorrect={false}
-            />
-          ))}
+        {(role == "Prestador" || user.role == "Encargado") && (
+          <TextInput
+            mode="outlined"
+            value={total_hours}
+            onChangeText={setTotal_hours}
+            label="Total de horas"
+            keyboardType="number-pad"
+            maxLength={3}
+            autoComplete="off"
+            autoCorrect={false}
+          />
+        )}
 
         <Flex fill>
           <Dropdown
@@ -630,6 +640,7 @@ export default EditUser = ({ navigation, route }) => {
           textColor={theme.colors.error}
           icon="trash-can-outline"
           mode="outlined"
+          disabled={modalLoading}
           onPress={() => {
             setModalConfirm(!modalConfirm)
           }}
@@ -660,6 +671,7 @@ export default EditUser = ({ navigation, route }) => {
       key="CancelButton"
       mode="outlined"
       icon="close"
+      disabled={modalLoading}
       onPress={() => {
         navigation.pop()
       }}
