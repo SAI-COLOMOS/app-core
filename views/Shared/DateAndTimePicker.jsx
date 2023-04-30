@@ -18,6 +18,7 @@ const ClockPicker = ({ handler, date, setDate }) => {
     date.setHours(hours)
     date.setMinutes(minutes)
     date.setSeconds(0)
+    date.setMilliseconds(0)
 
     setDate(new Date(date))
     handler[1]()

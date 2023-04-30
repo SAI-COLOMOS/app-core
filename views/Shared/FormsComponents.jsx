@@ -1,4 +1,5 @@
-import { Slider } from "@miblanchard/react-native-slider"
+// import { Slider } from "@miblanchard/react-native-slider"
+import Slider from "@react-native-community/slider"
 import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useState } from "react"
 import { Card, Checkbox, RadioButton, Text, TextInput, TouchableRipple, useTheme } from "react-native-paper"
@@ -181,7 +182,6 @@ const NumericQuestion = ({ question, id, getter, setter }) => {
 }
 
 const ScaleQuestion = ({ question, options, id, getter, setter }) => {
-  const [valueSelected, setValueSelected] = useState(options[1])
   const theme = useTheme()
 
   const Child = () => (
@@ -191,31 +191,20 @@ const ScaleQuestion = ({ question, options, id, getter, setter }) => {
         <Text variant="titleMedium">{options[1]}</Text>
       </HStack>
       <Slider
-        step={1}
-        renderThumbComponent={() => (
-          <Flex
-            center
-            style={{ width: 30, height: 30, borderRadius: theme.roundness, backgroundColor: theme.colors.primary, overflow: "hidden" }}
-          >
-            <Text
-              variant="bodyMedium"
-              style={{ color: theme.colors.onPrimary }}
-            >
-              {getter[id] ?? options[1]}
-            </Text>
-          </Flex>
-        )}
-        minimumTrackTintColor={theme.colors.inversePrimary}
-        maximumTrackTintColor={theme.colors.backdrop}
-        thumbTintColor={theme.colors.primary}
         minimumValue={options[0]}
         maximumValue={options[1]}
+        minimumTrackTintColor={theme.colors.inversePrimary}
+        maximumTrackTintColor={theme.colors.backdrop}
+        step={1}
+        thumbTintColor={theme.colors.primary}
         value={getter[id] ?? options[1]}
         onValueChange={(value) => {
-          const newObject = { ...getter, [id]: value[0] }
+          const newObject = { ...getter, [id]: value }
           setter(newObject)
         }}
+        tapToSeek={true}
       />
+      <Text variant="bodyMedium">Seleccionado: {getter[id] ?? options[1]}</Text>
     </Flex>
   )
 

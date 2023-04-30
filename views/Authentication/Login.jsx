@@ -1,6 +1,6 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
 import { createContext, useContext, useEffect, useState } from "react"
-import { Image, ScrollView } from "react-native"
+import { Image, Pressable, ScrollView } from "react-native"
 import { Button, Card, Text, TextInput, Checkbox, ActivityIndicator, useTheme, Switch } from "react-native-paper"
 import * as SecureStore from "expo-secure-store"
 import jwtDecode from "jwt-decode"
@@ -163,24 +163,25 @@ export default Login = ({ navigation }) => {
                   />
                 }
               />
-              <HStack
-                items="center"
-                spacing={10}
-              >
-                <Switch
-                  value={rememberUser}
-                  onValueChange={() => {
-                    setRememberUser(!rememberUser)
-                  }}
-                />
-                <Text variant="bodyMedium">Mantener la sesión abierta</Text>
-              </HStack>
+              <Pressable onPress={() => setRememberUser(!rememberUser)}>
+                <HStack
+                  items="center"
+                  spacing={10}
+                >
+                  <Switch
+                    value={rememberUser}
+                    onValueChange={() => setRememberUser(!rememberUser)}
+                  />
+                  <Text variant="bodyMedium">Mantener la sesión abierta</Text>
+                </HStack>
+              </Pressable>
             </VStack>
 
-            <VStack spacing={10}>
+            <VStack spacing={20}>
               <Button
                 disabled={modalLoading}
                 loading={modalLoading}
+                icon="login-variant"
                 mode="contained"
                 onPress={() => {
                   getSession()
@@ -191,7 +192,8 @@ export default Login = ({ navigation }) => {
 
               <Button
                 disabled={modalLoading}
-                mode="text"
+                icon="lock-reset"
+                mode="outlined"
                 onPress={() => {
                   navigation.navigate("ResetPassword")
                 }}

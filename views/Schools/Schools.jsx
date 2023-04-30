@@ -126,7 +126,7 @@ export default Schools = ({ navigation, route }) => {
               >
                 <Text
                   variant="titleMedium"
-                  numberOfLines={1}
+                  numberOfLines={2}
                 >
                   {item.school_name}
                 </Text>

@@ -18,33 +18,36 @@ export default ResetPassword = ({ navigation }) => {
   const [responseCode, setResponseCode] = useState("")
 
   const getRecovery = async () => {
-    setModalLoading(true)
+    try {
+      setModalLoading(true)
 
-    const request = await fetch(`${host}/auth/recovery`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Cache-Control": "no-cache"
-      },
-      body: JSON.stringify({
-        credential: credential.trim()
+      const request = await fetch(`${host}/auth/recovery`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache"
+        },
+        body: JSON.stringify({
+          credential: credential.trim()
+        })
       })
-    })
-      .then((response) => response.status)
-      .catch(() => null)
 
-    setModalLoading(false)
+      setModalLoading(false)
 
-    if (request == 200) {
-      setModalSuccess(true)
-    } else if (request != null) {
-      setResponseCode(request)
+      if (request.ok) {
+        setModalSuccess(true)
+        return
+      }
+
+      setResponseCode(request.status)
       setModalError(true)
-    } else {
+
+      return
+    } catch (error) {
+      console.error("Reset password:", error)
+      setModalLoading(false)
       setModalFatal(true)
     }
-
-    return
   }
 
   const Form = () => {
@@ -58,6 +61,7 @@ export default ResetPassword = ({ navigation }) => {
           label="Registro, email o teléfono"
           autoComplete="username"
           autoCapitalize="none"
+          keyboardType="email-address"
           autoCorrect={false}
           onChangeText={setCredential}
         />

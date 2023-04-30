@@ -535,7 +535,7 @@ export default AddUser = ({ navigation, route }) => {
             value={total_hours}
             onChangeText={setTotal_hours}
             label="Total de horas"
-            keyboardType="number-pad"
+            keyboardType="numeric"
             maxLength={3}
             autoComplete="off"
             autoCorrect={false}
