@@ -69,6 +69,8 @@ import SurveyResume from "./Surveys/SurveyResume"
 import AddSurvey from "./Surveys/AddSurvey"
 import SurveyAnswers from "./Surveys/SurveyAnswers"
 import DownloadSurvey from "./Surveys/DownloadSurvey"
+import ProximityReceptor from "./Attendance/Proximity/ProximityReceptor"
+import ProximityTransmisor from "./Attendance/Proximity/ProximityTransmisor"
 
 export default Navigation = () => {
   const Stack = createNativeStackNavigator()
@@ -310,7 +312,16 @@ export default Navigation = () => {
                 options={{ headerShown: false, presentation: "containedTransparentModal" }}
               />
 
-              {/* <Stack.Screen name="UpdatePassword" component={UpdatePassword} options={{ headerShown: false, presentation: 'containedTransparentModal' }} /> */}
+              <Stack.Screen
+                name="ProximityReceptor"
+                component={ProximityReceptor}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+              <Stack.Screen
+                name="ProximityTransmisor"
+                component={ProximityTransmisor}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
             </Stack.Group>
 
             {/* Forms */}

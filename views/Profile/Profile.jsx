@@ -38,6 +38,7 @@ export default Profile = ({ navigation, route }) => {
         await SecureStore.deleteItemAsync("token")
         await SecureStore.deleteItemAsync("user")
         await SecureStore.deleteItemAsync("keepAlive")
+        await SecureStore.deleteItemAsync("useBiometric")
         navigation.replace("Login")
       }}
     />

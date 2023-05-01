@@ -7,6 +7,7 @@ import jwtDecode from "jwt-decode"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import Constants from "expo-constants"
 import * as Linking from "expo-linking"
+import * as LocalAuthentication from "expo-local-authentication"
 import ModalMessage from "../Shared/ModalMessage"
 import ApplicationContext from "../ApplicationContext"
 
@@ -20,13 +21,40 @@ export default Login = ({ navigation }) => {
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [rememberUser, setRememberUser] = useState(false)
+  const [useBiometric, setUseBiometric] = useState(false)
   const [activeSession, setActiveSession] = useState(undefined)
+  const [hasHardware, setHasHardware] = useState(false)
 
   const [modalLoading, setModalLoading] = useState(false)
   const [modalSuccess, setModalSuccess] = useState(false)
   const [modalError, setModalError] = useState(false)
   const [modalFatal, setModalFatal] = useState(false)
   const [responseCode, setResponseCode] = useState("")
+
+  async function rememberUserHandler() {
+    if (useBiometric == true && rememberUser == true) {
+      const result = await LocalAuthentication.authenticateAsync()
+
+      if (result.success == true) {
+        setUseBiometric(!useBiometric)
+        await SecureStore.setItemAsync("useBiometric", useBiometric == true ? "true" : "false")
+      } else {
+        return
+      }
+    }
+
+    setRememberUser(!rememberUser)
+    return
+  }
+
+  async function useBiometricHandler() {
+    const result = await LocalAuthentication.authenticateAsync({ promptMessage: "Desbloquea para continuar" })
+
+    if (result.success == true) {
+      await SecureStore.setItemAsync("useBiometric", useBiometric == true ? "true" : "false")
+      setUseBiometric(!useBiometric)
+    }
+  }
 
   async function getSession() {
     try {
@@ -53,6 +81,18 @@ export default Login = ({ navigation }) => {
 
         setToken(response.token)
         setRegister(payload.register)
+
+        // if (useBiometric == true) {
+        //   const result = await LocalAuthentication.authenticateAsync({
+        //     promptMessage: "Desbloquea para acceder"
+        //   })
+
+        //   if (result.success == true) {
+        //     await SecureStore.setItemAsync("useBiometric", "true")
+        //   } else {
+        //     return
+        //   }
+        // }
 
         if (rememberUser == true) {
           await SecureStore.setItemAsync("token", response.token)
@@ -86,17 +126,42 @@ export default Login = ({ navigation }) => {
   }, [url])
 
   useEffect(() => {
+    const checkHasHardware = async () => {
+      const result = await LocalAuthentication.hasHardwareAsync()
+      setHasHardware(result)
+    }
+
+    checkHasHardware()
+  }, [])
+
+  useEffect(() => {
     const getActualSession = async () => {
       const token = await SecureStore.getItemAsync("token")
+      const useBiometric = await SecureStore.getItemAsync("useBiometric")
 
       if (token != null) {
         const payload = jwtDecode(token)
+        setRememberUser(true)
 
         if (payload.exp > Math.floor(Date.now() / 1000)) {
-          //await SecureStore.setItemAsync("register", payload.register)
           setRegister(payload.register)
           setToken(token)
+
+          if (useBiometric != null) {
+            setUseBiometric(true)
+
+            const result = await LocalAuthentication.authenticateAsync({
+              promptMessage: "Desbloquea para acceder"
+            })
+
+            if (result.success == false) {
+              setActiveSession(false)
+              return
+            }
+          }
+
           setActiveSession(true)
+
           navigation.replace("Dashboard")
         }
       }
@@ -163,18 +228,33 @@ export default Login = ({ navigation }) => {
                   />
                 }
               />
-              <Pressable onPress={() => setRememberUser(!rememberUser)}>
+              <Pressable onPress={() => rememberUserHandler()}>
                 <HStack
                   items="center"
                   spacing={10}
                 >
                   <Switch
                     value={rememberUser}
-                    onValueChange={() => setRememberUser(!rememberUser)}
+                    onValueChange={() => rememberUserHandler()}
                   />
                   <Text variant="bodyMedium">Mantener la sesión abierta</Text>
                 </HStack>
               </Pressable>
+
+              {hasHardware == true && rememberUser == true && (
+                <Pressable onPress={() => useBiometricHandler()}>
+                  <HStack
+                    items="center"
+                    spacing={10}
+                  >
+                    <Switch
+                      value={useBiometric}
+                      onValueChange={() => useBiometricHandler()}
+                    />
+                    <Text variant="bodyMedium">Iniciar sesión con sensor biométrico</Text>
+                  </HStack>
+                </Pressable>
+              )}
             </VStack>
 
             <VStack spacing={20}>
@@ -204,8 +284,6 @@ export default Login = ({ navigation }) => {
           </VStack>
         </ScrollView>
       )}
-
-      {/* <ModalLoaading handler={[modalLoading, () => setModalLoading(!modalLoading)]} dismissable={false}/> */}
 
       <ModalMessage
         title="¡Listo!"
