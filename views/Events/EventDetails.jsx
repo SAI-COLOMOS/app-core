@@ -483,15 +483,27 @@ export default EventDetails = ({ navigation, route }) => {
       )}
 
       {event?.attendance?.status == "En proceso" && (
-        <Button
-          disabled={loadingFinish}
-          mode="outlined"
-          style={{ backgroundColor: theme.colors.background }}
-          icon="qrcode-scan"
-          onPress={() => navigation.navigate("ScanAttendance", { attendeeList: event?.attendance?.attendee_list, event_identifier: event_identifier })}
-        >
-          Registrar asistencia
-        </Button>
+        <>
+          <Button
+            disabled={loadingFinish}
+            mode="outlined"
+            style={{ backgroundColor: theme.colors.background }}
+            icon="qrcode-scan"
+            onPress={() => navigation.navigate("ScanAttendance", { attendeeList: event?.attendance?.attendee_list, event_identifier: event_identifier })}
+          >
+            Registrar asistencia
+          </Button>
+
+          <Button
+            disabled={loadingFinish}
+            mode="outlined"
+            style={{ backgroundColor: theme.colors.background }}
+            icon="qrcode-scan"
+            onPress={() => navigation.navigate("ProximityReceptor", { event_identifier: event_identifier })}
+          >
+            Escanear dispositivos cercanos
+          </Button>
+        </>
       )}
 
       {event?.attendance?.status == "En proceso" && new Date(event?.ending_date) <= new Date() && (

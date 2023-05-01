@@ -164,7 +164,7 @@ export default ScanAttendance = ({ navigation, route }) => {
           key="AskForPermissions"
           title="Sin permisos"
           icon="camera-outline"
-          description="La aplicación no tiene permiso para usar la cámara, otorga los permisos necesarios para continuar"
+          description="La aplicación no tiene permiso para usar la cámara del dispositivo, otorga los permisos necesarios para continuar"
           buttonTitle="Otorgar permisos"
           buttonIcon="shape-outline"
           action={async () => await requestCameraPermission()}
@@ -176,7 +176,7 @@ export default ScanAttendance = ({ navigation, route }) => {
           key="AskForPermissions"
           title="Sin acceso"
           icon="camera-off-outline"
-          description="El acceso a la cámara está bloqueado, para poder continuar, es necesario otorgues los permisos necesarios desde la aplicación de configuraciones del dispositivo"
+          description="El acceso a la cámara está bloqueado, para poder continuar, es necesario que otorgues los permisos necesarios desde la configuración del dispositivo"
           buttonTitle="Volver a intentar"
           buttonIcon="reload"
           action={async () => await requestCameraPermission()}
