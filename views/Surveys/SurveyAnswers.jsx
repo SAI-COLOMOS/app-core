@@ -16,8 +16,6 @@ export default SurveyAnswers = ({ navigation, route }) => {
   const [survey, setSurvey] = useState(undefined)
   const [loading, setLoading] = useState(false)
   const [statusCode, setStatusCode] = useState("")
-  const [showDialog, setShowDialog] = useState(false)
-  const [downloadFormat, setDownloadFormat] = useState("")
 
   async function getSurvey() {
     try {
@@ -59,7 +57,7 @@ export default SurveyAnswers = ({ navigation, route }) => {
             >
               <IconButton
                 icon="tray-arrow-down"
-                onPress={() => setShowDialog(true)}
+                onPress={() => navigation.navigate("DownloadSurvey", { survey_identifier })}
               />
             </Tooltip>
           ]}
@@ -153,65 +151,8 @@ export default SurveyAnswers = ({ navigation, route }) => {
                 ))}
             </VStack>
           </List.AccordionGroup>
-          {/* <Text>{JSON.stringify(survey)}</Text>
-        <Text>{JSON.stringify(totalAnswers)}</Text> */}
         </VStack>
       </Card>
-    )
-  }
-
-  const DownloadDialog = () => {
-    const formats = [{ option: "PDF" }, { option: "Hoja de calculo" }, { option: "CSV" }]
-    return (
-      <Portal>
-        <Dialog
-          visible={showDialog}
-          onDismiss={() => {
-            setShowDialog(false)
-            setDownloadFormat("")
-          }}
-        >
-          <Dialog.Title style={{ textAlign: "center" }}>Descargar respuestas</Dialog.Title>
-          <Dialog.Content>
-            <VStack spacing={10}>
-              <Text variant="bodyMedium">Selecciona el formato de descarga</Text>
-              <Flex>
-                <Dropdown
-                  title="Formato"
-                  options={formats}
-                  value={downloadFormat}
-                  selected={setDownloadFormat}
-                />
-              </Flex>
-            </VStack>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <HStack
-              fill
-              justify="between"
-            >
-              <Button
-                mode="outlined"
-                icon="close"
-                onPress={() => {
-                  setShowDialog(false)
-                  setDownloadFormat("")
-                }}
-              >
-                Cancelar
-              </Button>
-              <Button
-                disabled={downloadFormat == ""}
-                mode="contained"
-                icon="tray-arrow-down"
-                onPress={() => null}
-              >
-                Descargar
-              </Button>
-            </HStack>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
     )
   }
 
@@ -226,8 +167,6 @@ export default SurveyAnswers = ({ navigation, route }) => {
         refreshAction={() => getSurvey()}
         children={[Info(), Responses()]}
       />
-
-      <DownloadDialog />
     </Flex>
   )
 }

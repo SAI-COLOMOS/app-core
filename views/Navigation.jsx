@@ -68,6 +68,7 @@ import ApplySurvey from "./Surveys/ApplySurvey"
 import SurveyResume from "./Surveys/SurveyResume"
 import AddSurvey from "./Surveys/AddSurvey"
 import SurveyAnswers from "./Surveys/SurveyAnswers"
+import DownloadSurvey from "./Surveys/DownloadSurvey"
 
 export default Navigation = () => {
   const Stack = createNativeStackNavigator()
@@ -361,6 +362,11 @@ export default Navigation = () => {
               <Stack.Screen
                 name="SurveyResume"
                 component={SurveyResume}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+              <Stack.Screen
+                name="DownloadSurvey"
+                component={DownloadSurvey}
                 options={{ headerShown: false, presentation: "containedTransparentModal" }}
               />
             </Stack.Group>

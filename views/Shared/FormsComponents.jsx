@@ -191,13 +191,13 @@ const ScaleQuestion = ({ question, options, id, getter, setter }) => {
         <Text variant="titleMedium">{options[1]}</Text>
       </HStack>
       <Slider
-        minimumValue={options[0]}
-        maximumValue={options[1]}
+        minimumValue={Number(options[0])}
+        maximumValue={Number(options[1])}
         minimumTrackTintColor={theme.colors.inversePrimary}
         maximumTrackTintColor={theme.colors.backdrop}
         step={1}
         thumbTintColor={theme.colors.primary}
-        value={getter[id] ?? options[1]}
+        value={Number(getter[id] ?? options[1])}
         onValueChange={(value) => {
           const newObject = { ...getter, [id]: value }
           setter(newObject)

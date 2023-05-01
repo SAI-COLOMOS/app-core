@@ -17,7 +17,7 @@ export default Dropdown = ({ title, options, selected, value, isAnObjectsArray, 
         >
           <TextInput
             label={title}
-            value={value}
+            value={value.value ? value.option : value}
             mode="outlined"
             editable={false}
             style={{ zIndex: -5 }}
