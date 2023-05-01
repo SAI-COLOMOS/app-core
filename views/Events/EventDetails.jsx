@@ -648,9 +648,17 @@ export default EventDetails = ({ navigation, route }) => {
                   onPress={() => navigation.navigate("ShowAttendanceCode", { getEvent })}
                   mode="contained"
                 >
-                  Tomar asistencia
+                  Tomar asistencia con QR
                 </Button>
               )}
+              {/* {status == "Inscrito" && ( */}
+              <Button
+                onPress={() => navigation.navigate("ProximityTransmisor", { getEvent, event_identifier: event_identifier })}
+                mode="contained"
+              >
+                Tomar asistencia por proximidad
+              </Button>
+              {/* )} */}
             </VStack>
           </Card>
         )}

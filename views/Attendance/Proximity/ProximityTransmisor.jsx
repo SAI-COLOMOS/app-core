@@ -12,15 +12,18 @@ import InformationMessage from "../../Shared/InformationMessage"
 import { useFocusEffect } from "@react-navigation/native"
 import { useKeepAwake } from "expo-keep-awake"
 
-export default ProximityReceptor = ({ navigation, route }) => {
+export default ProximityTransmisor = ({ navigation, route }) => {
   const theme = useTheme()
-  const { event_identifier } = route.params
+  const { event_identifier, getEvent } = route.params
   const { user, host, token } = useContext(ApplicationContext)
   useKeepAwake()
 
   const [status, requestPermission] = Location.useForegroundPermissions()
   const [location, setLocation] = useState({ latitude: undefined, longitude: undefined, accuracy: undefined })
   const [sending, setSending] = useState(false)
+  const [done, setDone] = useState(false)
+  const [outOfRange, setOutOfRange] = useState(false)
+  const [unavailable, setUnavailable] = useState(false)
   const [accuracy, setAccuracy] = useState(null)
 
   const avatarScale = useSharedValue(1)
@@ -66,7 +69,20 @@ export default ProximityReceptor = ({ navigation, route }) => {
 
       setSending(false)
 
-      if (request.ok) {
+      if (request.status == 201) {
+        setUnavailable(false)
+        setDone(true)
+        return
+      }
+
+      if (request.status == 200) {
+        setUnavailable(false)
+        setOutOfRange(true)
+        return
+      }
+
+      if (request.status == 403) {
+        setUnavailable(true)
         return
       }
 
@@ -107,6 +123,12 @@ export default ProximityReceptor = ({ navigation, route }) => {
     }, [status])
   )
 
+  useEffect(() => {
+    navigation.addListener("beforeRemove", (e) => {
+      getEvent()
+    })
+  }, [navigation])
+
   const Scanning = () => {
     return (
       <VStack
@@ -129,18 +151,50 @@ export default ProximityReceptor = ({ navigation, route }) => {
           />
         </Flex>
         <Text>Precisión del GPS: {accuracy ? `${Number(accuracy).toFixed(0)} m` : "Sin información"}</Text>
+        {outOfRange == true && (
+          <HStack
+            ph={20}
+            spacing={20}
+            center
+          >
+            <Icon
+              name="alert"
+              size={25}
+              color={theme.colors.onBackground}
+            />
+            <Flex fill>
+              <Text variant="bodySmall">Estás demasiado lejos del punto designado, acércate más para poder registrar tu asistencia</Text>
+            </Flex>
+          </HStack>
+        )}
+        {unavailable == true && (
+          <HStack
+            ph={20}
+            spacing={20}
+            center
+          >
+            <Icon
+              name="alert"
+              size={25}
+              color={theme.colors.onBackground}
+            />
+            <Flex fill>
+              <Text variant="bodySmall">Todavía no podemos registrar tu asistencia hasta que el encargado habilite la opción, inténtalo más tarde</Text>
+            </Flex>
+          </HStack>
+        )}
         <HStack
           ph={20}
           spacing={20}
           center
         >
           <Icon
-            name="alert"
+            name="information-outline"
             size={25}
             color={theme.colors.onBackground}
           />
           <Flex fill>
-            <Text variant="bodySmall">Al mantén esta pantalla activa, estarás actualizando la ubicación permitida para la toma de asistencia</Text>
+            <Text variant="bodySmall">Mantente en esta pantalla hasta que hayamos registrado tu asistencia</Text>
           </Flex>
         </HStack>
       </VStack>
@@ -153,7 +207,18 @@ export default ProximityReceptor = ({ navigation, route }) => {
       fill
     >
       {status?.granted == true ? (
-        <Scanning />
+        done == false ? (
+          <Scanning />
+        ) : (
+          <InformationMessage
+            icon="check-circle-outline"
+            title="¡Listo!"
+            description="Tu asistencia ha sido registrada"
+            buttonTitle="Terminar"
+            buttonIcon="page-previous-outline"
+            action={async () => await navigation.pop()}
+          />
+        )
       ) : status?.canAskAgain == true ? (
         <InformationMessage
           icon="map-marker-question-outline"
@@ -191,7 +256,7 @@ export default ProximityReceptor = ({ navigation, route }) => {
       navigation={navigation}
       title="Asistencia por proximidad"
       children={[Main()]}
-      actions={[Close()]}
+      actions={[done == false ? Close() : null]}
       disablePrevent={true}
     />
   )

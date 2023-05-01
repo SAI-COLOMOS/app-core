@@ -13,8 +13,6 @@ export default CreateForm = ({ navigation, route, loading, title, children, acti
       navigation.addListener("beforeRemove", (e) => {
         e.preventDefault()
 
-        console.log("JSJSJSJSJS")
-
         if (loading) {
           return
         } else {
