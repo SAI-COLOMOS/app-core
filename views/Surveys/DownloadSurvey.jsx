@@ -1,11 +1,12 @@
-import { Flex, VStack } from "react-native-flex-layout"
+import { Flex, HStack, VStack } from "react-native-flex-layout"
 import CreateForm from "../Shared/CreateForm"
-import { Button, Card, ProgressBar, Text, useTheme } from "react-native-paper"
+import { Button, Card, ProgressBar, Switch, Text, useTheme } from "react-native-paper"
 import Dropdown from "../Shared/Dropdown"
 import * as Sharing from "expo-sharing"
 import * as FileSystem from "expo-file-system"
 import { useCallback, useContext, useEffect, useState } from "react"
 import ApplicationContext from "../ApplicationContext"
+import { Pressable } from "react-native"
 
 export default DownloadSurvey = ({ navigation, route }) => {
   const theme = useTheme()
@@ -16,6 +17,7 @@ export default DownloadSurvey = ({ navigation, route }) => {
   const [downloadProgress, setDownloadProgress] = useState(0)
   const [actualFileURI, setActualFileURI] = useState("")
   const [actualFileExist, setActualFileExist] = useState(undefined)
+  const [withOpenAI, setWithOpenAI] = useState(true)
   const [loading, setLoading] = useState(false)
 
   const formats = [
@@ -29,16 +31,17 @@ export default DownloadSurvey = ({ navigation, route }) => {
       setLoading(true)
 
       const progress = (actualDownload) => {
+        console.log("Escritos", actualDownload.totalBytesWritten, "Por ser escritos", actualDownload.totalBytesExpectedToWrite)
         const progress = actualDownload.totalBytesWritten / actualDownload.totalBytesExpectedToWrite
         setDownloadProgress(Number(progress))
       }
 
       const downloadFile = FileSystem.createDownloadResumable(
-        `http://192.168.100.84:3000/prueba.${downloadFormat.value}`,
+        `${host}/surveys/${survey_identifier}/results?dispatch=${downloadFormat.value}&withOpenAI=${withOpenAI}`,
         actualFileURI,
         {
           headers: {
-            Authentication: `Bearer ${token}`
+            Authorization: `Bearer ${token}`
           }
         },
         progress
@@ -87,8 +90,6 @@ export default DownloadSurvey = ({ navigation, route }) => {
     if (actualFileURI != "") {
       getInfo()
     }
-
-    console.log(actualFileURI)
   }, [actualFileURI])
 
   const DownloadFormat = useCallback(
@@ -112,65 +113,87 @@ export default DownloadSurvey = ({ navigation, route }) => {
     [downloadFormat]
   )
 
-  const Options = () => {
-    return (
-      <VStack spacing={10}>
-        <Flex>
-          <Text variant="bodyMedium">Opciones</Text>
-          <VStack
-            pt={10}
-            spacing={10}
+  const Options = () => (
+    <VStack
+      key="Options"
+      spacing={10}
+    >
+      <Flex>
+        <Text variant="bodyMedium">Opciones</Text>
+        <VStack
+          pt={10}
+          spacing={10}
+        >
+          <Button
+            disabled={loading}
+            loading={loading}
+            mode="contained"
+            icon="tray-arrow-down"
+            onPress={() => downloadSurvey()}
           >
+            Descargar
+          </Button>
+
+          {downloadFormat.value == "pdf" && (
+            <Pressable
+              onPress={() => setWithOpenAI(!withOpenAI)}
+              disabled={loading}
+            >
+              <HStack
+                items="center"
+                spacing={10}
+              >
+                <Switch
+                  value={withOpenAI}
+                  onValueChange={() => setWithOpenAI(!withOpenAI)}
+                  disabled={loading}
+                />
+                <Flex fill>
+                  <Text variant="bodyMedium">Permitir que ChatGPT interprete las preguntas abiertas</Text>
+                </Flex>
+              </HStack>
+            </Pressable>
+          )}
+
+          {actualFileExist == true && (
             <Button
               disabled={loading}
-              loading={loading}
-              mode="contained"
-              icon="tray-arrow-down"
-              onPress={() => downloadSurvey()}
+              mode="outlined"
+              icon="share-outline"
+              onPress={() => shareSurvey()}
             >
-              Descargar
+              Compartir
             </Button>
+          )}
 
-            {actualFileExist == true && (
-              <Button
-                disabled={loading}
-                mode="outlined"
-                icon="share-outline"
-                onPress={() => shareSurvey()}
-              >
-                Compartir
-              </Button>
-            )}
-
-            {actualFileExist == true && (
-              <Button
-                disabled={loading}
-                mode="outlined"
-                icon="delete"
-                textColor={theme.colors.error}
-                onPress={async () => {
-                  await FileSystem.deleteAsync(actualFileURI, { idempotent: true })
-                  getInfo()
-                }}
-              >
-                Eliminar
-              </Button>
-            )}
-          </VStack>
-        </Flex>
-        {loading == true && (
-          <VStack spacing={5}>
-            <Text variant="bodyMedium">{downloadProgress == 0 ? "Iniciando descarga" : `${(downloadProgress * 100).toFixed(0)}% descargado`}</Text>
-            <ProgressBar
-              progress={downloadProgress}
-              color={theme.colors.primary}
-              indeterminate={downloadProgress == 0}
-            />
-          </VStack>
-        )}
-      </VStack>
-    )
-  }
+          {actualFileExist == true && (
+            <Button
+              disabled={loading}
+              mode="outlined"
+              icon="delete"
+              textColor={theme.colors.error}
+              onPress={async () => {
+                await FileSystem.deleteAsync(actualFileURI, { idempotent: true })
+                getInfo()
+              }}
+            >
+              Eliminar
+            </Button>
+          )}
+        </VStack>
+      </Flex>
+      {loading == true && (
+        <VStack spacing={5}>
+          <Text variant="bodyMedium">{downloadProgress == 0 ? "Iniciando descarga" : downloadProgress < 0 ? "Descargando..." : `${(downloadProgress * 100).toFixed(0)}% descargado`}</Text>
+          <ProgressBar
+            progress={downloadProgress}
+            color={theme.colors.primary}
+            indeterminate={downloadProgress <= 0}
+          />
+        </VStack>
+      )}
+    </VStack>
+  )
 
   const Cancel = () => (
     <Button
