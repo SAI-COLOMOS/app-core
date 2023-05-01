@@ -67,6 +67,12 @@
         {
           "cameraPermission": "Necesitamos acceder a tu cámara para poder escanear los códigos QR."
         }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Necesitamos acceder a tu sensor biométrico para poder habilitar esta función"
+        }
       ]
     ],
     "extra": {
