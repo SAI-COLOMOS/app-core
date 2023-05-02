@@ -76,7 +76,7 @@
       ]
     ],
     "extra": {
-      "environment": "development",
+      "environment": "production",
       "api_development": "http://192.168.100.84:3000",
       "api_production": "https://api.sai-colomos.dev",
       "eas": {

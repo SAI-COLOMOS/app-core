@@ -483,20 +483,21 @@ export default EventDetails = ({ navigation, route }) => {
           Concluir evento
         </Button>
       )}
-      <Card
-        key="Asistencia"
-        mode="outlined"
-      >
-        <Flex
-          p={20}
-          spacing={5}
+
+      {event?.attendance?.status == "En proceso" && (
+        <Card
+          key="Asistencia"
+          mode="outlined"
         >
-          <Text variant="titleMedium">Asistencia</Text>
-          <VStack
-            pt={20}
-            spacing={10}
+          <Flex
+            p={20}
+            spacing={5}
           >
-            {event?.attendance?.status == "En proceso" && (
+            <Text variant="titleMedium">Asistencia</Text>
+            <VStack
+              pt={20}
+              spacing={10}
+            >
               <Button
                 disabled={loadingFinish}
                 mode="outlined"
@@ -506,9 +507,7 @@ export default EventDetails = ({ navigation, route }) => {
               >
                 Registrar asistencia con QR
               </Button>
-            )}
 
-            {event?.attendance?.status == "En proceso" && (
               <Button
                 disabled={loadingFinish}
                 mode="outlined"
@@ -518,10 +517,10 @@ export default EventDetails = ({ navigation, route }) => {
               >
                 Registrar asistencia por proximidad
               </Button>
-            )}
-          </VStack>
-        </Flex>
-      </Card>
+            </VStack>
+          </Flex>
+        </Card>
+      )}
 
       <Card
         key="Description"
@@ -549,7 +548,7 @@ export default EventDetails = ({ navigation, route }) => {
                   </Button>
                 )}
 
-                {event?.attendance?.status == "En proceso" && event?.attendance?.status != "Concluido" && event?.attendance?.status != "Concluido por sistema" && (
+                {(event?.attendance?.status == "En proceso" || event?.attendance?.status == "Concluido" || event?.attendance?.status == "Concluido por sistema") && (
                   <Button
                     mode="outlined"
                     style={{ backgroundColor: theme.colors.background }}
