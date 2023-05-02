@@ -31,7 +31,7 @@ export default SchoolDetails = ({ navigation, route }) => {
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
-      .catch((_) => null)
+      .catch(() => null)
 
     setLoading(false)
 
@@ -104,78 +104,40 @@ export default SchoolDetails = ({ navigation, route }) => {
       fill
       pt={headerMargin - 20}
     >
-      <ScrollView
-        refreshControl={
-          <RefreshControl
-            refreshing={loading}
-            onRefresh={(_) => getSchool()}
-          />
-        }
-      >
-        {school !== undefined ? (
-          school !== null ? (
-            isNaN(school) ? (
-              <DisplayDetails
-                icon="town-hall"
-                title={school?.school_name}
-                children={[Contact(), Address()]}
-              />
-            ) : (
-              <VStack
-                p={30}
-                center
-                spacing={20}
-              >
-                <Icon
-                  color={theme.colors.onBackground}
-                  name="alert-circle-outline"
-                  size={50}
-                />
-                <VStack center>
-                  <Text variant="headlineSmall">Ocurrió un problema</Text>
-                  <Text
-                    variant="bodyMedium"
-                    style={{ textAlign: "center" }}
-                  >
-                    No podemos recuperar los datos de la escuela, intentalo de nuevo más tarde (Error: {school})
-                  </Text>
-                </VStack>
-                <Flex>
-                  <Button
-                    mode="outlined"
-                    onPress={(_) => {
-                      getSchool()
-                    }}
-                  >
-                    Volver a intentar
-                  </Button>
-                </Flex>
-              </VStack>
-            )
+      {school !== undefined &&
+        (school !== null ? (
+          isNaN(school) ? (
+            <DisplayDetails
+              refreshAction={() => getSchool()}
+              refreshStatus={loading}
+              icon="town-hall"
+              title={school?.school_name}
+              children={[Contact(), Address()]}
+            />
           ) : (
             <VStack
+              p={30}
               center
               spacing={20}
-              p={30}
             >
               <Icon
                 color={theme.colors.onBackground}
-                name="wifi-alert"
+                name="alert-circle-outline"
                 size={50}
               />
               <VStack center>
-                <Text variant="headlineSmall">Sin internet</Text>
+                <Text variant="headlineSmall">Ocurrió un problema</Text>
                 <Text
                   variant="bodyMedium"
                   style={{ textAlign: "center" }}
                 >
-                  No podemos recuperar los datos de la escuela, revisa tu conexión a internet e intentalo de nuevo
+                  No podemos recuperar los datos de la escuela, inténtalo de nuevo más tarde (Error: {school})
                 </Text>
               </VStack>
               <Flex>
                 <Button
                   mode="outlined"
-                  onPress={(_) => {
+                  onPress={() => {
                     getSchool()
                   }}
                 >
@@ -184,8 +146,38 @@ export default SchoolDetails = ({ navigation, route }) => {
               </Flex>
             </VStack>
           )
-        ) : null}
-      </ScrollView>
+        ) : (
+          <VStack
+            center
+            spacing={20}
+            p={30}
+          >
+            <Icon
+              color={theme.colors.onBackground}
+              name="wifi-alert"
+              size={50}
+            />
+            <VStack center>
+              <Text variant="headlineSmall">Sin internet</Text>
+              <Text
+                variant="bodyMedium"
+                style={{ textAlign: "center" }}
+              >
+                No podemos recuperar los datos de la escuela, revisa tu conexión a internet e inténtalo de nuevo
+              </Text>
+            </VStack>
+            <Flex>
+              <Button
+                mode="outlined"
+                onPress={() => {
+                  getSchool()
+                }}
+              >
+                Volver a intentar
+              </Button>
+            </Flex>
+          </VStack>
+        ))}
 
       {!(school === undefined || school === null) ? (
         <FAB

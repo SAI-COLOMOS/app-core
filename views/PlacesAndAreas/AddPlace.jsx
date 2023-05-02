@@ -9,6 +9,7 @@ import ApplicationContext from "../ApplicationContext"
 
 export default AddPlace = ({ navigation, route }) => {
   const { host, token } = useContext(ApplicationContext)
+  const { getPlaces } = route.params
 
   const [place_name, setPlace_name] = useState("")
   const [street, setStreet] = useState("")
@@ -93,41 +94,49 @@ export default AddPlace = ({ navigation, route }) => {
           mode="outlined"
           value={place_name}
           onChangeText={setPlace_name}
-          autoCapitalize="words"
           label="Nombre del bosque urbano"
-          maxLength={50}
+          maxLength={150}
+          multiline={true}
+          numberOfLines={1}
         />
         <TextInput
           mode="outlined"
           value={street}
           onChangeText={setStreet}
-          label="Nombre de la calle"
-          maxLength={50}
+          label="Calle"
+          maxLength={150}
+          multiline={true}
+          numberOfLines={1}
         />
         <TextInput
           mode="outlined"
           value={exterior_number}
           onChangeText={setExterior_number}
           label="Número del domicilio"
-          maxLength={50}
-          keyboardType="number-pad"
+          maxLength={150}
+          keyboardType="numeric"
           autoComplete="off"
+          multiline={true}
+          numberOfLines={1}
         />
         <TextInput
           mode="outlined"
           value={colony}
           onChangeText={setColony}
-          autoCapitalize="words"
-          label="Nombre de la colonia"
-          maxLength={50}
+          label="Colonia"
+          maxLength={150}
+          multiline={true}
+          numberOfLines={1}
         />
         <TextInput
           mode="outlined"
           value={municipality}
           onChangeText={setMunicipality}
           autoCapitalize="words"
-          label="Nombre del municipio"
-          maxLength={50}
+          label="Municipio"
+          maxLength={150}
+          multiline={true}
+          numberOfLines={1}
         />
         <TextInput
           mode="outlined"
@@ -135,8 +144,10 @@ export default AddPlace = ({ navigation, route }) => {
           onChangeText={setPostal_code}
           label="Código postal"
           maxLength={5}
-          keyboardType="number-pad"
+          keyboardType="numeric"
           autoComplete="off"
+          multiline={true}
+          numberOfLines={1}
         />
         <TextInput
           mode="outlined"
@@ -146,13 +157,15 @@ export default AddPlace = ({ navigation, route }) => {
           maxLength={10}
           keyboardType="phone-pad"
           autoComplete="off"
+          multiline={true}
+          numberOfLines={1}
         />
         <TextInput
           mode="outlined"
           value={reference}
           onChangeText={setReference}
           label="Referencia del lugar"
-          maxLength={250}
+          maxLength={500}
           multiline={true}
           numberOfLines={3}
         />
@@ -219,7 +232,15 @@ export default AddPlace = ({ navigation, route }) => {
         title="¡Listo!"
         description="El bosque urbano ha sido añadido exitosamente"
         handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]}
-        actions={[["Aceptar", () => navigation.pop()]]}
+        actions={[
+          [
+            "Aceptar",
+            () => {
+              getPlaces()
+              navigation.pop()
+            }
+          ]
+        ]}
         dismissable={false}
         icon="check-circle-outline"
       />

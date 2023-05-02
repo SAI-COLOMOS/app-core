@@ -17,7 +17,7 @@ export default Cards = ({ navigation, route }) => {
   const [cards, setCards] = useState(undefined)
   const [users, setUsers] = useState(undefined)
 
-  const getUsers = async (_) => {
+  const getUsers = async () => {
     let filters = {
       role: "Prestador"
     }
@@ -31,7 +31,7 @@ export default Cards = ({ navigation, route }) => {
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
-      .catch((_) => null)
+      .catch(() => null)
 
     if (request?.users) {
       setUsers(request.users)
@@ -40,7 +40,7 @@ export default Cards = ({ navigation, route }) => {
     }
   }
 
-  const getCard = async (_) => {
+  const getCard = async () => {
     const request = await fetch(`${localhost}/cards`, {
       method: "GET",
       headers: {
@@ -50,7 +50,7 @@ export default Cards = ({ navigation, route }) => {
       }
     })
       .then((response) => (response.ok ? response.json() : response.status))
-      .catch((_) => null)
+      .catch(() => null)
 
     if (request?.cards) {
       setCards(request.cards)
@@ -73,15 +73,40 @@ export default Cards = ({ navigation, route }) => {
 
   const Item = useCallback(({ first_name, role, avatar, user }) => {
     return (
-      <Flex ph={20} pv={5} onPress={() => {}}>
-        <Card mode="outlined" style={{ overflow: "hidden" }}>
+      <Flex
+        ph={20}
+        pv={5}
+        onPress={() => {}}
+      >
+        <Card
+          mode="outlined"
+          style={{ overflow: "hidden" }}
+        >
           <TouchableRipple
             onPress={() => {
               navigation.navigate("CardDetailsNex", { token, user })
             }}
           >
             <Flex p={10}>
-              <Card.Title title={first_name} titleNumberOfLines={2} subtitle={role} subtitleNumberOfLines={2} left={(props) => (avatar ? <Avatar.Image {...props} source={{ uri: `data:image/png;base64,${avatar}` }} /> : <Avatar.Icon {...props} icon="account" />)} />
+              <Card.Title
+                title={first_name}
+                titleNumberOfLines={2}
+                subtitle={role}
+                subtitleNumberOfLines={2}
+                left={(props) =>
+                  avatar ? (
+                    <Avatar.Image
+                      {...props}
+                      source={{ uri: `data:image/png;base64,${avatar}` }}
+                    />
+                  ) : (
+                    <Avatar.Icon
+                      {...props}
+                      icon="account"
+                    />
+                  )
+                }
+              />
             </Flex>
           </TouchableRipple>
         </Card>
@@ -89,13 +114,24 @@ export default Cards = ({ navigation, route }) => {
     )
   }, [])
 
-  const EmptyList = useCallback((_) => {
+  const EmptyList = useCallback(() => {
     return (
-      <VStack center spacing={20} p={30}>
-        <Icon name="pencil-plus-outline" color={theme.colors.onBackground} size={50} />
+      <VStack
+        center
+        spacing={20}
+        p={30}
+      >
+        <Icon
+          name="pencil-plus-outline"
+          color={theme.colors.onBackground}
+          size={50}
+        />
         <VStack center>
           <Text variant="headlineSmall">Sin usuarios</Text>
-          <Text variant="bodyMedium" style={{ textAlign: "center" }}>
+          <Text
+            variant="bodyMedium"
+            style={{ textAlign: "center" }}
+          >
             No hay ningun usuario registrado
           </Text>
         </VStack>
@@ -103,7 +139,7 @@ export default Cards = ({ navigation, route }) => {
           <Button
             icon="plus"
             mode="outlined"
-            onPress={(_) => {
+            onPress={() => {
               navigation.navigate('AddUser', {
                 user,
                 token
@@ -117,13 +153,24 @@ export default Cards = ({ navigation, route }) => {
     )
   }, [])
 
-  const NoConection = useCallback((_) => {
+  const NoConection = useCallback(() => {
     return (
-      <VStack center spacing={20} p={30}>
-        <Icon name="wifi-alert" color={theme.colors.onBackground} size={50} />
+      <VStack
+        center
+        spacing={20}
+        p={30}
+      >
+        <Icon
+          name="wifi-alert"
+          color={theme.colors.onBackground}
+          size={50}
+        />
         <VStack center>
           <Text variant="headlineSmall">Sin conexión</Text>
-          <Text variant="bodyMedium" style={{ textAlign: "center" }}>
+          <Text
+            variant="bodyMedium"
+            style={{ textAlign: "center" }}
+          >
             Parece que no tienes conexión a internet, conectate e intenta de nuevo
           </Text>
         </VStack>
@@ -131,7 +178,7 @@ export default Cards = ({ navigation, route }) => {
           <Button
             icon="reload"
             mode="outlined"
-            onPress={(_) => {
+            onPress={() => {
               setUsers(undefined)
               getUsers()
             }}
@@ -144,8 +191,25 @@ export default Cards = ({ navigation, route }) => {
   }, [])
 
   return (
-    <Flex fill pt={headerMargin}>
-      <FlatList data={users} ListEmptyComponent={() => (users === undefined ? null : users === null ? <NoConection /> : <EmptyList />)} refreshing={loading} onRefresh={(_) => getUsers()} renderItem={({ item }) => <Item onPress={() => {}} first_name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ""}`} role={`${item.register}`} user={item} avatar={item?.avatar} />} />
+    <Flex
+      fill
+      pt={headerMargin}
+    >
+      <FlatList
+        data={users}
+        ListEmptyComponent={() => (users === undefined ? null : users === null ? <NoConection /> : <EmptyList />)}
+        refreshing={loading}
+        onRefresh={() => getUsers()}
+        renderItem={({ item }) => (
+          <Item
+            onPress={() => {}}
+            first_name={`${item.first_name} ${item.first_last_name} ${item.second_last_name ?? ""}`}
+            role={`${item.register}`}
+            user={item}
+            avatar={item?.avatar}
+          />
+        )}
+      />
     </Flex>
   )
 }

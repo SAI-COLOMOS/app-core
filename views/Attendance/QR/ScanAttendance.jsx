@@ -5,12 +5,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { ActivityIndicator, Button, Switch, Text, useTheme } from "react-native-paper"
 import { Camera, CameraType } from "expo-camera"
 import { BarCodeScanner } from "expo-barcode-scanner"
-import InformationMessage from "../Shared/InformationMessage"
-import CreateForm from "../Shared/CreateForm"
-import ApplicationContext from "../ApplicationContext"
+import InformationMessage from "../../Shared/InformationMessage"
+import CreateForm from "../../Shared/CreateForm"
+import ApplicationContext from "../../ApplicationContext"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import Constants from "expo-constants"
-import ProfileImage from "../Shared/ProfileImage"
+import ProfileImage from "../../Shared/ProfileImage"
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
 import { useKeepAwake } from "expo-keep-awake"
 
@@ -19,7 +19,7 @@ export default ScanAttendance = ({ navigation, route }) => {
   const theme = useTheme()
   const insets = useSafeAreaInsets()
   const { host, token } = useContext(ApplicationContext)
-  const { attendeeList, event_identifier } = route.params
+  const { attendeeList, event_identifier, getEvent } = route.params
 
   const [doNotMarkRetard, setDoNotMarkRetard] = useState(false)
   const [register, setRegister] = useState("")
@@ -95,7 +95,7 @@ export default ScanAttendance = ({ navigation, route }) => {
         },
         body: JSON.stringify({
           attendee_register: attendee?.attendee_register,
-          status: doNotMarkRetard == true ? "Asistió" : null
+          status: doNotMarkRetard == true ? "Asistió" : "Retardo"
         })
       })
         .then(async (response) => {
@@ -164,7 +164,7 @@ export default ScanAttendance = ({ navigation, route }) => {
           key="AskForPermissions"
           title="Sin permisos"
           icon="camera-outline"
-          description="La aplicación no tiene permiso para usar la cámara, otorga los permisos necesarios para continuar"
+          description="La aplicación no tiene permiso para usar la cámara del dispositivo, otorga los permisos necesarios para continuar"
           buttonTitle="Otorgar permisos"
           buttonIcon="shape-outline"
           action={async () => await requestCameraPermission()}
@@ -176,7 +176,7 @@ export default ScanAttendance = ({ navigation, route }) => {
           key="AskForPermissions"
           title="Sin acceso"
           icon="camera-off-outline"
-          description="El acceso a la cámara está bloqueado, para poder continuar, es necesario otorgues los permisos necesarios desde la aplicación de configuraciones del dispositivo"
+          description="El acceso a la cámara está bloqueado, para poder continuar, es necesario que otorgues los permisos necesarios desde la configuración del dispositivo"
           buttonTitle="Volver a intentar"
           buttonIcon="reload"
           action={async () => await requestCameraPermission()}
@@ -187,33 +187,54 @@ export default ScanAttendance = ({ navigation, route }) => {
 
   /* Componentes para los estados */
   const Ready = () => (
-    <Flex key="Ready">
-      <VStack
-        // w={250}
-        style={{ alignSelf: "center" }}
-        center
-      >
-        <Switch
-          value={doNotMarkRetard}
-          onValueChange={() => setDoNotMarkRetard(!doNotMarkRetard)}
-        />
-        <Text
-          style={{ textAlign: "center" }}
-          variant="bodyMedium"
+    <VStack
+      key="Ready"
+      spacing={20}
+    >
+      <Pressable onPress={() => setDoNotMarkRetard(!doNotMarkRetard)}>
+        <HStack
+          ph={20}
+          spacing={10}
+          style={{ alignSelf: "center" }}
+          items="center"
         >
-          {doNotMarkRetard ? "No marcar" : "Marcar"} retardos automáticamente
-        </Text>
-      </VStack>
+          <Switch
+            value={doNotMarkRetard}
+            onValueChange={() => setDoNotMarkRetard(!doNotMarkRetard)}
+          />
+          <Flex fill>
+            <Text
+              // style={{ textAlign: "center" }}
+              variant="bodyMedium"
+            >
+              No marcar automáticamente los retardos
+            </Text>
+          </Flex>
+        </HStack>
+      </Pressable>
 
-      <InformationMessage
+      <Flex center>
+        <Button
+          icon="check"
+          mode="outlined"
+          onPress={() => {
+            getEvent()
+            navigation.pop()
+          }}
+        >
+          Terminar
+        </Button>
+      </Flex>
+
+      {/* <InformationMessage
         icon="qrcode-scan"
         title="Listo para escanear"
         description="Coloca el código QR dentro del recuadro y espera a que sea detectado"
         action={() => navigation.pop()}
         buttonTitle="Finalizar escaneo"
         buttonIcon="close"
-      />
-    </Flex>
+      /> */}
+    </VStack>
   )
 
   const Scanned = () => (

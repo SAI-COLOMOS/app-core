@@ -258,7 +258,7 @@ export default UserProgress = ({ navigation, route }) => {
         refreshControl={
           <RefreshControl
             refreshing={loading}
-            onRefresh={(_) => getCard()}
+            onRefresh={() => getCard()}
           />
         }
       >

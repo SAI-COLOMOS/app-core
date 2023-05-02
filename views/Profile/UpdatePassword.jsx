@@ -197,7 +197,7 @@ export default UpdatePassword = ({ navigation, route }) => {
           right={
             <TextInput.Icon
               icon="eye"
-              onPress={(_) => {
+              onPress={() => {
                 setShowNewPassword(!showNewPassword)
               }}
             />
@@ -214,7 +214,7 @@ export default UpdatePassword = ({ navigation, route }) => {
           right={
             <TextInput.Icon
               icon="eye"
-              onPress={(_) => {
+              onPress={() => {
                 setShowConfirmationNewPassword(!showConfirmationNewPassword)
               }}
             />

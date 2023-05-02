@@ -1,52 +1,49 @@
-import { Flex, VStack } from "@react-native-material/core"
-import { useCallback, useContext, useEffect, useState } from "react"
-import { FlatList, RefreshControl, ScrollView } from "react-native"
-import { ActivityIndicator, Avatar, Button, Card, FAB, ProgressBar, Text, useTheme } from "react-native-paper"
+import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useHeaderHeight } from "@react-navigation/elements"
-import Constants from "expo-constants"
+import { Button, Card, Text, useTheme } from "react-native-paper"
+import { MultipleOption, MultipleSelection, NumericQuestion, OpenQuestion, ScaleQuestion } from "../Shared/FormsComponents"
+import { useContext, useEffect, useState } from "react"
+import ApplicationContext from "../ApplicationContext"
 import Header from "../Shared/Header"
 import DisplayDetails from "../Shared/DisplayDetails"
-import { useFocusEffect } from "@react-navigation/native"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
-import { log } from "react-native-reanimated"
-import ApplicationContext from "../ApplicationContext"
-import { MultipleOption, MultipleSelection, NumericQuestion, OpenQuestion, ScaleQuestion } from "../Shared/FormsComponents"
 
-export default FormDetails = ({ navigation, route }) => {
-  const { host, token } = useContext(ApplicationContext)
-  const { form_identifier, getForms } = route.params
+export default ApplySurvey = ({ navigation, route }) => {
   const headerMargin = useHeaderHeight()
+  const { host, token } = useContext(ApplicationContext)
+  const { survey_identifier, getForms } = route.params
   const theme = useTheme()
 
   const [answers, setAnswers] = useState({})
   const [loading, setLoading] = useState(false)
-  const [form, setForm] = useState(undefined)
-  const [isTemplate, setIsTemplate] = useState(false)
+  const [survey, setSurvey] = useState(undefined)
 
   async function getForm() {
     setLoading(true)
 
-    const request = await fetch(`${host}/forms/${form_identifier}?isTemplate=${true}`, {
+    const request = await fetch(`${host}/surveys/${survey_identifier}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        "Cache-Control": "no-cache"
+        Authorization: `Bearer ${token}`
       }
     })
-      .then((response) => (response.ok ? response.json() : response.status))
+      .then(async (response) => {
+        if (response.ok) {
+          return response.json()
+        } else {
+          console.error(await response.json())
+          return response.status
+        }
+      })
       .catch(() => null)
-
-    //const json = await request.json()
-    //console.log("String: " + json)
 
     setLoading(false)
 
-    if (request?.form) {
-      setForm(request.form)
-      console.log(request)
+    if (request?.survey) {
+      setSurvey(request.survey)
     } else {
-      setForm(request)
+      setSurvey(request)
     }
   }
 
@@ -54,46 +51,48 @@ export default FormDetails = ({ navigation, route }) => {
     navigation.setOptions({
       header: (props) => <Header {...props} />,
       headerTransparent: true,
-      headerTitle: "Datos del formulario"
+      headerTitle: "Aplicación de encuesta"
     })
   }, [])
 
   useEffect(() => {
-    if (form?.questions !== undefined) {
+    if (survey?.questions !== undefined) {
       const object = {}
-      form?.questions.forEach((element) => {
+      survey?.questions.forEach((element) => {
         object[element?.question_identifier] = null
       })
       setAnswers({ ...object })
     }
-  }, [form])
+  }, [survey])
 
-  useFocusEffect(
-    useCallback(() => {
-      getForm()
-      return () => {}
-    }, [])
-  )
+  useEffect(() => {
+    getForm()
+  }, [])
 
-  const Details = () => (
+  const Info = () => (
     <Card
-      key="Details"
+      key="Info"
       mode="outlined"
     >
       <VStack
         p={20}
         spacing={5}
       >
-        <Text variant="titleMedium">Datos del formulario</Text>
+        <Text variant="titleMedium">Datos de la encuesta</Text>
         <VStack spacing={10}>
           <Flex>
-            <Text variant="labelSmall">Descripción del evento</Text>
-            <Text variant="bodyMedium">{form?.description}</Text>
+            <Text variant="labelSmall">Nombre</Text>
+            <Text variant="bodyMedium">{survey?.name ?? "Sin nombre"}</Text>
           </Flex>
 
           <Flex>
-            <Text variant="labelSmall">Folio del formulario</Text>
-            <Text variant="bodyMedium">{form?.version ?? "Sin folio"}</Text>
+            <Text variant="labelSmall">Descripción</Text>
+            <Text variant="bodyMedium">{survey?.description ?? "Sin descripción"}</Text>
+          </Flex>
+
+          <Flex>
+            <Text variant="labelSmall">Folio</Text>
+            <Text variant="bodyMedium">{survey?.version ?? "Sin versión"}</Text>
           </Flex>
         </VStack>
       </VStack>
@@ -105,9 +104,9 @@ export default FormDetails = ({ navigation, route }) => {
       key="Questions"
       spacing={20}
     >
-      {form?.questions.length > 0 &&
-        form.questions.map((question, index) => (
-          <Flex key={index.toString()}>
+      {survey?.questions.length > 0 &&
+        survey.questions.map((question, index) => (
+          <Flex key={question.interrogation}>
             {
               {
                 "Opción múltiple": (
@@ -160,26 +159,42 @@ export default FormDetails = ({ navigation, route }) => {
     </VStack>
   )
 
+  const Buttons = () => (
+    <HStack
+      key="Button"
+      justify="between"
+    >
+      <Button
+        mode="outlined"
+        icon="close"
+        onPress={() => navigation.pop()}
+      >
+        Cancelar
+      </Button>
+      <Button
+        mode="contained"
+        onPress={() => navigation.navigate("SurveyResume", { questions: survey?.questions, answers, survey_identifier })}
+        icon="page-next-outline"
+      >
+        Continuar
+      </Button>
+    </HStack>
+  )
+
   return (
     <Flex
       fill
       pt={headerMargin - 20}
     >
-      {/* <ScrollView
-        refreshControl={
-          <RefreshControl
-            refreshing={loading}
-            onRefresh={() => getForm()}
-          />
-        }
-      > */}
-      {form !== undefined ? (
-        form !== null ? (
-          isNaN(form) ? (
+      {survey !== undefined &&
+        (survey !== null ? (
+          isNaN(survey) ? (
             <DisplayDetails
-              icon="form-select"
-              title={form?.name}
-              children={[Details(), Questions()]}
+              refreshAction={() => getForm()}
+              refreshStatus={loading}
+              showHeader={false}
+              title={survey?.name}
+              children={[Info(), Questions(), Buttons()]}
             />
           ) : (
             <VStack
@@ -198,7 +213,7 @@ export default FormDetails = ({ navigation, route }) => {
                   variant="bodyMedium"
                   style={{ textAlign: "center" }}
                 >
-                  No podemos recuperar los datos del formulario, inténtalo de nuevo más tarde (Error: {form})
+                  No podemos recuperar los datos del formulario, inténtalo de nuevo más tarde (Error: {survey})
                 </Text>
               </VStack>
               <Flex>
@@ -244,23 +259,7 @@ export default FormDetails = ({ navigation, route }) => {
               </Button>
             </Flex>
           </VStack>
-        )
-      ) : null}
-      {/* </ScrollView> */}
-
-      {!(form === undefined || form === null) && (
-        <FAB
-          icon="pencil-outline"
-          style={{ position: "absolute", margin: 16, right: 0, bottom: 0 }}
-          onPress={() => {
-            navigation.navigate("EditForm", {
-              form,
-              getForms,
-              getForm
-            })
-          }}
-        />
-      )}
+        ))}
     </Flex>
   )
 }

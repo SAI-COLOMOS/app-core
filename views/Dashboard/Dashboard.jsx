@@ -3,23 +3,20 @@ import { useState, useEffect, useCallback, useMemo, useContext } from "react"
 import * as SecureStore from "expo-secure-store"
 import { Button, Card, Text, useTheme, Avatar, TouchableRipple } from "react-native-paper"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { Image, Pressable, RefreshControl, ScrollView, useWindowDimensions } from "react-native"
+import { Image, RefreshControl, ScrollView } from "react-native"
 import { LinearGradient } from "expo-linear-gradient"
 import { useFocusEffect } from "@react-navigation/native"
 import CircularProgress from "react-native-circular-progress-indicator"
-import Constants from "expo-constants"
-import Animated, { interpolate, log, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated"
+import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated"
 import InformationMessage from "../Shared/InformationMessage"
-import { GetCompactMonth, GetDay, GetMoment, ShortDate, Time24 } from "../Shared/LocaleDate"
+import { GetCompactMonth, GetDay, GetMoment, Time24 } from "../Shared/LocaleDate"
 import ApplicationContext from "../ApplicationContext"
-import CacheContext from "../Contexts/CacheContext"
 import ProfileImage from "../Shared/ProfileImage"
 
 export default Dashboard = ({ navigation }) => {
   const { host, user, setUser, token, setToken, register, setRegister, achieved_hours, setAchieved_hours } = useContext(ApplicationContext)
   const insets = useSafeAreaInsets()
   const theme = useTheme()
-  const { width } = useWindowDimensions()
   const selectedImage = useMemo(() => Math.floor(Math.random() * 4), [])
 
   const [greeting, setGreeting] = useState("Hola")
@@ -29,9 +26,7 @@ export default Dashboard = ({ navigation }) => {
 
   async function fetchData() {
     try {
-      if (loading == false) {
-        setLoading(true)
-      }
+      setLoading(true)
 
       const requests = await Promise.all([
         await fetch(`${host}/profile/${register}`, {
@@ -52,8 +47,6 @@ export default Dashboard = ({ navigation }) => {
         })
       ])
 
-      setLoading(false)
-
       if (requests[0].ok && requests[1].ok) {
         const responses = [await requests[0].json(), await requests[1].json()]
 
@@ -61,6 +54,8 @@ export default Dashboard = ({ navigation }) => {
         setFeed(responses[1])
         setAchieved_hours(responses[1]?.achieved_hours)
       }
+
+      setLoading(false)
 
       return
     } catch (error) {
@@ -355,7 +350,7 @@ export default Dashboard = ({ navigation }) => {
         <WidgetLarge
           title={GetMoment(feed?.enrolled_event?.starting_date)}
           screen="EventDetails"
-          payload={{ event_identifier: feed?.enrolled_event?.event_identifier }}
+          payload={{ event_identifier: feed?.enrolled_event?.event_identifier, fetchData }}
           image={true}
           child={
             <Flex
@@ -658,69 +653,86 @@ export default Dashboard = ({ navigation }) => {
           h={insets.top}
           w={"100%"}
         />
-        {user != null && feed != null ? (
-          <VStack pb={50}>
-            <VStack
-              h={200}
-              center
-            >
-              <Text
-                variant="headlineLarge"
-                style={{ color: theme.colors.primary }}
-              >
-                {greeting}
-              </Text>
-              <Text
-                variant="headlineSmall"
-                numberOfLines={1}
-              >
-                {user?.first_name}
-              </Text>
-              {timeToSleep ? (
-                <Text
-                  variant="bodyMedium"
-                  numberOfLines={1}
-                >
-                  No dilates, dormir es importante ✨
-                </Text>
-              ) : null}
-            </VStack>
 
-            <Flex
-              fill
-              style={{ borderTopLeftRadius: 50, borderTopRightRadius: 50, backgroundColor: theme.colors.background }}
-            >
-              <Flex
-                p={25}
+        {loading == false &&
+          (user != null && feed != null ? (
+            <VStack pb={50}>
+              <VStack
+                h={200}
                 center
               >
-                <Text variant="headlineSmall">Tu centro de control</Text>
-              </Flex>
+                <Text
+                  variant="headlineLarge"
+                  style={{ color: theme.colors.primary }}
+                >
+                  {greeting}
+                </Text>
+                <Text
+                  variant="headlineSmall"
+                  numberOfLines={1}
+                >
+                  {user?.first_name}
+                </Text>
+                {timeToSleep ? (
+                  <Text
+                    variant="bodyMedium"
+                    numberOfLines={1}
+                  >
+                    No dilates, dormir es importante ✨
+                  </Text>
+                ) : null}
+              </VStack>
 
-              {
+              <Flex
+                fill
+                style={{ borderTopLeftRadius: 50, borderTopRightRadius: 50, backgroundColor: theme.colors.background }}
+              >
+                <Flex
+                  p={25}
+                  center
+                >
+                  <Text variant="headlineSmall">Tu centro de control</Text>
+                </Flex>
+
                 {
-                  Administrador: <VistaAdministrador />,
-                  Encargado: <VistaEncargado />,
-                  Prestador: <VistaPrestador />
-                }[user?.role]
-              }
+                  {
+                    Administrador: <VistaAdministrador />,
+                    Encargado: <VistaEncargado />,
+                    Prestador: <VistaPrestador />
+                  }[user?.role]
+                }
+              </Flex>
+            </VStack>
+          ) : (
+            <Flex
+              pt={insets.top}
+              fill
+            >
+              <InformationMessage
+                icon="alert"
+                title="Uy, ocurrió un error"
+                description="No podemos recuperar la información de tu cuenta, revisa tu conexión a internet e inténtalo nuevamente, si el problema persiste, contacta con tu encargado de servicio"
+                buttonIcon="reload"
+                buttonTitle="Volver a cargar"
+                action={() => fetchData()}
+              />
+              <Flex center>
+                <Button
+                  icon="logout"
+                  mode="outlined"
+                  onPress={async () => {
+                    await SecureStore.deleteItemAsync("token")
+                    await SecureStore.deleteItemAsync("user")
+                    await SecureStore.deleteItemAsync("keepAlive")
+                    navigation.popToTop()
+                    navigation.replace("Login")
+                  }}
+                >
+                  Cerrar sesión
+                </Button>
+              </Flex>
             </Flex>
-          </VStack>
-        ) : loading == false ? (
-          <Flex
-            pt={insets.top}
-            fill
-          >
-            <InformationMessage
-              icon="alert"
-              title="Uy, ocurrió un error"
-              description="No podemos recuperar la información de tu cuenta, revisa tu conexión a internet e inténtalo nuevamente, si el problema persiste, contacta con tu encargado de servicio"
-              buttonIcon="reload"
-              buttonTitle="Volver a cargar"
-              action={() => fetchData()}
-            />
-          </Flex>
-        ) : null}
+          ))}
       </ScrollView>
     </Flex>
   )

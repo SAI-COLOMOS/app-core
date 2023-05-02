@@ -12,6 +12,7 @@ import SearchBar from "../Shared/SearchBar"
 import InformationMessage from "../Shared/InformationMessage"
 import { it } from "react-native-paper-dates"
 import ApplicationContext from "../ApplicationContext"
+import ProfileImage from "../Shared/ProfileImage"
 
 export default Forms = ({ navigation, route }) => {
   const theme = useTheme()
@@ -30,7 +31,7 @@ export default Forms = ({ navigation, route }) => {
   async function getForms() {
     setLoading(true)
 
-    const request = await fetch(`${host}/forms?isTemplate=${isTemplate}`, {
+    const request = await fetch(`${host}/forms?isTemplate=${true}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -60,7 +61,7 @@ export default Forms = ({ navigation, route }) => {
       return
     }
 
-    const request = await fetch(`${host}/forms?search=${search}`, {
+    const request = await fetch(`${host}/forms?isTemplate=true&search=${search}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -107,38 +108,43 @@ export default Forms = ({ navigation, route }) => {
     }, [])
   )
 
-  const Item = ({ form_name, description, form_identifier }) => {
+  const Item = ({ item, form_identifier }) => {
     return (
       <Flex
         ph={20}
         pv={5}
-        onPress={() => {}}
       >
-        <Card
-          mode="outlined"
-          style={{ overflow: "hidden" }}
+        <TouchableRipple
+          onPress={() => {
+            navigation.navigate("FormDetails", { form_identifier, getForms })
+          }}
         >
-          <TouchableRipple
-            onPress={() => {
-              navigation.navigate("FormDetails", { token, form_identifier, getForms })
-            }}
+          <Card
+            mode="outlined"
+            style={{ overflow: "hidden" }}
           >
-            <Flex p={10}>
-              <Card.Title
-                title={form_name}
-                titleNumberOfLines={2}
-                subtitle={description}
-                subtitleNumberOfLines={1}
-                left={(props) => (
-                  <Avatar.Icon
-                    {...props}
-                    icon="form-select"
-                  />
-                )}
-              />
-            </Flex>
-          </TouchableRipple>
-        </Card>
+            <HStack items="center">
+              <ProfileImage icon="form-select" />
+              <Flex
+                fill
+                p={10}
+              >
+                <Text
+                  variant="titleMedium"
+                  numberOfLines={1}
+                >
+                  {item.name}
+                </Text>
+                <Text
+                  variant="bodySmall"
+                  numberOfLines={2}
+                >
+                  {item.version ?? "Sin folio"}
+                </Text>
+              </Flex>
+            </HStack>
+          </Card>
+        </TouchableRipple>
       </Flex>
     )
   }
@@ -172,8 +178,7 @@ export default Forms = ({ navigation, route }) => {
                       buttonTitle="Agregar"
                       action={() => {
                         navigation.navigate("AddForm", {
-                          user,
-                          token
+                          getForms
                         })
                       }}
                     />
@@ -184,8 +189,7 @@ export default Forms = ({ navigation, route }) => {
                 renderItem={({ item }) => (
                   <Item
                     key={item.form_identifier}
-                    form_name={item.name}
-                    description={item.description}
+                    item={item}
                     form_identifier={item.form_identifier}
                   />
                 )}
@@ -195,10 +199,7 @@ export default Forms = ({ navigation, route }) => {
                 icon="plus"
                 style={{ position: "absolute", margin: 16, right: 0, bottom: 0 }}
                 onPress={() => {
-                  navigation.navigate("AddForm", {
-                    user,
-                    token
-                  })
+                  navigation.navigate("AddForm", { getForms })
                 }}
               />
             </Flex>
@@ -247,8 +248,7 @@ export default Forms = ({ navigation, route }) => {
               renderItem={({ item }) => (
                 <Item
                   key={item.form_identifier}
-                  form_name={item.name}
-                  description={item.description}
+                  item={item}
                   form_identifier={item.form_identifier}
                 />
               )}

@@ -1,12 +1,14 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useEffect, useState, useContext, Component } from "react"
-import { Button, Text, TextInput, useTheme, IconButton } from "react-native-paper"
+import { Button, Text, TextInput, useTheme, IconButton, Card } from "react-native-paper"
 import CreateForm from "../Shared/CreateForm"
 import Constants from "expo-constants"
 import ModalMessage from "../Shared/ModalMessage"
 import Dropdown from "../Shared/Dropdown"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import ApplicationContext from "../ApplicationContext"
+import InformationMessage from "../Shared/InformationMessage"
+import ModalQuestion from "../Shared/ModalQuestion"
 
 export default EditForm = ({ navigation, route }) => {
   const theme = useTheme()
@@ -15,18 +17,8 @@ export default EditForm = ({ navigation, route }) => {
 
   const [name, setName] = useState(`${form?.name ?? ""}`)
   const [description, setDescription] = useState(`${form?.description ?? ""}`)
-  const [belonging_area, setBeging_area] = useState(`${form?.belonging_area ?? ""}`)
-  const [belonging_place, setBelonging_place] = useState(`${form?.belonging_place ?? ""}`)
-  const [belonging_event_identifier, setBelonging_event_identifier] = useState(`${form?.belonging_event_identifier ?? ""}`)
-  const [version, setVersion] = useState(`${form?.version}`)
-  const [questions, setQuestions] = useState([
-    {
-      interrogation: "",
-      question_type: "Abierta",
-      enum_options: []
-    }
-  ])
-  const [isTemplate, setIsTemplate] = useState(false)
+  const [version, setVersion] = useState(`${form?.version ?? ""}`)
+  const [questions, setQuestions] = useState(form.questions)
 
   const QuestionType = [
     {
@@ -45,6 +37,11 @@ export default EditForm = ({ navigation, route }) => {
       option: "Escala"
     }
   ]
+
+  const [selectedIndex, setSelectedIndex] = useState(0)
+  const [showQuestionMaker, setShowQuestionMaker] = useState(false)
+  const [verified, setVerified] = useState(false)
+
   const [loading, setLoading] = useState(false)
   const [modalConfirm, setModalConfirm] = useState(false)
   const [modalLoading, setModalLoading] = useState(false)
@@ -55,31 +52,31 @@ export default EditForm = ({ navigation, route }) => {
   const [modalFatal, setModalFatal] = useState(false)
   const [responseCode, setResponseCode] = useState("")
 
-  async function SaveForm() {
-    const request = await fetch(`${host}/forms`, {
+  async function saveForm() {
+    setModalLoading(true)
+    const request = await fetch(`${host}/forms/${form.form_identifier}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        "Cache-Control": "no-cache"
+        Authorization: `Bearer ${token}`
       },
       body: JSON.stringify({
         name: name.trim(),
         description: description.trim(),
-        belonging_area: belonging_area.trim(),
-        belonging_place: belonging_place.trim(),
-        belonging_event_identifier: belonging_event_identifier.trim(),
-        version: Number(version),
+        version: version,
         questions: questions,
-        isTemplate
+        isTemplate: true
       })
     })
-      .then((response) => response.json() /*response.status*/)
+      .then(async (response) => {
+        console.log(await response.json())
+        return response.status
+      })
       .catch((error) => console.error("Error: ", error))
 
-    // console.log(request)
+    setModalLoading(false)
 
-    if (request == 201) {
+    if (request == 200) {
       setModalSuccess(true)
     } else if (request != null) {
       setResponseCode(request)
@@ -89,103 +86,29 @@ export default EditForm = ({ navigation, route }) => {
     }
   }
 
-  const FormData = () => {
-    return (
-      <VStack
-        key="Form"
-        spacing={5}
-      >
-        <Text variant="labelLarge">Datos del formulario</Text>
-        <VStack
-          key="FormData"
-          spacing={10}
-        >
-          <TextInput
-            mode="outlined"
-            value={name}
-            onChangeText={setName}
-            label="Nombre del formulario"
-            maxLength={50}
-            autoComplete="off"
-            autoCorrect={false}
-            autoCapitalize="sentences"
-          />
-          <TextInput
-            mode="outlined"
-            value={description}
-            onChangeText={setDescription}
-            label="Descripción del formulario"
-            maxLength={250}
-            multiline={true}
-            numberOfLines={5}
-            autoCapitalize="sentences"
-          />
-          <TextInput
-            mode="outlined"
-            value={belonging_place}
-            onChangeText={setBelonging_place}
-            label="Lugar de origen"
-            maxLength={150}
-            autoCapitalize="words"
-          />
-          <TextInput
-            mode="outlined"
-            value={belonging_area}
-            onChangeText={setBeging_area}
-            maxLength={150}
-            label="Área de origen"
-          />
-          <TextInput
-            mode="outlined"
-            value={belonging_event_identifier}
-            onChangeText={setBelonging_event_identifier}
-            label="Identificador de evento de origen"
-            maxLength={150}
-            autoCapitalize="characters"
-          />
-          <TextInput
-            mode="outlined"
-            value={version}
-            onChangeText={setVersion}
-            label="Versión"
-            // keyboardType="number-pad"
-            maxLength={3}
-            autoComplete="off"
-          />
-          <Text variant="labelLarge">Preguntas</Text>
-
-          {questions.length > 0 &&
-            questions.map((question, questionIndex) => (
-              <Item
-                key={questionIndex}
-                questionIndex={questionIndex}
-                question={question}
-              />
-            ))}
-        </VStack>
-      </VStack>
-    )
-  }
-
   async function deleteForm() {
+    setModalLoading(true)
+
     const request = await fetch(`${host}/forms/${form.form_identifier}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        "Cache-Control": "no-cache"
+        Authorization: `Bearer ${token}`
       },
       body: JSON.stringify({
-        isTemplate
+        isTemplate: true
       })
     })
-      .then((response) => /*response.json()*/ response.status)
+      .then(async (response) => /*response.json()*/ {
+        console.log(await response.json())
+        return response.status
+      })
       .catch((error) => console.error("Error: ", error))
 
-    // console.log(request)
+    setModalLoading(false)
 
-    if (request == 201) {
-      setModalSuccess(true)
+    if (request == 200) {
+      setModalSuccessDelete(true)
     } else if (request != null) {
       setResponseCode(request)
       setModalError(true)
@@ -194,148 +117,162 @@ export default EditForm = ({ navigation, route }) => {
     }
   }
 
-  ////// Funciones para las preguntas //////
+  useEffect(() => {
+    let valid = true
 
-  const addQuestion = (interrogation, setInterrogation, question_type, enum_options, setEnum_options) => {
-    const newQuestion = {
-      interrogation: interrogation,
-      question_type: question_type,
-      enum_options: enum_options
+    if (name.length <= 0) {
+      valid = false
     }
 
-    const updatedQuestions = [...questions]
-    updatedQuestions.unshift(newQuestion)
-    setQuestions(updatedQuestions)
-    setInterrogation("")
-    // setEnum_options("")
-  }
-
-  //Aun no usar, elimina las preguntas
-  const changeQuestion = (questionIndex, interrogation) => {
-    const modifyQuestion = questions[questionIndex]
-    modifyQuestion[questionIndex] = { interrogation }
-    // setInterrogation(modifyQuestion.interrogation)
-    // setEnum_options(modifyQuestion.enum_options || [])
-
-    const updatedQuestions = [...questions]
-    updatedQuestions.splice(questionIndex, 1)
-    setQuestions(updatedQuestions)
-  }
-
-  const deleteQuestion = (questionIndex) => {
-    setQuestions(questions.filter((_, i) => i !== questionIndex))
-  }
-
-  const addAnswerOptions = (questionIndex, nuevaOpcion, setNewAnswerOption) => {
-    const updatedAnswer = {
-      ...questions[questionIndex],
-      enum_options: [...questions[questionIndex].enum_options, nuevaOpcion]
+    if (description.length <= 0) {
+      valid = false
     }
 
-    const updatedAnswers = [...questions]
-    updatedAnswers[questionIndex] = updatedAnswer
-    setQuestions(updatedAnswers)
-    setNewAnswerOption("Presionado")
-  }
+    if (version.length <= 0) {
+      valid = false
+    }
 
-  const Item = ({ questionIndex, question }) => {
-    const { question_type } = question
-    const [interrogation, setInterrogation] = useState(question.interrogation)
-    const [enum_options, setEnum_options] = useState(question.enum_options)
-    const [newAnswerOption, setNewAnswerOption] = useState("")
-    // console.log(questions)
-    return (
-      <VStack
-        key="Question"
-        spacing={5}
-      >
-        <Dropdown
-          title="Tipo de pregunta"
-          options={QuestionType}
-          value={question_type}
-          isAnObjectsArray={true}
-          objectInfo={{ index: questionIndex, key: "question_type", arr: questions, setArr: setQuestions }}
-        />
+    if (questions?.length == 0) {
+      valid = false
+    }
+
+    questions?.forEach((question) => {
+      if (question.interrogation == "") {
+        valid = false
+      }
+      if (question.question_type == "") {
+        valid = false
+      }
+      if (question?.enum_options?.length <= 0) {
+        valid = false
+      }
+    })
+
+    console.log("Valid", valid, questions)
+
+    setVerified(valid)
+  }, [questions, name, description, version])
+
+  const Data = () => (
+    <VStack
+      key="Data"
+      spacing={5}
+    >
+      <Text variant="labelLarge">Datos del formulario</Text>
+      <VStack spacing={10}>
         <TextInput
           mode="outlined"
-          value={interrogation}
-          onChangeText={setInterrogation}
-          label="Interrogante"
+          value={name}
+          onChangeText={setName}
+          label="Nombre del formulario"
+          maxLength={150}
+          multiline={true}
+          numberOfLines={1}
         />
-        {question_type === "Opción múltiple" || question_type === "Selección múltiple" || question_type === "Escala" ? (
-          <Flex>
-            <TextInput
-              mode="outlined"
-              value={newAnswerOption}
-              onChangeText={setNewAnswerOption}
-              label="Respuestas"
-            />
-            <Text variant="bodyMedium">Simbologia: </Text>
-            <Text variant="labelSmall">El icono de el pastel con + es para agregar respuestas, El icono + agrega pregunta, El icono de la hoja de papel con un lapiz modifica la pregunta, El icono - borra la pregunta</Text>
-            <Flex
-              direction="row"
-              items="center"
-              justify="end"
-            >
-              <IconButton //Boton agregar respuesta
-                icon="database-plus-outline"
-                mode="contained"
-                onPress={(_) => addAnswerOptions(questionIndex, newAnswerOption, setNewAnswerOption)}
-              />
 
-              <IconButton //Boton agregar pregunta
-                icon="plus"
-                mode="contained"
-                onPress={(_) => addQuestion(interrogation, setInterrogation, question_type, enum_options, setEnum_options)}
-              />
-              <IconButton //Boton modificar pregunta
-                icon="file-document-edit-outline"
-                mode="contained"
-                onPress={(_) => changeQuestion(questionIndex, interrogation)}
-              />
-              {questionIndex > 0 && (
-                <IconButton //Boton eliminar pregunta
-                  icon="minus"
-                  mode="contained"
-                  onPress={(_) => deleteQuestion(questionIndex)}
-                />
-              )}
-            </Flex>
-          </Flex>
-        ) : null}
-        {question_type === "Abierta" || question_type === "Numérica" ? (
-          <Flex>
-            <Text variant="bodyMedium">Simbologia: </Text>
-            <Text variant="labelSmall">El icono + agrega pregunta, El icono de la hoja de papel con un lapiz modifica la pregunta, El icono - borra la pregunta</Text>
+        <TextInput
+          mode="outlined"
+          value={description}
+          onChangeText={setDescription}
+          multiline={true}
+          numberOfLines={3}
+          label="Descripción del formulario"
+          maxLength={500}
+        />
 
-            <Flex
-              direction="row"
-              items="center"
-              justify="end"
-            >
-              <IconButton
-                icon="plus"
-                mode="contained"
-                onPress={(_) => addQuestion(interrogation, setInterrogation, question_type, enum_options, setEnum_options)}
-              />
-              <IconButton
-                icon="file-document-edit-outline"
-                mode="contained"
-                onPress={(_) => changeQuestion(questionIndex)}
-              />
-              {questionIndex > 0 && (
-                <IconButton
-                  icon="minus"
-                  mode="contained"
-                  onPress={(_) => deleteQuestion(questionIndex)}
-                />
-              )}
-            </Flex>
-          </Flex>
-        ) : null}
+        <TextInput
+          mode="outlined"
+          value={version}
+          onChangeText={setVersion}
+          label="Folio del formulario"
+          maxLength={150}
+          multiline={true}
+          numberOfLines={1}
+        />
       </VStack>
-    )
-  }
+    </VStack>
+  )
+
+  const Questions = () => (
+    <VStack
+      key="Questions"
+      spacing={5}
+    >
+      <Text variant="labelLarge">Preguntas</Text>
+      <VStack spacing={10}>
+        {questions?.length > 0 ? (
+          questions.map((item, index) => (
+            <Card
+              mode="outlined"
+              key={index.toString()}
+            >
+              <VStack
+                p={20}
+                spacing={20}
+              >
+                <Flex fill>
+                  <Text variant="titleMedium">{questions[index].interrogation == "" ? "Pregunta vacía" : questions[index].interrogation}</Text>
+                  <Text variant="bodyMedium">Tipo de pregunta: {questions[index].question_type == "" ? "Sin definir" : questions[index].question_type}</Text>
+                </Flex>
+
+                <HStack
+                  items="baseline"
+                  justify="between"
+                >
+                  <Button
+                    mode="outlined"
+                    icon="delete"
+                    onPress={() => {
+                      const newArray = [...questions]
+                      newArray.splice(index, 1)
+                      console.log("AAAA", newArray)
+                      setQuestions(newArray)
+                    }}
+                  >
+                    Eliminar
+                  </Button>
+
+                  <Button
+                    mode="contained"
+                    icon="pencil-outline"
+                    onPress={() => {
+                      setSelectedIndex(index)
+                      setShowQuestionMaker(true)
+                    }}
+                  >
+                    Editar
+                  </Button>
+                </HStack>
+              </VStack>
+            </Card>
+          ))
+        ) : (
+          <InformationMessage
+            icon="clipboard-edit-outline"
+            title="Sin preguntas"
+            description="Todavía no registras alguna pregunta, ¿qué te parece si hacemos la primera?"
+          />
+        )}
+        <HStack reverse={true}>
+          <Button
+            icon="plus"
+            disabled={questions[questions?.length - 1]?.interrogation == "" || questions[questions?.length - 1]?.question_type == ""}
+            mode="outlined"
+            onPress={() => {
+              let newQuestion = {
+                interrogation: "",
+                question_type: ""
+              }
+
+              setQuestions([...questions, newQuestion])
+            }}
+          >
+            Agregar pregunta
+          </Button>
+        </HStack>
+      </VStack>
+    </VStack>
+  )
 
   const Delete = () => (
     <VStack
@@ -348,6 +285,7 @@ export default EditForm = ({ navigation, route }) => {
           textColor={theme.colors.error}
           icon="trash-can-outline"
           mode="outlined"
+          disabled={modalLoading}
           onPress={() => {
             setModalConfirm(!modalConfirm)
           }}
@@ -363,10 +301,10 @@ export default EditForm = ({ navigation, route }) => {
       key="SaveButton"
       mode="contained"
       icon="content-save-outline"
-      // disabled={modalLoading || !verified}
+      disabled={modalLoading || !verified}
       loading={modalLoading}
       onPress={() => {
-        // SaveForm()
+        saveForm()
       }}
     >
       Guardar
@@ -377,6 +315,7 @@ export default EditForm = ({ navigation, route }) => {
     <Button
       key="CancelButton"
       mode="outlined"
+      disabled={modalLoading}
       icon="close"
       onPress={() => {
         navigation.pop()
@@ -390,7 +329,7 @@ export default EditForm = ({ navigation, route }) => {
     <Flex fill>
       <CreateForm
         title="Editar formulario"
-        children={[FormData(), Delete()]}
+        children={[Data(), Questions(), Delete()]}
         actions={[Save(), Cancel()]}
         navigation={navigation}
       />
@@ -440,7 +379,7 @@ export default EditForm = ({ navigation, route }) => {
             "Aceptar",
             () => {
               navigation.pop(2)
-              getForms()
+              //getForms()
             }
           ]
         ]}
@@ -473,6 +412,14 @@ export default EditForm = ({ navigation, route }) => {
         actions={[["Aceptar"]]}
         dismissable={true}
         icon="wifi-alert"
+      />
+
+      <ModalQuestion
+        questions={questions}
+        setter={setQuestions}
+        index={selectedIndex}
+        handler={[showQuestionMaker, () => setShowQuestionMaker(!showQuestionMaker)]}
+        dismissable={true}
       />
     </Flex>
   )

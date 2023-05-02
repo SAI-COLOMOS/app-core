@@ -7,6 +7,7 @@ import { useCallback, useContext, useEffect, useState } from "react"
 import { LongDate } from "../Shared/LocaleDate"
 // import { DateAndTimerPicker } from "../Shared/TimeAndDatePicker"
 import ApplicationContext from "../ApplicationContext"
+import { Pressable } from "react-native"
 
 export default EditCard = ({ navigation, route }) => {
   const { register, activity, getCard } = route.params
@@ -20,6 +21,7 @@ export default EditCard = ({ navigation, route }) => {
   const [penalized, setPenalized] = useState(activity?.toSubstract ?? false)
   const [_id, set_id] = useState(`${activity?._id}`)
 
+  const [validated, setValidated] = useState(false)
   const [modalConfirm, setModalConfirm] = useState(false)
   const [modalSuccess, setModalSuccess] = useState(false)
   const [modalLoading, setModalLoading] = useState(false)
@@ -51,7 +53,7 @@ export default EditCard = ({ navigation, route }) => {
         console.log(await response.json())
         return response.status
       })
-      .catch((_) => null)
+      .catch(() => null)
     setModalLoading(false)
 
     if (request == 200) {
@@ -65,6 +67,8 @@ export default EditCard = ({ navigation, route }) => {
   }
 
   async function DeleteCard() {
+    setModalLoading(true)
+
     const request = await fetch(`${host}/cards/${register}/activity`, {
       method: "DELETE",
       headers: {
@@ -79,6 +83,8 @@ export default EditCard = ({ navigation, route }) => {
       .then((response) => response.status)
       .catch(() => null)
 
+    setModalLoading(false)
+
     if (request == 200) {
       setModalSuccessDelete(true)
     } else if (request != null) {
@@ -89,23 +95,33 @@ export default EditCard = ({ navigation, route }) => {
     }
   }
 
-  const Activity = (_) => {
+  useEffect(() => {
+    let valid = true
+
+    activity_name?.length == 0 ? (valid = false) : null
+    hours?.length == 0 ? (valid = false) : null
+
+    setValidated(valid)
+  }, [activity_name, hours])
+
+  const Activity = () => {
     return (
       <VStack
         spacing={5}
         key="Activity"
       >
-        <Text variant="labelLarge">Actividad</Text>
+        <Text variant="labelLarge">Actividad realizada</Text>
         <VStack spacing={10}>
           <TextInput
             mode="outlined"
             value={activity_name}
             onChangeText={setActivity_name}
             label="Nombre de actividad"
-            maxLength={50}
-            autoComplete="off"
-            autoCorrect={false}
+            maxLength={150}
+            numberOfLines={1}
+            multiline={true}
           />
+
           <TextInput
             mode="outlined"
             value={hours}
@@ -113,22 +129,24 @@ export default EditCard = ({ navigation, route }) => {
             label="Horas a asignar"
             keyboardType="numeric"
             maxLength={3}
-            autoComplete="off"
-            autoCorrect={false}
+            numberOfLines={1}
+            multiline={true}
             left={penalized == true && <TextInput.Affix text="-" />}
             right={<TextInput.Affix text="hrs" />}
           />
 
-          <HStack
-            items="center"
-            spacing={10}
-          >
-            <Switch
-              value={penalized}
-              onValueChange={() => setPenalized(!penalized)}
-            />
-            <Text variant="bodyMedium">{penalized == true ? "Horas en contra" : "Horas a favor"}</Text>
-          </HStack>
+          <Pressable onPress={() => setPenalized(!penalized)}>
+            <HStack
+              items="center"
+              spacing={10}
+            >
+              <Switch
+                value={penalized}
+                onValueChange={() => setPenalized(!penalized)}
+              />
+              <Text variant="bodyMedium">{penalized == true ? "Horas en contra" : "Horas a favor"}</Text>
+            </HStack>
+          </Pressable>
         </VStack>
       </VStack>
     )
@@ -138,7 +156,7 @@ export default EditCard = ({ navigation, route }) => {
     return (
       <Button
         loading={modalLoading}
-        disabled={modalLoading}
+        disabled={modalLoading || !validated}
         mode="contained"
         icon="content-save-outline"
         key="Update"

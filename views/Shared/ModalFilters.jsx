@@ -1,9 +1,6 @@
-import { useCallback, useEffect, useState } from "react"
-import { Button, Card, Dialog, Modal, Portal, Text } from "react-native-paper"
-import { KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, ScrollView } from "react-native"
-import { Flex, HStack, Spacer, VStack } from "@react-native-material/core"
-import { useFocusEffect } from "@react-navigation/native"
-import Dropdown from "./Dropdown"
+import { Button, Dialog } from "react-native-paper"
+import { ScrollView } from "react-native"
+import { HStack } from "@react-native-material/core"
 
 export default ModalFilters = ({ handler, child, action }) => {
   return (
@@ -17,11 +14,7 @@ export default ModalFilters = ({ handler, child, action }) => {
       <Dialog.Title style={{ textAlign: "center" }}>Filtros de búsqueda</Dialog.Title>
 
       <Dialog.Content>
-        <ScrollView>
-          {/* <Card mode="outlined"> */}
-          {child}
-          {/* </Card> */}
-        </ScrollView>
+        <ScrollView style={{ maxHeight: 350 }}>{child}</ScrollView>
       </Dialog.Content>
 
       <Dialog.Actions>

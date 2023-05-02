@@ -52,7 +52,7 @@ export default EditSchool = ({ navigation, route }) => {
       })
     })
       .then((response) => response.status)
-      .catch((_) => null)
+      .catch(() => null)
 
     setModalLoading(false)
 
@@ -78,7 +78,7 @@ export default EditSchool = ({ navigation, route }) => {
       }
     })
       .then((response) => response.status)
-      .catch((_) => null)
+      .catch(() => null)
 
     setModalLoading(false)
 
@@ -123,8 +123,8 @@ export default EditSchool = ({ navigation, route }) => {
           onChangeText={setSchool_name}
           label="Nombre de la escuela"
           maxLength={150}
-          autoComplete="off"
-          autoCapitalize="words"
+          multiline={true}
+          numberOfLines={1}
         />
         <TextInput
           mode="outlined"
@@ -132,6 +132,8 @@ export default EditSchool = ({ navigation, route }) => {
           onChangeText={setPhone}
           label="Teléfono de la escuela"
           maxLength={10}
+          multiline={true}
+          numberOfLines={1}
           autoComplete="off"
           keyboardType="phone-pad"
         />
@@ -150,52 +152,55 @@ export default EditSchool = ({ navigation, route }) => {
           mode="outlined"
           value={street}
           onChangeText={setStreet}
-          label="Calle de la escuela"
+          label="Calle"
           maxLength={150}
-          autoComplete="off"
+          multiline={true}
+          numberOfLines={1}
         />
         <TextInput
           mode="outlined"
           value={exterior_number}
           onChangeText={setExterior_number}
-          label="Número de la escuela"
-          keyboardType="number-pad"
-          maxLength={10}
+          label="Número del domicilio"
+          keyboardType="numeric"
+          multiline={true}
+          numberOfLines={1}
           autoComplete="off"
         />
         <TextInput
           mode="outlined"
           value={colony}
           onChangeText={setColony}
-          label="Colonia de la escuela"
+          label="Colonia"
           maxLength={150}
-          autoComplete="off"
-          autoCapitalize="words"
+          multiline={true}
+          numberOfLines={1}
         />
         <TextInput
           mode="outlined"
           value={municipality}
           onChangeText={setMunicipality}
-          label="Municipio de la escuela"
+          label="Municipio"
           maxLength={150}
-          autoComplete="off"
-          autoCapitalize="words"
+          multiline={true}
+          numberOfLines={1}
         />
         <TextInput
           mode="outlined"
           value={postal_code}
           onChangeText={setPostal_code}
-          label="Código postal de la escuela"
+          label="Código postal"
           maxLength={5}
-          autoComplete="off"
-          keyboardType="number-pad"
+          multiline={true}
+          numberOfLines={1}
+          keyboardType="numeric"
         />
         <TextInput
           mode="outlined"
           value={reference}
           onChangeText={setReference}
           label="Referencias de la escuela"
-          maxLength={250}
+          maxLength={500}
           autoComplete="off"
           numberOfLines={3}
           multiline={true}
@@ -246,7 +251,7 @@ export default EditSchool = ({ navigation, route }) => {
       icon="close"
       disabled={modalLoading}
       mode="outlined"
-      onPress={(_) => {
+      onPress={() => {
         navigation.pop()
       }}
     >

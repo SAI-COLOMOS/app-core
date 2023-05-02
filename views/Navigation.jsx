@@ -16,6 +16,7 @@ import Events from "./Events/Events"
 import EventDetails from "./Events/EventDetails"
 import AddEvent from "./Events/AddEvent"
 import EditEvent from "./Events/EditEvent"
+import AddAttendee from "./Events/AddAttendee"
 
 // Profile
 import Profile from "./Profile/Profile"
@@ -42,11 +43,11 @@ import UserDetails, { CardProvider } from "./Users/UserDetails"
 import EditUser from "./Users/EditUser"
 
 // Attendance
-import AttendanceDetails from "./Attendance/AttendanceDetails"
-import TakeAttendance from "./Attendance/TakeAttendance"
-import ScanAttendance from "./Attendance/ScanAttendance"
-import AttendanceProximityClient from "./Attendance/AttendanceProximityClient"
-import ShowAttendanceCode from "./Attendance/ShowAttendanceCode"
+import EditAttendance from "./Attendance/EditAttendance"
+import ScanAttendance from "./Attendance/QR/ScanAttendance"
+import ShowAttendanceCode from "./Attendance/QR/ShowAttendanceCode"
+import ProximityReceptor from "./Attendance/Proximity/ProximityReceptor"
+import ProximityTransmisor from "./Attendance/Proximity/ProximityTransmisor"
 
 // Cards
 import Cards from "./Cards/Cards"
@@ -60,8 +61,13 @@ import Forms from "./Forms/Forms"
 import FormDetails from "./Forms/FormDetails"
 import AddForm from "./Forms/AddForm"
 import EditForm from "./Forms/EditForm"
-import AddAttendee from "./Events/AddAttendee"
-import EditAttendance from "./Attendance/EditAttendance"
+
+// Survey
+import ApplySurvey from "./Surveys/ApplySurvey"
+import SurveyResume from "./Surveys/SurveyResume"
+import AddSurvey from "./Surveys/AddSurvey"
+import SurveyAnswers from "./Surveys/SurveyAnswers"
+import DownloadSurvey from "./Surveys/DownloadSurvey"
 
 export default Navigation = () => {
   const Stack = createNativeStackNavigator()
@@ -275,26 +281,13 @@ export default Navigation = () => {
               screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
             >
               <Stack.Screen
-                name="AttendanceDetails"
-                component={AttendanceDetails}
-              />
-              <Stack.Screen
                 name="EditAttendance"
                 component={EditAttendance}
                 options={{ headerShown: false, presentation: "containedTransparentModal" }}
               />
               <Stack.Screen
-                name="TakeAttendance"
-                component={TakeAttendance}
-              />
-              <Stack.Screen
                 name="ScanAttendance"
                 component={ScanAttendance}
-                options={{ headerShown: false, presentation: "containedTransparentModal" }}
-              />
-              <Stack.Screen
-                name="AttendanceProximityClient"
-                component={AttendanceProximityClient}
                 options={{ headerShown: false, presentation: "containedTransparentModal" }}
               />
               <Stack.Screen
@@ -303,9 +296,19 @@ export default Navigation = () => {
                 options={{ headerShown: false, presentation: "containedTransparentModal" }}
               />
 
-              {/* <Stack.Screen name="UpdatePassword" component={UpdatePassword} options={{ headerShown: false, presentation: 'containedTransparentModal' }} /> */}
+              <Stack.Screen
+                name="ProximityReceptor"
+                component={ProximityReceptor}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+              <Stack.Screen
+                name="ProximityTransmisor"
+                component={ProximityTransmisor}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
             </Stack.Group>
 
+            {/* Forms */}
             <Stack.Group
               navigationKey="Forms"
               screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
@@ -326,6 +329,39 @@ export default Navigation = () => {
               <Stack.Screen
                 name="EditForm"
                 component={EditForm}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+            </Stack.Group>
+
+            {/* Surveys */}
+            <Stack.Group
+              navigationKey="Surveys"
+              screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
+            >
+              <Stack.Screen
+                name="AddSurvey"
+                component={AddSurvey}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+
+              <Stack.Screen
+                name="ApplySurvey"
+                component={ApplySurvey}
+              />
+
+              <Stack.Screen
+                name="SurveyAnswers"
+                component={SurveyAnswers}
+              />
+
+              <Stack.Screen
+                name="SurveyResume"
+                component={SurveyResume}
+                options={{ headerShown: false, presentation: "containedTransparentModal" }}
+              />
+              <Stack.Screen
+                name="DownloadSurvey"
+                component={DownloadSurvey}
                 options={{ headerShown: false, presentation: "containedTransparentModal" }}
               />
             </Stack.Group>

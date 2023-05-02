@@ -14,6 +14,7 @@ import { manipulateAsync, FlipType, SaveFormat } from "expo-image-manipulator"
 import ApplicationContext from "../ApplicationContext"
 
 export default Profile = ({ navigation, route }) => {
+  const theme = useTheme()
   const headerMargin = useHeaderHeight()
   const { user, token } = useContext(ApplicationContext)
 
@@ -37,7 +38,7 @@ export default Profile = ({ navigation, route }) => {
         await SecureStore.deleteItemAsync("token")
         await SecureStore.deleteItemAsync("user")
         await SecureStore.deleteItemAsync("keepAlive")
-        navigation.popToTop()
+        await SecureStore.deleteItemAsync("useBiometric")
         navigation.replace("Login")
       }}
     />
@@ -179,10 +180,12 @@ export default Profile = ({ navigation, route }) => {
 
   const UpdatePassword = () => (
     <Button
+      mode="outlined"
       key="UpdatePasswordButton"
       icon="form-textbox-password"
+      style={{ backgroundColor: theme.colors.background }}
       onPress={() => {
-        navigation.navigate("UpdatePassword", { token, register: user?.register })
+        navigation.navigate("UpdatePassword")
       }}
     >
       Actualizar contraseña
@@ -198,8 +201,7 @@ export default Profile = ({ navigation, route }) => {
         icon="account-circle-outline"
         avatar={user?.avatar}
         title={`${user?.first_name} ${user?.first_last_name} ${user?.second_last_name ?? ""}`}
-        children={[PersonalData(), ContactData(), EmergencyData(), AccountData()]}
-        actions={[UpdatePassword()]}
+        children={[UpdatePassword(), PersonalData(), ContactData(), EmergencyData(), AccountData()]}
       />
     </Flex>
   )

@@ -1,7 +1,3 @@
-import { Flex } from "@react-native-material/core"
-import { Text } from "react-native-paper"
-import { log } from "react-native-reanimated"
-
 export const LongDate = (date) => {
   //const originalDate = typeof date == "object" ? date : new Date(date)
   const originalDate = { object: date, string: new Date(date) }[typeof date]
@@ -101,28 +97,28 @@ export const ShortDate = (date) => {
   const weekDay = () => {
     switch (Number(originalDate.getDay())) {
       case 0:
-        return "Dom"
+        return "dom"
 
       case 1:
-        return "Lun"
+        return "lun"
 
       case 2:
-        return "Mar"
+        return "mar"
 
       case 3:
-        return "Mié"
+        return "mié"
 
       case 4:
-        return "Jue"
+        return "jue"
 
       case 5:
-        return "Vie"
+        return "vie"
 
       case 6:
-        return "Sáb"
+        return "sáb"
 
       default:
-        return "DdlS"
+        return "ddlS"
     }
   }
 
@@ -171,9 +167,7 @@ export const ShortDate = (date) => {
     }
   }
 
-  const year = () => originalDate.getFullYear()
-
-  return `${weekDay()}. ${day()} de ${month()}`
+  return `${weekDay()}. ${day()} de ${month()}.`
 }
 
 export const CompactDate = (date) => {

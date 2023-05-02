@@ -1,80 +1,53 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
-import { useEffect, useState, useContext, Component, useFocusEffect, useCallback } from "react"
-import { Button, Text, TextInput, useTheme, IconButton } from "react-native-paper"
+import { useContext, useEffect, useState } from "react"
+import { Button, Card, IconButton, Text, TextInput } from "react-native-paper"
 import CreateForm from "../Shared/CreateForm"
-import Constants from "expo-constants"
 import ModalMessage from "../Shared/ModalMessage"
-import Dropdown from "../Shared/Dropdown"
-import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import ApplicationContext from "../ApplicationContext"
-import { event } from "react-native-reanimated"
+import InformationMessage from "../Shared/InformationMessage"
+import ModalQuestion from "../Shared/ModalQuestion"
 
 export default AddForm = ({ navigation, route }) => {
-  const theme = useTheme()
-  const { host, user, token } = useContext(ApplicationContext)
+  const { host, token } = useContext(ApplicationContext)
+  const { getForms } = route.params
 
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
-  const [belonging_area, setBeging_area] = useState("")
-  const [belonging_place, setBelonging_place] = useState("")
-  const [belonging_event_identifier, setBelonging_event_identifier] = useState("")
   const [version, setVersion] = useState("")
-  const [questions, setQuestions] = useState([
-    {
-      interrogation: "",
-      question_type: "Abierta",
-      enum_options: []
-    }
-  ])
-  const [isTemplate, setIsTemplate] = useState(false)
+  const [questions, setQuestions] = useState([])
+  const [selectedIndex, setSelectedIndex] = useState(0)
+  const [showQuestionMaker, setShowQuestionMaker] = useState(false)
 
-  const QuestionType = [
-    {
-      option: "Abierta"
-    },
-    {
-      option: "Numérica"
-    },
-    {
-      option: "Opción múltiple"
-    },
-    {
-      option: "Selección múltiple"
-    },
-    {
-      option: "Escala"
-    }
-  ]
-  const [modalSuccess, setModalSuccess] = useState(false)
+  const [verified, setVerified] = useState(false)
+
   const [modalLoading, setModalLoading] = useState(false)
+  const [modalSuccess, setModalSuccess] = useState(false)
   const [modalError, setModalError] = useState(false)
   const [modalFatal, setModalFatal] = useState(false)
   const [responseCode, setResponseCode] = useState("")
 
-  async function SaveForm() {
-    // elimnarVacio()
+  async function saveForm() {
+    setModalLoading(true)
+
     const request = await fetch(`${host}/forms`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        "Cache-Control": "no-cache"
+        Authorization: `Bearer ${token}`
       },
       body: JSON.stringify({
         name: name.trim(),
         description: description.trim(),
-        belonging_area: belonging_area.trim(),
-        belonging_place: belonging_place.trim(),
-        belonging_event_identifier: belonging_event_identifier.trim(),
-        version: Number(version),
+        belonging_event_identifier: "AAA",
+        version: version,
         questions: questions,
-        isTemplate
+        isTemplate: true
       })
     })
-      .then((response) => response.json() /*response.status*/)
-      .catch((error) => console.error("Error: ", error))
+      .then((response) => response.status)
+      .catch(() => null)
 
-    console.log(request)
+    setModalLoading(false)
 
     if (request == 201) {
       setModalSuccess(true)
@@ -86,94 +59,170 @@ export default AddForm = ({ navigation, route }) => {
     }
   }
 
-  const FormData = () => {
-    return (
-      <VStack
-        key="Form"
-        spacing={5}
-      >
-        <Text variant="labelLarge">Datos del formulario</Text>
-        <VStack
-          key="FormData"
-          spacing={10}
-        >
-          <TextInput
-            mode="outlined"
-            value={name}
-            onChangeText={setName}
-            label="Nombre del formulario"
-            maxLength={50}
-            autoComplete="off"
-            autoCorrect={false}
-            autoCapitalize="sentences"
-          />
-          <TextInput
-            mode="outlined"
-            value={description}
-            onChangeText={setDescription}
-            label="Descripción del formulario"
-            maxLength={250}
-            multiline={true}
-            numberOfLines={5}
-            autoCapitalize="sentences"
-          />
-          {/* <TextInput
-            mode="outlined"
-            value={belonging_place}
-            onChangeText={setBelonging_place}
-            label="Lugar de origen"
-            maxLength={150}
-            autoCapitalize="words"
-          />
-          <TextInput
-            mode="outlined"
-            value={belonging_area}
-            onChangeText={setBeging_area}
-            maxLength={150}
-            label="Área de origen"
-          /> */}
-          <TextInput
-            mode="outlined"
-            value={belonging_event_identifier}
-            onChangeText={setBelonging_event_identifier}
-            label="Identificador de evento de origen"
-            maxLength={150}
-            autoCapitalize="characters"
-          />
-          <TextInput
-            mode="outlined"
-            value={version}
-            onChangeText={setVersion}
-            label="Versión"
-            // keyboardType="number-pad"
-            maxLength={3}
-            autoComplete="off"
-          />
-          <Text variant="labelLarge">Preguntas</Text>
+  useEffect(() => {
+    let valid = true
 
-          {questions.length > 0 &&
-            questions.map((question, questionIndex) => (
-              <Item
-                key={questionIndex}
-                questionIndex={questionIndex}
-                question={question}
-              />
-            ))}
-        </VStack>
+    if (name.length <= 0) {
+      valid = false
+    }
+
+    if (description.length <= 0) {
+      valid = false
+    }
+
+    if (version.length <= 0) {
+      valid = false
+    }
+
+    if (questions?.length == 0) {
+      valid = false
+    }
+
+    questions?.forEach((question) => {
+      if (question.interrogation == "") {
+        valid = false
+      }
+      if (question.question_type == "") {
+        valid = false
+      }
+      if (question?.enum_options?.length <= 0) {
+        valid = false
+      }
+    })
+
+    setVerified(valid)
+  }, [questions, name, description, version])
+
+  const Data = () => (
+    <VStack
+      key="Data"
+      spacing={5}
+    >
+      <Text variant="labelLarge">Datos del formulario</Text>
+      <VStack spacing={10}>
+        <TextInput
+          mode="outlined"
+          value={name}
+          onChangeText={setName}
+          label="Nombre del formulario"
+          maxLength={150}
+          multiline={true}
+          numberOfLines={1}
+        />
+
+        <TextInput
+          mode="outlined"
+          value={description}
+          onChangeText={setDescription}
+          multiline={true}
+          numberOfLines={3}
+          label="Descripción del formulario"
+          maxLength={500}
+        />
+
+        <TextInput
+          mode="outlined"
+          value={version}
+          onChangeText={setVersion}
+          label="Folio del formulario"
+          maxLength={150}
+          multiline={true}
+          numberOfLines={1}
+        />
       </VStack>
-    )
-  }
+    </VStack>
+  )
+
+  const Questions = () => (
+    <VStack
+      key="Questions"
+      spacing={5}
+    >
+      <Text variant="labelLarge">Preguntas</Text>
+      <VStack spacing={10}>
+        {questions?.length > 0 ? (
+          questions.map((item, index) => (
+            <Card
+              mode="outlined"
+              key={index.toString()}
+            >
+              <VStack
+                p={20}
+                spacing={20}
+              >
+                <Flex fill>
+                  <Text variant="titleMedium">{questions[index].interrogation == "" ? "Pregunta vacía" : questions[index].interrogation}</Text>
+                  <Text variant="bodyMedium">Tipo de pregunta: {questions[index].question_type == "" ? "Sin definir" : questions[index].question_type}</Text>
+                </Flex>
+
+                <HStack
+                  items="baseline"
+                  justify="between"
+                >
+                  <Button
+                    mode="outlined"
+                    icon="delete"
+                    onPress={() => {
+                      const newArray = [...questions]
+                      newArray.splice(index, 1)
+                      console.log("AAAA", newArray)
+                      setQuestions(newArray)
+                    }}
+                  >
+                    Eliminar
+                  </Button>
+
+                  <Button
+                    mode="contained"
+                    icon="pencil-outline"
+                    onPress={() => {
+                      setSelectedIndex(index)
+                      setShowQuestionMaker(true)
+                    }}
+                  >
+                    Editar
+                  </Button>
+                </HStack>
+              </VStack>
+            </Card>
+          ))
+        ) : (
+          <InformationMessage
+            icon="clipboard-edit-outline"
+            title="Sin preguntas"
+            description="Todavía no registras alguna pregunta, ¿qué te parece si hacemos la primera?"
+          />
+        )}
+        <HStack reverse={true}>
+          <Button
+            icon="plus"
+            disabled={questions[questions?.length - 1]?.interrogation == "" || questions[questions?.length - 1]?.question_type == ""}
+            mode="outlined"
+            onPress={() => {
+              let newQuestion = {
+                interrogation: "",
+                question_type: ""
+              }
+
+              setQuestions([...questions, newQuestion])
+            }}
+          >
+            Agregar pregunta
+          </Button>
+        </HStack>
+      </VStack>
+    </VStack>
+  )
 
   const Save = () => (
     <Button
       key="SaveButton"
-      mode="contained"
       icon="content-save-outline"
-      // disabled={modalLoading || !verified}
+      disabled={modalLoading || !verified}
       loading={modalLoading}
+      mode="contained"
       onPress={() => {
-        // elimnarVacio()
-        SaveForm()
+        saveForm()
       }}
     >
       Guardar
@@ -183,8 +232,9 @@ export default AddForm = ({ navigation, route }) => {
   const Cancel = () => (
     <Button
       key="CancelButton"
-      mode="outlined"
       icon="close"
+      disabled={modalLoading}
+      mode="outlined"
       onPress={() => {
         navigation.pop()
       }}
@@ -193,183 +243,34 @@ export default AddForm = ({ navigation, route }) => {
     </Button>
   )
 
-  const elimnarVacio = () => {
-    setQuestions((questions) => {
-      const nuevosDatos = questions.filter((dato) => dato.interrogation.trim() !== "")
-      return nuevosDatos
-    })
-    // console.log("Si entra")
-  }
-
-  const addQuestion = (interrogation, setInterrogation, question_type, enum_options, setEnum_options) => {
-    const newQuestion = {
-      interrogation: interrogation,
-      question_type: question_type,
-      enum_options: enum_options
-    }
-
-    const updatedQuestions = [...questions]
-    updatedQuestions.push(newQuestion)
-    setQuestions(updatedQuestions)
-    setInterrogation("")
-    // setEnum_options("")
-  }
-
-  //Aun no usar, elimina las preguntas
-  const changeQuestion = (questionIndex, interrogation) => {
-    const modifyQuestion = questions[questionIndex]
-    modifyQuestion[questionIndex] = { interrogation }
-    // setInterrogation(modifyQuestion.interrogation)
-    // setEnum_options(modifyQuestion.enum_options || [])
-
-    const updatedQuestions = [...questions]
-    updatedQuestions.splice(questionIndex, 1)
-    setQuestions(updatedQuestions)
-  }
-
-  const deleteQuestion = (questionIndex) => {
-    setQuestions(questions.filter((_, i) => i !== questionIndex))
-  }
-
-  const modificarOpcionRespuesta = (e, index, enum_options, setEnum_options) => {
-    const opcionesActualizadas = [...enum_options]
-    opcionesActualizadas[index] = e.target.value
-    setEnum_options(opcionesActualizadas)
-  }
-
-  const addOption = (nuevaOpcion, setNewAnswerOption) => {
-    if (nuevaOpcion.trim() !== "") {
-      setQuestions((questions) => {
-        const nuevosDatos = [...questions]
-        nuevosDatos.forEach((dato) => {
-          dato.enum_options.push(nuevaOpcion)
-        })
-        return nuevosDatos
-      })
-      setNewAnswerOption("")
-    }
-  }
-
-  const Item = ({ questionIndex, question }) => {
-    const { question_type } = question
-    const [interrogation, setInterrogation] = useState(question.interrogation)
-    const [enum_options, setEnum_options] = useState(question.enum_options)
-    const [newAnswerOption, setNewAnswerOption] = useState("")
-    console.log(questions)
-    return (
-      <VStack
-        key="Question"
-        spacing={5}
-      >
-        <Dropdown
-          title="Tipo de pregunta"
-          options={QuestionType}
-          value={question_type}
-          isAnObjectsArray={true}
-          objectInfo={{ index: questionIndex, key: "question_type", arr: questions, setArr: setQuestions }}
-        />
-        <TextInput
-          mode="outlined"
-          value={interrogation}
-          onChangeText={setInterrogation}
-          label="Interrogante"
-        />
-        {question_type === "Opción múltiple" || question_type === "Selección múltiple" || question_type === "Escala" ? (
-          <Flex>
-            <TextInput
-              mode="outlined"
-              value={newAnswerOption}
-              onChangeText={setNewAnswerOption}
-              label="Respuestas"
-            />
-            <Text variant="bodyMedium">Simbologia: </Text>
-            <Text variant="labelSmall">El icono de el pastel con + es para agregar respuestas, El icono + agrega pregunta, El icono de la hoja de papel con un lapiz modifica la pregunta, El icono - borra la pregunta</Text>
-            <Flex
-              direction="row"
-              items="center"
-              justify="end"
-            >
-              <IconButton //Boton agregar respuesta
-                icon="database-plus-outline"
-                mode="contained"
-                // onPress={(_) => addAnswerOptions(questionIndex, newAnswerOption, setNewAnswerOption)}
-                onPress={(_) => addOption(newAnswerOption, setNewAnswerOption)}
-              />
-
-              <IconButton //Boton agregar pregunta
-                icon="plus"
-                mode="contained"
-                onPress={(_) => addQuestion(interrogation, setInterrogation, question_type, enum_options, setEnum_options)}
-              />
-              <IconButton //Boton modificar pregunta
-                icon="file-document-edit-outline"
-                mode="contained"
-                // onPress={(_) => changeQuestion(questionIndex, interrogation)}
-              />
-              {questionIndex > 0 && (
-                <IconButton //Boton eliminar pregunta
-                  icon="minus"
-                  mode="contained"
-                  onPress={(_) => deleteQuestion(questionIndex)}
-                />
-              )}
-            </Flex>
-          </Flex>
-        ) : null}
-        {question_type === "Abierta" || question_type === "Numérica" ? (
-          <Flex>
-            <Text variant="bodyMedium">Simbologia: </Text>
-            <Text variant="labelSmall">El icono + agrega pregunta, El icono de la hoja de papel con un lapiz modifica la pregunta, El icono - borra la pregunta</Text>
-
-            <Flex
-              direction="row"
-              items="center"
-              justify="end"
-            >
-              <IconButton
-                icon="plus"
-                mode="contained"
-                onPress={(_) => addQuestion(interrogation, setInterrogation, question_type, enum_options, setEnum_options)}
-              />
-              <IconButton
-                icon="file-document-edit-outline"
-                mode="contained"
-                // onPress={(_) => changeQuestion(questionIndex)}
-              />
-              {questionIndex > 0 && (
-                <IconButton
-                  icon="minus"
-                  mode="contained"
-                  onPress={(_) => deleteQuestion(questionIndex)}
-                />
-              )}
-            </Flex>
-          </Flex>
-        ) : null}
-      </VStack>
-    )
-  }
-
   return (
     <Flex fill>
       <CreateForm
-        title="Añadir nuevo formulario"
-        children={[FormData()]}
+        title="Crear formulario"
+        children={[Data(), Questions()]}
         actions={[Save(), Cancel()]}
         navigation={navigation}
+        loading={modalLoading}
       />
-
       <ModalMessage
         title="¡Listo!"
-        description="El formulario ha sido creado"
+        description="el formulario ha sido creado"
         handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]}
-        actions={[["Aceptar", () => navigation.pop()]]}
+        actions={[
+          [
+            "Aceptar",
+            () => {
+              getForms()
+              navigation.pop()
+            }
+          ]
+        ]}
         dismissable={false}
         icon="check-circle-outline"
       />
       <ModalMessage
         title="Ocurrió un problema"
-        description={`No pudimos crear el formulario, inténtalo más tarde.`}
+        description={`No pudimos crear el formulario, inténtalo más tarde. (${responseCode})`}
         handler={[modalError, () => setModalError(!modalError)]}
         actions={[["Aceptar"]]}
         dismissable={true}
@@ -382,6 +283,14 @@ export default AddForm = ({ navigation, route }) => {
         actions={[["Aceptar"]]}
         dismissable={true}
         icon="wifi-alert"
+      />
+
+      <ModalQuestion
+        questions={questions}
+        setter={setQuestions}
+        index={selectedIndex}
+        handler={[showQuestionMaker, () => setShowQuestionMaker(!showQuestionMaker)]}
+        dismissable={true}
       />
     </Flex>
   )

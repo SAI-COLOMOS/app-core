@@ -4,12 +4,12 @@ import { useSafeAreaInsets, useSafeAreaFrame } from "react-native-safe-area-cont
 import { Text, TouchableRipple, useTheme } from "react-native-paper"
 import { useEffect } from "react"
 
-export default CreateForm = ({ navigation, route, loading, title, children, actions, refreshingStatus, refreshingAction }) => {
+export default CreateForm = ({ navigation, route, loading, title, children, actions, refreshingStatus, refreshingAction, disablePrevent }) => {
   const theme = useTheme()
   const insets = useSafeAreaInsets()
 
-  useEffect(
-    () =>
+  useEffect(() => {
+    if (disablePrevent !== true) {
       navigation.addListener("beforeRemove", (e) => {
         e.preventDefault()
 
@@ -18,9 +18,9 @@ export default CreateForm = ({ navigation, route, loading, title, children, acti
         } else {
           navigation.dispatch(e.data.action)
         }
-      }),
-    [navigation, loading]
-  )
+      })
+    }
+  }, [navigation])
 
   return (
     <Flex

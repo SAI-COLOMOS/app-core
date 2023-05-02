@@ -1,34 +1,33 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useCallback, useContext, useEffect, useState } from "react"
-import { ActivityIndicator, Button, IconButton, Text, TextInput } from "react-native-paper"
-import Constants from "expo-constants"
+import { ActivityIndicator, Button, HelperText, IconButton, Text, TextInput, useTheme } from "react-native-paper"
 import CreateForm from "../Shared/CreateForm"
 import ModalMessage from "../Shared/ModalMessage"
-//import { DateAndTimerPicker } from "../Shared/TimeAndDatePicker"
 import ApplicationContext from "../ApplicationContext"
 import Dropdown from "../Shared/Dropdown"
-import { Pressable } from "react-native"
-import DateAndTimePicker, { CalendarPicker, ClockPicker } from "../Shared/DateAndTimePicker"
-import { LongDate } from "../Shared/LocaleDate"
+import DateAndTimePicker from "../Shared/DateAndTimePicker"
+import { LongDate, ShortDate, Time24 } from "../Shared/LocaleDate"
+import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 
 export default AddEvent = ({ navigation, route }) => {
+  const theme = useTheme()
   const { host, token } = useContext(ApplicationContext)
   const { getEvents } = route.params
+  const actualDate = new Date()
+  actualDate.getSeconds(0)
+  actualDate.setMilliseconds(0)
 
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
   const [offered_hours, setOffered_hours] = useState("")
   const [tolerance, setTolerance] = useState("")
   const [vacancy, setVacancy] = useState("")
-  const [starting_date, setStarting_date] = useState(new Date())
-  const [ending_date, setEnding_date] = useState(new Date())
-  const [publishing_date, setPublishing_date] = useState(new Date())
+  const [starting_date, setStarting_date] = useState(new Date(actualDate.getTime() + 3 * 60 * 60 * 1000))
+  const [ending_date, setEnding_date] = useState(new Date(actualDate.getTime() + 7 * 60 * 60 * 1000))
+  const [publishing_date, setPublishing_date] = useState(new Date(actualDate))
   const [place, setPlace] = useState("")
   const [avatar, setAvatar] = useState(null)
   const [verified, setVerified] = useState(false)
-
-  const [showStarting_date, setShowStarting_date] = useState(false)
-  const [showStarting_dateTime, setShowStarting_dateTime] = useState(false)
 
   const [loading, setLoading] = useState(false)
   const [placesOptions, setPlacesOptions] = useState()
@@ -119,6 +118,15 @@ export default AddEvent = ({ navigation, route }) => {
     vacancy.length > 0 ? null : (check = false)
     place.length > 0 ? null : (check = false)
 
+    starting_date.getTime() < publishing_date.getTime() + 3 * 60 * 60 * 1000 ? (check = false) : null
+    starting_date.getTime() >= ending_date.getTime() + 3 * 60 * 60 * 1000 ? (check = false) : null
+
+    ending_date.getTime() <= starting_date.getTime() ? (check = false) : null
+    ending_date.getTime() <= publishing_date.getTime() ? (check = false) : null
+
+    publishing_date.getTime() > starting_date.getTime() - 3 * 60 * 60 * 1000 ? (check = false) : null
+    publishing_date.getTime() > ending_date.getTime() ? (check = false) : null
+
     if (check) {
       setVerified(true)
     } else {
@@ -126,131 +134,266 @@ export default AddEvent = ({ navigation, route }) => {
     }
   }, [name, description, offered_hours, tolerance, vacancy, starting_date, ending_date, publishing_date, place])
 
-  const Data = () => {
-    return (
-      <VStack
-        key="Data"
-        spacing={5}
-      >
-        <Text variant="labelLarge">Datos del evento</Text>
-        <VStack spacing={10}>
-          <TextInput
-            mode="outlined"
-            value={name}
-            onChangeText={setName}
-            label="Nombre del evento"
-            maxLength={50}
-          />
-          <TextInput
-            mode="outlined"
-            value={description}
-            onChangeText={setDescription}
-            label="Descripción del evento"
-            maxLength={500}
-            multiline={true}
-            numberOfLines={5}
-          />
-          <TextInput
-            mode="outlined"
-            value={offered_hours}
-            onChangeText={setOffered_hours}
-            label="Número de horas ofertadas"
-            maxLength={3}
-            keyboardType="number-pad"
-            autoComplete="off"
-          />
-          <TextInput
-            mode="outlined"
-            value={tolerance}
-            onChangeText={setTolerance}
-            label="Minutos de tolerancia"
-            maxLength={3}
-            keyboardType="number-pad"
-            autoComplete="off"
-          />
-          <TextInput
-            mode="outlined"
-            value={vacancy}
-            onChangeText={setVacancy}
-            label="Número de vacantes"
-            maxLength={3}
-            keyboardType="number-pad"
-            autoComplete="off"
-          />
+  const Data = () => (
+    <VStack
+      key="Data"
+      spacing={5}
+    >
+      <Text variant="labelLarge">Datos del evento</Text>
+      <VStack spacing={10}>
+        <TextInput
+          mode="outlined"
+          value={name}
+          onChangeText={setName}
+          label="Nombre del evento"
+          maxLength={150}
+          multiline={true}
+          numberOfLines={1}
+        />
+        <TextInput
+          mode="outlined"
+          value={description}
+          onChangeText={setDescription}
+          label="Descripción del evento"
+          maxLength={500}
+          multiline={true}
+          numberOfLines={5}
+        />
+        <TextInput
+          mode="outlined"
+          value={offered_hours}
+          onChangeText={setOffered_hours}
+          label="Número de horas ofertadas"
+          maxLength={3}
+          keyboardType="numeric"
+          multiline={true}
+          numberOfLines={1}
+        />
+        <TextInput
+          mode="outlined"
+          value={tolerance}
+          onChangeText={setTolerance}
+          label="Minutos de tolerancia"
+          maxLength={3}
+          keyboardType="numeric"
+          multiline={true}
+          numberOfLines={1}
+        />
+        <TextInput
+          mode="outlined"
+          value={vacancy}
+          onChangeText={setVacancy}
+          label="Número de vacantes"
+          maxLength={3}
+          keyboardType="numeric"
+          multiline={true}
+          numberOfLines={1}
+        />
 
-          <Flex>
-            <DateAndTimePicker
-              title="Fecha y hora de inicio"
-              date={starting_date}
-              setDate={setStarting_date}
-            />
-          </Flex>
-
-          <Flex>
-            <DateAndTimePicker
-              title="Fecha y hora de termino"
-              date={ending_date}
-              setDate={setEnding_date}
-            />
-          </Flex>
-
-          <Flex>
-            <DateAndTimePicker
-              title="Fecha y hora de publicación"
-              date={publishing_date}
-              setDate={setPublishing_date}
-            />
-          </Flex>
-
-          <Flex>
-            {placesOptions != null ? (
-              <Dropdown
-                title="Bosque urbano"
-                value={place}
-                selected={setPlace}
-                options={placesOptions}
+        <Flex>
+          <DateAndTimePicker
+            title="Fecha y hora de inicio"
+            date={starting_date}
+            setDate={setStarting_date}
+          />
+          {starting_date.getTime() < publishing_date.getTime() + 3 * 60 * 60 * 1000 && (
+            <HStack
+              pv={5}
+              ph={10}
+              spacing={10}
+              items="center"
+            >
+              <Icon
+                name="alert"
+                size={20}
+                color={theme.colors.error}
               />
-            ) : loading == true ? (
-              <HStack
-                fill
-                items="center"
-                pv={10}
-                spacing={20}
-              >
-                <Flex fill>
-                  <Text variant="bodyMedium">Obteniendo la lista de bosques urbanos</Text>
-                </Flex>
-                <ActivityIndicator />
-              </HStack>
-            ) : (
-              <HStack
-                fill
-                items="center"
-                pv={10}
-                spacing={20}
-              >
-                <Flex fill>
-                  <Text variant="bodyMedium">Ocurrió un problema obteniendo la lista de bosques urbanos</Text>
-                </Flex>
-                <IconButton
-                  icon="reload"
-                  mode="outlined"
-                  onPress={() => getPlaces()}
-                />
-              </HStack>
-            )}
-          </Flex>
-        </VStack>
+              <Flex fill>
+                <Text
+                  variant="labelSmall"
+                  style={{ color: theme.colors.error }}
+                >
+                  La fecha de inicio no puede ser menor a la fecha de publicación más tres horas ({ShortDate(new Date(publishing_date.getTime() + 3 * 60 * 60 * 1000))} a las {Time24(new Date(publishing_date.getTime() + 3 * 60 * 60 * 1000))})
+                </Text>
+              </Flex>
+            </HStack>
+          )}
+          {starting_date.getTime() >= ending_date.getTime() + 3 * 60 * 60 * 1000 && (
+            <HStack
+              pv={5}
+              ph={10}
+              spacing={10}
+              items="center"
+            >
+              <Icon
+                name="alert"
+                size={20}
+                color={theme.colors.error}
+              />
+              <Flex fill>
+                <Text
+                  variant="labelSmall"
+                  style={{ color: theme.colors.error }}
+                >
+                  La fecha de inicio no puede ser mayor o igual a la fecha de termino ({ShortDate(ending_date)} a las {Time24(ending_date)})
+                </Text>
+              </Flex>
+            </HStack>
+          )}
+        </Flex>
+
+        <Flex>
+          <DateAndTimePicker
+            title="Fecha y hora de termino"
+            date={ending_date}
+            setDate={setEnding_date}
+          />
+          {ending_date.getTime() <= starting_date.getTime() && (
+            <HStack
+              pv={5}
+              ph={10}
+              spacing={10}
+              items="center"
+            >
+              <Icon
+                name="alert"
+                size={20}
+                color={theme.colors.error}
+              />
+              <Flex fill>
+                <Text
+                  variant="labelSmall"
+                  style={{ color: theme.colors.error }}
+                >
+                  La fecha de termino no puede ser menor o igual a la fecha de inicio ({ShortDate(starting_date)} a las {Time24(starting_date)})
+                </Text>
+              </Flex>
+            </HStack>
+          )}
+          {ending_date.getTime() <= publishing_date.getTime() && (
+            <HStack
+              pv={5}
+              ph={10}
+              spacing={10}
+              items="center"
+            >
+              <Icon
+                name="alert"
+                size={20}
+                color={theme.colors.error}
+              />
+              <Flex fill>
+                <Text
+                  variant="labelSmall"
+                  style={{ color: theme.colors.error }}
+                >
+                  La fecha de termino no puede ser menor o igual a la fecha de publicación (({ShortDate(publishing_date)} a las {Time24(publishing_date)}))
+                </Text>
+              </Flex>
+            </HStack>
+          )}
+        </Flex>
+
+        <Flex>
+          <DateAndTimePicker
+            title="Fecha y hora de publicación"
+            date={publishing_date}
+            setDate={setPublishing_date}
+          />
+          {publishing_date.getTime() > starting_date.getTime() - 3 * 60 * 60 * 1000 && (
+            <HStack
+              pv={5}
+              ph={10}
+              spacing={10}
+              items="center"
+            >
+              <Icon
+                name="alert"
+                size={20}
+                color={theme.colors.error}
+              />
+              <Flex fill>
+                <Text
+                  variant="labelSmall"
+                  style={{ color: theme.colors.error }}
+                >
+                  La fecha de publicación no puede ser mayor a la fecha de inicio menos tres horas ({ShortDate(new Date(starting_date.getTime() - 3 * 60 * 60 * 1000))} a las {Time24(new Date(starting_date.getTime() - 3 * 60 * 60 * 1000))})
+                </Text>
+              </Flex>
+            </HStack>
+          )}
+          {publishing_date.getTime() > ending_date.getTime() && (
+            <HStack
+              pv={5}
+              ph={10}
+              spacing={10}
+              items="center"
+            >
+              <Icon
+                name="alert"
+                size={20}
+                color={theme.colors.error}
+              />
+              <Flex fill>
+                <Text
+                  variant="labelSmall"
+                  style={{ color: theme.colors.error }}
+                >
+                  La fecha de publicación no puede ser mayor a la fecha de termino ({ShortDate(ending_date)} a las {Time24(ending_date)})
+                </Text>
+              </Flex>
+            </HStack>
+          )}
+        </Flex>
+
+        <Flex>
+          {placesOptions != null ? (
+            <Dropdown
+              title="Bosque urbano"
+              value={place}
+              selected={setPlace}
+              options={placesOptions}
+            />
+          ) : loading == true ? (
+            <HStack
+              fill
+              items="center"
+              pv={10}
+              spacing={20}
+            >
+              <Flex fill>
+                <Text variant="bodyMedium">Obteniendo la lista de bosques urbanos</Text>
+              </Flex>
+              <ActivityIndicator />
+            </HStack>
+          ) : (
+            <HStack
+              fill
+              items="center"
+              pv={10}
+              spacing={20}
+            >
+              <Flex fill>
+                <Text variant="bodyMedium">Ocurrió un problema obteniendo la lista de bosques urbanos</Text>
+              </Flex>
+              <IconButton
+                icon="reload"
+                mode="outlined"
+                onPress={() => getPlaces()}
+              />
+            </HStack>
+          )}
+        </Flex>
       </VStack>
-    )
-  }
+    </VStack>
+  )
 
   const ImageData = () => (
     <VStack
       key="Image"
       spacing={5}
     >
-      <Text variant="labelLarge">Foto del parque</Text>
+      <Text variant="labelLarge">Imagen alusiva al evento</Text>
       <VStack spacing={10}>
         <ImageSelector
           value={avatar}
