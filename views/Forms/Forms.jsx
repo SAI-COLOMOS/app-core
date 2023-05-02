@@ -139,7 +139,7 @@ export default Forms = ({ navigation, route }) => {
                   variant="bodySmall"
                   numberOfLines={2}
                 >
-                  {item.version}
+                  {item.version ?? "Sin folio"}
                 </Text>
               </Flex>
             </HStack>
@@ -178,8 +178,7 @@ export default Forms = ({ navigation, route }) => {
                       buttonTitle="Agregar"
                       action={() => {
                         navigation.navigate("AddForm", {
-                          user,
-                          token
+                          getForms
                         })
                       }}
                     />
@@ -200,7 +199,7 @@ export default Forms = ({ navigation, route }) => {
                 icon="plus"
                 style={{ position: "absolute", margin: 16, right: 0, bottom: 0 }}
                 onPress={() => {
-                  navigation.navigate("AddForm")
+                  navigation.navigate("AddForm", { getForms })
                 }}
               />
             </Flex>

@@ -9,12 +9,11 @@ import ModalQuestion from "../Shared/ModalQuestion"
 
 export default AddForm = ({ navigation, route }) => {
   const { host, token } = useContext(ApplicationContext)
+  const { getForms } = route.params
 
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
-  const [belonging_event_identifier, setBelonging_event_identifier] = useState("")
   const [version, setVersion] = useState("")
-  const [isTemplate, setIsTemplate] = useState(true)
   const [questions, setQuestions] = useState([])
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [showQuestionMaker, setShowQuestionMaker] = useState(false)
@@ -39,10 +38,8 @@ export default AddForm = ({ navigation, route }) => {
       body: JSON.stringify({
         name: name.trim(),
         description: description.trim(),
-        //        belonging_area: belonging_area.trim(),
-        //        belonging_place: belonging_place.trim(),
         belonging_event_identifier: "AAA",
-        version: Number(version),
+        version: version,
         questions: questions,
         isTemplate: true
       })
@@ -109,7 +106,8 @@ export default AddForm = ({ navigation, route }) => {
           onChangeText={setName}
           label="Nombre del formulario"
           maxLength={150}
-          autoComplete="off"
+          multiline={true}
+          numberOfLines={1}
         />
 
         <TextInput
@@ -120,7 +118,6 @@ export default AddForm = ({ navigation, route }) => {
           numberOfLines={3}
           label="Descripción del formulario"
           maxLength={500}
-          autoComplete="off"
         />
 
         <TextInput
@@ -129,7 +126,8 @@ export default AddForm = ({ navigation, route }) => {
           onChangeText={setVersion}
           label="Folio del formulario"
           maxLength={150}
-          autoComplete="off"
+          multiline={true}
+          numberOfLines={1}
         />
       </VStack>
     </VStack>
@@ -256,13 +254,13 @@ export default AddForm = ({ navigation, route }) => {
       />
       <ModalMessage
         title="¡Listo!"
-        description="La escuela ha sido añadida"
+        description="el formulario ha sido creado"
         handler={[modalSuccess, () => setModalSuccess(!modalSuccess)]}
         actions={[
           [
             "Aceptar",
             () => {
-              //getSchools()
+              getForms()
               navigation.pop()
             }
           ]
@@ -272,7 +270,7 @@ export default AddForm = ({ navigation, route }) => {
       />
       <ModalMessage
         title="Ocurrió un problema"
-        description={`No pudimos añadir la escuela, inténtalo más tarde. (${responseCode})`}
+        description={`No pudimos crear el formulario, inténtalo más tarde. (${responseCode})`}
         handler={[modalError, () => setModalError(!modalError)]}
         actions={[["Aceptar"]]}
         dismissable={true}

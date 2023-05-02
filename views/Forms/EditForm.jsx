@@ -17,9 +17,8 @@ export default EditForm = ({ navigation, route }) => {
 
   const [name, setName] = useState(`${form?.name ?? ""}`)
   const [description, setDescription] = useState(`${form?.description ?? ""}`)
-  const [version, setVersion] = useState(`${form?.version}`)
+  const [version, setVersion] = useState(`${form?.version ?? ""}`)
   const [questions, setQuestions] = useState(form.questions)
-  const [isTemplate, setIsTemplate] = useState(false)
 
   const QuestionType = [
     {
@@ -64,12 +63,15 @@ export default EditForm = ({ navigation, route }) => {
       body: JSON.stringify({
         name: name.trim(),
         description: description.trim(),
-        version: Number(version),
+        version: version,
         questions: questions,
         isTemplate: true
       })
     })
-      .then((response) => response.status)
+      .then(async (response) => {
+        console.log(await response.json())
+        return response.status
+      })
       .catch((error) => console.error("Error: ", error))
 
     setModalLoading(false)
@@ -85,6 +87,8 @@ export default EditForm = ({ navigation, route }) => {
   }
 
   async function deleteForm() {
+    setModalLoading(true)
+
     const request = await fetch(`${host}/forms/${form.form_identifier}`, {
       method: "DELETE",
       headers: {
@@ -101,7 +105,7 @@ export default EditForm = ({ navigation, route }) => {
       })
       .catch((error) => console.error("Error: ", error))
 
-    // console.log(request)
+    setModalLoading(false)
 
     if (request == 200) {
       setModalSuccessDelete(true)
@@ -162,7 +166,8 @@ export default EditForm = ({ navigation, route }) => {
           onChangeText={setName}
           label="Nombre del formulario"
           maxLength={150}
-          autoComplete="off"
+          multiline={true}
+          numberOfLines={1}
         />
 
         <TextInput
@@ -173,7 +178,6 @@ export default EditForm = ({ navigation, route }) => {
           numberOfLines={3}
           label="Descripción del formulario"
           maxLength={500}
-          autoComplete="off"
         />
 
         <TextInput
@@ -182,7 +186,8 @@ export default EditForm = ({ navigation, route }) => {
           onChangeText={setVersion}
           label="Folio del formulario"
           maxLength={150}
-          autoComplete="off"
+          multiline={true}
+          numberOfLines={1}
         />
       </VStack>
     </VStack>

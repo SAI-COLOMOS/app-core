@@ -93,7 +93,7 @@ export default FormDetails = ({ navigation, route }) => {
 
           <Flex>
             <Text variant="labelSmall">Folio del formulario</Text>
-            <Text variant="bodyMedium">{form?.version}</Text>
+            <Text variant="bodyMedium">{form?.version ?? "Sin folio"}</Text>
           </Flex>
         </VStack>
       </VStack>
