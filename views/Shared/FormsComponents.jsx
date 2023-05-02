@@ -204,7 +204,7 @@ const ScaleQuestion = ({ question, options, id, getter, setter }) => {
         }}
         tapToSeek={true}
       />
-      <Text variant="bodyMedium">{options[1] ? `Seleccionado: ${options[1]}` : "Sin selección"}</Text>
+      <Text variant="bodyMedium">{getter[id] ? `Seleccionado: ${getter[id]}` : "Sin selección"}</Text>
     </Flex>
   )
 
