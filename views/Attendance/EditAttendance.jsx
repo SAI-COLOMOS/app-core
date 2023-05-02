@@ -1,13 +1,12 @@
 import { Flex, VStack } from "@react-native-material/core"
 import { useContext, useEffect, useState } from "react"
 import { Button, Text, TextInput, useTheme } from "react-native-paper"
-import Constants from "expo-constants"
 import CreateForm from "../Shared/CreateForm"
 import ModalMessage from "../Shared/ModalMessage"
 import ApplicationContext from "../ApplicationContext"
 import Dropdown from "../Shared/Dropdown"
 
-export default EditSchool = ({ navigation, route }) => {
+export default EditAttendance = ({ navigation, route }) => {
   const theme = useTheme()
   const { host, token } = useContext(ApplicationContext)
   const { attendee, event_identifier, event_status, getEvent } = route.params
