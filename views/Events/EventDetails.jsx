@@ -366,16 +366,6 @@ export default EventDetails = ({ navigation, route }) => {
           Prestador: <ProviderOptions key="P" />
         }[user?.role]
       }
-      {/* 
-
-        {event?.author_register == user.register ? (
-          <Button
-            mode="contained"
-            onPress={() => navigation.navigate("ScanAttendance", { attendeeList: event?.attendance.attendee_list })}
-          >
-            Registrar asistencia
-          </Button>
-        ) :  */}
     </Flex>
   )
 
@@ -482,30 +472,6 @@ export default EventDetails = ({ navigation, route }) => {
         </Card>
       )}
 
-      {event?.attendance?.status == "En proceso" && (
-        <>
-          <Button
-            disabled={loadingFinish}
-            mode="outlined"
-            style={{ backgroundColor: theme.colors.background }}
-            icon="qrcode-scan"
-            onPress={() => navigation.navigate("ScanAttendance", { attendeeList: event?.attendance?.attendee_list, event_identifier: event_identifier })}
-          >
-            Registrar asistencia
-          </Button>
-
-          <Button
-            disabled={loadingFinish}
-            mode="outlined"
-            style={{ backgroundColor: theme.colors.background }}
-            icon="qrcode-scan"
-            onPress={() => navigation.navigate("ProximityReceptor", { event_identifier: event_identifier })}
-          >
-            Escanear dispositivos cercanos
-          </Button>
-        </>
-      )}
-
       {event?.attendance?.status == "En proceso" && new Date(event?.ending_date) <= new Date() && (
         <Button
           disabled={loadingFinish}
@@ -517,6 +483,45 @@ export default EventDetails = ({ navigation, route }) => {
           Concluir evento
         </Button>
       )}
+      <Card
+        key="Asistencia"
+        mode="outlined"
+      >
+        <Flex
+          p={20}
+          spacing={5}
+        >
+          <Text variant="titleMedium">Asistencia</Text>
+          <VStack
+            pt={20}
+            spacing={10}
+          >
+            {event?.attendance?.status == "En proceso" && (
+              <Button
+                disabled={loadingFinish}
+                mode="outlined"
+                style={{ backgroundColor: theme.colors.background }}
+                icon="qrcode-scan"
+                onPress={() => navigation.navigate("ScanAttendance", { attendeeList: event?.attendance?.attendee_list, event_identifier: event_identifier, getEvent })}
+              >
+                Registrar asistencia con QR
+              </Button>
+            )}
+
+            {event?.attendance?.status == "En proceso" && (
+              <Button
+                disabled={loadingFinish}
+                mode="outlined"
+                style={{ backgroundColor: theme.colors.background }}
+                icon="human-greeting-proximity"
+                onPress={() => navigation.navigate("ProximityReceptor", { event_identifier: event_identifier, getEvent })}
+              >
+                Registrar asistencia por proximidad
+              </Button>
+            )}
+          </VStack>
+        </Flex>
+      </Card>
 
       <Card
         key="Description"
@@ -645,20 +650,23 @@ export default EventDetails = ({ navigation, route }) => {
               </Flex>
               {status == "Inscrito" && (
                 <Button
+                  icon="qrcode-scan"
                   onPress={() => navigation.navigate("ShowAttendanceCode", { getEvent })}
                   mode="contained"
                 >
                   Tomar asistencia con QR
                 </Button>
               )}
-              {/* {status == "Inscrito" && ( */}
-              <Button
-                onPress={() => navigation.navigate("ProximityTransmisor", { getEvent, event_identifier: event_identifier })}
-                mode="contained"
-              >
-                Tomar asistencia por proximidad
-              </Button>
-              {/* )} */}
+
+              {status == "Inscrito" && (
+                <Button
+                  icon="human-greeting-proximity"
+                  onPress={() => navigation.navigate("ProximityTransmisor", { getEvent, event_identifier: event_identifier })}
+                  mode="contained"
+                >
+                  Tomar asistencia por proximidad
+                </Button>
+              )}
             </VStack>
           </Card>
         )}
