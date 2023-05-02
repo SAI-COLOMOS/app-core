@@ -20,7 +20,7 @@ export default CreateForm = ({ navigation, route, loading, title, children, acti
         }
       })
     }
-  }, [navigation, loading])
+  }, [navigation])
 
   return (
     <Flex

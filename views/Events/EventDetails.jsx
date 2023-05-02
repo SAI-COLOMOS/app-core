@@ -713,7 +713,7 @@ export default EventDetails = ({ navigation, route }) => {
               <Flex>
                 <Button
                   mode="outlined"
-                  onPress={(_) => {
+                  onPress={() => {
                     getEvent()
                   }}
                 >

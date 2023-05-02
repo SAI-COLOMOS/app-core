@@ -292,25 +292,25 @@ export default AddForm = ({ navigation, route }) => {
               <IconButton //Boton agregar respuesta
                 icon="database-plus-outline"
                 mode="contained"
-                // onPress={(_) => addAnswerOptions(questionIndex, newAnswerOption, setNewAnswerOption)}
-                onPress={(_) => addOption(newAnswerOption, setNewAnswerOption)}
+                // onPress={() => addAnswerOptions(questionIndex, newAnswerOption, setNewAnswerOption)}
+                onPress={() => addOption(newAnswerOption, setNewAnswerOption)}
               />
 
               <IconButton //Boton agregar pregunta
                 icon="plus"
                 mode="contained"
-                onPress={(_) => addQuestion(interrogation, setInterrogation, question_type, enum_options, setEnum_options)}
+                onPress={() => addQuestion(interrogation, setInterrogation, question_type, enum_options, setEnum_options)}
               />
               <IconButton //Boton modificar pregunta
                 icon="file-document-edit-outline"
                 mode="contained"
-                // onPress={(_) => changeQuestion(questionIndex, interrogation)}
+                // onPress={() => changeQuestion(questionIndex, interrogation)}
               />
               {questionIndex > 0 && (
                 <IconButton //Boton eliminar pregunta
                   icon="minus"
                   mode="contained"
-                  onPress={(_) => deleteQuestion(questionIndex)}
+                  onPress={() => deleteQuestion(questionIndex)}
                 />
               )}
             </Flex>
@@ -329,18 +329,18 @@ export default AddForm = ({ navigation, route }) => {
               <IconButton
                 icon="plus"
                 mode="contained"
-                onPress={(_) => addQuestion(interrogation, setInterrogation, question_type, enum_options, setEnum_options)}
+                onPress={() => addQuestion(interrogation, setInterrogation, question_type, enum_options, setEnum_options)}
               />
               <IconButton
                 icon="file-document-edit-outline"
                 mode="contained"
-                // onPress={(_) => changeQuestion(questionIndex)}
+                // onPress={() => changeQuestion(questionIndex)}
               />
               {questionIndex > 0 && (
                 <IconButton
                   icon="minus"
                   mode="contained"
-                  onPress={(_) => deleteQuestion(questionIndex)}
+                  onPress={() => deleteQuestion(questionIndex)}
                 />
               )}
             </Flex>

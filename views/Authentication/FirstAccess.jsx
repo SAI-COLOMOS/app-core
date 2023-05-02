@@ -230,7 +230,7 @@ export default FirstAccess = ({ navigation }) => {
                   right={
                     <TextInput.Icon
                       icon="eye"
-                      onPress={(_) => {
+                      onPress={() => {
                         setShowNewPassword(!showNewPassword)
                       }}
                     />
@@ -247,7 +247,7 @@ export default FirstAccess = ({ navigation }) => {
                   right={
                     <TextInput.Icon
                       icon="eye"
-                      onPress={(_) => {
+                      onPress={() => {
                         setShowConfirmationNewPassword(!showConfirmationNewPassword)
                       }}
                     />
@@ -267,7 +267,7 @@ export default FirstAccess = ({ navigation }) => {
               icon="logout"
               disabled={modalLoading}
               mode="outlined"
-              onPress={async (_) => {
+              onPress={async () => {
                 await SecureStore.deleteItemAsync("token")
                 setToken(null)
                 setRegister(null)

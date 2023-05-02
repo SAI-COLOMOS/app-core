@@ -42,7 +42,7 @@ export default EditAttendance = ({ navigation, route }) => {
         console.log(await response.json())
         return response.status
       })
-      .catch((_) => null)
+      .catch(() => null)
 
     setModalLoading(false)
 
@@ -74,7 +74,7 @@ export default EditAttendance = ({ navigation, route }) => {
         console.log(await response.json())
         return response.status
       })
-      .catch((_) => null)
+      .catch(() => null)
 
     setModalLoading(false)
 
@@ -148,7 +148,7 @@ export default EditAttendance = ({ navigation, route }) => {
       icon="close"
       disabled={modalLoading}
       mode="outlined"
-      onPress={(_) => {
+      onPress={() => {
         navigation.pop()
       }}
     >

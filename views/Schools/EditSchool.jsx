@@ -52,7 +52,7 @@ export default EditSchool = ({ navigation, route }) => {
       })
     })
       .then((response) => response.status)
-      .catch((_) => null)
+      .catch(() => null)
 
     setModalLoading(false)
 
@@ -78,7 +78,7 @@ export default EditSchool = ({ navigation, route }) => {
       }
     })
       .then((response) => response.status)
-      .catch((_) => null)
+      .catch(() => null)
 
     setModalLoading(false)
 
@@ -251,7 +251,7 @@ export default EditSchool = ({ navigation, route }) => {
       icon="close"
       disabled={modalLoading}
       mode="outlined"
-      onPress={(_) => {
+      onPress={() => {
         navigation.pop()
       }}
     >

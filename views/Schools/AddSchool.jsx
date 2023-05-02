@@ -46,7 +46,7 @@ export default AddSchool = ({ navigation, route }) => {
       })
     })
       .then((response) => response.status)
-      .catch((_) => null)
+      .catch(() => null)
 
     setModalLoading(false)
 
@@ -198,7 +198,7 @@ export default AddSchool = ({ navigation, route }) => {
       icon="close"
       disabled={modalLoading}
       mode="outlined"
-      onPress={(_) => {
+      onPress={() => {
         navigation.pop()
       }}
     >

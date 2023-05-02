@@ -169,7 +169,7 @@ export default FormDetails = ({ navigation, route }) => {
         refreshControl={
           <RefreshControl
             refreshing={loading}
-            onRefresh={(_) => getForm()}
+            onRefresh={() => getForm()}
           />
         }
       > */}
@@ -204,7 +204,7 @@ export default FormDetails = ({ navigation, route }) => {
               <Flex>
                 <Button
                   mode="outlined"
-                  onPress={(_) => {
+                  onPress={() => {
                     getForm()
                   }}
                 >
@@ -236,7 +236,7 @@ export default FormDetails = ({ navigation, route }) => {
             <Flex>
               <Button
                 mode="outlined"
-                onPress={(_) => {
+                onPress={() => {
                   getForm()
                 }}
               >

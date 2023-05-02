@@ -250,7 +250,7 @@ export default ApplySurvey = ({ navigation, route }) => {
             <Flex>
               <Button
                 mode="outlined"
-                onPress={(_) => {
+                onPress={() => {
                   getForm()
                 }}
               >
