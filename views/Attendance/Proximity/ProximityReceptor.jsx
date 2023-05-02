@@ -14,7 +14,7 @@ import { useKeepAwake } from "expo-keep-awake"
 
 export default ProximityReceptor = ({ navigation, route }) => {
   const theme = useTheme()
-  const { event_identifier } = route.params
+  const { event_identifier, getEvent } = route.params
   const { user, host, token } = useContext(ApplicationContext)
   useKeepAwake()
 
@@ -87,7 +87,6 @@ export default ProximityReceptor = ({ navigation, route }) => {
         watcher = await Location.watchPositionAsync(
           {
             accuracy: Location.Accuracy.BestForNavigation,
-            distanceInterval: 5,
             timeInterval: 2000
           },
           async ({ coords }) => {
@@ -140,7 +139,7 @@ export default ProximityReceptor = ({ navigation, route }) => {
             color={theme.colors.onBackground}
           />
           <Flex fill>
-            <Text variant="bodySmall">Al mantén esta pantalla activa, estarás actualizando la ubicación permitida para la toma de asistencia</Text>
+            <Text variant="bodySmall">Al mantener esta pantalla activa, estarás actualizando la ubicación permitida para la toma de asistencia</Text>
           </Flex>
         </HStack>
       </VStack>
@@ -180,7 +179,10 @@ export default ProximityReceptor = ({ navigation, route }) => {
       key="Close"
       icon="close"
       mode="contained"
-      onPress={() => navigation.pop()}
+      onPress={() => {
+        getEvent()
+        navigation.pop()
+      }}
     >
       Cerrar
     </Button>

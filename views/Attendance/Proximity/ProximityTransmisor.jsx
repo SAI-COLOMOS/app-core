@@ -103,8 +103,7 @@ export default ProximityTransmisor = ({ navigation, route }) => {
         watcher = await Location.watchPositionAsync(
           {
             accuracy: Location.Accuracy.BestForNavigation,
-            distanceInterval: 5,
-            timeInterval: 2000
+            timeInterval: 5000
           },
           async ({ coords }) => {
             setAccuracy(coords.accuracy)
@@ -245,7 +244,10 @@ export default ProximityTransmisor = ({ navigation, route }) => {
       key="Close"
       icon="close"
       mode="contained"
-      onPress={() => navigation.pop()}
+      onPress={() => {
+        getEvent()
+        navigation.pop()
+      }}
     >
       Cerrar
     </Button>
