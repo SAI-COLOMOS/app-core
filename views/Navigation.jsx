@@ -43,12 +43,11 @@ import UserDetails, { CardProvider } from "./Users/UserDetails"
 import EditUser from "./Users/EditUser"
 
 // Attendance
-import AttendanceDetails from "./Attendance/AttendanceDetails"
-import TakeAttendance from "./Attendance/TakeAttendance"
-import ScanAttendance from "./Attendance/ScanAttendance"
-import AttendanceProximityClient from "./Attendance/AttendanceProximityClient"
-import ShowAttendanceCode from "./Attendance/ShowAttendanceCode"
 import EditAttendance from "./Attendance/EditAttendance"
+import ScanAttendance from "./Attendance/QR/ScanAttendance"
+import ShowAttendanceCode from "./Attendance/QR/ShowAttendanceCode"
+import ProximityReceptor from "./Attendance/Proximity/ProximityReceptor"
+import ProximityTransmisor from "./Attendance/Proximity/ProximityTransmisor"
 
 // Cards
 import Cards from "./Cards/Cards"
@@ -69,8 +68,6 @@ import SurveyResume from "./Surveys/SurveyResume"
 import AddSurvey from "./Surveys/AddSurvey"
 import SurveyAnswers from "./Surveys/SurveyAnswers"
 import DownloadSurvey from "./Surveys/DownloadSurvey"
-import ProximityReceptor from "./Attendance/Proximity/ProximityReceptor"
-import ProximityTransmisor from "./Attendance/Proximity/ProximityTransmisor"
 
 export default Navigation = () => {
   const Stack = createNativeStackNavigator()
@@ -284,26 +281,13 @@ export default Navigation = () => {
               screenOptions={{ headerShown: true, animationTypeForReplace: "push", animation: "fade_from_bottom" }}
             >
               <Stack.Screen
-                name="AttendanceDetails"
-                component={AttendanceDetails}
-              />
-              <Stack.Screen
                 name="EditAttendance"
                 component={EditAttendance}
                 options={{ headerShown: false, presentation: "containedTransparentModal" }}
               />
               <Stack.Screen
-                name="TakeAttendance"
-                component={TakeAttendance}
-              />
-              <Stack.Screen
                 name="ScanAttendance"
                 component={ScanAttendance}
-                options={{ headerShown: false, presentation: "containedTransparentModal" }}
-              />
-              <Stack.Screen
-                name="AttendanceProximityClient"
-                component={AttendanceProximityClient}
                 options={{ headerShown: false, presentation: "containedTransparentModal" }}
               />
               <Stack.Screen

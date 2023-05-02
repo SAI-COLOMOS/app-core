@@ -1,11 +1,10 @@
-import { Flex, HStack, VStack } from "@react-native-material/core"
+import { Flex } from "@react-native-material/core"
 import { useCallback, useContext, useEffect, useState } from "react"
-import { Image, KeyboardAvoidingView, Pressable, ScrollView, useWindowDimensions } from "react-native"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { Avatar, Button, Text, useTheme } from "react-native-paper"
+import { Image } from "react-native"
+import { Button, Text, useTheme } from "react-native-paper"
 import Code from "react-native-qrcode-svg"
-import CreateForm from "../Shared/CreateForm"
-import ApplicationContext from "../ApplicationContext"
+import CreateForm from "../../Shared/CreateForm"
+import ApplicationContext from "../../ApplicationContext"
 import * as Brightness from "expo-brightness"
 import { useKeepAwake } from "expo-keep-awake"
 
@@ -71,6 +70,7 @@ export default ShowAttendanceCode = ({ navigation, route }) => {
   const ExitButton = useCallback(
     () => (
       <Button
+        key="Exit"
         mode="contained"
         icon="close"
         onPress={async () => {
@@ -85,26 +85,13 @@ export default ShowAttendanceCode = ({ navigation, route }) => {
     [actualBright]
   )
 
-  const ProximityModeButton = useCallback(
-    () => (
-      <Button
-        mode="outlined"
-        disabled={true}
-        icon="human-greeting-proximity"
-      >
-        Tomar por proximidad
-      </Button>
-    ),
-    []
-  )
-
   return (
     <Flex fill>
       <CreateForm
         title="Tomar asistencia"
         loading={false}
         children={[QR(), Register()]}
-        actions={[<ExitButton key="Exit" />, <ProximityModeButton key="ProximityMode" />]}
+        actions={[ExitButton()]}
         navigation={navigation}
       />
     </Flex>
