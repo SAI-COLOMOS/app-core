@@ -17,7 +17,6 @@ export default ApplySurvey = ({ navigation, route }) => {
   const [answers, setAnswers] = useState({})
   const [loading, setLoading] = useState(false)
   const [survey, setSurvey] = useState(undefined)
-  const [isTemplate, setIsTemplate] = useState(false)
 
   async function getForm() {
     setLoading(true)
@@ -187,10 +186,12 @@ export default ApplySurvey = ({ navigation, route }) => {
       fill
       pt={headerMargin - 20}
     >
-      {survey !== undefined ? (
-        survey !== null ? (
+      {survey !== undefined &&
+        (survey !== null ? (
           isNaN(survey) ? (
             <DisplayDetails
+              refreshAction={() => getForm()}
+              refreshStatus={loading}
               showHeader={false}
               title={survey?.name}
               children={[Info(), Questions(), Buttons()]}
@@ -258,8 +259,7 @@ export default ApplySurvey = ({ navigation, route }) => {
               </Button>
             </Flex>
           </VStack>
-        )
-      ) : null}
+        ))}
     </Flex>
   )
 }

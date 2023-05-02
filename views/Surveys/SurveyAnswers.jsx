@@ -6,6 +6,7 @@ import ApplicationContext from "../ApplicationContext"
 import { useHeaderHeight } from "@react-navigation/elements"
 import Header from "../Shared/Header"
 import Dropdown from "../Shared/Dropdown"
+import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 
 export default SurveyAnswers = ({ navigation, route }) => {
   const theme = useTheme()
@@ -15,11 +16,12 @@ export default SurveyAnswers = ({ navigation, route }) => {
 
   const [survey, setSurvey] = useState(undefined)
   const [loading, setLoading] = useState(false)
-  const [statusCode, setStatusCode] = useState("")
+  const [statusCode, setStatusCode] = useState(null)
 
   async function getSurvey() {
     try {
       setLoading(true)
+      setStatusCode(null)
 
       const request = await fetch(`${host}/surveys/${survey_identifier}`, {
         method: "GET",
@@ -41,6 +43,8 @@ export default SurveyAnswers = ({ navigation, route }) => {
       return
     } catch (error) {
       console.error("Get survey:", error)
+      setSurvey(null)
+      setLoading(false)
       return
     }
   }
@@ -127,14 +131,11 @@ export default SurveyAnswers = ({ navigation, route }) => {
                       id={index.toString()}
                       title={`Encuesta #${index + 1}`} //{survey?.questions?.find((question) => question.question_identifier == answer.question_referenced)?.interrogation}
                       style={{ backgroundColor: theme.colors.elevation.level5 }}
-                      //style={{ borderColor: theme.colors.onSurface, borderWidth: 0.5 }}
                     >
                       <VStack
                         spacing={10}
                         p={20}
-                        // mt={-10}
                         style={{ backgroundColor: theme.colors.elevation.level2, borderBottomLeftRadius: 10, borderBottomRightRadius: 10 }}
-                        //style={{ borderRadius: 10, borderColor: theme.colors.onSurface, borderWidth: 0.5, zIndex: -1 }}
                       >
                         {survey?.questions.map((question) => (
                           <Flex
@@ -142,7 +143,7 @@ export default SurveyAnswers = ({ navigation, route }) => {
                             fill
                           >
                             <Text variant="labelMedium">{question?.interrogation}</Text>
-                            <Text variant="bodyLarge">{survey?.answers.find((answer) => answer.question_referenced == question?.question_identifier)?.answer[index]}</Text>
+                            <Text variant="bodyLarge">{survey?.answers.find((answer) => answer.question_referenced == question?.question_identifier)?.answer[index] ?? "Sin respuesta"}</Text>
                           </Flex>
                         ))}
                       </VStack>
@@ -161,12 +162,79 @@ export default SurveyAnswers = ({ navigation, route }) => {
       fill
       pt={headerMargin - 20}
     >
-      <DisplayDetails
-        showHeader={false}
-        refreshStatus={loading}
-        refreshAction={() => getSurvey()}
-        children={[Info(), Responses()]}
-      />
+      {survey !== undefined &&
+        (survey !== null ? (
+          statusCode === null ? (
+            <DisplayDetails
+              showHeader={false}
+              refreshStatus={loading}
+              refreshAction={() => getSurvey()}
+              children={[Info(), Responses()]}
+            />
+          ) : (
+            <VStack
+              p={30}
+              center
+              spacing={20}
+            >
+              <Icon
+                color={theme.colors.onBackground}
+                name="alert-circle-outline"
+                size={50}
+              />
+              <VStack center>
+                <Text variant="headlineSmall">Ocurrió un problema</Text>
+                <Text
+                  variant="bodyMedium"
+                  style={{ textAlign: "center" }}
+                >
+                  No podemos recuperar los datos de la encuesta, inténtalo de nuevo más tarde (Error: {statusCode})
+                </Text>
+              </VStack>
+              <Flex>
+                <Button
+                  mode="outlined"
+                  onPress={() => {
+                    getSurvey()
+                  }}
+                >
+                  Volver a intentar
+                </Button>
+              </Flex>
+            </VStack>
+          )
+        ) : (
+          <VStack
+            center
+            spacing={20}
+            p={30}
+          >
+            <Icon
+              color={theme.colors.onBackground}
+              name="wifi-alert"
+              size={50}
+            />
+            <VStack center>
+              <Text variant="headlineSmall">Sin internet</Text>
+              <Text
+                variant="bodyMedium"
+                style={{ textAlign: "center" }}
+              >
+                No podemos recuperar los datos de la encuesta, revisa tu conexión a internet e inténtalo de nuevo
+              </Text>
+            </VStack>
+            <Flex>
+              <Button
+                mode="outlined"
+                onPress={() => {
+                  getSurvey()
+                }}
+              >
+                Volver a intentar
+              </Button>
+            </Flex>
+          </VStack>
+        ))}
     </Flex>
   )
 }
