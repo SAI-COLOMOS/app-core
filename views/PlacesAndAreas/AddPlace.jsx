@@ -132,7 +132,6 @@ export default AddPlace = ({ navigation, route }) => {
           mode="outlined"
           value={municipality}
           onChangeText={setMunicipality}
-          autoCapitalize="words"
           label="Municipio"
           maxLength={150}
           multiline={true}
