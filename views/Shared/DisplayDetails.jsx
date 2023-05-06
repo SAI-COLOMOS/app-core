@@ -1,5 +1,6 @@
 import { Flex, VStack } from "@react-native-material/core"
-import { Image, KeyboardAvoidingView, RefreshControl, ScrollView, useWindowDimensions } from "react-native"
+import { KeyboardAvoidingView, RefreshControl, ScrollView, useWindowDimensions } from "react-native"
+import { Image } from "expo-image"
 import { Avatar, Card, Text, useTheme } from "react-native-paper"
 import { LinearGradient } from "expo-linear-gradient"
 import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated"
@@ -37,6 +38,7 @@ export default SchoolDetails = ({ icon, image, title, children, actions, avatar,
               <Image
                 source={{ uri: `data:image/png;base64,${avatar}` }}
                 style={{ width: "100%", height: "100%" }}
+                cachePolicy="memory-disk"
                 blurRadius={5}
               />
               <LinearGradient
@@ -56,7 +58,8 @@ export default SchoolDetails = ({ icon, image, title, children, actions, avatar,
             >
               <Image
                 source={{ uri: `data:image/png;base64,${image}` }}
-                resizeMode="cover"
+                contentFit="cover"
+                cachePolicy="memory-disk"
                 style={{ width: "100%", height: "100%" }}
               />
               <LinearGradient

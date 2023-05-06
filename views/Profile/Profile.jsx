@@ -1,16 +1,10 @@
 import { Flex, VStack } from "@react-native-material/core"
-import { useState, useEffect, useCallback, useContext } from "react"
-import { Button, Card, IconButton, Text, TextInput, useTheme } from "react-native-paper"
+import { useEffect, useContext } from "react"
+import { Button, Card, IconButton, Text, useTheme } from "react-native-paper"
 import { useHeaderHeight } from "@react-navigation/elements"
 import Header from "../Shared/Header"
 import * as SecureStore from "expo-secure-store"
-import { FlatList, Image, RefreshControl, ScrollView } from "react-native"
-import { LinearGradient } from "expo-linear-gradient"
-import Constants from "expo-constants"
 import DisplayDetails from "../Shared/DisplayDetails"
-import { useFocusEffect } from "@react-navigation/native"
-import * as ImagePicker from "expo-image-picker"
-import { manipulateAsync, FlipType, SaveFormat } from "expo-image-manipulator"
 import ApplicationContext from "../ApplicationContext"
 
 export default Profile = ({ navigation, route }) => {

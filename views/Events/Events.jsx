@@ -3,7 +3,8 @@ import { useCallback, useContext, useEffect, useState } from "react"
 import { Card, IconButton, TouchableRipple, Text, useTheme, Avatar, FAB, ActivityIndicator, Tooltip } from "react-native-paper"
 import { useHeaderHeight } from "@react-navigation/elements"
 import Header from "../Shared/Header"
-import { FlatList, Image } from "react-native"
+import { FlatList } from "react-native"
+import { Image } from "expo-image"
 import SearchBar from "../Shared/SearchBar"
 import ModalFilters from "../Shared/ModalFilters"
 import Dropdown from "../Shared/Dropdown"
@@ -193,7 +194,8 @@ export default Users = ({ navigation }) => {
             >
               <Image
                 source={avatar !== null ? { uri: `data:image/png;base64,${avatar}` } : require("../../assets/images/stocks/events.jpg")}
-                resizeMode="cover"
+                contentFit="cover"
+                cachePolicy="memory-disk"
                 onLoadEnd={() => setLoadingDone(true)}
                 style={{ height: 175, width: "100%" }}
               />

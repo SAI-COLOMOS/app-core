@@ -6,7 +6,7 @@ import Header from "../Shared/Header"
 import { FlatList, Pressable } from "react-native"
 import SearchBar from "../Shared/SearchBar"
 import InformationMessage from "../Shared/InformationMessage"
-import { Image } from "react-native"
+import { Image } from "expo-image"
 import ApplicationContext from "../ApplicationContext"
 import CacheContext from "../Contexts/CacheContext"
 
@@ -137,7 +137,8 @@ export default PlaceAndAreas = ({ navigation, route }) => {
             >
               <Image
                 source={avatar !== null ? { uri: `data:image/png;base64,${avatar}` } : require("../../assets/images/stocks/place.jpg")}
-                resizeMode="cover"
+                contentFit="cover"
+                cachePolicy="memory-disk"
                 onLoadEnd={() => setLoadingDone(true)}
                 style={{ height: 175, width: "100%" }}
               />

@@ -1,11 +1,9 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
 import { useCallback, useContext, useEffect, useState } from "react"
-import { Card, IconButton, TouchableRipple, Text, TextInput, useTheme, Avatar, FAB } from "react-native-paper"
+import { Card, IconButton, TouchableRipple, Text, TextInput, useTheme, FAB } from "react-native-paper"
 import { useHeaderHeight } from "@react-navigation/elements"
 import Header from "../Shared/Header"
-import Constants from "expo-constants"
-import { FlatList, Image, Pressable } from "react-native"
-import { useFocusEffect } from "@react-navigation/native"
+import { FlatList } from "react-native"
 import SearchBar from "../Shared/SearchBar"
 import ModalFilters from "../Shared/ModalFilters"
 import Dropdown from "../Shared/Dropdown"
@@ -21,7 +19,6 @@ export default Users = ({ navigation, route }) => {
   const theme = useTheme()
 
   const [loading, setLoading] = useState(false)
-  //const [users, setUsers] = useState(undefined)
   const [foundUsers, setFoundUsers] = useState(undefined)
   const [search, setSearch] = useState("")
   const [showSearch, setShowSearch] = useState(null)

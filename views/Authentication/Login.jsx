@@ -1,6 +1,7 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
 import { createContext, useContext, useEffect, useState } from "react"
-import { Image, Pressable, ScrollView } from "react-native"
+import { Pressable, ScrollView } from "react-native"
+import { Image } from "expo-image"
 import { Button, Card, Text, TextInput, Checkbox, ActivityIndicator, useTheme, Switch } from "react-native-paper"
 import * as SecureStore from "expo-secure-store"
 import jwtDecode from "jwt-decode"
@@ -201,6 +202,7 @@ export default Login = ({ navigation }) => {
               <Image
                 source={require("../../assets/logo.png")}
                 style={{ width: 150, height: 150 }}
+                cachePolicy="memory-disk"
               />
             </Flex>
 

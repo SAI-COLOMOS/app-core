@@ -3,7 +3,8 @@ import { useState, useEffect, useCallback, useMemo, useContext } from "react"
 import * as SecureStore from "expo-secure-store"
 import { Button, Card, Text, useTheme, Avatar, TouchableRipple } from "react-native-paper"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { Image, RefreshControl, ScrollView } from "react-native"
+import { RefreshControl, ScrollView } from "react-native"
+import { Image } from "expo-image"
 import { LinearGradient } from "expo-linear-gradient"
 import { useFocusEffect } from "@react-navigation/native"
 import CircularProgress from "react-native-circular-progress-indicator"
@@ -187,7 +188,8 @@ export default Dashboard = ({ navigation }) => {
               >
                 <Image
                   source={require("../../assets/images/stocks/events.jpg")}
-                  resizeMode="cover"
+                  contentFit="cover"
+                  cachePolicy="memory-disk"
                   style={{ height: "100%", width: "100%" }}
                 />
                 <Flex
@@ -240,30 +242,35 @@ export default Dashboard = ({ navigation }) => {
                 <Image
                   source={require("../../assets/images/cover/1.jpg")}
                   style={{ width: "100%", height: "100%" }}
+                  cachePolicy="memory-disk"
                 />
               ),
               1: (
                 <Image
                   source={require("../../assets/images/cover/2.jpg")}
                   style={{ width: "100%", height: "100%" }}
+                  cachePolicy="memory-disk"
                 />
               ),
               2: (
                 <Image
                   source={require("../../assets/images/cover/3.jpg")}
                   style={{ width: "100%", height: "100%" }}
+                  cachePolicy="memory-disk"
                 />
               ),
               3: (
                 <Image
                   source={require("../../assets/images/cover/4.jpg")}
                   style={{ width: "100%", height: "100%" }}
+                  cachePolicy="memory-disk"
                 />
               ),
               4: (
                 <Image
                   source={require("../../assets/images/cover/5.jpg")}
                   style={{ width: "100%", height: "100%" }}
+                  cachePolicy="memory-disk"
                 />
               )
             }[selectedImage]
