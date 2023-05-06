@@ -35,7 +35,7 @@ export default Login = ({ navigation }) => {
 
   async function rememberUserHandler() {
     if (useBiometric == true && rememberUser == true) {
-      const result = await LocalAuthentication.authenticateAsync()
+      const result = await LocalAuthentication.authenticateAsync({ promptMessage: "Desbloquea para continuar" })
 
       if (result.success == true) {
         setUseBiometric(!useBiometric)
