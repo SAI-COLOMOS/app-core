@@ -87,7 +87,7 @@ export default FormDetails = ({ navigation, route }) => {
         <Text variant="titleMedium">Datos del formulario</Text>
         <VStack spacing={10}>
           <Flex>
-            <Text variant="labelSmall">Descripción del evento</Text>
+            <Text variant="labelSmall">Descripción del formulario</Text>
             <Text variant="bodyMedium">{form?.description}</Text>
           </Flex>
 

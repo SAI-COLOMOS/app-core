@@ -88,17 +88,17 @@ export default SurveyAnswers = ({ navigation, route }) => {
         <Text variant="titleMedium">Datos de la encuesta</Text>
         <VStack spacing={10}>
           <Flex>
-            <Text variant="labelSmall">Nombre</Text>
+            <Text variant="labelSmall">Nombre de la encuesta</Text>
             <Text variant="bodyMedium">{survey?.name ?? "Sin nombre"}</Text>
           </Flex>
 
           <Flex>
-            <Text variant="labelSmall">Descripción</Text>
+            <Text variant="labelSmall">Descripción de la encuesta</Text>
             <Text variant="bodyMedium">{survey?.description ?? "Sin descripción"}</Text>
           </Flex>
 
           <Flex>
-            <Text variant="labelSmall">Folio</Text>
+            <Text variant="labelSmall">Folio de la encuesta</Text>
             <Text variant="bodyMedium">{survey?.version ?? "Sin versión"}</Text>
           </Flex>
         </VStack>
