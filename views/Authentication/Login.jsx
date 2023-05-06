@@ -20,6 +20,7 @@ export default Login = ({ navigation }) => {
 
   const [credential, setCredential] = useState("")
   const [password, setPassword] = useState("")
+  const [isValid, setIsValid] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [rememberUser, setRememberUser] = useState(false)
   const [useBiometric, setUseBiometric] = useState(false)
@@ -82,18 +83,6 @@ export default Login = ({ navigation }) => {
 
         setToken(response.token)
         setRegister(payload.register)
-
-        // if (useBiometric == true) {
-        //   const result = await LocalAuthentication.authenticateAsync({
-        //     promptMessage: "Desbloquea para acceder"
-        //   })
-
-        //   if (result.success == true) {
-        //     await SecureStore.setItemAsync("useBiometric", "true")
-        //   } else {
-        //     return
-        //   }
-        // }
 
         if (rememberUser == true) {
           await SecureStore.setItemAsync("token", response.token)
@@ -174,6 +163,15 @@ export default Login = ({ navigation }) => {
       getActualSession()
     }
   }, [activeSession])
+
+  useEffect(() => {
+    let valid = true
+
+    credential != "" ? (valid = true) : (valid = false)
+    password != "" && password?.length >= 8 ? (valid = true) : (valid = false)
+
+    setIsValid(valid)
+  }, [credential, password])
 
   return (
     <Flex
@@ -261,7 +259,7 @@ export default Login = ({ navigation }) => {
 
             <VStack spacing={20}>
               <Button
-                disabled={modalLoading}
+                disabled={modalLoading || !isValid}
                 loading={modalLoading}
                 icon="login-variant"
                 mode="contained"
