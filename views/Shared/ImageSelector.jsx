@@ -3,7 +3,7 @@ import { Button, Card, Text, TouchableRipple, useTheme } from "react-native-pape
 import * as ImagePicker from "expo-image-picker"
 import { manipulateAsync } from "expo-image-manipulator"
 import { Flex, HStack, VStack } from "@react-native-material/core"
-import { Image } from "react-native"
+import { Image } from "expo-image"
 import ProfileImage from "./ProfileImage"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 
@@ -61,7 +61,8 @@ export default ImageSelector = ({ value, setter, type }) => {
                 rectangular: (
                   <Image
                     source={{ uri: `data:image/png;base64,${value}` }}
-                    resizeMode="cover"
+                    contentFit="cover"
+                    cachePolicy="memory-disk"
                     style={{ height: 200, width: "100%", borderRadius: 10 }}
                   />
                 )

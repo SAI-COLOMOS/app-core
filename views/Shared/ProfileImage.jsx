@@ -1,5 +1,5 @@
 import { Flex } from "@react-native-material/core"
-import { Image } from "react-native"
+import { Image } from "expo-image"
 import { ActivityIndicator, useTheme } from "react-native-paper"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 
@@ -15,8 +15,9 @@ export default ProfileImage = ({ image, icon, height, width, loading }) => {
     >
       {image ? (
         <Image
+          cachePolicy="memory-disk"
           source={{ uri: `data:image/png;base64,${image}` }}
-          resizeMode="cover"
+          contentFit="cover"
           style={{ height: "100%", width: "100%" }}
         />
       ) : (

@@ -1,6 +1,6 @@
 import { Flex } from "@react-native-material/core"
 import { useCallback, useContext, useEffect, useState } from "react"
-import { Image } from "react-native"
+import { Image } from "expo-image"
 import { Button, Text, useTheme } from "react-native-paper"
 import Code from "react-native-qrcode-svg"
 import CreateForm from "../../Shared/CreateForm"
@@ -43,6 +43,7 @@ export default ShowAttendanceCode = ({ navigation, route }) => {
             source={{ uri: `data:image/png;base64,${user?.avatar}` }}
             style={{ width: "100%", height: "100%", position: "absolute" }}
             blurRadius={5}
+            cachePolicy="memory-disk"
           />
         ) : null}
         <Code

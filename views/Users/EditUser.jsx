@@ -327,7 +327,6 @@ export default EditUser = ({ navigation, route }) => {
           maxLength={150}
           multiline={true}
           numberOfLines={1}
-          autoCapitalize="words"
         />
         <TextInput
           mode="outlined"
@@ -337,7 +336,6 @@ export default EditUser = ({ navigation, route }) => {
           maxLength={150}
           multiline={true}
           numberOfLines={1}
-          autoCapitalize="words"
         />
         <TextInput
           mode="outlined"
@@ -347,7 +345,6 @@ export default EditUser = ({ navigation, route }) => {
           maxLength={150}
           multiline={true}
           numberOfLines={1}
-          autoCapitalize="words"
         />
         <TextInput
           mode="outlined"

@@ -9,7 +9,7 @@ import * as SplashScreen from "expo-splash-screen"
 import Navigation from "./views/Navigation"
 import { LogBox } from "react-native"
 
-import { darkTheme, lightTheme } from "./assets/themes/themeGreen"
+import { darkTheme, lightTheme } from "./assets/themes/themes"
 
 SplashScreen.preventAutoHideAsync()
 

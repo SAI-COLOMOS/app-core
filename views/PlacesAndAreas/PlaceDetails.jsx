@@ -128,7 +128,7 @@ export default PlaceDetails = ({ navigation, route }) => {
           <InformationMessage
             icon="tree-outline"
             title="Sin áreas"
-            description="Todavía no hay áreas registradas, ¿quieres agregar a alguna?"
+            description="Todavía no hay áreas registradas, ¿quieres agregar alguna?"
           />
         )}
         <Flex ph={20}>

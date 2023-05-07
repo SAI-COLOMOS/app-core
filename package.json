@@ -48,7 +48,8 @@
     "expo-notifications": "~0.18.1",
     "expo-sharing": "~11.2.2",
     "expo-file-system": "~15.2.2",
-    "expo-local-authentication": "~13.3.0"
+    "expo-local-authentication": "~13.3.0",
+    "expo-image": "~1.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

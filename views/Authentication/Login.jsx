@@ -1,6 +1,7 @@
 import { Flex, HStack, VStack } from "@react-native-material/core"
 import { createContext, useContext, useEffect, useState } from "react"
-import { Image, Pressable, ScrollView } from "react-native"
+import { Pressable, ScrollView } from "react-native"
+import { Image } from "expo-image"
 import { Button, Card, Text, TextInput, Checkbox, ActivityIndicator, useTheme, Switch } from "react-native-paper"
 import * as SecureStore from "expo-secure-store"
 import jwtDecode from "jwt-decode"
@@ -19,6 +20,7 @@ export default Login = ({ navigation }) => {
 
   const [credential, setCredential] = useState("")
   const [password, setPassword] = useState("")
+  const [isValid, setIsValid] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [rememberUser, setRememberUser] = useState(false)
   const [useBiometric, setUseBiometric] = useState(false)
@@ -33,7 +35,7 @@ export default Login = ({ navigation }) => {
 
   async function rememberUserHandler() {
     if (useBiometric == true && rememberUser == true) {
-      const result = await LocalAuthentication.authenticateAsync()
+      const result = await LocalAuthentication.authenticateAsync({ promptMessage: "Desbloquea para continuar" })
 
       if (result.success == true) {
         setUseBiometric(!useBiometric)
@@ -81,18 +83,6 @@ export default Login = ({ navigation }) => {
 
         setToken(response.token)
         setRegister(payload.register)
-
-        // if (useBiometric == true) {
-        //   const result = await LocalAuthentication.authenticateAsync({
-        //     promptMessage: "Desbloquea para acceder"
-        //   })
-
-        //   if (result.success == true) {
-        //     await SecureStore.setItemAsync("useBiometric", "true")
-        //   } else {
-        //     return
-        //   }
-        // }
 
         if (rememberUser == true) {
           await SecureStore.setItemAsync("token", response.token)
@@ -174,6 +164,15 @@ export default Login = ({ navigation }) => {
     }
   }, [activeSession])
 
+  useEffect(() => {
+    let valid = true
+
+    credential != "" ? (valid = true) : (valid = false)
+    password != "" && password?.length >= 8 ? (valid = true) : (valid = false)
+
+    setIsValid(valid)
+  }, [credential, password])
+
   return (
     <Flex
       fill
@@ -201,6 +200,7 @@ export default Login = ({ navigation }) => {
               <Image
                 source={require("../../assets/logo.png")}
                 style={{ width: 150, height: 150 }}
+                cachePolicy="memory-disk"
               />
             </Flex>
 
@@ -259,7 +259,7 @@ export default Login = ({ navigation }) => {
 
             <VStack spacing={20}>
               <Button
-                disabled={modalLoading}
+                disabled={modalLoading || !isValid}
                 loading={modalLoading}
                 icon="login-variant"
                 mode="contained"
