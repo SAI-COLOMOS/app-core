@@ -6,11 +6,13 @@ import Header from "../Shared/Header"
 import * as SecureStore from "expo-secure-store"
 import DisplayDetails from "../Shared/DisplayDetails"
 import ApplicationContext from "../ApplicationContext"
+import CacheContext from "../Contexts/CacheContext"
 
 export default Profile = ({ navigation, route }) => {
   const theme = useTheme()
   const headerMargin = useHeaderHeight()
   const { user, token } = useContext(ApplicationContext)
+  const { clearCache } = useContext(CacheContext)
 
   useEffect(() => {
     navigation.setOptions({
@@ -33,6 +35,7 @@ export default Profile = ({ navigation, route }) => {
         await SecureStore.deleteItemAsync("user")
         await SecureStore.deleteItemAsync("keepAlive")
         await SecureStore.deleteItemAsync("useBiometric")
+        clearCache()
         navigation.replace("Login")
       }}
     />

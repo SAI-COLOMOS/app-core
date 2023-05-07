@@ -13,9 +13,11 @@ import InformationMessage from "../Shared/InformationMessage"
 import { GetCompactMonth, GetDay, GetMoment, Time24 } from "../Shared/LocaleDate"
 import ApplicationContext from "../ApplicationContext"
 import ProfileImage from "../Shared/ProfileImage"
+import CacheContext from "../Contexts/CacheContext"
 
 export default Dashboard = ({ navigation }) => {
   const { host, user, setUser, token, setToken, register, setRegister, achieved_hours, setAchieved_hours } = useContext(ApplicationContext)
+  const { clearCache } = useContext(CacheContext)
   const insets = useSafeAreaInsets()
   const theme = useTheme()
   const selectedImage = useMemo(() => Math.floor(Math.random() * 4), [])
@@ -731,7 +733,7 @@ export default Dashboard = ({ navigation }) => {
                     await SecureStore.deleteItemAsync("token")
                     await SecureStore.deleteItemAsync("user")
                     await SecureStore.deleteItemAsync("keepAlive")
-                    navigation.popToTop()
+                    clearCache()
                     navigation.replace("Login")
                   }}
                 >

@@ -47,6 +47,16 @@ const CacheProvider = ({ children }) => {
     get()
   }, [])
 
+  function clearCache() {
+    setActivities(undefined)
+    setAttendees(undefined)
+    setEvents(undefined)
+    setPlaces(undefined)
+    setProfiles(undefined)
+    setSchools(undefined)
+    setUsers(undefined)
+  }
+
   const props = {
     users,
     setUsers,
