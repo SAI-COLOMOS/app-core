@@ -71,7 +71,8 @@ const CacheProvider = ({ children }) => {
     attendees,
     setAttendees,
     profiles,
-    setProfiles
+    setProfiles,
+    clearCache
   }
 
   return (
