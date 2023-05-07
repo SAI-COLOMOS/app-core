@@ -325,7 +325,7 @@ export default EventDetails = ({ navigation, route }) => {
               <Attendee attendee={item} />
             </Flex>
           ))}
-          {!(event?.attendance.status == "Concluido" || event?.attendance.status == "Concluido por sistema" || event?.attendance.status == "En proceso" || event?.attendance.status == "Por comenzar") && (
+          {!(event?.attendance?.status == "Concluido" || event?.attendance?.status == "Concluido por sistema" || event?.attendance.status == "En proceso" || event?.attendance.status == "Por comenzar") && (
             <Flex center>
               <Button
                 icon="plus"
@@ -596,7 +596,7 @@ export default EventDetails = ({ navigation, route }) => {
   )
 
   const ProviderOptions = () => {
-    const [status, setStatus] = useState(event?.attendance.attendee_list.find((item) => item.attendee_register == user.register).status)
+    const [status, setStatus] = useState(event?.attendance?.attendee_list.find((item) => item.attendee_register == user.register).status)
 
     return (
       <VStack
