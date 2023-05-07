@@ -53,6 +53,8 @@ export default Dashboard = ({ navigation }) => {
       if (requests[0].ok && requests[1].ok) {
         const responses = [await requests[0].json(), await requests[1].json()]
 
+        console.log(responses[1])
+
         setUser(responses[0].user)
         setFeed(responses[1])
         setAchieved_hours(responses[1]?.achieved_hours)
@@ -182,25 +184,24 @@ export default Dashboard = ({ navigation }) => {
           }}
         >
           <>
-            {image && (
+            <Flex
+              h={"100%"}
+              w={"100%"}
+              style={{ position: "absolute" }}
+            >
+              <Image
+                source={image ? { uri: `data:image/png;base64,${image}` } : require("../../assets/images/stocks/events.jpg")}
+                contentFit="cover"
+                cachePolicy="memory-disk"
+                style={{ height: "100%", width: "100%" }}
+              />
               <Flex
                 h={"100%"}
                 w={"100%"}
-                style={{ position: "absolute" }}
-              >
-                <Image
-                  source={require("../../assets/images/stocks/events.jpg")}
-                  contentFit="cover"
-                  cachePolicy="memory-disk"
-                  style={{ height: "100%", width: "100%" }}
-                />
-                <Flex
-                  h={"100%"}
-                  w={"100%"}
-                  style={{ position: "absolute", backgroundColor: theme.colors.cover }}
-                />
-              </Flex>
-            )}
+                style={{ position: "absolute", backgroundColor: theme.colors.cover }}
+              />
+            </Flex>
+
             <VStack
               ph={10}
               pv={10}
@@ -360,7 +361,7 @@ export default Dashboard = ({ navigation }) => {
           title={GetMoment(feed?.enrolled_event?.starting_date)}
           screen="EventDetails"
           payload={{ event_identifier: feed?.enrolled_event?.event_identifier, fetchData }}
-          image={true}
+          image={feed?.enrolled_event?.avatar}
           child={
             <Flex
               w={"100%"}
