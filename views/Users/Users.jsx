@@ -141,6 +141,7 @@ export default Users = ({ navigation, route }) => {
 
     if (request?.places) {
       let placesData = []
+      console.log(request.places)
       request.places.forEach((place) => {
         let areasData = []
 
@@ -215,9 +216,10 @@ export default Users = ({ navigation, route }) => {
   useEffect(() => {
     if (users == undefined) {
       getUsers()
-      getPlaces()
-      getSchools()
     }
+
+    getPlaces()
+    getSchools()
   }, [])
 
   const Item = useCallback(
