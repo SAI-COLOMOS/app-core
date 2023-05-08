@@ -69,9 +69,13 @@ export default Dashboard = ({ navigation }) => {
     }
   }
 
-  useEffect(() => {
-    fetchData()
-  }, [])
+  useFocusEffect(
+    useCallback(() => {
+      fetchData()
+    }, [])
+  )
+  // useEffect(() => {
+  // }, [])
 
   useFocusEffect(
     useCallback(() => {
@@ -471,7 +475,7 @@ export default Dashboard = ({ navigation }) => {
           title={GetMoment(feed?.enrolled_event?.starting_date)}
           screen="EventDetails"
           payload={{ event_identifier: feed?.enrolled_event?.event_identifier }}
-          image={true}
+          image={feed?.enrolled_event?.avatar}
           child={
             <Flex
               w={"100%"}
