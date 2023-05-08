@@ -542,34 +542,41 @@ export default Dashboard = ({ navigation }) => {
                 />
               </Flex>
               <HStack
-                key={feed?.available_events?.name}
-                fill
+                key={feed?.available_events[0].name}
                 spacing={20}
               >
                 <Flex items="center">
                   <Avatar.Text
-                    label={GetDay(feed?.available_events?.starting_date)}
+                    label={GetDay(feed?.available_events[0].starting_date)}
                     size={30}
                   />
-                  <Text variant="bodyMedium">{GetCompactMonth(feed?.available_events?.starting_date)}</Text>
+                  <Text variant="bodyMedium">{GetCompactMonth(feed?.available_events[0].starting_date)}</Text>
                 </Flex>
                 <VStack fill>
                   <Text
                     variant="titleMedium"
                     numberOfLines={1}
                   >
-                    {feed?.available_events?.name}
+                    {feed?.available_events[0].name}
                   </Text>
                   <Flex fill>
                     <Text
                       variant="bodyMedium"
                       numberOfLines={1}
                     >
-                      {Time24(feed?.available_events?.starting_date)} - {Time24(feed?.available_events?.ending_date)}, {feed?.available_events?.place}
+                      {Time24(feed?.available_events[0].starting_date)} - {Time24(feed?.available_events[0].ending_date)}, {feed?.available_events[0].place}
                     </Text>
                   </Flex>
                 </VStack>
               </HStack>
+              {feed?.available_events?.length > 1 && (
+                <Text
+                  variant="bodyMedium"
+                  style={{ paddingTop: 10 }}
+                >
+                  Y {feed?.available_events?.length - 1} más
+                </Text>
+              )}
               {/* {feed?.available_events?.map((event) => (
               ))} */}
             </Flex>
