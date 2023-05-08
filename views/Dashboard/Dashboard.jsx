@@ -237,7 +237,7 @@ export default Dashboard = ({ navigation }) => {
         <Flex
           w={"100%"}
           h={250 + insets.top}
-          style={{ backgroundColor: "#ff0099", position: "absolute" }}
+          style={{ position: "absolute" }}
         >
           {
             {
@@ -664,56 +664,56 @@ export default Dashboard = ({ navigation }) => {
           w={"100%"}
         />
 
-        {loading == false &&
-          (user != null && feed != null ? (
-            <VStack pb={50}>
-              <VStack
-                h={200}
-                center
+        {user != null && feed != null ? (
+          <VStack pb={50}>
+            <VStack
+              h={200}
+              center
+            >
+              <Text
+                variant="headlineLarge"
+                style={{ color: theme.colors.primary }}
               >
+                {greeting}
+              </Text>
+              <Text
+                variant="headlineSmall"
+                numberOfLines={1}
+              >
+                {user?.first_name}
+              </Text>
+              {timeToSleep ? (
                 <Text
-                  variant="headlineLarge"
-                  style={{ color: theme.colors.primary }}
-                >
-                  {greeting}
-                </Text>
-                <Text
-                  variant="headlineSmall"
+                  variant="bodyMedium"
                   numberOfLines={1}
                 >
-                  {user?.first_name}
+                  No dilates, dormir es importante ✨
                 </Text>
-                {timeToSleep ? (
-                  <Text
-                    variant="bodyMedium"
-                    numberOfLines={1}
-                  >
-                    No dilates, dormir es importante ✨
-                  </Text>
-                ) : null}
-              </VStack>
-
-              <Flex
-                fill
-                style={{ borderTopLeftRadius: 50, borderTopRightRadius: 50, backgroundColor: theme.colors.background }}
-              >
-                <Flex
-                  p={25}
-                  center
-                >
-                  <Text variant="headlineSmall">Tu centro de control</Text>
-                </Flex>
-
-                {
-                  {
-                    Administrador: <VistaAdministrador />,
-                    Encargado: <VistaEncargado />,
-                    Prestador: <VistaPrestador />
-                  }[user?.role]
-                }
-              </Flex>
+              ) : null}
             </VStack>
-          ) : (
+
+            <Flex
+              fill
+              style={{ borderTopLeftRadius: 50, borderTopRightRadius: 50, backgroundColor: theme.colors.background }}
+            >
+              <Flex
+                p={25}
+                center
+              >
+                <Text variant="headlineSmall">Tu centro de control</Text>
+              </Flex>
+
+              {
+                {
+                  Administrador: <VistaAdministrador />,
+                  Encargado: <VistaEncargado />,
+                  Prestador: <VistaPrestador />
+                }[user?.role]
+              }
+            </Flex>
+          </VStack>
+        ) : (
+          loading == false && (
             <Flex
               pt={insets.top}
               fill
@@ -742,7 +742,8 @@ export default Dashboard = ({ navigation }) => {
                 </Button>
               </Flex>
             </Flex>
-          ))}
+          )
+        )}
       </ScrollView>
     </Flex>
   )
