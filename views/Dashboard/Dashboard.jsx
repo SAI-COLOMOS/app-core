@@ -69,9 +69,13 @@ export default Dashboard = ({ navigation }) => {
     }
   }
 
-  useEffect(() => {
-    fetchData()
-  }, [])
+  useFocusEffect(
+    useCallback(() => {
+      fetchData()
+    }, [])
+  )
+  // useEffect(() => {
+  // }, [])
 
   useFocusEffect(
     useCallback(() => {
@@ -237,7 +241,7 @@ export default Dashboard = ({ navigation }) => {
         <Flex
           w={"100%"}
           h={250 + insets.top}
-          style={{ backgroundColor: "#ff0099", position: "absolute" }}
+          style={{ position: "absolute" }}
         >
           {
             {
@@ -468,10 +472,10 @@ export default Dashboard = ({ navigation }) => {
       {/* Widget de a continuación */}
       {feed?.enrolled_event != null && (
         <WidgetLarge
-          title={GetMoment(feed?.enrolled_event?.starting_date)}
+          title="A continuación"
           screen="EventDetails"
           payload={{ event_identifier: feed?.enrolled_event?.event_identifier }}
-          image={true}
+          image={feed?.enrolled_event?.avatar}
           child={
             <Flex
               w={"100%"}
@@ -537,37 +541,44 @@ export default Dashboard = ({ navigation }) => {
                   size={25}
                 />
               </Flex>
-              {feed?.available_events?.map((event) => (
-                <HStack
-                  key={event.name}
-                  fill
-                  spacing={20}
-                >
-                  <Flex items="center">
-                    <Avatar.Text
-                      label={GetDay(event?.starting_date)}
-                      size={30}
-                    />
-                    <Text variant="bodyMedium">{GetCompactMonth(event?.starting_date)}</Text>
-                  </Flex>
-                  <VStack fill>
+              <HStack
+                key={feed?.available_events[0].name}
+                spacing={20}
+              >
+                <Flex items="center">
+                  <Avatar.Text
+                    label={GetDay(feed?.available_events[0].starting_date)}
+                    size={30}
+                  />
+                  <Text variant="bodyMedium">{GetCompactMonth(feed?.available_events[0].starting_date)}</Text>
+                </Flex>
+                <VStack fill>
+                  <Text
+                    variant="titleMedium"
+                    numberOfLines={1}
+                  >
+                    {feed?.available_events[0].name}
+                  </Text>
+                  <Flex fill>
                     <Text
-                      variant="titleMedium"
+                      variant="bodyMedium"
                       numberOfLines={1}
                     >
-                      {event.name}
+                      {Time24(feed?.available_events[0].starting_date)} - {Time24(feed?.available_events[0].ending_date)}, {feed?.available_events[0].place}
                     </Text>
-                    <Flex fill>
-                      <Text
-                        variant="bodyMedium"
-                        numberOfLines={1}
-                      >
-                        {Time24(event.starting_date)} - {Time24(event.ending_date)}, {event.place}
-                      </Text>
-                    </Flex>
-                  </VStack>
-                </HStack>
-              ))}
+                  </Flex>
+                </VStack>
+              </HStack>
+              {feed?.available_events?.length > 1 && (
+                <Text
+                  variant="bodyMedium"
+                  style={{ paddingTop: 10 }}
+                >
+                  Y {feed?.available_events?.length - 1} más
+                </Text>
+              )}
+              {/* {feed?.available_events?.map((event) => (
+              ))} */}
             </Flex>
           }
         />
@@ -664,56 +675,56 @@ export default Dashboard = ({ navigation }) => {
           w={"100%"}
         />
 
-        {loading == false &&
-          (user != null && feed != null ? (
-            <VStack pb={50}>
-              <VStack
-                h={200}
-                center
+        {user != null && feed != null ? (
+          <VStack pb={50}>
+            <VStack
+              h={200}
+              center
+            >
+              <Text
+                variant="headlineLarge"
+                style={{ color: theme.colors.primary }}
               >
+                {greeting}
+              </Text>
+              <Text
+                variant="headlineSmall"
+                numberOfLines={1}
+              >
+                {user?.first_name}
+              </Text>
+              {timeToSleep ? (
                 <Text
-                  variant="headlineLarge"
-                  style={{ color: theme.colors.primary }}
-                >
-                  {greeting}
-                </Text>
-                <Text
-                  variant="headlineSmall"
+                  variant="bodyMedium"
                   numberOfLines={1}
                 >
-                  {user?.first_name}
+                  No dilates, dormir es importante ✨
                 </Text>
-                {timeToSleep ? (
-                  <Text
-                    variant="bodyMedium"
-                    numberOfLines={1}
-                  >
-                    No dilates, dormir es importante ✨
-                  </Text>
-                ) : null}
-              </VStack>
-
-              <Flex
-                fill
-                style={{ borderTopLeftRadius: 50, borderTopRightRadius: 50, backgroundColor: theme.colors.background }}
-              >
-                <Flex
-                  p={25}
-                  center
-                >
-                  <Text variant="headlineSmall">Tu centro de control</Text>
-                </Flex>
-
-                {
-                  {
-                    Administrador: <VistaAdministrador />,
-                    Encargado: <VistaEncargado />,
-                    Prestador: <VistaPrestador />
-                  }[user?.role]
-                }
-              </Flex>
+              ) : null}
             </VStack>
-          ) : (
+
+            <Flex
+              fill
+              style={{ borderTopLeftRadius: 50, borderTopRightRadius: 50, backgroundColor: theme.colors.background }}
+            >
+              <Flex
+                p={25}
+                center
+              >
+                <Text variant="headlineSmall">Tu centro de control</Text>
+              </Flex>
+
+              {
+                {
+                  Administrador: <VistaAdministrador />,
+                  Encargado: <VistaEncargado />,
+                  Prestador: <VistaPrestador />
+                }[user?.role]
+              }
+            </Flex>
+          </VStack>
+        ) : (
+          loading == false && (
             <Flex
               pt={insets.top}
               fill
@@ -742,7 +753,8 @@ export default Dashboard = ({ navigation }) => {
                 </Button>
               </Flex>
             </Flex>
-          ))}
+          )
+        )}
       </ScrollView>
     </Flex>
   )

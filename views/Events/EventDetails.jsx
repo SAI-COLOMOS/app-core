@@ -41,7 +41,7 @@ export default EventDetails = ({ navigation, route }) => {
   const [showConfirmUnlinkForm, setShowConfirmUnlinkForm] = useState(false)
   const [loadingUnlinkForm, setLoadingUnlinkForm] = useState(false)
 
-  async function getEvent() {
+  async function getEvent () {
     setLoading(true)
 
     const request = await fetch(`${host}/agenda/${event_identifier}`, {
@@ -67,7 +67,7 @@ export default EventDetails = ({ navigation, route }) => {
     }
   }
 
-  async function subscribeEvent() {
+  async function subscribeEvent () {
     const request = await fetch(`${host}/agenda/${event_identifier}/attendance`, {
       method: "POST",
       headers: {
@@ -81,7 +81,7 @@ export default EventDetails = ({ navigation, route }) => {
     }
   }
 
-  async function unsubscribeEvent() {
+  async function unsubscribeEvent () {
     const request = await fetch(`${host}/agenda/${event_identifier}/attendance`, {
       method: "DELETE",
       headers: {
@@ -97,7 +97,7 @@ export default EventDetails = ({ navigation, route }) => {
     console.error(await request.json())
   }
 
-  async function postNow() {
+  async function postNow () {
     setLoadingPost(true)
 
     const request = await fetch(`${host}/agenda/${event_identifier}/status`, {
@@ -122,7 +122,7 @@ export default EventDetails = ({ navigation, route }) => {
     setShowErrorFinish(true)
   }
 
-  async function finishEvent() {
+  async function finishEvent () {
     setLoadingFinish(true)
 
     const request = await fetch(`${host}/agenda/${event_identifier}/status`, {
@@ -146,7 +146,7 @@ export default EventDetails = ({ navigation, route }) => {
     setShowErrorFinish(true)
   }
 
-  async function unlinkFrom() {
+  async function unlinkFrom () {
     setLoadingUnlinkForm(true)
 
     const request = await fetch(`${host}/surveys/${event?.survey_identifier}`, {
@@ -596,7 +596,7 @@ export default EventDetails = ({ navigation, route }) => {
   )
 
   const ProviderOptions = () => {
-    const [status, setStatus] = useState(event?.attendance?.attendee_list.find((item) => item.attendee_register == user.register).status)
+    const [status, setStatus] = useState(event?.attendance?.attendee_list.find((item) => item.attendee_register == user.register)?.status)
 
     return (
       <VStack
