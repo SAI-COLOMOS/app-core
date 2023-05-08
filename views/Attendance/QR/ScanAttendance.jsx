@@ -95,7 +95,7 @@ export default ScanAttendance = ({ navigation, route }) => {
         },
         body: JSON.stringify({
           attendee_register: attendee?.attendee_register,
-          status: doNotMarkRetard == true ? "Asistió" : "Retardo"
+          status: doNotMarkRetard == true ? "Asistió" : ""
         })
       })
         .then(async (response) => {
