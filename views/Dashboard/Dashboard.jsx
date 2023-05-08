@@ -472,7 +472,7 @@ export default Dashboard = ({ navigation }) => {
       {/* Widget de a continuación */}
       {feed?.enrolled_event != null && (
         <WidgetLarge
-          title={GetMoment(feed?.enrolled_event?.starting_date)}
+          title="A continuación"
           screen="EventDetails"
           payload={{ event_identifier: feed?.enrolled_event?.event_identifier }}
           image={feed?.enrolled_event?.avatar}
@@ -541,37 +541,37 @@ export default Dashboard = ({ navigation }) => {
                   size={25}
                 />
               </Flex>
-              {feed?.available_events?.map((event) => (
-                <HStack
-                  key={event.name}
-                  fill
-                  spacing={20}
-                >
-                  <Flex items="center">
-                    <Avatar.Text
-                      label={GetDay(event?.starting_date)}
-                      size={30}
-                    />
-                    <Text variant="bodyMedium">{GetCompactMonth(event?.starting_date)}</Text>
-                  </Flex>
-                  <VStack fill>
+              <HStack
+                key={feed?.available_events?.name}
+                fill
+                spacing={20}
+              >
+                <Flex items="center">
+                  <Avatar.Text
+                    label={GetDay(feed?.available_events?.starting_date)}
+                    size={30}
+                  />
+                  <Text variant="bodyMedium">{GetCompactMonth(feed?.available_events?.starting_date)}</Text>
+                </Flex>
+                <VStack fill>
+                  <Text
+                    variant="titleMedium"
+                    numberOfLines={1}
+                  >
+                    {feed?.available_events?.name}
+                  </Text>
+                  <Flex fill>
                     <Text
-                      variant="titleMedium"
+                      variant="bodyMedium"
                       numberOfLines={1}
                     >
-                      {event.name}
+                      {Time24(feed?.available_events?.starting_date)} - {Time24(feed?.available_events?.ending_date)}, {feed?.available_events?.place}
                     </Text>
-                    <Flex fill>
-                      <Text
-                        variant="bodyMedium"
-                        numberOfLines={1}
-                      >
-                        {Time24(event.starting_date)} - {Time24(event.ending_date)}, {event.place}
-                      </Text>
-                    </Flex>
-                  </VStack>
-                </HStack>
-              ))}
+                  </Flex>
+                </VStack>
+              </HStack>
+              {/* {feed?.available_events?.map((event) => (
+              ))} */}
             </Flex>
           }
         />
