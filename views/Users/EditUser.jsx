@@ -266,12 +266,13 @@ export default EditUser = ({ navigation, route }) => {
       role?.length > 0 ? null : (check = false)
     }
 
+    ;/^[a-zA-Z0-9]+(\.?[a-zA-Z0-9])+@+[a-zA-Z0-9_\-]+\.+[a-zA-Z0-9]/.test(email) ? null : (check = false)
     first_name?.length > 0 ? null : (check = false)
     first_last_name?.length > 0 ? null : (check = false)
     age?.length > 0 ? null : (check = false)
     blood_type?.length > 0 ? null : (check = false)
     email?.length > 0 ? null : (check = false)
-    email?.length > 0 ? null : (check = false)(/^[a-zA-Z0-9]+(\.?[a-zA-Z0-9])+@+[a-zA-Z0-9_\-]+\.+[a-zA-Z0-9]/).test(email) ? null : (check = false)
+    email?.length > 0 ? null : (check = false)
     phone?.length == 10 ? null : (check = false)
     emergency_contact?.length > 0 ? null : (check = false)
     emergency_phone?.length == 10 ? null : (check = false)
