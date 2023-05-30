@@ -202,7 +202,7 @@ export default DownloadSurvey = ({ navigation, route }) => {
       mode="contained"
       icon="page-previous-outline"
       onPress={() => {
-        setShowDialog(false)
+        navigation.pop()
       }}
     >
       Regresar
