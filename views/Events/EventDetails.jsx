@@ -362,7 +362,14 @@ export default EventDetails = ({ navigation, route }) => {
     <Flex key="Subscribe">
       {
         {
-          Encargado: <ManagerOptions key="M" />,
+          Encargado: <VStack spacing={10}>
+            <Flex>
+              <ProviderOptions key="P" />
+            </Flex>
+            <Flex>
+              <ManagerOptions key="M" />
+            </Flex>
+          </VStack>,
           Prestador: <ProviderOptions key="P" />
         }[user?.role]
       }
